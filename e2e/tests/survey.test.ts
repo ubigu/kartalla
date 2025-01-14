@@ -11,6 +11,7 @@ test.describe('Create a survey', () => {
     surveyEditPage,
     surveyAdminPage,
     surveyPage,
+    makeAxeBuilder,
   }) => {
     await surveyEditPage.goto();
     await surveyEditPage.fillBasicInfo(testSurveyData);
@@ -36,5 +37,7 @@ test.describe('Create a survey', () => {
     expect(await surveyPage.page.locator('h3').textContent()).toContain(
       radioQuestion.title,
     );
+
+    expect((await makeAxeBuilder().analyze()).violations).toHaveLength(0);
   });
 });

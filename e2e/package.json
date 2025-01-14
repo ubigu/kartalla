@@ -12,9 +12,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.2",
-    "pg": "^8.13.1",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "pg": "^8.13.1"
   }
 }
