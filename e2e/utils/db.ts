@@ -53,3 +53,8 @@ export async function clearData() {
 
 SELECT data.truncate_tables();`);
 }
+
+export async function clearSections() {
+  return connection.query(`
+    DELETE FROM data.page_section;`);
+}

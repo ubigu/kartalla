@@ -1,4 +1,8 @@
-import { RadioQuestionParams, SurveyParams } from '../pages/surveyEditPage';
+import {
+  CheckBoxQuestionParams,
+  RadioQuestionParams,
+  SurveyParams,
+} from '../pages/surveyEditPage';
 import dayjs from 'dayjs';
 
 export const testSurveyData: SurveyParams = {
@@ -18,5 +22,20 @@ export function getRadioQuestionData(pageName: string): RadioQuestionParams {
     isRequired: true,
     allowCustom: false,
     additionalInfo: 'Valitse vain yksi vaihtoehto',
+  };
+}
+
+export function getCheckBoxQuestionData(
+  pageName: string,
+  answerLimits?: CheckBoxQuestionParams['answerLimits'],
+): CheckBoxQuestionParams {
+  return {
+    pageName: pageName,
+    title: 'Mitkä seuraavista ovat lempiruokiasi?',
+    answerOptions: ['Pizza', 'Hampurilainen', 'Salaatti', 'Kebab'],
+    isRequired: true,
+    allowCustom: false,
+    additionalInfo: 'Valitse kaikki, jotka pidät',
+    answerLimits: answerLimits,
   };
 }

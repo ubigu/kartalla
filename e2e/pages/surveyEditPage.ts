@@ -18,6 +18,16 @@ export interface RadioQuestionParams {
   additionalInfo?: string;
 }
 
+export interface CheckBoxQuestionParams {
+  pageName: string;
+  title: string;
+  isRequired?: boolean;
+  answerOptions: string[];
+  answerLimits?: { min: number; max: number };
+  allowCustom?: boolean;
+  additionalInfo?: string;
+}
+
 export class SurveyEditPage {
   private _page: Page;
   private _surveyId: string | null;
@@ -35,6 +45,10 @@ export class SurveyEditPage {
     return this._surveyId;
   }
 
+  set surveyId(id) {
+    this._surveyId = id;
+  }
+
   async goto() {
     if (this._surveyId) {
       await this._page.goto(
@@ -47,8 +61,7 @@ export class SurveyEditPage {
         'http://localhost:8080/admin/kyselyt/*/perustiedot',
       );
       const urlParts = this._page.url().split('/');
-      const lastElement = urlParts[urlParts.length - 1];
-      this._surveyId = lastElement;
+      this._surveyId = urlParts[urlParts.length - 2];
     }
   }
 
@@ -72,6 +85,7 @@ export class SurveyEditPage {
   async renamePage(oldName: string, newName: string) {
     await this.goToPage(oldName);
     await this._page.getByLabel('Sivun nimi *').fill(newName);
+    await this._page.getByLabel('save-changes').click();
   }
 
   async createRadioQuestion(radioQuestionParams: RadioQuestionParams) {
@@ -104,5 +118,55 @@ export class SurveyEditPage {
         .fill(radioQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+  }
+
+  async createCheckBoxQuestion(checkBoxQuestionParams: CheckBoxQuestionParams) {
+    await this.goToPage(checkBoxQuestionParams.pageName);
+    await this._page.getByLabel('add-checkbox-question').click();
+    await this._page.getByLabel('Otsikko').fill(checkBoxQuestionParams.title);
+    if (checkBoxQuestionParams.isRequired) {
+      await this._page
+        .getByRole('checkbox', { name: 'Vastaus pakollinen' })
+        .check();
+    }
+
+    for (const [
+      idx,
+      option,
+    ] of checkBoxQuestionParams.answerOptions.entries()) {
+      if (idx > 0) await this._page.getByLabel('add-question-option').click();
+      await this._page
+        .getByTestId(`radio-input-option-${idx}`)
+        .locator('textarea')
+        .nth(0)
+        .fill(option);
+    }
+
+    if (checkBoxQuestionParams.answerLimits) {
+      await this._page.getByLabel('Rajoita vastauslukumäärää').check();
+      await this._page
+        .getByLabel('Vastauksia vähintään')
+        .fill(checkBoxQuestionParams.answerLimits.min.toString());
+      await this._page
+        .getByLabel('Vastauksia enintään')
+        .fill(checkBoxQuestionParams.answerLimits.max.toString());
+    }
+    if (checkBoxQuestionParams.allowCustom) {
+      await this._page.getByLabel('Salli “Jokin muu, mikä?” -').check();
+    }
+    if (checkBoxQuestionParams.additionalInfo) {
+      await this._page.getByLabel('Anna lisätietoja kysymykseen').check();
+      await this._page
+        .getByLabel('rdw-editor')
+        .locator('div')
+        .nth(2)
+        .fill(checkBoxQuestionParams.additionalInfo);
+    }
+    await this._page.getByLabel('save-changes').click();
+  }
+
+  async deleteSurvey() {
+    await this._page.getByRole('button', { name: 'Poista kysely' }).click();
+    this._surveyId = null;
   }
 }

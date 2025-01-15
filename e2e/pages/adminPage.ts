@@ -20,11 +20,24 @@ export class SurveyAdminPage {
   }
 
   async publishSurvey(surveyName: string) {
-    await this._page
+    const publishButton = this._page
       .getByRole('listitem')
       .filter({ hasText: surveyName })
-      .getByText('julkaise')
-      .click();
+      .getByRole('button', { name: 'julkaise' });
+    const unPublishButton = this._page
+      .getByRole('listitem')
+      .filter({ hasText: surveyName })
+      .getByRole('button', { name: 'Päätä kysely' });
+
+    // Need to wait here because isVisible() does not wait for the element to be visible
+    await expect(publishButton.or(unPublishButton)).toBeVisible();
+
+    const alreadyPublished = await unPublishButton.isVisible();
+
+    if (alreadyPublished) {
+      return;
+    }
+    await publishButton.click();
 
     await this._page.getByRole('button', { name: 'Kyllä' }).click();
     await expect(this._page.getByText('Kysely julkaistu')).toBeVisible();
