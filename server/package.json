@@ -46,7 +46,7 @@
     "compression": "^1.7.4",
     "connect-pg-simple": "^6.2.1",
     "email-templates": "^8.1.0",
-    "express": "^4.20.0",
+    "express": "^4.21.2",
     "express-async-handler": "^1.2.0",
     "express-session": "^1.18.0",
     "express-validator": "^6.15.0",
