@@ -21,6 +21,7 @@ export type SurveyFollowUpSectionParent = Extract<
  * Question section of a survey page
  */
 export type SurveyQuestion =
+  | SurveyPersonalInfoQuestion
   | SurveyCheckboxQuestion
   | SurveyRadioQuestion
   | SurveyNumericQuestion
@@ -100,6 +101,15 @@ interface FileAnswer {
 }
 
 /**
+ * Personal info anwers
+ */
+interface PersonalInfoAnswer {
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
+/**
  * Checkbox question
  */
 export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
@@ -110,6 +120,16 @@ export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
     max?: number;
   };
   allowCustomAnswer: boolean;
+}
+
+/**
+ * Personal info question
+ */
+export interface SurveyPersonalInfoQuestion extends CommonSurveyPageQuestion {
+  type: 'personal-info';
+  askName: boolean;
+  askEmail: boolean;
+  askPhone: boolean;
 }
 
 /**
@@ -456,6 +476,10 @@ export interface Survey {
      * Optional free-form information to be shown on the front page of the report
      */
     info: SurveyEmailInfoItem[];
+    /**
+     * Should personal info be included in the email
+     */
+    includePersonalInfo: boolean;
   };
   /**
    * Should the survey be able to be saved as unfinished
@@ -579,9 +603,17 @@ export type AnswerEntry = {
    * ID of the page section
    */
   sectionId: number;
+  /**
+   * Error status of the answer if validation is performed on component level
+   */
+  hasError?: boolean;
 } & /**
  * Type of the section
  */ (
+  | {
+      type: 'personal-info';
+      value: PersonalInfoAnswer;
+    }
   | {
       type: 'free-text';
       value: string;

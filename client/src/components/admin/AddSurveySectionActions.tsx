@@ -14,14 +14,16 @@ import LikertGroupIcon from '../icons/LikertGroupIcon';
 import TextFileIcon from '../icons/TextFileIcon';
 import TextSectionIcon from '../icons/TextSectionIcon';
 import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
-import { Fab, Grid, Typography } from '@mui/material';
+import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Person } from '@mui/icons-material';
+import React from 'react';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -45,9 +47,14 @@ export default function AddSurveySectionActions(props: Props) {
   const { addSection } = useSurvey();
   const { clipboardSection } = useClipboard();
   const { showToast } = useToasts();
+  const { activeSurvey } = useSurvey();
   const { pageId } = useParams<{
     pageId: string;
   }>();
+
+  const personalInfoDisabled = activeSurvey.pages.some((page) =>
+    page.sections.some((section) => section.type === 'personal-info'),
+  );
 
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
@@ -55,6 +62,14 @@ export default function AddSurveySectionActions(props: Props) {
   const defaultSections: {
     [type in SurveyPageSection['type']]: SurveyPageSection;
   } = {
+    'personal-info': {
+      type: 'personal-info',
+      title: initializeLocalizedObject(''),
+      isRequired: false,
+      askName: false,
+      askEmail: false,
+      askPhone: false,
+    },
     checkbox: {
       type: 'checkbox',
       title: initializeLocalizedObject(''),
@@ -200,6 +215,12 @@ export default function AddSurveySectionActions(props: Props) {
     icon: ReactNode;
   }[] = [
     {
+      type: 'personal-info',
+      label: tr.AddSurveySectionActions.personalInfoQuestion,
+      ariaLabel: 'add-personal-info-section',
+      icon: <Person />,
+    },
+    {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
       ariaLabel: 'add-radio-question',
@@ -304,17 +325,33 @@ export default function AddSurveySectionActions(props: Props) {
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
                 <div className={classes.actionItem}>
-                  <Fab
-                    color="primary"
-                    aria-label={button.ariaLabel}
-                    size="small"
-                    onClick={handleAdd(button.type)}
-                    disabled={props.disabled}
-                    style={{ minWidth: '40px' }}
-                    sx={{ boxShadow: 'none' }}
+                  <Tooltip
+                    title={
+                      personalInfoDisabled && button.type === 'personal-info'
+                        ? tr.AddSurveySectionActions.personalInfoDisabled
+                        : ''
+                    }
+                    placement="left"
                   >
-                    {button.icon}
-                  </Fab>
+                    <span>
+                      <Fab
+                        color="primary"
+                        aria-label={button.ariaLabel}
+                        size="small"
+                        onClick={handleAdd(button.type)}
+                        disabled={
+                          props.disabled ||
+                          (button.type === 'personal-info' &&
+                            personalInfoDisabled)
+                        }
+                        style={{ minWidth: '40px' }}
+                        sx={{ boxShadow: 'none' }}
+                      >
+                        {button.icon}
+                      </Fab>
+                    </span>
+                  </Tooltip>
+
                   <Typography>{button.label}</Typography>
                 </div>
               </Grid>

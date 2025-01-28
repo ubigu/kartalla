@@ -2,11 +2,14 @@ import {
   AnswerEntry,
   LanguageCode,
   MapQuestionAnswer,
+  PersonalInfoAnswer,
   Submission,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
+import { CredentialsEntry } from '@interfaces/submission';
 import {
+  encryptionKey,
   getColumnSet,
   getDb,
   getGeoJSONColumn,
@@ -39,6 +42,16 @@ interface DBAnswerEntry {
   map_layers: number[];
 }
 
+/** DB row of special personal info question */
+interface DBPersonalInfo {
+  id?: number;
+  submission_id: number;
+  section_id: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
 interface DBSubmission {
   id: number;
   created_at: Date;
@@ -52,13 +65,6 @@ interface DBCredentialsEntry {
   alphanumeric_included: boolean;
   geospatial_included: boolean;
   personal_included: boolean;
-}
-
-export interface CredentialsEntry {
-  username: string;
-  alphanumericIncluded: boolean;
-  geospatialIncluded: boolean;
-  personalIncluded: boolean;
 }
 
 /**
@@ -192,6 +198,49 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   ]);
 }
 
+/** Encrypt and save personal info question answers to database */
+async function savePersonalInfo(personalInfo: DBPersonalInfo) {
+  await getDb().any(
+    `
+    INSERT INTO data.personal_info (submission_id, section_id, name, email, phone)
+    VALUES 
+      ($(submission_id), 
+      $(section_id),
+      pgp_sym_encrypt($(name), $(encryptionKey)), 
+      pgp_sym_encrypt($(email), $(encryptionKey)), 
+      pgp_sym_encrypt($(phone), $(encryptionKey))
+  );`,
+    { ...personalInfo, encryptionKey },
+  );
+}
+
+/** Get decrypted personal info question answer from database */
+async function getPersonalInfo(submissionId: number) {
+  const result = await getDb().oneOrNone<DBPersonalInfo>(
+    `
+    SELECT
+      submission_id,
+      section_id,
+      pgp_sym_decrypt(name, $(encryptionKey)) as name,
+      pgp_sym_decrypt(email, $(encryptionKey)) as email,
+      pgp_sym_decrypt(phone, $(encryptionKey)) as phone
+    FROM data.personal_info
+    WHERE submission_id = $(submissionId);
+  `,
+    { submissionId, encryptionKey },
+  );
+
+  if (!result) {
+    return null;
+  }
+
+  return {
+    type: 'personal-info',
+    sectionId: result.section_id,
+    value: { name: result.name, email: result.email, phone: result.phone },
+  } as AnswerEntry;
+}
+
 /**
  * Create a submission and related answer entries
  * @param surveyID Survey ID
@@ -251,8 +300,36 @@ export async function createSurveySubmission(
   }
 
   const { id, unfinished_token, updated_at } = submissionRow;
+
+  // Save personal info separately
+  const personalInfo = answerEntries.find(
+    (entry) => entry.type === 'personal-info',
+  );
+  if (personalInfo) {
+    await savePersonalInfo({
+      ...(personalInfo.value as PersonalInfoAnswer),
+      submission_id: id,
+      section_id: personalInfo.sectionId,
+    });
+  }
+
   const entryRows = answerEntriesToRows(id, answerEntries);
   const inputSRID = getSRIDFromEntries(answerEntries);
+  const submissionStatus = {
+    id,
+    // Timestamp of the submission = timestamp of the last update
+    timestamp: updated_at,
+    // If the submission was unfinished, return the newly created token
+    unfinishedToken: unfinished ? unfinished_token : null,
+  };
+
+  if (entryRows.length === 0) {
+    if (personalInfo) {
+      return submissionStatus;
+    }
+    throw new BadRequestError(`Invalid submission with no answers.`);
+  }
+
   // While inserting the entries, pick all entry IDs for linking subquestion answers where needed
   const entryIds = await getDb().manyOrNone<{ id: number }>(
     `${getMultiInsertQuery(
@@ -286,13 +363,7 @@ export async function createSurveySubmission(
     }),
   );
 
-  return {
-    id,
-    // Timestamp of the submission = timestamp of the last update
-    timestamp: updated_at,
-    // If the submission was unfinished, return the newly created token
-    unfinishedToken: unfinished ? unfinished_token : null,
-  };
+  return submissionStatus;
 }
 
 /**
@@ -520,6 +591,8 @@ function answerEntriesToRows(
             map_layers: null,
           })) ?? [];
         break;
+      case 'personal-info':
+        break;
       default:
         assertNever(entry);
     }
@@ -691,6 +764,7 @@ function dbAnswerEntriesToAnswerEntries(
         case 'text':
         case 'image':
         case 'document':
+        case 'personal-info':
           break;
         default:
           assertNever(row.section_type);
@@ -738,7 +812,10 @@ export async function getSurveyAnswerLanguage(token: string) {
  * @param token Unfinished token
  * @returns Answer entries for the submission
  */
-export async function getUnfinishedAnswerEntries(token: string) {
+export async function getUnfinishedAnswerEntries(
+  token: string,
+  withPersonalInfo?: boolean,
+) {
   const rows = await getDb()
     .manyOrNone<
       DBAnswerEntry & {
@@ -777,6 +854,12 @@ export async function getUnfinishedAnswerEntries(token: string) {
   if (!rows.length) {
     throw new NotFoundError(`Token not found`);
   }
+
+  if (withPersonalInfo) {
+    const personalInfo = await getPersonalInfo(rows[0].submission_id);
+    return [...dbAnswerEntriesToAnswerEntries(rows), personalInfo];
+  }
+
   return dbAnswerEntriesToAnswerEntries(rows);
 }
 
@@ -785,7 +868,10 @@ export async function getUnfinishedAnswerEntries(token: string) {
  * @param submissionId Submission ID
  * @returns Answer entries
  */
-export async function getAnswerEntries(submissionId: number) {
+export async function getAnswerEntries(
+  submissionId: number,
+  withPersonalInfo?: boolean,
+) {
   const rows = await getDb().manyOrNone<
     DBAnswerEntry & {
       section_type: SurveyPageSection['type'];
@@ -820,7 +906,20 @@ export async function getAnswerEntries(submissionId: number) {
     [submissionId],
   );
 
-  return rows.length ? dbAnswerEntriesToAnswerEntries(rows) : [];
+  if (rows.length === 0) {
+    if (withPersonalInfo) {
+      const personalInfo = await getPersonalInfo(submissionId);
+      return [personalInfo];
+    }
+    return [];
+  }
+
+  if (withPersonalInfo) {
+    const personalInfo = await getPersonalInfo(submissionId);
+    return [...dbAnswerEntriesToAnswerEntries(rows), personalInfo];
+  }
+
+  return dbAnswerEntriesToAnswerEntries(rows);
 }
 
 /**
@@ -845,8 +944,8 @@ export async function getSubmissionsForSurvey(
   surveyId: number,
   alphanumeric: boolean = true,
   geospatial: boolean = true,
-  personal: boolean = true,
   attachments: boolean = true,
+  withPersonalInfo?: boolean,
 ) {
   const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
@@ -887,34 +986,93 @@ export async function getSubmissionsForSurvey(
         : ''
     }
     ${!geospatial ? `AND ps.type != 'map'` : ''}
-    ${!personal ? `AND ps.type != 'personal-info'` : ''}
+    ${!withPersonalInfo ? `AND ps.type != 'personal-info'` : ''}
     ${!attachments ? `AND ps.type != 'attachment'` : ''}
     ORDER BY updated_at, sp.idx, ps.idx;`,
     { surveyId },
   );
+
+  const personalInfoRows = withPersonalInfo
+    ? await getDb().manyOrNone<DBPersonalInfo & DBSubmission>(
+        `SELECT 
+          s.updated_at,
+          s.id as submission_id,
+          pi.section_id,
+          pgp_sym_decrypt(pi.name, $(encryptionKey)) as name,
+          pgp_sym_decrypt(pi.email, $(encryptionKey)) as email,
+          pgp_sym_decrypt(pi.phone, $(encryptionKey)) as phone
+        FROM data.submission s
+        INNER JOIN data.personal_info pi ON pi.submission_id = s.id
+        WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
+      `,
+        { surveyId, encryptionKey },
+      )
+    : [];
+
   const result = [];
   let currentSubmission: {
     id: number;
     timestamp: Date;
     entries: DBAnswerEntry[];
+    personalInfo: Omit<DBPersonalInfo, 'submission_id'> | null;
   } | null = null;
+
+  // First push all answer entries to the correct submission object
   for (const row of rows) {
     if (currentSubmission?.id !== row.submission_id) {
       currentSubmission = {
         id: row.submission_id,
         timestamp: row.updated_at,
         entries: [],
+        personalInfo: null,
       };
       result.push(currentSubmission);
     }
     currentSubmission.entries.push(row);
   }
+
+  // Then add the personal info to the correct submission object
+  for (const personalInfoRow of personalInfoRows) {
+    const submission = result.find(
+      (sub) => sub.id === personalInfoRow.submission_id,
+    );
+
+    if (submission) {
+      submission.personalInfo = {
+        type: 'personal-info',
+        sectionId: personalInfoRow.section_id,
+        value: {
+          name: personalInfoRow.name,
+          email: personalInfoRow.email,
+          phone: personalInfoRow.phone,
+        },
+      };
+    } else {
+      result.push({
+        id: personalInfoRow.submission_id,
+        timestamp: personalInfoRow.updated_at,
+        entries: [],
+        personalInfo: {
+          type: 'personal-info',
+          sectionId: personalInfoRow.section_id,
+          value: {
+            name: personalInfoRow.name,
+            email: personalInfoRow.email,
+            phone: personalInfoRow.phone,
+          },
+        },
+      });
+    }
+  }
+
   return result.map(
-    (x) =>
+    (sub) =>
       ({
-        id: x.id,
-        timestamp: x.timestamp,
-        answerEntries: dbAnswerEntriesToAnswerEntries(x.entries),
+        id: sub.id,
+        timestamp: sub.timestamp,
+        answerEntries: withPersonalInfo
+          ? [...dbAnswerEntriesToAnswerEntries(sub.entries), sub.personalInfo]
+          : dbAnswerEntriesToAnswerEntries(sub.entries),
       }) as Submission,
   );
 }

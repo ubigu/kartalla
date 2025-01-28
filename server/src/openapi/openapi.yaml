@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -90,6 +90,11 @@ paths:
           schema:
             type: number
           description: The id of the survey.
+        - name: withPersonalInfo
+          in: query
+          description: Should personal info answers be included.
+          schema:
+            type: boolean
       responses:
         '200':
           description: A list of submissions for a survey.

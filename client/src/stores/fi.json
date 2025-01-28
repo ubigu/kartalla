@@ -1,12 +1,14 @@
 {
   "DataExport": {
     "exportAnswers": "Lataa vastaukset…",
-    "surveyAnswerExport": "Kyselyn vastausdatan lataus",
-    "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
+    "surveyAnswerExport": "Mitkä aineistot haluat ladata?",
     "download": "Lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
     "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
-    "attachments": "Vastausliitteet"
+    "attachments": "Vastausliitteet",
+    "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",
+    "geospatialSubmissions": "Paikkatietovastaukset",
+    "personalInfo": "Sisällytä henkilötiedot"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",
@@ -21,7 +23,7 @@
     "password": "Salasana",
     "passwordAgain": "Salasana uudelleen",
     "passwordsMismatch": "Salasanat eivät täsmää",
-    "personalInfo": "Henkilötiedot",
+    "personalInfo": "Sisällytä henkilötiedot",
     "submissionsApi": "Vastausrajapinta",
     "submissionsApiOpening": "Vastausrajapinnan avaus",
     "submissionsApiOptions": "Vastausrajapinnan tiedot",
@@ -102,7 +104,9 @@
     "emailSubject": "Viestin aihe",
     "emailBody": "Viestin sisältö",
     "info": "Lisätiedot",
-    "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla."
+    "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
+    "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle."
   },
   "KeyValueForm": {
     "key": "Nimi",
@@ -213,6 +217,8 @@
     "deleteGroup": "Poista ryhmä"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
+    "personalInfoQuestion": "Lisää henkilötietokysymys",
     "radioQuestion": "Lisää valintakysymys",
     "checkBoxQuestion": "Lisää monivalintakysymys",
     "numericQuestion": "Lisää numeerinen kysymys",
@@ -234,6 +240,7 @@
     "scale": "Asteikko"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Henkilötietokysymys",
     "radioQuestion": "Valintakysymys",
     "checkBoxQuestion": "Monivalintakysymys",
     "numericQuestion": "Numeerinen kysymys",
@@ -265,6 +272,12 @@
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
     "removeOption": "Poista vastausvaihtoehto",
     "selectAnswer": "Valitse vastaus"
+  },
+  "PersonalInfoQuestion": {
+    "label": "Kysyttävät tiedot",
+    "nameLabel": "Nimi",
+    "emailLabel": "Sähköposti",
+    "phoneLabel": "Puhelinnumero"
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",

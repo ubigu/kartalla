@@ -14,5 +14,11 @@
   "newUserRequest": "Uusi käyttäjäpyyntö",
   "fi": "suomi",
   "en": "englanti",
-  "se": "ruotsi"
+  "se": "ruotsi",
+  "PersonalInfo": {
+    "label": "Vastaajan tiedot",
+    "name": "Nimi",
+    "email": "Sähköpostiosoite",
+    "phone": "Puhelinnumero"
+  }
 }

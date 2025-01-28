@@ -8,7 +8,7 @@ import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { param } from 'express-validator';
+import { param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 
 const router = Router();
@@ -22,6 +22,10 @@ router.get(
   ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('withPersonalInfo')
+      .optional()
+      .isBoolean()
+      .withMessage('withPersonalInfo must be a boolean'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -32,7 +36,10 @@ router.get(
       );
     }
 
-    const exportFiles = await getCSVFile(surveyId);
+    const exportFiles = await getCSVFile(
+      surveyId,
+      req.query.withPersonalInfo === 'true',
+    );
 
     if (!exportFiles) {
       res.status(404).json({ message: 'No attachments found' });

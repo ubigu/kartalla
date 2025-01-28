@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   Conditions,
   LanguageCode,
+  PersonalInfoAnswer,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -72,6 +73,16 @@ export const SurveyAnswerContext = createContext<Context>(null);
 
 export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
   switch (section.type) {
+    case 'personal-info':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: {
+          name: '',
+          email: '',
+          phone: '',
+        },
+      };
     case 'checkbox':
       return {
         sectionId: section.id,
@@ -176,6 +187,13 @@ export function isAnswerEmpty(
       return true;
     }
   }
+  // Personal info is considered incomplete if all of the fields are null
+  if (question.type === 'personal-info') {
+    const { name, email, phone } = value as PersonalInfoAnswer;
+    if (!name && !email && !phone) {
+      return true;
+    }
+  }
   // If value is an array, check the array length - otherwise check for its emptiness
   else if (
     Array.isArray(value)
@@ -204,11 +222,18 @@ export function useSurveyAnswers() {
     question: SurveyQuestion,
     answers = state.answers,
   ) {
-    const errors: ('answerLimits' | 'required' | 'minValue' | 'maxValue')[] =
-      [];
+    const errors: (
+      | 'answerLimits'
+      | 'required'
+      | 'minValue'
+      | 'maxValue'
+      | 'custom'
+    )[] = [];
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
+
     if (!answer.hasOwnProperty('value')) return errors; // Shouldn't happen but used just in case to prevent errors
+    if (answer.hasError) errors.push('custom');
 
     // Checkbox question validation - check possible answer limits
     if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
@@ -280,6 +305,23 @@ export function useSurveyAnswers() {
         (answer.value as string[][]).some((row) => row.length === 0)
       ) {
         errors.push('required');
+      } else if (question.type === 'personal-info') {
+        if (
+          question.askEmail &&
+          (answer.value as PersonalInfoAnswer).email.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askName &&
+          (answer.value as PersonalInfoAnswer).name.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askPhone &&
+          (answer.value as PersonalInfoAnswer).phone.length === 0
+        ) {
+          errors.push('required');
+        }
       }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (
@@ -331,14 +373,14 @@ export function useSurveyAnswers() {
           )
             ? true
             : conditionForSection.greaterThan.some(
-                  (conditionValue) => answerEntry.value >= conditionValue,
-                )
-              ? true
-              : conditionForSection.lessThan.some(
-                    (conditionValue) => answerEntry.value <= conditionValue,
-                  )
-                ? true
-                : false;
+                (conditionValue) => answerEntry.value >= conditionValue,
+              )
+            ? true
+            : conditionForSection.lessThan.some(
+                (conditionValue) => answerEntry.value <= conditionValue,
+              )
+            ? true
+            : false;
 
         default:
           return false;
@@ -401,14 +443,14 @@ export function useSurveyAnswers() {
             )
               ? true
               : section.conditions.greaterThan.some(
-                    (conditionValue) => value >= conditionValue,
-                  )
-                ? true
-                : section.conditions.lessThan.some(
-                      (conditionValue) => value <= conditionValue,
-                    )
-                  ? true
-                  : false;
+                  (conditionValue) => value >= conditionValue,
+                )
+              ? true
+              : section.conditions.lessThan.some(
+                  (conditionValue) => value <= conditionValue,
+                )
+              ? true
+              : false;
           })
           .map((s) => s.id);
       default:

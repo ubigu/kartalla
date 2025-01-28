@@ -1,6 +1,7 @@
 import {
   AnswerEntry,
   LanguageCode,
+  PersonalInfoAnswer,
   SectionOption,
   Survey,
   SurveyFollowUpSection,
@@ -21,6 +22,7 @@ import {
   getScreenshots,
 } from './screenshot';
 import { getFile, getOptionsForSurvey } from './survey';
+import { formatPhoneNumber } from '@src/utils';
 
 const fonts = {
   Courier: {
@@ -142,6 +144,58 @@ async function getFrontPage(
 ): Promise<Content> {
   const tr = useTranslations(language);
 
+  const personalInfoQuestion = survey.pages
+    .map((page) =>
+      page.sections.find((section) => section.type === 'personal-info'),
+    )
+    .find(Boolean);
+
+  const personalInfoAnswer = answerEntries.find(
+    (entry) => entry.type === 'personal-info',
+  );
+
+  function getPersonalInfoLabels(personalInfoQuestion) {
+    if (!personalInfoQuestion || !personalInfoAnswer) {
+      return [];
+    }
+    const labelMap = {
+      askName: tr.PersonalInfo.name,
+      askEmail: tr.PersonalInfo.email,
+      askPhone: tr.PersonalInfo.phone,
+    };
+
+    const answerValuesForLabelsMap = {
+      askName: (personalInfoAnswer.value as PersonalInfoAnswer).name,
+      askEmail: (personalInfoAnswer.value as PersonalInfoAnswer).email,
+      askPhone: formatPhoneNumber(
+        (personalInfoAnswer.value as PersonalInfoAnswer).phone,
+      ),
+    };
+
+    const labels: Content[] = [
+      {
+        text: `${tr.PersonalInfo.label}:`,
+        fontSize: 12,
+        bold: true,
+        margin: [0, 10, 0, 8],
+      },
+    ];
+
+    Object.entries(personalInfoQuestion).forEach(
+      ([personalInfoProperty, isIncluded]) => {
+        if (personalInfoProperty in labelMap && isIncluded) {
+          labels.push({
+            text: `${labelMap[personalInfoProperty]}: ${answerValuesForLabelsMap[personalInfoProperty]}`,
+            fontSize: 12,
+            margin: [0, 0, 0, 8],
+          });
+        }
+      },
+    );
+
+    return labels;
+  }
+
   const [logo, banner] = await Promise.all([
     survey.marginImages.top.imageUrl
       ? (await getFile(survey.marginImages.top.imageUrl)).data.toString()
@@ -203,6 +257,7 @@ async function getFrontPage(
         fontSize: 12,
         margin: [0, 0, 0, 10],
       })),
+    getPersonalInfoLabels(personalInfoQuestion),
     { text: '', pageBreak: 'after' },
   ];
 }

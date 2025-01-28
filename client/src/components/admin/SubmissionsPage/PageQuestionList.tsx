@@ -1,4 +1,3 @@
-import React from 'react';
 import { CardActionArea, ListItem, List, Typography, Box } from '@mui/material';
 
 import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
@@ -17,6 +16,8 @@ import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
+import { Person } from '@mui/icons-material';
+import React from 'react';
 
 interface Props {
   questions: SurveyQuestion[];
@@ -49,6 +50,8 @@ function getQuestionIcon(
       return <PaperclipIcon color="primary" />;
     case 'free-text':
       return <TextSectionIcon color="primary" />;
+    case 'personal-info':
+      return <Person color="primary" />;
     default:
       assertNever(questionType);
   }

@@ -79,6 +79,7 @@ interface DBSurvey {
   email_subject: LocalizedText;
   email_body: LocalizedText;
   email_info: SurveyEmailInfoItem[];
+  email_include_personal_info: boolean;
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
@@ -1223,7 +1224,8 @@ export async function updateSurvey(survey: Survey) {
         bottom_margin_image_url = $28,
         organization = $29,
         tags = $30,
-        languages = $31
+        languages = $31,
+        email_include_personal_info = $32
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1259,6 +1261,7 @@ export async function updateSurvey(survey: Survey) {
         Object.entries(survey.enabledLanguages)
           .filter(([, isEnabled]) => isEnabled)
           .map(([lang]) => lang),
+        survey.email.includePersonalInfo,
       ],
     )
     .catch((error) => {
@@ -1484,9 +1487,14 @@ export async function deleteSurvey(id: Number) {
     );
 
     if (submissions.length > 0) {
+      const submissionIds = submissions.map((s) => s.id);
       await t.any(
         `DELETE FROM data.answer_entry WHERE submission_id = ANY ($1)`,
-        [submissions.map((s) => s.id)],
+        [submissionIds],
+      );
+      await t.any(
+        `DELETE FROM data.personal_info WHERE submission_id = ANY ($1)`,
+        [submissionIds],
       );
     }
 
@@ -1551,6 +1559,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
       info: dbSurvey.email_info,
+      includePersonalInfo: dbSurvey.email_include_personal_info,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,

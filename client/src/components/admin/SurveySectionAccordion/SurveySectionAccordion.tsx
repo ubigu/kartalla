@@ -11,6 +11,7 @@ import {
   SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -66,6 +67,8 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
+import { Person } from '@mui/icons-material';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -134,6 +137,16 @@ export default function SurveySectionAccordion(props: Props) {
       form: ReactNode;
     };
   } = {
+    'personal-info': {
+      icon: <Person />,
+      tooltip: tr.SurveySection.personalInfoQuestion,
+      form: (
+        <EditPersonalInfoQuestion
+          section={props.section as SurveyPersonalInfoQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
     checkbox: {
       icon: <CheckboxCheckedIcon />,
       tooltip: tr.SurveySection.checkBoxQuestion,

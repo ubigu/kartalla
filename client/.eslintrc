@@ -4,7 +4,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:@typescript-eslint/eslint-recommended"
+    "plugin:@typescript-eslint/eslint-recommended",
   ],
   "rules": {
     "no-redeclare": "off",
@@ -12,14 +12,16 @@
     "no-unused-vars": "off",
     "react/prop-types": "off",
     "no-prototype-builtins": "off",
-    "no-useless-catch": "off"
+    "no-useless-catch": "off",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
   },
   "env": {
-    "browser": true
+    "browser": true,
   },
   "settings": {
     "react": {
-      "version": "detect"
-    }
-  }
+      "version": "detect",
+    },
+  },
 }

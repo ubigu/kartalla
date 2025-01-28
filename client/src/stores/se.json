@@ -1,12 +1,14 @@
 {
   "DataExport": {
     "exportAnswers": "Ladda ner svar…",
-    "surveyAnswerExport": "Nedladdning av enkätsvar",
-    "chooseFileFormat": "Välj önskat filformat",
+    "surveyAnswerExport": "Vilka data vill du ladda ner?",
     "download": "Ladda ner",
     "errorDownloadingCSV": "Misslyckades att ladda ner CSV-filen",
     "errorDownloadingGPKG": "Misslyckades att ladda ner GeoPackage-filen",
-    "attachments": "Bilagor"
+    "attachments": "Bilagor",
+    "alphanumericSubmissions": "Alfanumeriska svar",
+    "geospatialSubmissions": "Rumsliga svar",
+    "personalInfo": "Personuppgifter"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Alfanumeriska svar",
@@ -100,7 +102,9 @@
     "emailSubject": "Ämne för meddelandet",
     "emailBody": "Meddelandets innehåll",
     "info": "Ytterligare information",
-    "infoHelperText": "Ytterligare information visas på framsidan av e-postmeddelandet som skickas med svarrapporten."
+    "infoHelperText": "Ytterligare information visas på framsidan av e-postmeddelandet som skickas med svarrapporten.",
+    "includePersonalInfo": "Inkludera respondentens personuppgifter",
+    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten."
   },
   "KeyValueForm": {
     "key": "Namn",
@@ -211,6 +215,8 @@
     "deleteGroup": "Ta bort grupp"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "Personuppgiftsfrågan har redan lagts till i enkäten.",
+    "personalInfoQuestion": "Lägg till personuppgiftsfråga",
     "radioQuestion": "Lägg till alternativfråga",
     "checkBoxQuestion": "Lägg till flervalsfråga",
     "numericQuestion": "Lägg till numerisk fråga",
@@ -232,6 +238,7 @@
     "scale": "Skala"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Personuppgiftsfråga",
     "radioQuestion": "Alternativfråga",
     "checkBoxQuestion": "Flervalsfråga",
     "numericQuestion": "Numerisk fråga",
@@ -263,6 +270,12 @@
     "optionInfo": "Ytterligare information om frågealternativet",
     "removeOption": "Ta bort svarsalternativ",
     "selectAnswer": "Välj svar"
+  },
+  "PersonalInfoQuestion": {
+    "label": "Personuppgifter",
+    "nameLabel": "Namn",
+    "emailLabel": "E-post",
+    "phoneLabel": "Telefonnummer"
   },
   "NumericQuestion": {
     "minValue": "Värdet måste vara minst {minValue}",

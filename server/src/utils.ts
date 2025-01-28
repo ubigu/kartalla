@@ -98,3 +98,30 @@ export function geometryToGeoJSONFeatureCollection(
     features: [{ type: 'Feature', geometry: geometry, properties }],
   };
 }
+
+export function formatPhoneNumber(phoneNumber: string) {
+  // Remove all non-numeric characters (except '+')
+  const cleanNumber = phoneNumber.replace(/[^+\d]/g, '');
+
+  let prefix = '';
+  let rest = cleanNumber;
+
+  // If the number starts with '+' (international number)
+  if (cleanNumber.startsWith('+')) {
+    prefix = cleanNumber.slice(0, 4); // Country code +358
+    rest = cleanNumber.slice(4); // Remaining numbers
+  }
+
+  let formatted;
+  // Segment the main part based on the length of the number
+  if (rest.length <= 9) {
+    formatted = `${rest.slice(0, 2)} ${rest.slice(2, 5)} ${rest.slice(5)}`;
+  } else if (rest.length <= 10) {
+    formatted = `${rest.slice(0, 3)} ${rest.slice(3, 6)} ${rest.slice(6)}`;
+  } else {
+    formatted = `${rest.slice(0, 3)} ${rest.slice(3, 6)} ${rest.slice(6)}`;
+  }
+
+  // Return the combined number
+  return `${prefix} ${formatted}`.trim();
+}
