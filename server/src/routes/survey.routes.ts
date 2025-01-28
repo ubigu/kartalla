@@ -440,6 +440,12 @@ router.get(
   '/:surveyId/report/:submissionId/:lang',
   ensureAuthenticated(),
   ensureSurveyGroupAccess('surveyId'),
+  validateRequest([
+    query('withPersonalInfo')
+      .optional()
+      .isBoolean()
+      .withMessage('withPersonalInfo must be a boolean'),
+  ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
@@ -453,7 +459,7 @@ router.get(
 
     const [survey, answerEntries, timestamp] = await Promise.all([
       getSurvey({ id: surveyId }),
-      getAnswerEntries(submissionId),
+      getAnswerEntries(submissionId, req.query.withPersonalInfo === 'true'),
       getTimestamp(submissionId),
     ]);
     const pdfBuffer = await generatePdf(
@@ -479,7 +485,12 @@ router.get(
   ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('withPersonalInfo')
+      .optional()
+      .isBoolean()
+      .withMessage('withPersonalInfo must be a boolean'),
   ]),
+
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
 
@@ -491,7 +502,10 @@ router.get(
       );
     }
 
-    const submissions = await getSubmissionsForSurvey(surveyId);
+    const submissions = await getSubmissionsForSurvey(
+      surveyId,
+      req.query.withPersonalInfo === 'true',
+    );
     res.json(submissions);
   }),
 );
@@ -513,8 +527,8 @@ router.get(
       Number(req.params.id),
       alphanumericIncluded,
       geospatialIncluded,
+      true,
       personalIncluded,
-      false,
     );
     res.json(submissions);
   }),

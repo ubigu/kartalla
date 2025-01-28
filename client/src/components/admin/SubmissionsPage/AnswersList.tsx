@@ -81,9 +81,11 @@ export default function AnswersList({
             elevation={0}
             key={index}
             expanded={isItemSelected(answer, selectedAnswer, selectedQuestion)}
-            TransitionProps={{
-              onEntered: (node) =>
-                node.scrollIntoView({ behavior: 'smooth', block: 'end' }),
+            slotProps={{
+              transition: {
+                onEntered: (node) =>
+                  node.scrollIntoView({ behavior: 'smooth', block: 'end' }),
+              },
             }}
             onChange={(_event, isExpanded) => {
               if (isExpanded) {
@@ -101,6 +103,7 @@ export default function AnswersList({
           >
             <AccordionSummary
               sx={{
+                gap: '1rem',
                 flexDirection: 'row-reverse',
                 '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
                   transform: 'rotate(180deg)',

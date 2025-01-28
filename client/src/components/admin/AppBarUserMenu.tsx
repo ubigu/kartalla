@@ -58,16 +58,17 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
-        {activeUserIsAdmin && (
-          <MenuItem
-            onClick={() => {
-              setMenuOpen(false);
-              history.push('/kayttajahallinta');
-            }}
-          >
-            {tr.AppBarUserMenu.userManagement}
-          </MenuItem>
-        )}
+        {activeUserIsAdmin ||
+          (activeUserIsSuperUser && (
+            <MenuItem
+              onClick={() => {
+                setMenuOpen(false);
+                history.push('/kayttajahallinta');
+              }}
+            >
+              {tr.AppBarUserMenu.userManagement}
+            </MenuItem>
+          ))}
         {activeUserIsSuperUser && (
           <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
             {tr.AppBarUserMenu.updateInstructions}

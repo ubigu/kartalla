@@ -1,5 +1,6 @@
 import { FileAnswer } from '@interfaces/survey';
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -15,7 +16,8 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 
 interface Props {
   surveyId: number;
@@ -23,6 +25,7 @@ interface Props {
 
 export default function DataExport({ surveyId }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [withPersonalInfo, setWithPersonalInfo] = useState(false);
   const [selectedFileFormats, setSelectedFileFormats] = useState({
     csv: true,
     geopackage: false,
@@ -36,9 +39,12 @@ export default function DataExport({ surveyId }: Props) {
 
   async function exportCSV() {
     try {
-      const res = await fetch(`/api/answers/${surveyId}/file-export/csv`, {
-        method: 'GET',
-      });
+      const res = await fetch(
+        `/api/answers/${surveyId}/file-export/csv?withPersonalInfo=${withPersonalInfo}`,
+        {
+          method: 'GET',
+        },
+      );
 
       const csvText = await res.text();
       const textBlob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
@@ -126,23 +132,44 @@ export default function DataExport({ surveyId }: Props) {
       <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>
         <DialogTitle> {tr.DataExport.surveyAnswerExport} </DialogTitle>
         <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography> {tr.DataExport.chooseFileFormat} </Typography>
-          <FormControlLabel
-            label="CSV"
-            control={
-              <Checkbox
-                checked={selectedFileFormats.csv}
-                onChange={(event) =>
-                  setSelectedFileFormats({
-                    ...selectedFileFormats,
-                    csv: event.target.checked,
-                  })
+          <Box display="flex" flexDirection="column">
+            <FormControlLabel
+              label={tr.DataExport.alphanumericSubmissions}
+              control={
+                <Checkbox
+                  checked={selectedFileFormats.csv}
+                  onChange={(event) =>
+                    setSelectedFileFormats({
+                      ...selectedFileFormats,
+                      csv: event.target.checked,
+                    })
+                  }
+                />
+              }
+            />
+            {selectedFileFormats.csv && (
+              <FormControlLabel
+                sx={{
+                  marginLeft: '8px',
+                  height: '26px',
+                  '& .MuiFormControlLabel-label': {
+                    fontSize: '14px',
+                  },
+                  paddingBottom: '6px',
+                }}
+                label={tr.DataExport.personalInfo}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={withPersonalInfo}
+                    onChange={() => setWithPersonalInfo((prev) => !prev)}
+                  />
                 }
               />
-            }
-          />
+            )}
+          </Box>
           <FormControlLabel
-            label="Geopackage"
+            label={tr.DataExport.geospatialSubmissions}
             control={
               <Checkbox
                 checked={selectedFileFormats.geopackage}
@@ -175,6 +202,11 @@ export default function DataExport({ surveyId }: Props) {
             {tr.commands.cancel}
           </Button>
           <Button
+            disabled={
+              !selectedFileFormats.csv &&
+              !selectedFileFormats.geopackage &&
+              !selectedFileFormats.attachments
+            }
             onClick={() => {
               setDisplayDialog(false);
               selectedFileFormats.csv && exportCSV();

@@ -23,7 +23,7 @@ import {
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
 import DataExport from '../DataExport';
@@ -33,6 +33,7 @@ import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 import DataPublish from '../DataPublish';
+import React from 'react';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -117,7 +118,7 @@ export default function SurveySubmissionsPage() {
 
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = `/api/surveys/${survey.id}/submissions`;
+      const submissionUrl = `/api/surveys/${survey.id}/submissions?withPersonalInfo=true`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(
@@ -182,6 +183,7 @@ export default function SurveySubmissionsPage() {
   /**
    * All answers flattened from all submissions
    */
+
   const allAnswers = useMemo(() => {
     return submissions?.reduce(
       (answerEntries, submission) => [
@@ -200,6 +202,7 @@ export default function SurveySubmissionsPage() {
   /**
    * Currently visible answers
    */
+
   const answers = useMemo(() => {
     return selectedQuestion?.id === 0 || !selectedQuestion
       ? allAnswers

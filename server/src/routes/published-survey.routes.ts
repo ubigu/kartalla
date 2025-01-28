@@ -63,6 +63,7 @@ router.post(
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
+
     const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
     const { id: submissionId, timestamp } = await createSurveySubmission(
@@ -84,7 +85,11 @@ router.post(
     const pdfFile = await generatePdf(
       survey,
       { id: submissionId, timestamp },
-      answerEntries,
+      survey.email.includePersonalInfo
+        ? answerEntries
+        : answerEntries.filter(
+            (entry: AnswerEntry) => entry.type !== 'personal-info',
+          ),
       answerLanguage,
     );
 
@@ -172,6 +177,10 @@ router.get(
   '/:name/unfinished-submission',
   validateRequest([
     query('token').isString().withMessage('Token must be a string'),
+    query('withPersonalInfo')
+      .optional()
+      .isBoolean()
+      .withMessage('withPersonalInfo must be a boolean'),
   ]),
   asyncHandler(async (req, res) => {
     const survey = await getSurvey({ name: req.params.name });
@@ -179,7 +188,10 @@ router.get(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
-    const answers = await getUnfinishedAnswerEntries(String(req.query.token));
+    const answers = await getUnfinishedAnswerEntries(
+      String(req.query.token),
+      req.query.withPersonalInfo === 'true',
+    );
     const language = await getSurveyAnswerLanguage(String(req.query.token));
     res.json({ answers, language });
   }),

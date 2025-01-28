@@ -1,3 +1,4 @@
+import { CredentialsEntry } from '@interfaces/submission';
 import {
   Box,
   Button,
@@ -16,14 +17,13 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
-import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
+import { styled } from '@mui/material/styles';
 import HierarchyIcon from '@src/components/icons/HierarchyIcon';
-import { useToasts } from '@src/stores/ToastContext';
+import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
+import { Toast, useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
-import { CredentialsEntry } from '@src/application/submission';
 
 interface Props {
   surveyId: number;
@@ -59,7 +59,7 @@ const initialInput = {
   passwordAgain: '',
   alphanumericIncluded: true,
   geospatialIncluded: true,
-  personalIncluded: true,
+  personalIncluded: false,
 };
 
 export default function DataPublish({ surveyId }: Props) {
@@ -71,7 +71,9 @@ export default function DataPublish({ surveyId }: Props) {
 
   const { tr } = useTranslations();
   const { showToast } = useToasts();
-  const publicationURL = `${window.location.protocol}//${window.location.hostname}${
+  const publicationURL = `${window.location.protocol}//${
+    window.location.hostname
+  }${
     window.location.port ? `:${window.location.port}` : ''
   }/api/surveys/${surveyId}/publication`;
 
@@ -103,17 +105,24 @@ export default function DataPublish({ surveyId }: Props) {
     fetchCredentials();
   }, []);
 
-  function getErrorObject(err: Response | Error) {
+  function getErrorObject(err: Response | Error): Toast {
     return {
       severity: 'error',
       message: err instanceof Error ? err.message : err.statusText,
     };
   }
 
-  function handleInputChange({ target }: { target: HTMLInputElement }) {
+  function handleInputChange({
+    target,
+  }: {
+    target: HTMLInputElement | HTMLTextAreaElement;
+  }) {
     setInput({
       ...input,
-      [target.name]: target.type === 'checkbox' ? target.checked : target.value,
+      [target.name]:
+        target.type === 'checkbox'
+          ? (target as HTMLInputElement).checked
+          : target.value,
     });
   }
 
@@ -201,7 +210,11 @@ export default function DataPublish({ surveyId }: Props) {
             : tr.DataPublish.openSubmissionsApi}
         </Button>
       )}
-      <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>
+      <Dialog
+        open={displayDialog}
+        onClose={() => setDisplayDialog(false)}
+        sx={{ '& .MuiDialog-paper': { width: '670px', maxWidth: '900px' } }}
+      >
         <DialogTitle>
           {credentials
             ? tr.DataPublish.submissionsApiOptions
@@ -209,7 +222,6 @@ export default function DataPublish({ surveyId }: Props) {
         </DialogTitle>
         {isLoading && (
           <DialogContent
-            component="div"
             sx={{
               display: 'flex',
               justifyContent: 'center',
@@ -302,32 +314,44 @@ export default function DataPublish({ surveyId }: Props) {
                   flexDirection: 'column',
                 }}
               >
-                <FormControlLabel
-                  label={tr.DataPublish.alphanumericSubmissions}
-                  control={
-                    <Checkbox
-                      name="alphanumericIncluded"
-                      checked={input.alphanumericIncluded}
-                      onChange={handleInputChange}
+                <Box display="flex" flexDirection="column">
+                  <FormControlLabel
+                    label={tr.DataPublish.alphanumericSubmissions}
+                    control={
+                      <Checkbox
+                        name="alphanumericIncluded"
+                        checked={input.alphanumericIncluded}
+                        onChange={handleInputChange}
+                      />
+                    }
+                  />
+                  {input.alphanumericIncluded && (
+                    <FormControlLabel
+                      sx={{
+                        marginLeft: '8px',
+                        height: '26px',
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: '14px',
+                        },
+                        paddingBottom: '6px',
+                      }}
+                      label={tr.DataPublish.personalInfo}
+                      control={
+                        <Checkbox
+                          name="personalIncluded"
+                          checked={input.personalIncluded}
+                          onChange={handleInputChange}
+                        />
+                      }
                     />
-                  }
-                />
+                  )}
+                </Box>
                 <FormControlLabel
                   label={tr.DataPublish.geospatialSubmissions}
                   control={
                     <Checkbox
                       name="geospatialIncluded"
                       checked={input.geospatialIncluded}
-                      onChange={handleInputChange}
-                    />
-                  }
-                />
-                <FormControlLabel
-                  label={tr.DataPublish.personalInfo}
-                  control={
-                    <Checkbox
-                      name="personalIncluded"
-                      checked={input.personalIncluded}
                       onChange={handleInputChange}
                     />
                   }

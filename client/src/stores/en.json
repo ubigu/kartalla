@@ -1,12 +1,14 @@
 {
   "DataExport": {
     "exportAnswers": "Export response data…",
-    "surveyAnswerExport": "Export survey response data",
-    "chooseFileFormat": "Choose files to export",
+    "surveyAnswerExport": "Which data would you like to download?",
     "download": "Download",
-    "errorDownloadingCSV": "Failed to export CSV -file",
-    "errorDownloadingGPKG": "Failed to export GeoPackage -file",
-    "attachments": "Survey response data attachments"
+    "errorDownloadingCSV": "Failed to export CSV file",
+    "errorDownloadingGPKG": "Failed to export GeoPackage file",
+    "attachments": "Survey response data attachments",
+    "alphanumericSubmissions": "Alphanumeric submissions",
+    "geospatialSubmissions": "Geospatial submissions",
+    "personalInfo": "Personal information"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Alphanumeric submissions",
@@ -101,7 +103,9 @@
     "emailSubject": "Email subject",
     "emailBody": "Email content",
     "info": "Additional information",
-    "infoHelperText": "Additional information will be displayed on the front page of the answer report."
+    "infoHelperText": "Additional information will be displayed on the front page of the answer report.",
+    "includePersonalInfo": "Include respondent's personal information",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report."
   },
   "KeyValueForm": {
     "key": "Key",
@@ -212,6 +216,8 @@
     "deleteGroup": "Delete group"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "The personal information question has already been added to the survey.",
+    "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
@@ -233,6 +239,7 @@
     "scale": "Scale"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
@@ -248,6 +255,12 @@
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
     "question": "Question"
+  },
+  "PersonalInfoQuestion": {
+    "label": "Personal information",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone number"
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",

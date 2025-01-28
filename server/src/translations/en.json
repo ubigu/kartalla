@@ -14,5 +14,11 @@
   "newUserRequest": "New user request",
   "fi": "Finnish",
   "en": "English",
-  "se": "Swedish"
+  "se": "Swedish",
+  "PersonalInfo": {
+    "label": "Personal Information",
+    "name": "Name",
+    "email": "Email address",
+    "phone": "Phone number"
+  }
 }
