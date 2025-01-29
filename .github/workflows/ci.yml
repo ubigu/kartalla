@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.ACR_REGISTRY_USERNAME }}
           password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
       - name: Build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           cache-from: type=registry,ref=${{ github.event_name == 'release' && env.IMAGE_NAME_PROD || env.IMAGE_NAME_TEST }}:latest
