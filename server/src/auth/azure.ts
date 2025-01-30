@@ -2,8 +2,8 @@ import { Express } from 'express';
 import passport from 'passport';
 import { OIDCStrategy } from 'passport-azure-ad';
 import { decrypt } from '../crypto';
-import { upsertUser } from '../user';
 import logger from '@src/logger';
+import { dbOrganizationIdToOrganization, upsertUser } from '../user';
 
 /**
  * Configures authentication for given Express application.
@@ -41,7 +41,9 @@ export function configureAzureAuth(app: Express) {
             id: profile.oid,
             fullName: profile.displayName,
             email: profile._json.email,
-            organizations: JSON.parse(profile._json.groups), // Parse groups to trim extra characters
+            organizations: JSON.parse(profile._json.groups).map((o) =>
+              dbOrganizationIdToOrganization(o),
+            ), // Parse groups to trim extra characters
             roles: JSON.parse(profile._json.roles), // Parse roles to trim extra characters
           });
           return done(null, user);

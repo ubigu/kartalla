@@ -141,7 +141,7 @@ export function UserList({
                   </TableCell>
                   {activeUserIsSuperUser && (
                     <TableCell align="left">
-                      {user.organizations.join(', ')}
+                      {user.organizations.map((org) => org.name).join(', ')}
                     </TableCell>
                   )}
                 </TableRow>

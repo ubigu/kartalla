@@ -9,10 +9,12 @@ import { getPublishedSurvey, getSurvey } from '@src/application/survey';
 import { sendSubmissionReport } from '@src/email/submission-report';
 import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { ForbiddenError, NotFoundError } from '@src/error';
+import logger from '@src/logger';
+import { getOrganizationIdWithName } from '@src/user';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, query } from 'express-validator';
+import { body, query, param } from 'express-validator';
 
 const router = Router();
 
@@ -20,11 +22,30 @@ const router = Router();
  * Endpoint for getting a published survey
  */
 router.get(
-  '/:name',
-  validateRequest([query('test').optional().isString()]),
+  '/:organization/:name',
+  validateRequest([
+    param('organization').isString(),
+    param('name').isString(),
+    query('test').optional().isString(),
+  ]),
   asyncHandler(async (req, res) => {
     const test = req.query.test === 'true';
-    const survey = await getPublishedSurvey({ name: req.params.name });
+    const organizationId = getOrganizationIdWithName(req.params.organization);
+
+    if (!organizationId) {
+      throw new NotFoundError(
+        `Organization with name ${req.params.organization} not found`,
+      );
+    }
+    logger.info(
+      `Getting survey ${req.params.name} for organization ${organizationId}: ${req.params.organization}`,
+    );
+    const survey = await getPublishedSurvey({
+      name: req.params.name,
+      organizationId: organizationId,
+      organizationName: req.params.organization,
+    });
+    logger.info(JSON.stringify(survey));
     if ((!test && !survey.isPublished) || (test && !survey.allowTestSurvey)) {
       // In case the survey shouldn't be published (or test survey not allowed if requested), throw the same not found error
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
@@ -37,7 +58,7 @@ router.get(
  * Endpoint for creating a submission under the survey
  */
 router.post(
-  '/:name/submission',
+  '/:organization/:name/submission',
   validateRequest([
     body('entries').isArray().withMessage('Entries must be an array'),
     body('entries.*.sectionId')
@@ -54,10 +75,23 @@ router.post(
       .isEmail()
       .withMessage('Email must be valid'),
     body('language').isString().withMessage('Language must be a string'),
+    param('organization').isString(),
+    param('name').isString(),
     query('token').optional().isString().withMessage('Token must be a string'),
   ]),
   asyncHandler(async (req, res) => {
-    const survey = await getSurvey({ name: req.params.name });
+    const organizationId = getOrganizationIdWithName(req.params.organization);
+
+    if (!organizationId) {
+      throw new NotFoundError(
+        `Organization with name ${req.params.organization} not found`,
+      );
+    }
+
+    const survey = await getSurvey({
+      name: req.params.name,
+      organization: organizationId,
+    });
     if (!survey.isPublished) {
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
@@ -126,7 +160,7 @@ router.post(
  * Endpoint for saving an unfinished submission
  */
 router.post(
-  '/:name/unfinished-submission',
+  '/:organization/:name/unfinished-submission',
   validateRequest([
     body('entries').isArray().withMessage('Entries must be an array'),
     body('entries.*.sectionId')
@@ -140,10 +174,22 @@ router.post(
       .withMessage('Entry values must be provided'),
     body('email').isEmail().withMessage('Email must be valid'),
     body('language').isString().withMessage('Language must be a string'),
+    param('organization').isString(),
+    param('name').isString(),
     query('token').optional().isString().withMessage('Token must be a string'),
   ]),
   asyncHandler(async (req, res) => {
-    const survey = await getSurvey({ name: req.params.name });
+    const organizationId = getOrganizationIdWithName(req.params.organization);
+    if (!organizationId) {
+      throw new NotFoundError(
+        `Organization with name ${req.params.organization} not found`,
+      );
+    }
+
+    const survey = await getSurvey({
+      name: req.params.name,
+      organization: organizationId,
+    });
     if (!survey.isPublished) {
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
@@ -174,16 +220,27 @@ router.post(
  * Endpoint for getting an unfinished submission by token
  */
 router.get(
-  '/:name/unfinished-submission',
+  '/:organization/:name/unfinished-submission',
   validateRequest([
     query('token').isString().withMessage('Token must be a string'),
     query('withPersonalInfo')
       .optional()
       .isBoolean()
       .withMessage('withPersonalInfo must be a boolean'),
+    param('organization').isString(),
+    param('name').isString(),
   ]),
   asyncHandler(async (req, res) => {
-    const survey = await getSurvey({ name: req.params.name });
+    const organizationId = getOrganizationIdWithName(req.params.organization);
+    if (!organizationId) {
+      throw new NotFoundError(
+        `Organization with name ${req.params.organization} not found`,
+      );
+    }
+    const survey = await getSurvey({
+      name: req.params.name,
+      organization: organizationId,
+    });
     if (!survey.isPublished) {
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);

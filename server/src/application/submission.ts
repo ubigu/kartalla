@@ -942,10 +942,10 @@ export async function getTimestamp(submissionId: number) {
  */
 export async function getSubmissionsForSurvey(
   surveyId: number,
+  withPersonalInfo?: boolean,
   alphanumeric: boolean = true,
   geospatial: boolean = true,
   attachments: boolean = true,
-  withPersonalInfo?: boolean,
 ) {
   const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
@@ -1071,7 +1071,10 @@ export async function getSubmissionsForSurvey(
         id: sub.id,
         timestamp: sub.timestamp,
         answerEntries: withPersonalInfo
-          ? [...dbAnswerEntriesToAnswerEntries(sub.entries), sub.personalInfo]
+          ? [
+              ...dbAnswerEntriesToAnswerEntries(sub.entries),
+              ...(sub.personalInfo ? [sub.personalInfo] : []),
+            ]
           : dbAnswerEntriesToAnswerEntries(sub.entries),
       }) as Submission,
   );

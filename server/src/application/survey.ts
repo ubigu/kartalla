@@ -36,7 +36,12 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import { isAdmin, isSuperUser } from '@src/user';
+import logger from '@src/logger';
+import {
+  dbOrganizationIdToOrganization,
+  isAdmin,
+  isSuperUser,
+} from '@src/user';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -273,7 +278,10 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
  * @returns Requested survey
  */
 export async function getPublishedSurvey(
-  params: ({ id: number } | { name: string }) & { organization?: string },
+  params: ({ id: number } | { name: string }) & {
+    organizationId?: string;
+    organizationName?: string;
+  },
 ) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
@@ -320,6 +328,7 @@ export async function getPublishedSurvey(
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
           survey.languages,
+          ${params.organizationName ? '$3 as organization,' : ''} -- To prevent organization id public exposure
           theme_name,
           theme_data,
           page.id as page_id,
@@ -341,7 +350,7 @@ export async function getPublishedSurvey(
               theme.data as theme_data
             FROM data.survey survey
             LEFT JOIN application.theme theme ON survey.theme_id = theme.id
-            ${typeof params.organization === 'string' ? `WHERE survey.organization = $2` : ''}
+            ${typeof params.organizationId === 'string' ? `WHERE survey.organization = $2` : ''}
           ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
@@ -356,7 +365,11 @@ export async function getPublishedSurvey(
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name, params.organization],
+    [
+      'id' in params ? params.id : params.name,
+      params.organizationId,
+      params.organizationName,
+    ],
   );
 
   if (!rows.length) {
@@ -766,7 +779,7 @@ export async function getSurvey(
 export async function getSurveys(
   authorId?: string | null,
   filterByPublished?: boolean,
-  organization?: string | null,
+  organizationId?: string | null,
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
@@ -777,10 +790,10 @@ export async function getSurveys(
     LEFT JOIN data.submission sub ON sub.survey_id = survey.id
   WHERE
     ($1 IS NULL OR author_id = $1)
-    ${typeof organization === 'string' ? `AND survey.organization = $3` : ''}
+    ${typeof organizationId === 'string' ? `AND survey.organization = $3` : ''}
   GROUP BY survey.id
   ORDER BY updated_at DESC`,
-    [authorId, filterByPublished, organization],
+    [authorId, filterByPublished, organizationId],
   );
 
   return rows
@@ -840,7 +853,7 @@ export async function createSurvey(user: User) {
     `INSERT INTO data.survey (author_id, organization)
     VALUES ($1, $2)
     RETURNING *`,
-    [user.id, user.organizations[0]], // For now, use the first organization
+    [user.id, user.organizations[0].id], // For now, use the first organization
   );
 
   if (!surveyRow) {
@@ -1256,7 +1269,7 @@ export async function updateSurvey(survey: Survey) {
         survey.displayPrivacyStatement,
         survey.marginImages.top.imageUrl ?? null,
         survey.marginImages.bottom.imageUrl ?? null,
-        survey.organization,
+        survey.organization.id,
         survey.tags,
         Object.entries(survey.enabledLanguages)
           .filter(([, isEnabled]) => isEnabled)
@@ -1265,7 +1278,7 @@ export async function updateSurvey(survey: Survey) {
       ],
     )
     .catch((error) => {
-      throw error.constraint === 'survey_name_key'
+      throw error.constraint === 'survey_name_organization_unique_key'
         ? new BadRequestError(
             `Survey name ${survey.name} already exists`,
             'duplicate_survey_name',
@@ -1472,7 +1485,10 @@ export async function updateSurvey(survey: Survey) {
     }),
   );
 
-  return await getSurvey({ id: survey.id, organization: survey.organization });
+  return await getSurvey({
+    id: survey.id,
+    organization: survey.organization.id,
+  });
 }
 
 /**
@@ -1573,7 +1589,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
         imageUrl: dbSurvey.bottom_margin_image_url,
       },
     },
-    organization: dbSurvey.organization,
+    organization: dbOrganizationIdToOrganization(dbSurvey.organization),
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
   };
@@ -2029,7 +2045,7 @@ export async function storeFile({
   mimetype,
   details,
   surveyId,
-  organization,
+  organizationId,
 }: {
   buffer: Buffer;
   path: string[];
@@ -2037,21 +2053,21 @@ export async function storeFile({
   mimetype: string;
   details: { [key: string]: any };
   surveyId: number;
-  organization: string;
+  organizationId: string;
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
-  const fileUrl = `${organization}/${path.join('/')}/${name}`;
+  const fileUrl = `${organizationId}/${path.join('/')}/${name}`;
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, mime_type, survey_id, url, organization)
-    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organization))
+    INSERT INTO data.files (file, details, mime_type, survey_id, url, organizationId)
+    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organizationId))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
       url = $(fileUrl),
-      organization = $(organization)
+      organization = $(organizationId)
     RETURNING url as url;
     `,
     {
@@ -2060,7 +2076,7 @@ export async function storeFile({
       mimetype,
       surveyId,
       fileUrl,
-      organization,
+      organizationId,
     },
   );
 
@@ -2103,8 +2119,8 @@ export async function getFile(fileUrl: string) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[], organization: string) {
-  const filePattern = `${organization}/${imagePath.join('/')}%`;
+export async function getImages(imagePath: string[], organizationId: string) {
+  const filePattern = `${organizationId}/${imagePath.join('/')}%`;
   const rows = await getDb().manyOrNone(
     `
     SELECT 
@@ -2227,10 +2243,10 @@ export async function getDistinctAutoSendToEmails() {
 
 /**
  * get all distinct tags used by the organisation
- * @param organizations array of organizations. Likely to be of length 1 for now
+ * @param organizationIds array of organization ids. Likely to be of length 1 for now
  * @returns array of distinct tags
  */
-export async function getTagsByOrganizations(organizations: string[]) {
+export async function getTagsByOrganizations(organizationIds: string[]) {
   const rows = await getDb().manyOrNone<{ tag: string }>(
     `
     SELECT
@@ -2240,7 +2256,7 @@ export async function getTagsByOrganizations(organizations: string[]) {
     WHERE
       s.organization = ANY($1)
   `,
-    [organizations],
+    [organizationIds],
   );
   return rows.map((row) => row.tag);
 }

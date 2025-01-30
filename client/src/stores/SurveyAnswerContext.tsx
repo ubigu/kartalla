@@ -592,7 +592,7 @@ export function useSurveyAnswers() {
         answers: AnswerEntry[];
         language: LanguageCode;
       }>(
-        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`,
+        `/api/published-surveys/${state.survey.organization.name}/${state.survey.name}/unfinished-submission?token=${token}`,
       );
       const { answers, language } = response;
       dispatch({

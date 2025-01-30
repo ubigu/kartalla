@@ -38,6 +38,7 @@
     "saveSuccessful": "Survey saved successfully!",
     "saveFailed": "Failed to save the survey. Please try again later.",
     "saveFailedDuplicateName": "Survey with the same name already exists. Please choose another name and try again.",
+    "saveFailedAnswerSubmitted": "Survey responses prevent saving changes.",
     "invalidFields": "The following fields have invalid values:",
     "validationError": {
       "survey.title": "Survey title",
@@ -344,6 +345,7 @@
     "defaultMinLabel": "Strongly disagree",
     "defaultMaxLabel": "Strongly agree",
     "defaultTranslatedMinLabel": {
+      "se": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },

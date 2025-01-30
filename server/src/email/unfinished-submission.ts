@@ -19,7 +19,7 @@ export async function sendUnfinishedSubmissionLink({
 }) {
   const tr = useTranslations(language);
   const subject = `${survey.title[language]} - ${tr.unfinishedSubmission}`;
-  const url = `${process.env.EMAIL_APP_URL}/${survey.name}?token=${token}`;
+  const url = `${process.env.EMAIL_APP_URL}/${survey.organization.name}/${survey.name}?token=${token}`;
   try {
     await sendMail({
       message: {

@@ -108,7 +108,7 @@ export default function SurveyImageList({
   }
 
   function getApiFilePath(imageType: ImageType) {
-    const surveyOrganizationId = activeSurvey?.organization;
+    const surveyOrganizationId = activeSurvey?.organization.id;
     let baseUrl;
     switch (imageType) {
       case 'backgroundImage':
@@ -261,7 +261,7 @@ export default function SurveyImageList({
         method: 'POST',
         body: formData,
         headers: {
-          organization: activeSurvey.organization,
+          organization: activeSurvey.organization.id,
         },
       });
       acceptedFiles.shift();

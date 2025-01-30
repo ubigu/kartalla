@@ -47,10 +47,10 @@ const Application = () => {
             <Route path="/tietosuojaseloste" exact>
               <DataProtectionStatement />
             </Route>
-            <Route path="/:name" exact>
+            <Route path="/:organization/:name" exact>
               <SurveyPage />
             </Route>
-            <Route path="/:name/testi">
+            <Route path="/:organization/:name/testi">
               <SurveyPage isTestSurvey />
             </Route>
             <Route>
