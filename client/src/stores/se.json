@@ -38,6 +38,7 @@
     "saveSuccessful": "Enkäten sparades framgångsrikt!",
     "saveFailed": "Det gick inte att spara enkäten. Försök igen senare.",
     "saveFailedDuplicateName": "En enkät med samma namn finns redan. Välj ett annat namn och försök igen.",
+    "saveFailedAnswerSubmitted": "Enkätens svar förhindrar att ändringarna sparas.",
     "invalidFields": "Följande fält har ogiltiga värden:",
     "validationError": {
       "survey.title": "Undersökningens titel",
@@ -343,10 +344,12 @@
     "defaultMinLabel": "Helt oenig",
     "defaultMaxLabel": "Helt enig",
     "defaultTranslatedMinLabel": {
+      "se": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
+      "se": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },

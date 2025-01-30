@@ -205,6 +205,15 @@ components:
                         param: 'id'
                         location: 'params'
   schemas:
+    Organization:
+      description: An organization object which represents a user organization.
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
     APISurvey:
       description: A survey object which contains all necessary information used by the client application.
       type: object
@@ -344,7 +353,8 @@ components:
             bottom:
               type: object
         organization:
-          type: string
+          type: object
+          $ref: '#/components/schemas/Organization'
           description: User organization that can access the survey.
         tags:
           type: array

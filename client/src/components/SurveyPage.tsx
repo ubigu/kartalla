@@ -29,7 +29,10 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
   const [continueUnfinished, setContinueUnfinished] = useState(false);
 
-  const { name } = useParams<{ name: string }>();
+  const { name, organization } = useParams<{
+    name: string;
+    organization: string;
+  }>();
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
@@ -46,7 +49,9 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     async function fetchSurvey() {
       try {
         const survey = await request<Survey>(
-          `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
+          `/api/published-surveys/${organization}/${name}${
+            isTestSurvey ? '?test=true' : ''
+          }`,
         );
         if (survey.backgroundImageUrl) {
           const response = await fetch(

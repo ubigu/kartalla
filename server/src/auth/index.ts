@@ -3,7 +3,13 @@ import {
   getSurveyOrganization,
 } from '@src/application/survey';
 import logger from '@src/logger';
-import { getUser, isAdmin, isSuperUser, upsertUser } from '@src/user';
+import {
+  dbOrganizationIdToOrganization,
+  getUser,
+  isAdmin,
+  isSuperUser,
+  upsertUser,
+} from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
 import expressSession from 'express-session';
@@ -103,11 +109,14 @@ export function configureAuth(app: Express) {
  */
 export function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
+  const mockOrganization = ['test-group-id-2'];
   const mockUser: Express.User = {
     id: '12345-67890-abcde-fghij1',
     fullName: 'toinen Testaaja',
     email: 'toinen.testaaja@testi.com',
-    organizations: ['test-group-id-1'],
+    organizations: mockOrganization.map((id) =>
+      dbOrganizationIdToOrganization(id),
+    ),
     roles: ['organization_user', 'organization_admin', 'super_user'],
   };
   upsertUser(mockUser);
@@ -187,12 +196,14 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
     if (isSuperUser(req.user)) {
       return next();
     }
-    const surveyOrganization = req.params[id]
+    const surveyOrganizationId = req.params[id]
       ? await getSurveyOrganization(Number(req.params[id]))
       : null;
     if (
-      typeof surveyOrganization === 'string' &&
-      !req.user.organizations.includes(surveyOrganization)
+      typeof surveyOrganizationId === 'string' &&
+      req.user.organizations.findIndex(
+        (org) => org.id === surveyOrganizationId,
+      ) === -1
     ) {
       res.status(403).send('Forbidden');
     } else {
@@ -217,17 +228,19 @@ export function ensureFileGroupAccess() {
       return next();
     }
     const surveyOrganizations = req.headers['organization']
-      ? (req.headers['organization'] as string)
-      : req.user.organizations;
+      ? [req.headers['organization'] as string]
+      : req.user.organizations.map((o) => o.id);
 
-    const fileOrganization = req.user.organizations.filter((organization) =>
-      (surveyOrganizations as string[]).includes(organization),
-    );
+    const fileOrganizations = req.user.organizations
+      .map((o) => o.id)
+      .filter((organization) =>
+        (surveyOrganizations as string[]).includes(organization),
+      );
 
-    if (fileOrganization.length === 0) {
+    if (fileOrganizations.length === 0) {
       res.status(403).send('Forbidden');
     } else {
-      res.locals.fileOrganizations = fileOrganization;
+      res.locals.fileOrganizations = fileOrganizations;
       return next();
     }
   };

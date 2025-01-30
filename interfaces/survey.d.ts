@@ -1,4 +1,5 @@
 import { GeoJSONWithCRS } from './geojson';
+import { Organization } from './user';
 
 /**
  * Section of a survey page
@@ -513,7 +514,7 @@ export interface Survey {
   /**
    * User organization that can access the survey
    */
-  organization: string;
+  organization: Organization;
   /**
    * Survey tags
    */

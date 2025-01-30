@@ -51,7 +51,9 @@ export default function SaveAsUnfinishedDialog({
     setLoading(true);
     try {
       const { token } = await request<{ token: string }>(
-        `/api/published-surveys/${survey.name}/unfinished-submission${
+        `/api/published-surveys/${survey.organization.name}/${
+          survey.name
+        }/unfinished-submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
         {

@@ -14,7 +14,7 @@ interface Props {
   }[];
   onUpload: (file: { url: string }) => void;
   onDelete: (file: { url: string }) => void;
-  surveyOrganization: string;
+  surveyOrganizationId: string;
 }
 
 export default function FileUpload({
@@ -23,7 +23,7 @@ export default function FileUpload({
   value,
   onDelete,
   surveyId,
-  surveyOrganization,
+  surveyOrganizationId,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -34,7 +34,7 @@ export default function FileUpload({
   async function deleteFile(url: string) {
     await fetch(`/api/file/${url}`, {
       method: 'DELETE',
-      headers: { organization: JSON.stringify(surveyOrganization) },
+      headers: { organization: JSON.stringify(surveyOrganizationId) },
     });
   }
 
@@ -60,7 +60,7 @@ export default function FileUpload({
       const file = acceptedFiles[0];
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('organization', surveyOrganization);
+      formData.append('organization', surveyOrganizationId);
       if (surveyId != null) {
         formData.append('surveyId', String(surveyId));
       }
@@ -71,7 +71,7 @@ export default function FileUpload({
         });
         // Upload complete - notify via callback
         onUpload({
-          url: getFullFilePath(surveyOrganization, targetPath, file.name),
+          url: getFullFilePath(surveyOrganizationId, targetPath, file.name),
         });
       } catch (error) {
         showToast({

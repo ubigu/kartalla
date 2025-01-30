@@ -4,7 +4,7 @@ import {
 } from '@interfaces/survey';
 import { Box, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 
 const labelWrapperStyle = {
@@ -41,7 +41,7 @@ export function PersonalInfoQuestion({
   onChange,
 }: Props) {
   const { tr } = useTranslations();
-  const [_hasInvalidInput, setHasInvalidInput] = useState({
+  const [hasInvalidInput, setHasInvalidInput] = useState({
     name: false,
     email: false,
     phone: false,
@@ -51,6 +51,8 @@ export function PersonalInfoQuestion({
     email: false,
     phone: false,
   });
+
+  useEffect(() => {}, [hasInvalidInput]);
 
   return (
     <Box
@@ -85,17 +87,15 @@ export function PersonalInfoQuestion({
               }))
             }
             onChange={(event) => {
-              setHasInvalidInput((prev) => {
-                const newValue = {
-                  ...prev,
-                  name: !event.target.validity.valid,
-                };
-                onChange(
-                  { ...value, name: event.target.value },
-                  Object.values(newValue).some((isInvalid) => isInvalid),
-                );
-                return newValue;
-              });
+              const newValue = {
+                ...hasInvalidInput,
+                name: !event.target.validity.valid,
+              };
+              setHasInvalidInput(newValue);
+              onChange(
+                { ...value, name: event.target.value },
+                Object.values(newValue).some((isInvalid) => isInvalid),
+              );
             }}
           />
 
@@ -123,7 +123,7 @@ export function PersonalInfoQuestion({
             autoFocus={autoFocus}
             value={value?.email ?? ''}
             maxLength={50}
-            pattern="[a-zA-Z0-9+._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+            pattern="[a-zA-Z0-9+._%\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}" //"[a-zA-Z0-9+._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
             required={question.isRequired}
             onBlur={(event) =>
               setShowInputErrorsFor((prev) => ({
@@ -132,17 +132,15 @@ export function PersonalInfoQuestion({
               }))
             }
             onChange={(event) => {
-              setHasInvalidInput((prev) => {
-                const newValue = {
-                  ...prev,
-                  email: !event.target.validity.valid,
-                };
-                onChange(
-                  { ...value, email: event.target.value },
-                  Object.values(newValue).some((isInvalid) => isInvalid),
-                );
-                return newValue;
-              });
+              const newValue = {
+                ...hasInvalidInput,
+                email: !event.target.validity.valid,
+              };
+              setHasInvalidInput(newValue);
+              onChange(
+                { ...value, email: event.target.value },
+                Object.values(newValue).some((isInvalid) => isInvalid),
+              );
             }}
           />
 
@@ -179,23 +177,21 @@ export function PersonalInfoQuestion({
               }))
             }
             onChange={(event) => {
-              setHasInvalidInput((prev) => {
-                const newValue = {
-                  ...prev,
-                  phone: !event.target.validity.valid,
-                };
-                const sanitizedPhone = event.target.value
-                  .replace(/\s+/g, '')
-                  .trim();
-                onChange(
-                  {
-                    ...value,
-                    phone: sanitizedPhone,
-                  },
-                  Object.values(newValue).some((isInvalid) => isInvalid),
-                );
-                return newValue;
-              });
+              const newValue = {
+                ...hasInvalidInput,
+                phone: !event.target.validity.valid,
+              };
+              setHasInvalidInput(newValue);
+              const sanitizedPhone = event.target.value
+                .replace(/\s+/g, '')
+                .trim();
+              onChange(
+                {
+                  ...value,
+                  phone: sanitizedPhone,
+                },
+                Object.values(newValue).some((isInvalid) => isInvalid),
+              );
             }}
           />
 

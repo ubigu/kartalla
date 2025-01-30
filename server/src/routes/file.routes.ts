@@ -93,7 +93,7 @@ router.post(
       mimetype,
       details,
       surveyId: surveyId == null ? null : Number(surveyId),
-      organization: organizations[0], // For now, use the first organization
+      organizationId: organizations[0], // For now, use the first organization
     });
     res.status(200).json({ id });
   }),

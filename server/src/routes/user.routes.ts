@@ -28,7 +28,7 @@ router.get(
   ]),
   asyncHandler(async (req, res) => {
     const users = await getUsers(
-      req.user.organizations,
+      req.user.organizations.map((o) => o.id),
       req.query.includePending === 'true',
     );
     res.json(users);
@@ -74,7 +74,7 @@ router.get(
   asyncHandler(async (req, res) => {
     // Exclude logged in user from response
     const users = await getUsers(
-      req.user.organizations,
+      req.user.organizations.map((o) => o.id),
       req.query.includePending === 'true',
       [req.user.id],
     );
@@ -97,7 +97,7 @@ router.post(
       fullName: req.body.name,
       email: req.body.email,
       roles: [req.body.role],
-      organizations: req.user.organizations,
+      organizations: req.user.organizations.map((o) => o.id),
     };
     const user = await addPendingUserRequest(newUser);
 

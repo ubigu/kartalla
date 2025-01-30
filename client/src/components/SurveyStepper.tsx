@@ -290,7 +290,7 @@ export default function SurveyStepper({
     setShouldSubmit(false);
     doSubmit();
   }, [shouldSubmit]);
-
+  console.log(survey);
   async function doSubmit(info?: SubmissionInfo) {
     if (isTestSurvey) {
       onComplete();
@@ -299,12 +299,12 @@ export default function SurveyStepper({
     setLoading(true);
 
     const visibleAnswers = getAnswersForSubmission(visiblePages);
-
+    console.log(survey);
     try {
       await request(
-        `/api/published-surveys/${survey.name}/submission${
-          unfinishedToken ? `?token=${unfinishedToken}` : ''
-        }`,
+        `/api/published-surveys/${survey.organization.name}/${
+          survey.name
+        }/submission${unfinishedToken ? `?token=${unfinishedToken}` : ''}`,
         { method: 'POST', body: { entries: visibleAnswers, info, language } },
       );
       setLoading(false);

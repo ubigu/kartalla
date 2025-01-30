@@ -71,7 +71,7 @@ export default function EditSurveyInfo(props: Props) {
   const { allUsers, activeUser } = useUser();
 
   const testSurveyUrl = useMemo(() => {
-    return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
+    return `${window.location.origin}/${originalActiveSurvey.organization.name}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
 
   const localLanguage = useMemo(() => {

@@ -1,3 +1,8 @@
+interface Organization {
+  id: string;
+  name: string;
+}
+
 /**
  * Application user
  */
@@ -15,9 +20,9 @@ export interface User {
    */
   email: string;
   /**
-   * User's group ids
+   * User's group ids and mapped names
    */
-  organizations: string[];
+  organizations: Organization[];
   /**
    * User's roles
    */

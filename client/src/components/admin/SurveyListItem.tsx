@@ -99,7 +99,7 @@ export default function SurveyListItem(props: Props) {
     }
     return `${window.location.protocol}//${window.location.hostname}${
       window.location.port ? `:${window.location.port}` : ''
-    }/${survey.name}`;
+    }/${survey.organization.name}/${survey.name}`;
   }, [survey.name]);
 
   return (

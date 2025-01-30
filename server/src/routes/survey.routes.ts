@@ -56,7 +56,9 @@ router.get(
   '/org-tags',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const orgTags = await getTagsByOrganizations(req.user.organizations);
+    const orgTags = await getTagsByOrganizations(
+      req.user.organizations.map((o) => o.id),
+    );
     res.json(orgTags);
   }),
 );
@@ -83,10 +85,11 @@ router.get(
     const organization = isSuperUser(req.user)
       ? null
       : req.user.organizations[0];
+
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
-      organization,
+      organization?.id ?? null,
     );
 
     res.status(200).json(surveys);
@@ -116,7 +119,7 @@ router.get(
     const survey = await getSurvey({
       id: surveyId,
       ...(!isSuperUser(req.user) && {
-        organization: req.user.organizations[0],
+        organization: req.user.organizations[0].id,
       }),
     });
     res.status(200).json(survey);
@@ -214,8 +217,8 @@ router.put(
       .isString()
       .withMessage('Section type must be a string'),
     body('organization')
-      .isString()
-      .withMessage('Organization must be a string'),
+      .isObject()
+      .withMessage('Organization must be an object'),
     body('tags').optional().isArray().withMessage('Tags must be an array.'),
   ]),
   asyncHandler(async (req, res) => {
@@ -525,10 +528,9 @@ router.get(
       res.locals;
     const submissions = await getSubmissionsForSurvey(
       Number(req.params.id),
+      personalIncluded,
       alphanumericIncluded,
       geospatialIncluded,
-      true,
-      personalIncluded,
     );
     res.json(submissions);
   }),

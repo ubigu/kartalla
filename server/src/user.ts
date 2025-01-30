@@ -1,4 +1,4 @@
-import { User as ApplicationUser } from '@interfaces/user';
+import { User as ApplicationUser, Organization } from '@interfaces/user';
 import { getDb, encryptionKey } from './database';
 import { BadRequestError, InternalServerError } from './error';
 import { sendMail } from './email/email';
@@ -23,6 +23,23 @@ interface DbUser {
   isPending?: boolean;
 }
 
+export function dbOrganizationIdToOrganization(
+  organizationId: string,
+): Organization {
+  const userGroupNameMapping = JSON.parse(process.env.USER_GROUP_NAME_MAPPING);
+  return {
+    id: organizationId,
+    name: userGroupNameMapping[organizationId] ?? organizationId,
+  };
+}
+
+export function getOrganizationIdWithName(organizationName: string) {
+  const userGroupNameMapping = JSON.parse(process.env.USER_GROUP_NAME_MAPPING);
+  return Object.keys(userGroupNameMapping).find(
+    (key) => userGroupNameMapping[key] === organizationName,
+  );
+}
+
 /**
  * Converts a DB user into user
  * @param dbUser DB user
@@ -35,7 +52,9 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         id: dbUser.id,
         fullName: dbUser.full_name,
         email: dbUser.email,
-        organizations: dbUser.organizations,
+        organizations: dbUser.organizations.map((id: string) =>
+          dbOrganizationIdToOrganization(id),
+        ),
         roles: dbUser.roles,
         ...(dbUser.isPending && { isPending: dbUser.isPending }),
       };
@@ -52,7 +71,11 @@ export function isSuperUser(user?: Express.User) {
 }
 
 /** Add pending user request */
-export async function addPendingUserRequest(user: Omit<ApplicationUser, 'id'>) {
+export async function addPendingUserRequest(
+  user: Omit<ApplicationUser, 'id' | 'organizations'> & {
+    organizations: string[];
+  },
+) {
   const tr = useTranslations('fi');
   const existingUser = await getDb().oneOrNone<DbUser>(
     `
@@ -149,7 +172,7 @@ export async function upsertUser(user: Express.User) {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
-        organizations: user.organizations,
+        organizations: user.organizations.map((org) => org.id),
         roles: user.roles,
         encryptionKey,
       },

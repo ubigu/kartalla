@@ -1,4 +1,4 @@
-import { alpha, Components, createTheme, Theme } from '@mui/material/styles';
+import { Components, createTheme, Theme } from '@mui/material/styles';
 
 const havu = '#00a393';
 const textlink = '#219acd';
