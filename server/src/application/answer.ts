@@ -436,7 +436,7 @@ async function answerEntriesToCSV(
         for (const [headerKey, headerValue] of Object.entries(headerObj)) {
           csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
             ? `,"${Object.values(submissions[i])[0][headerKey]}"`
-            : '';
+            : ',';
         }
       });
       csvData += '\n';
@@ -1202,10 +1202,10 @@ export async function getAnswerCounts(surveyId: number) {
   }>(
     `
     WITH answer_entries AS (
-      SELECT ae.id, ae.submission_id, ps.type, ps.parent_section FROM DATA.answer_entry ae
-      LEFT JOIN DATA.page_section ps ON ps.id = ae.section_id
-      LEFT JOIN DATA.submission sub ON sub.id = ae.submission_id 
+      SELECT sub.id AS submission_id, ae.id, ps.type, ps.parent_section FROM DATA.submission sub 
+      LEFT JOIN DATA.answer_entry ae ON sub.id = ae.submission_id 
       LEFT JOIN DATA.survey s ON s.id = sub.survey_id
+      LEFT JOIN DATA.page_section ps ON ps.id = ae.section_id
       WHERE s.id = $1
     ), personal_info_entries AS (
       SELECT * FROM DATA.personal_info 

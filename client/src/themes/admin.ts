@@ -22,9 +22,12 @@ export const theme = createTheme(
   ubiTheme,
   {
     palette: {
-      disabled: {
-        main: '#858585',
-      },
+      disabled: ubiTheme.palette.augmentColor({
+        color: {
+          main: '#858585',
+        },
+        name: 'disabled',
+      }),
     },
     components: {
       ...surveyCardOverrides,
