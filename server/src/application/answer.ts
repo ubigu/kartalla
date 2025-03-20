@@ -716,7 +716,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
         LEFT JOIN data.option opt ON opt.id = ae.value_option_id
-        WHERE (type = 'map' OR parent_section IS NOT NULL)
+        WHERE (type = 'map' OR type = 'budget-map' OR parent_section IS NOT NULL)
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
           ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index, opt.idx`,

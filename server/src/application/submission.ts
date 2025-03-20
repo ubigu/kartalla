@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  BudgetMapQuestionAnswer,
   LanguageCode,
   MapQuestionAnswer,
   PersonalInfoAnswer,
@@ -150,6 +151,52 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
   });
 }
 
+async function validateEntriesByMaxBudget(answerEntries: AnswerEntry[]) {
+  type BudgetMapEntry = AnswerEntry & { type: 'budget-map' };
+  const budgetMapAnswerEntries = answerEntries.filter<BudgetMapEntry>(
+    (entry): entry is BudgetMapEntry => entry.type === 'budget-map',
+  );
+
+  if (budgetMapAnswerEntries.length === 0) return;
+
+  const budgetMapQuestions = await getDb().manyOrNone<{
+    id: number;
+    budget: number;
+  }>(
+    `SELECT id, (details->>'budget')::int budget FROM data.page_section WHERE id = ANY ($1)`,
+    [budgetMapAnswerEntries.map((entry) => entry.sectionId)],
+  );
+
+  const optionIdsInAnswers = budgetMapAnswerEntries.reduce<number[]>(
+    (acc, entry) => acc.concat(entry.value.map((value) => value.optionId)),
+    [],
+  );
+
+  const options = await getDb().manyOrNone<{ id: number; value: number }>(
+    `SELECT id, value FROM data.option WHERE id = ANY ($1)`,
+    [optionIdsInAnswers],
+  );
+
+  budgetMapAnswerEntries.forEach((entry) => {
+    const question = budgetMapQuestions.find((q) => q.id === entry.sectionId);
+    if (!question) {
+      throw new BadRequestError(
+        `Question ${entry.sectionId} not found in budget map questions`,
+      );
+    }
+    const entryTotalBudget = entry.value.reduce(
+      (total, value) =>
+        total + (options.find((o) => o.id === value.optionId)?.value ?? 0),
+      0,
+    );
+    if (entryTotalBudget > question.budget) {
+      throw new BadRequestError(
+        `Total budget for question ${entry.sectionId} exceeds the limit of ${question.budget}`,
+      );
+    }
+  });
+}
+
 /**
  * Validate answer entries to contain answers required questions
  * Disregard follow-up questions as they are conditionally answered
@@ -195,6 +242,7 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   await Promise.all([
     validateEntriesByAnswerLimits(answerEntries),
     validateEntriesByIsRequired(answerEntries),
+    validateEntriesByMaxBudget(answerEntries),
   ]);
 }
 
@@ -330,7 +378,9 @@ export async function createSurveySubmission(
   }
 
   const entryRows = answerEntriesToRows(id, answerEntries);
+  logger.info(JSON.stringify(entryRows));
   const inputSRID = getSRIDFromEntries(answerEntries);
+  logger.info(`SRID: ${inputSRID}`);
   const submissionStatus = {
     id,
     // Timestamp of the submission = timestamp of the last update
@@ -346,13 +396,18 @@ export async function createSurveySubmission(
     throw new BadRequestError(`Invalid submission with no answers.`);
   }
 
+  const entryRowsWithoutSubQuestions = entryRows.map((row) => {
+    const { subQuestionAnswers, ...entry } = row;
+    return entry;
+  });
   // While inserting the entries, pick all entry IDs for linking subquestion answers where needed
   const entryIds = await getDb().manyOrNone<{ id: number }>(
     `${getMultiInsertQuery(
-      entryRows,
+      entryRowsWithoutSubQuestions,
       answerEntryColumnSet(inputSRID),
     )} RETURNING id;`,
   );
+  logger.info(JSON.stringify(entryIds));
 
   // Insert subquestion answers for the newly created entries
   await Promise.all(
@@ -389,7 +444,9 @@ export async function createSurveySubmission(
  */
 function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
   const geometryEntry = submissionEntries.find(
-    (entry) => entry.type === 'map' && entry.value.length > 0,
+    (entry) =>
+      (entry.type === 'map' || entry.type === 'budget-map') &&
+      entry.value.length > 0,
   );
   if (!geometryEntry) return null;
 
@@ -511,6 +568,26 @@ function answerEntriesToRows(
             parent_entry_id: parentEntryId,
             value_text: null,
             value_option_id: null,
+            value_geometry: value.geometry?.geometry,
+            value_numeric: null,
+            value_json: null,
+            value_file: null,
+            value_file_name: null,
+            map_layers: value.mapLayers,
+            // Save subquestion answers under the entry for inserting them with correct parent entry ID later on
+            subQuestionAnswers: value.subQuestionAnswers,
+          };
+        }, []);
+
+        break;
+      case 'budget-map':
+        newEntries = entry.value.map((value) => {
+          return {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: null,
+            value_option_id: value.optionId,
             value_geometry: value.geometry?.geometry,
             value_numeric: null,
             value_json: null,
@@ -723,6 +800,49 @@ function dbAnswerEntriesToAnswerEntries(
               geometry: row.value_geometry,
               properties: {},
             },
+            mapLayers: row.map_layers,
+            // The function should only return map subquestion answers because of filtering - assume the type here
+            subQuestionAnswers: dbAnswerEntriesToAnswerEntries(
+              rows,
+              row.id,
+            ) as SurveyMapSubQuestionAnswer[],
+          };
+          if (value != null) {
+            entry.value.push(value);
+          }
+          break;
+        }
+        case 'budget-map': {
+          logger.info(JSON.stringify(row));
+          // Try to find an existing entry for this section
+          let entry = entries.find(
+            (entry): entry is AnswerEntry & { type: 'budget-map' } =>
+              entry.sectionId === row.section_id,
+          );
+          // If the entry doesn't exist, create it
+          if (
+            !entry &&
+            (entry = {
+              sectionId: row.section_id,
+              type: 'budget-map',
+              value: [],
+            })
+          ) {
+            entries.push(entry);
+          }
+          const value: BudgetMapQuestionAnswer = {
+            selectionType:
+              row.value_geometry.type === 'Point'
+                ? 'point'
+                : row.value_geometry.type === 'LineString'
+                  ? 'line'
+                  : 'area',
+            geometry: {
+              type: 'Feature',
+              geometry: row.value_geometry,
+              properties: {},
+            },
+            optionId: row.value_option_id,
             mapLayers: row.map_layers,
             // The function should only return map subquestion answers because of filtering - assume the type here
             subQuestionAnswers: dbAnswerEntriesToAnswerEntries(

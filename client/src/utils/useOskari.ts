@@ -31,6 +31,7 @@ const defaultFeatureStyle: FeatureStyle = {
 const defaultMarkerStyle: MarkerStyle = {
   shape: null,
   size: null,
+  font: 'bold 14px Verdana',
 };
 
 function getOrigin(url: string) {
@@ -201,33 +202,21 @@ export function useOskari() {
       const isPrimaryStyle =
         feature.properties.question.id === features[0].properties?.question?.id;
       if (isPointFeature(feature)) {
-        if (feature.properties.selected) {
-          const style =
-            getMarkerStyle?.(feature, isPrimaryStyle, false) ??
-            defaultMarkerStyle;
-          rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
-            {
-              x: (feature.geometry as any).coordinates[0],
-              y: (feature.geometry as any).coordinates[1],
-              offsetX: 0,
-              offsetY: 0,
-              ...style,
-              size: style.size * 2,
-              color: '#ffffff',
-            },
-            String(feature.id) + '_selection',
-          ]);
-        }
+        const style =
+          getMarkerStyle?.(feature, isPrimaryStyle, true) ?? defaultMarkerStyle;
         rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
           {
             x: (feature.geometry as any).coordinates[0],
             y: (feature.geometry as any).coordinates[1],
             offsetX: 0,
             offsetY: 0,
-            ...(getMarkerStyle?.(feature, isPrimaryStyle, true) ??
-              defaultMarkerStyle),
+            ...style,
+            ...(feature.properties.selected && {
+              size: style.size * 2,
+            }),
           },
-          String(feature.id),
+          String(feature.id) +
+            (feature.properties.selected ? '_selection' : ''),
         ]);
       } else {
         const style: FeatureStyle =
@@ -245,16 +234,15 @@ export function useOskari() {
             featureStyle: {
               ...style,
               text: {
-                font: 'bold 14px Arial',
+                font: 'bold 14px Verdana',
                 labelProperty: 'submissionId',
+                labelText: feature.properties.submissionId,
               },
               ...(feature.properties.selected && {
                 stroke: {
                   ...style.stroke,
+                  color: '#0076A3',
                   lineDash: null,
-                },
-                text: {
-                  labelText: feature.properties.submissionId,
                 },
               }),
             },

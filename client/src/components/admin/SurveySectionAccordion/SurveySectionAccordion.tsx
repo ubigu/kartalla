@@ -1,5 +1,6 @@
 import {
   Conditions,
+  SurveyBudgetMapQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -67,8 +68,9 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
-import { Person } from '@mui/icons-material';
+import { Euro, Person } from '@mui/icons-material';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditBudgetMapQuestion from '../EditBudgetMapQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -119,7 +121,7 @@ export default function SurveySectionAccordion(props: Props) {
   const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number | null>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection) {
@@ -187,6 +189,17 @@ export default function SurveySectionAccordion(props: Props) {
         <EditMapQuestion
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'budget-map': {
+      icon: <Euro />,
+      tooltip: 'Budget map question',
+      form: (
+        <EditBudgetMapQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyBudgetMapQuestion}
           onChange={handleEdit}
         />
       ),

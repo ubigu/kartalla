@@ -8,6 +8,7 @@ import {
   SectionOption,
   SectionOptionGroup,
   Survey,
+  SurveyBudgetMapQuestion,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
   SurveyFollowUpSection,
@@ -20,6 +21,7 @@ import {
   SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
   SurveyRadioQuestion,
+  SurveySortingQuestion,
   SurveyTheme,
 } from '@interfaces/survey';
 
@@ -49,6 +51,7 @@ const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
   'checkbox',
   'sorting',
+  'budget-map',
 ];
 
 /**
@@ -135,6 +138,7 @@ interface DBSectionOption {
   id?: number;
   idx: number;
   text: LocalizedText;
+  value: number;
   section_id: number;
   info?: LocalizedText;
   group_id: number;
@@ -194,6 +198,7 @@ type DBSurveyJoin = DBSurvey & {
   section_file_url: string;
   option_id: number;
   option_text: LocalizedText;
+  option_value: number;
   option_group_id: number;
   option_info: LocalizedText;
   theme_id: number;
@@ -288,6 +293,7 @@ export async function getPublishedSurvey(
       survey_page_section.*,
       option.id as option_id,
       option.text as option_text,
+      option.value as option_value,
       option.idx as option_idx,
       option.group_id as option_group_id,
       option.info as option_info
@@ -491,7 +497,11 @@ export async function getPublishedSurvey(
     // Only look for options if the section type allows options
     if (sectionTypesWithOptions.includes(section?.type)) {
       // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
-      const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
+      const question = section as
+        | SurveyRadioQuestion
+        | SurveyCheckboxQuestion
+        | SurveySortingQuestion
+        | SurveyBudgetMapQuestion;
       // Try to find the pre-existing question option object
       let option = question.options.find(
         (option) => option.id === row.option_id,
@@ -552,7 +562,8 @@ export async function getSurvey(
       option.text as option_text,
       option.idx as option_idx,
       option.group_id as option_group_id,
-      option.info as option_info
+      option.info as option_info,
+      option.value as option_value
     FROM (
       SELECT
         survey_page.*,
@@ -726,7 +737,11 @@ export async function getSurvey(
     // Only look for options if the section type allows options
     if (sectionTypesWithOptions.includes(section?.type)) {
       // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
-      const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
+      const question = section as
+        | SurveyRadioQuestion
+        | SurveyCheckboxQuestion
+        | SurveySortingQuestion
+        | SurveyBudgetMapQuestion;
       // Try to find the pre-existing question option object
       let option = question.options.find(
         (option) => option.id === row.option_id,
@@ -934,7 +949,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSectionOption>(
     `
-    INSERT INTO data.option (id, text, section_id, idx, group_id, info)
+    INSERT INTO data.option (id, text, value, section_id, idx, group_id, info)
     VALUES (
       COALESCE(
         CASE
@@ -944,6 +959,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
         NEXTVAL('data.option_id_seq')
       ),
       $(text)::json,
+      $(value),
       $(sectionId),
       $(index),
       $(groupId),
@@ -952,6 +968,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
     ON CONFLICT (id) DO
       UPDATE SET
         text = $(text)::json,
+        value = $(value),
         section_id = $(sectionId),
         idx = $(index),
         group_id = $(groupId),
@@ -961,6 +978,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
     {
       id: option.id,
       text: option.text,
+      value: option.value,
       sectionId: option.section_id,
       index,
       groupId: option.group_id,
@@ -1695,6 +1713,7 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
         id: dbSurveyJoin.option_id,
         text: dbSurveyJoin.option_text,
         info: dbSurveyJoin.option_info,
+        value: dbSurveyJoin.option_value,
       };
 }
 
@@ -1969,6 +1988,7 @@ function optionsToRows(
       id: option.id ?? null,
       idx: index,
       text: option.text,
+      value: option.value,
       info: option.info,
       group_id: optionGroupId ?? null,
     } as DBSectionOption;

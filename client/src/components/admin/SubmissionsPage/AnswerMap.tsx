@@ -34,9 +34,9 @@ export default function AnswerMap({
     if (!question) return false;
 
     return (
-      question.type === 'map' ||
-      (question?.followUpSections?.some(
-        (followUpSection) => followUpSection.type === 'map',
+      ['map', 'budget-map'].includes(question.type) ||
+      (question?.followUpSections?.some((followUpSection) =>
+        ['map', 'budget-map'].includes(followUpSection.type),
       ) ??
         false)
     );
@@ -51,16 +51,19 @@ export default function AnswerMap({
       selectedAnswer &&
       selectedAnswer.submissionId === submission.id &&
       selectedAnswer.questionId === section.id &&
-      (section.type === 'map' ? selectedAnswer.index === index : true)
+      (['map', 'budget-map'].includes(section.type)
+        ? selectedAnswer.index === index
+        : true)
     );
   }
 
   function getAnswerVisibility(answer: AnswerEntry) {
     if (!answer.value) return false;
     // Current question is not selected, filter away answers that are not map answers
-    if (selectedQuestion.id === 0) return answer.type === 'map';
+    if (selectedQuestion.id === 0)
+      return ['map', 'budget-map'].includes(answer.type);
 
-    if (answer.type === 'map') {
+    if (['map', 'budget-map'].includes(answer.type)) {
       if (answer.sectionId === selectedQuestion.id) {
         return true;
       } else if (selectedQuestion.followUpSections?.length > 0) {
@@ -88,8 +91,11 @@ export default function AnswerMap({
             ...features,
             ...submission.answerEntries
 
-              .filter((answer): answer is AnswerEntry & { type: 'map' } =>
-                getAnswerVisibility(answer),
+              .filter(
+                (
+                  answer,
+                ): answer is AnswerEntry & { type: 'map' | 'budget-map' } =>
+                  getAnswerVisibility(answer),
               )
 
               // Reduce answer's values into a single array of features
@@ -115,6 +121,12 @@ export default function AnswerMap({
                         question: question,
                         submissionId: submission.id,
                         index,
+                        ...('optionId' in value &&
+                          question.type === 'budget-map' && {
+                            selectedOption: question.options.find(
+                              (o) => o.id === value.optionId,
+                            ),
+                          }),
                         selected: isFeatureSelected(
                           submission,
                           question,
@@ -146,8 +158,10 @@ export default function AnswerMap({
 
     const firstQuestionWithMap = questions.find(
       (question) =>
-        question.type === 'map' ||
-        question.followUpSections?.some((section) => section.type === 'map'),
+        ['map', 'budget-map'].includes(question.type) ||
+        question.followUpSections?.some((section) =>
+          ['map', 'budget-map'].includes(section.type),
+        ),
     );
     if (!firstQuestionWithMap) return [];
     // If all answers are currently shown, find the first map question to determine shown map layers

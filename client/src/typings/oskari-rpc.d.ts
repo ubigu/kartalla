@@ -231,6 +231,11 @@ declare module 'oskari-rpc' {
    * Style for a feature
    */
   export interface FeatureStyle {
+    text?: {
+      labelProperty: string;
+      labelText: string;
+      font: string;
+    };
     stroke?: {
       color: string;
       width: number;
@@ -250,6 +255,7 @@ declare module 'oskari-rpc' {
     size: number;
     color?: string;
     msg?: string;
+    font?: string;
   }
 
   /**

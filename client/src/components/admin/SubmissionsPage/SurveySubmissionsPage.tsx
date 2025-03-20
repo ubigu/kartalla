@@ -35,28 +35,34 @@ import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 import DataPublish from '../DataPublish';
 import React from 'react';
 
-function isMapEntry(
-  entry: AnswerEntry,
-): entry is AnswerEntry & { type: 'map' } {
-  return entry.type === 'map';
-}
-
 function answerEntryToItems(
   submission: Submission,
   entry: AnswerEntry,
 ): AnswerItem[] {
-  if (!isMapEntry(entry)) {
-    return [{ submission, entry }];
+  switch (entry.type) {
+    case 'map':
+      return entry.value.map((value, index) => ({
+        submission,
+        entry: {
+          sectionId: entry.sectionId,
+          type: entry.type,
+          value: [value],
+          index,
+        },
+      }));
+    case 'budget-map':
+      return entry.value.map((value, index) => ({
+        submission,
+        entry: {
+          sectionId: entry.sectionId,
+          type: entry.type,
+          value: [value],
+          index,
+        },
+      }));
+    default:
+      return [{ submission, entry }];
   }
-  return entry.value.map((value, index) => ({
-    submission,
-    entry: {
-      sectionId: entry.sectionId,
-      type: entry.type,
-      value: [value],
-      index,
-    },
-  }));
 }
 
 export default function SurveySubmissionsPage() {
