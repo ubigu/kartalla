@@ -5,6 +5,7 @@ import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { AnswerSelection } from './AnswersList';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
   url: string;
@@ -30,6 +31,7 @@ export default function OskariMap({
     setVisibleLayers,
     oskariVersion,
   } = useOskari();
+  const { surveyLanguage } = useTranslations();
   const { mapFeatureColorScheme } = useSurveyMap();
 
   // Default feature style
@@ -121,6 +123,10 @@ export default function OskariMap({
     return feature.properties.question?.followUpSections?.length > 0;
   }
 
+  function featureIsBudgetMapQuestion(feature: Feature) {
+    return feature.properties.question?.type === 'budget-map';
+  }
+
   function getMarkerStyle(
     feature: Feature,
     isPrimaryStyle: boolean,
@@ -142,6 +148,10 @@ export default function OskariMap({
         msg: `${feature.properties.submissionId}${
           featureIsForFollowUpSection(feature)
             ? `-${feature.properties.index + 1}`
+            : ''
+        } ${
+          featureIsBudgetMapQuestion(feature)
+            ? `(${feature.properties?.selectedOption?.text?.[surveyLanguage]})`
             : ''
         }`,
       };
@@ -180,7 +190,7 @@ export default function OskariMap({
     }
 
     drawFeatures(features, getFeatureStyle, getMarkerStyle);
-  }, [features, selectedAnswer, isMapReady, oskariVersion]);
+  }, [features, selectedAnswer, isMapReady, oskariVersion, surveyLanguage]);
 
   /**
    * Update visible layers onto the map

@@ -1,6 +1,7 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import {
   MapQuestionSelectionType,
+  SurveyBudgetMapQuestion,
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import { LineString, Point, Polygon } from 'geojson';
@@ -144,7 +145,7 @@ const defaultFeatureStyle = {
 
 function getFeatureStyle(
   selectionType: MapQuestionSelectionType,
-  question: SurveyMapQuestion,
+  question: SurveyMapQuestion | SurveyBudgetMapQuestion,
 ) {
   // Use default style for points
   if (selectionType === 'point') {
@@ -317,7 +318,7 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
-  const drawingRef = useRef<boolean>();
+  const drawingRef = useRef<boolean | null>(null);
   drawingRef.current = state.questionId != null;
 
   const isMapReady = useMemo(() => {
@@ -374,6 +375,12 @@ export function useSurveyMap() {
               : 0,
             offsetX: 0,
             offsetY: 0,
+            msg:
+              'options' in feature.properties.question &&
+              feature.properties.question.options.find(
+                (option: { id: string }) =>
+                  option.id === feature.properties.optionId,
+              ).text[language],
             size:
               isCustomIcon &&
               state.oskariVersion >= 270 &&
@@ -473,7 +480,10 @@ export function useSurveyMap() {
      * @param question Map question
      * @returns Drawn geometry
      */
-    async draw(type: MapQuestionSelectionType, question: SurveyMapQuestion) {
+    async draw(
+      type: MapQuestionSelectionType,
+      question: SurveyMapQuestion | SurveyBudgetMapQuestion,
+    ) {
       // Stop any previous drawing if the map is in a draw state
       if (state.questionId) {
         state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [

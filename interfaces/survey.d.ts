@@ -28,6 +28,7 @@ export type SurveyQuestion =
   | SurveyNumericQuestion
   | SurveyFreeTextQuestion
   | SurveyMapQuestion
+  | SurveyBudgetMapQuestion
   | SurveySortingQuestion
   | SurveySliderQuestion
   | SurveyMultiMatrixQuestion
@@ -204,6 +205,30 @@ export type FeatureStrokeStyle = 'solid' | 'dashed' | 'dotted';
 export interface SurveyMapQuestion extends CommonSurveyPageQuestion {
   type: 'map';
   selectionTypes: MapQuestionSelectionType[];
+  featureStyles: {
+    point: {
+      /**
+       * Marker icon in SVG format
+       */
+      markerIcon: string;
+    };
+    line: { strokeStyle: FeatureStrokeStyle; strokeColor: string };
+    area: {
+      strokeStyle: FeatureStrokeStyle;
+      strokeColor: string;
+    };
+  };
+  subQuestions: SurveyMapSubQuestion[];
+}
+
+/**
+ * Budget map question
+ */
+export interface SurveyBudgetMapQuestion extends CommonSurveyPageQuestion {
+  type: 'budget-map';
+  selectionTypes: MapQuestionSelectionType[];
+  budget: number;
+  options: SectionOption[];
   featureStyles: {
     point: {
       /**
@@ -532,7 +557,7 @@ export type APISurvey = Omit<Survey, 'createdAt' | 'updatedAt'>;
 export type EnabledLanguages = Record<LanguageCode, boolean>;
 
 /**
- * A single option of a multichoise question
+ * A single option of a question
  */
 export interface SectionOption {
   /**
@@ -547,6 +572,10 @@ export interface SectionOption {
    * Localized text field of the option's info
    */
   info?: LocalizedText;
+  /**
+   * A numeric value for the option
+   */
+  value?: number;
 }
 
 /**
@@ -599,6 +628,14 @@ export interface MapQuestionAnswer {
 }
 
 /**
+ * Answer value for a single budget map question.
+ */
+
+export interface BudgetMapQuestionAnswer extends MapQuestionAnswer {
+  optionId: number;
+}
+
+/**
  * Submission entry interface
  */
 export type AnswerEntry = {
@@ -636,6 +673,10 @@ export type AnswerEntry = {
   | {
       type: 'map';
       value: MapQuestionAnswer[];
+    }
+  | {
+      type: 'budget-map';
+      value: BudgetMapQuestionAnswer[];
     }
   | {
       type: 'sorting';

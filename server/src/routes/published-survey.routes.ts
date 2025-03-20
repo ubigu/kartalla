@@ -97,7 +97,7 @@ router.post(
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
-
+    logger.info(JSON.stringify(answerEntries));
     const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
     const { id: submissionId, timestamp } = await createSurveySubmission(

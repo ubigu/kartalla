@@ -1,7 +1,10 @@
 import {
   AnswerEntry,
+  BudgetMapQuestionAnswer,
+  MapQuestionAnswer,
   SubmissionInfo,
   Survey,
+  SurveyBudgetMapQuestion,
   SurveyMapQuestion,
   SurveyPage,
 } from '@interfaces/survey';
@@ -212,27 +215,32 @@ export default function SurveyStepper({
     const mapQuestions = currentPage.sections
       .map((section) => [section, ...(section?.followUpSections ?? [])])
       .flat(1)
-      .filter((section) => section.type === 'map');
+      .filter((section) => ['map', 'budget-map'].includes(section.type));
 
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
-        const answer = answers.find(
-          (answer) => answer.sectionId === question.id,
-        ) as AnswerEntry & { type: 'map' };
+        const answer = answers.find((answer) => {
+          return answer.sectionId === question.id;
+        });
+
         return {
           ...featureCollection,
           features: [
             ...featureCollection.features,
-            ...answer.value.reduce(
+            ...(
+              answer.value as (BudgetMapQuestionAnswer | MapQuestionAnswer)[]
+            ).reduce(
               (features, value, index) => [
                 ...features,
                 {
                   ...value.geometry,
                   // Add a unique index to prevent conflicts
                   id: `feature-${question.id}-${index}`,
-                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode
+                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode and for displaying option text
                   properties: {
+                    ...('optionId' in value &&
+                      value.optionId && { optionId: value.optionId }),
                     question,
                     index,
                   },

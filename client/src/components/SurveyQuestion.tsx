@@ -1,5 +1,6 @@
 import type {
   AnswerEntry,
+  BudgetMapQuestionAnswer,
   FileAnswer,
   MapQuestionAnswer,
   PersonalInfoAnswer,
@@ -29,6 +30,7 @@ import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 import { PersonalInfoQuestion } from './PersonalInfoQuestion';
+import BudgetMapQuestion from './BudgetMapQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -229,6 +231,22 @@ function SurveyQuestion({
       {question.type === 'map' && (
         <MapQuestion
           value={value as MapQuestionAnswer[]}
+          setDialogOpen={setDialogOpen}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          mobileDrawerOpen={mobileDrawerOpen}
+        />
+      )}
+      {/* Budget map question */}
+      {question.type === 'budget-map' && (
+        <BudgetMapQuestion
+          value={value as BudgetMapQuestionAnswer[]}
           setDialogOpen={setDialogOpen}
           onChange={(value) => {
             updateAnswer({

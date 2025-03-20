@@ -1,11 +1,15 @@
-import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
+import {
+  SurveyBudgetMapQuestion,
+  SurveyMapQuestion,
+  SurveyMapSubQuestion,
+} from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 
 interface Props {
-  mapQuestion: SurveyMapQuestion;
+  mapQuestion: SurveyMapQuestion | SurveyBudgetMapQuestion;
   expandedSection: number;
   onChange: (subQuestions: SurveyMapSubQuestion[]) => void;
   disabled?: boolean;

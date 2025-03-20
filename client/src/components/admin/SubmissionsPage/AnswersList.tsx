@@ -145,31 +145,34 @@ export default function AnswersList({
             </AccordionSummary>
             {isItemSelected(answer, selectedAnswer, selectedQuestion) && (
               <AccordionDetails sx={{ borderTop: 0, padding: '1rem 2rem' }}>
-                {answer.entry.type === 'map' ? (
+                {answer.entry.type === 'map' ||
+                answer.entry.type === 'budget-map' ? (
                   <>
-                    {(answer.entry as AnswerEntry & { type: 'map' }).value.map(
-                      (item) =>
-                        item.subQuestionAnswers.map(
-                          (subquestionAnswer, index) => (
-                            <SurveyQuestion
-                              pageUnfinished={false}
-                              mobileDrawerOpen={false}
-                              key={index}
-                              readOnly
-                              question={(
-                                surveyQuestions.find(
-                                  (question) =>
-                                    question.id === answer.entry.sectionId,
-                                ) as SurveyMapQuestion
-                              )?.subQuestions?.find(
-                                (subQuestion) =>
-                                  subQuestion.id ===
-                                  subquestionAnswer.sectionId,
-                              )}
-                              value={subquestionAnswer.value}
-                            />
-                          ),
+                    {(
+                      answer.entry as AnswerEntry & {
+                        type: 'map' | 'budget-map';
+                      }
+                    ).value.map((item) =>
+                      item.subQuestionAnswers.map(
+                        (subquestionAnswer, index) => (
+                          <SurveyQuestion
+                            pageUnfinished={false}
+                            mobileDrawerOpen={false}
+                            key={index}
+                            readOnly
+                            question={(
+                              surveyQuestions.find(
+                                (question) =>
+                                  question.id === answer.entry.sectionId,
+                              ) as SurveyMapQuestion
+                            )?.subQuestions?.find(
+                              (subQuestion) =>
+                                subQuestion.id === subquestionAnswer.sectionId,
+                            )}
+                            value={subquestionAnswer.value}
+                          />
                         ),
+                      ),
                     )}
                   </>
                 ) : (

@@ -1,5 +1,5 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Person } from '@mui/icons-material';
+import { Euro, Person } from '@mui/icons-material';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
@@ -98,6 +98,29 @@ export default function AddSurveySectionActions(props: Props) {
     map: {
       type: 'map',
       title: initializeLocalizedObject(''),
+      isRequired: false,
+      info: null,
+      selectionTypes: [],
+      featureStyles: {
+        point: {
+          markerIcon: null,
+        },
+        line: {
+          strokeStyle: null,
+          strokeColor: null,
+        },
+        area: {
+          strokeStyle: null,
+          strokeColor: null,
+        },
+      },
+      subQuestions: [],
+    },
+    'budget-map': {
+      type: 'budget-map',
+      title: initializeLocalizedObject(''),
+      budget: 0,
+      options: [],
       isRequired: false,
       info: null,
       selectionTypes: [],
@@ -250,6 +273,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.mapQuestion,
       ariaLabel: 'add-map-question',
       icon: <MapIcon />,
+    },
+    {
+      type: 'budget-map',
+      label: 'Lisää geobudjetointikysymys',
+      ariaLabel: 'add-budget-map',
+      icon: <Euro />,
     },
     {
       type: 'sorting',
@@ -405,7 +434,10 @@ export default function AddSurveySectionActions(props: Props) {
 
                       setSectionSequence((prev) => prev - 1);
 
-                      if (clipboardSection.type === 'map') {
+                      if (
+                        clipboardSection.type === 'map' ||
+                        clipboardSection.type === 'budget-map'
+                      ) {
                         showToast({
                           severity: 'warning',
                           autoHideDuration: 30000,

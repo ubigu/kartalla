@@ -44,7 +44,7 @@ export default function EditRadioQuestion({
           onChange({ ...section, options });
         }}
         title={tr.SurveySections.options}
-        enableClipboardImport={true}
+        enableClipboardImport={false}
         allowOptionInfo={false}
       />
       <FormGroup row>

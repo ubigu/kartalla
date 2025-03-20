@@ -16,7 +16,7 @@ import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
-import { Person } from '@mui/icons-material';
+import { Euro, Person } from '@mui/icons-material';
 import React from 'react';
 
 interface Props {
@@ -36,6 +36,8 @@ function getQuestionIcon(
       return <NumericFieldIcon color="primary" />;
     case 'map':
       return <MapIcon color="primary" />;
+    case 'budget-map':
+      return <Euro color="primary" />;
     case 'sorting':
       return <OrderedIcon color="primary" />;
     case 'slider':

@@ -113,6 +113,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: [],
       };
+    case 'budget-map':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     case 'sorting':
       return {
         sectionId: section.id,

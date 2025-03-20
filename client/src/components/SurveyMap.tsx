@@ -24,7 +24,7 @@ interface MapPosition {
 export default function SurveyMap(props: Props) {
   const [mapInitialized, setMapInitialized] = useState(false);
   const [mapInitialPos, setMapiInitialPos] = useState<MapPosition | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>();
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const {
     rpcChannel,
     setRpcChannel,
