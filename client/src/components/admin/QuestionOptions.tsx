@@ -120,6 +120,7 @@ export default function QuestionOptions({
         <Fab
           color="primary"
           disabled={disabled}
+          data-testid="add-question-option"
           aria-label="add-question-option"
           size="small"
           sx={{ boxShadow: 'none' }}

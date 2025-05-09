@@ -54,6 +54,15 @@ export async function clearData() {
 SELECT data.truncate_tables();`);
 }
 
+export async function clearSurveyData(surveyId: number) {
+  return connection.query(`
+    DELETE FROM DATA.answer_entry WHERE submission_id = (SELECT id FROM DATA.submission WHERE survey_id = ${surveyId});
+    DELETE FROM DATA.personal_info WHERE submission_id = (SELECT id FROM DATA.submission WHERE survey_id = ${surveyId});
+    DELETE FROM DATA.submission WHERE survey_id = ${surveyId};
+    DELETE FROM DATA.survey WHERE id = ${surveyId};
+    `);
+}
+
 export async function clearSections() {
   return connection.query(`
     DELETE FROM data.page_section;`);

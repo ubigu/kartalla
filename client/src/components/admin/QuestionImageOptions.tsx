@@ -125,10 +125,12 @@ export default function QuestionImageOptions({
       <Stack gap={'1rem'}>
         {options.map((option, index) => (
           <Box sx={{ ...styles.row, ...styles.option }} key={index}>
-            <Box sx={styles.optionContainer}>
+            <Box
+              sx={styles.optionContainer}
+              data-testid={`radio-image-input-option-${index}`}
+            >
               <Box display="flex" alignItems="center" gap="1rem">
                 <TextField
-                  data-testid={`radio-input-option-${index}`}
                   multiline
                   label={tr.QuestionImageOption.optionLabel}
                   inputRef={inputRefs[index]}
