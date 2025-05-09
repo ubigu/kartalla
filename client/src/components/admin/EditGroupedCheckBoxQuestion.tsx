@@ -61,7 +61,7 @@ export default function EditGroupedCheckBoxQuestion({
           control={
             <Checkbox
               name="limit-answers"
-              disabled={true}
+              disabled={disabled}
               checked={Boolean(section.answerLimits)}
               onChange={(event) => {
                 onChange({
