@@ -9,10 +9,8 @@ export function LoadingBackdrop({ open }: Props) {
   return (
     <Backdrop
       sx={(theme) => ({
-        backgroundColor: 'rgba(0, 0, 0, 0.01)',
         margin: '0 !important',
         zIndex: theme.zIndex.drawer + 1,
-        '& .MuiCardActions-root': { margin: '0 !important' },
       })}
       open={open}
     >

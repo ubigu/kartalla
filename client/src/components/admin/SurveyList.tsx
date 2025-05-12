@@ -17,6 +17,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
 import { useHistory } from 'react-router-dom';
 import { TagPicker } from '@src/components/admin/TagPicker';
+import { LoadingBackdrop } from './LoadingBackdrop';
 
 const useStyles = makeStyles({
   root: {
@@ -47,6 +48,7 @@ export default function SurveyList() {
   const [showAuthoredOnly, setShowAuthoredOnly] = useState<boolean>(false);
   const [showPublishedOnly, setShowPublishedOnly] = useState<boolean>(false);
   const [filterTags, setFilterTags] = useState<string[]>([]);
+  const [copying, setCopying] = useState(false);
   const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
@@ -166,55 +168,60 @@ export default function SurveyList() {
       {surveysLoading ? (
         <Skeleton variant="rectangular" width="auto" height={210} />
       ) : (
-        <List
-          sx={{
-            listStyle: 'none',
-            padding: '0',
-            opacity: 0,
-            '@keyframes fadeIn': { '100%': { opacity: 1 } },
-            animation: 'fadeIn 1s forwards',
-          }}
-          data-testid="survey-admin-list"
-        >
-          {surveys
-            .filter((s) => s.isArchived === (tabView === 'archived'))
-            .filter((s) =>
-              filterTags.length
-                ? filterTags.some((t) =>
-                    s.tags.length ? s.tags.includes(t) : false,
-                  )
-                : true,
-            )
-            .map((survey) => (
-              <SurveyListItem
-                onArchive={(surveyId) =>
-                  setSurveys((prev) =>
-                    prev.map((survey) =>
-                      survey.id === surveyId
-                        ? {
-                            ...survey,
-                            isArchived: true,
-                            isPublished: false,
-                            endDate: new Date(),
-                          }
-                        : survey,
-                    ),
-                  )
-                }
-                onRestore={(surveyId) =>
-                  setSurveys((prev) =>
-                    prev.map((survey) =>
-                      survey.id === surveyId
-                        ? { ...survey, isArchived: false }
-                        : survey,
-                    ),
-                  )
-                }
-                key={survey.id}
-                survey={survey}
-              />
-            ))}
-        </List>
+        <>
+          <List
+            sx={{
+              listStyle: 'none',
+              padding: '0',
+              opacity: 0,
+              '@keyframes fadeIn': { '100%': { opacity: 1 } },
+              animation: 'fadeIn 1s forwards',
+            }}
+            data-testid="survey-admin-list"
+          >
+            {surveys
+              .filter((s) => s.isArchived === (tabView === 'archived'))
+              .filter((s) =>
+                filterTags.length
+                  ? filterTags.some((t) =>
+                      s.tags.length ? s.tags.includes(t) : false,
+                    )
+                  : true,
+              )
+              .map((survey) => (
+                <SurveyListItem
+                  onArchive={(surveyId) =>
+                    setSurveys((prev) =>
+                      prev.map((survey) =>
+                        survey.id === surveyId
+                          ? {
+                              ...survey,
+                              isArchived: true,
+                              isPublished: false,
+                              endDate: new Date(),
+                            }
+                          : survey,
+                      ),
+                    )
+                  }
+                  onRestore={(surveyId) =>
+                    setSurveys((prev) =>
+                      prev.map((survey) =>
+                        survey.id === surveyId
+                          ? { ...survey, isArchived: false }
+                          : survey,
+                      ),
+                    )
+                  }
+                  key={survey.id}
+                  survey={survey}
+                  onCopyStart={() => setCopying(true)}
+                  onCopyEnd={() => setCopying(false)}
+                />
+              ))}
+          </List>
+          <LoadingBackdrop open={copying} />
+        </>
       )}
     </div>
   );
