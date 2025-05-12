@@ -177,6 +177,7 @@ export class SurveyEditPage {
 
   async goToPage(pageName: string) {
     await this._page.getByRole('link', { name: pageName }).click();
+    await this._page.getByLabel('Sivun nimi *').waitFor({ state: 'visible' });
   }
 
   async renamePage(oldName: string, newName: string) {
