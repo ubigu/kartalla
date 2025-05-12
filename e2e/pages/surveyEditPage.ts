@@ -652,7 +652,7 @@ export class SurveyEditPage {
     ] of groupedCheckboxQuestionParams.groups.entries()) {
       await questionLocator
         .getByLabel('add-checkbox-group')
-        .waitFor({ state: 'visible' });
+        .waitFor({ state: 'visible' }); // For some reason explicit wait is needed
       await questionLocator.getByLabel('add-checkbox-group').click();
       const groupLocator = questionLocator.getByTestId(
         `group-${groupIndex}-expanded`,
@@ -661,6 +661,10 @@ export class SurveyEditPage {
 
       for (const [optionIndex, option] of group.answerOptions.entries()) {
         await groupLocator.getByTestId('add-question-option').click();
+        await groupLocator
+          .getByTestId(`radio-input-option-${optionIndex}`)
+          .locator('textarea')
+          .waitFor({ state: 'visible' }); // For some reason explicit wait is needed
         await groupLocator
           .getByTestId(`radio-input-option-${optionIndex}`)
           .locator('textarea')
