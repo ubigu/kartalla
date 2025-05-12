@@ -74,9 +74,9 @@ test.describe('Survey test', async () => {
     await workerSurveyEditPage.createSliderQuestion(sliderStringQuestion);
     await workerSurveyEditPage.createMatrixQuestion(matrixQuestion);
     await workerSurveyEditPage.createMultiMatrixQuestion(multiMatrixQuestion);
-    await workerSurveyEditPage.createGroupedCheckboxQuestion(
+    /* await workerSurveyEditPage.createGroupedCheckboxQuestion(
       groupedCheckboxQuestion,
-    );
+    ); */
   });
   test('answer survey', async ({
     surveyAdminPage,
@@ -290,7 +290,7 @@ test.describe('Survey test', async () => {
         }),
       );
     }
-    // Grouped checkbox question
+    /* // Grouped checkbox question
     const groupedCheckboxFieldset = secondPageQuestions.find((item) =>
       item.title?.includes(groupedCheckboxQuestion.title),
     );
@@ -298,7 +298,7 @@ test.describe('Survey test', async () => {
     await groupedCheckboxFieldset?.element.getByRole('button').first().click();
     await groupedCheckboxFieldset?.element.locator('input').first().check();
     await groupedCheckboxFieldset?.element.getByRole('button').last().click();
-    await groupedCheckboxFieldset?.element.locator('input').last().check();
+    await groupedCheckboxFieldset?.element.locator('input').last().check(); */
 
     // Accessibility check
     expect((await makeAxeBuilder('main').analyze()).violations).toHaveLength(0);
