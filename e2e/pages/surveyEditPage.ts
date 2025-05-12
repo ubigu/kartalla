@@ -172,6 +172,7 @@ export class SurveyEditPage {
       .nth(2)
       .fill(params.text);
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async goToPage(pageName: string) {
@@ -182,6 +183,7 @@ export class SurveyEditPage {
     await this.goToPage(oldName);
     await this._page.getByLabel('Sivun nimi *').fill(newName);
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createPersonalInfoQuestion(
@@ -227,6 +229,7 @@ export class SurveyEditPage {
         .fill(personalInfoQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createRadioQuestion(radioQuestionParams: RadioQuestionParams) {
@@ -263,6 +266,7 @@ export class SurveyEditPage {
         .fill(radioQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createRadioImageQuestion(
@@ -314,6 +318,7 @@ export class SurveyEditPage {
         .fill(radioImageQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createCheckBoxQuestion(checkBoxQuestionParams: CheckBoxQuestionParams) {
@@ -363,6 +368,7 @@ export class SurveyEditPage {
         .fill(checkBoxQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createFreeTextQuestion(freeTextQuestionParams: FreeTextQuestionParams) {
@@ -391,6 +397,7 @@ export class SurveyEditPage {
         .fill(freeTextQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createNumericQuestion(numericQuestionParams: NumericQuestionParams) {
@@ -425,6 +432,7 @@ export class SurveyEditPage {
         .fill(numericQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMapQuestion(mapQuestionParams: MapQuestionParams) {
@@ -455,6 +463,7 @@ export class SurveyEditPage {
         .fill(mapQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createSortingQuestion(sortingQuestionParams: SortingQuestionParams) {
@@ -487,6 +496,7 @@ export class SurveyEditPage {
         .fill(sortingQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createSliderQuestion(sliderQuestionParams: SliderQuestionParams) {
@@ -523,6 +533,7 @@ export class SurveyEditPage {
         .fill(sliderQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMultiMatrixQuestion(
@@ -578,6 +589,7 @@ export class SurveyEditPage {
         .fill(multiMatrixQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMatrixQuestion(matrixQuestionParams: MatrixQuestionParams) {
@@ -617,6 +629,7 @@ export class SurveyEditPage {
         .fill(matrixQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createGroupedCheckboxQuestion(
@@ -661,6 +674,7 @@ export class SurveyEditPage {
         .fill(groupedCheckboxQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async deleteSurvey() {

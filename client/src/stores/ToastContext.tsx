@@ -165,6 +165,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           tabIndex={-1}
           variant="filled"
           severity={state.currentToast?.severity}
+          data-testid="info-toast"
           sx={{ width: '100%' }}
           action={
             <IconButton size="small" onClick={closeCurrentToast}>
