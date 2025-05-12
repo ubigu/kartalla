@@ -650,6 +650,9 @@ export class SurveyEditPage {
       groupIndex,
       group,
     ] of groupedCheckboxQuestionParams.groups.entries()) {
+      await questionLocator
+        .getByLabel('add-checkbox-group')
+        .waitFor({ state: 'visible' });
       await questionLocator.getByLabel('add-checkbox-group').click();
       const groupLocator = questionLocator.getByTestId(
         `group-${groupIndex}-expanded`,
