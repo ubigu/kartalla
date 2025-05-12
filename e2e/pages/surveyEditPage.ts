@@ -37,6 +37,17 @@ export interface RadioQuestionParams extends CommonQuestionParams {
   additionalInfo?: string;
 }
 
+export interface RadioImageQuestionParams extends CommonQuestionParams {
+  answerOptions: {
+    imageUrl: string | null;
+    altText: string | null;
+    attributions: string | null;
+    label: string;
+  }[];
+  allowCustom?: boolean;
+  additionalInfo?: string;
+}
+
 export interface CheckBoxQuestionParams extends CommonQuestionParams {
   answerOptions: string[];
   answerLimits?: { min: number; max: number };
@@ -92,10 +103,12 @@ export interface GroupedCheckboxQuestionParams extends CommonQuestionParams {
 export class SurveyEditPage {
   private _page: Page;
   private _surveyId: string | null;
+  private _workerIdx: number | null = null;
 
-  constructor(page: Page, surveyId?: string) {
+  constructor(page: Page, workerIdx: number, surveyId?: string) {
     this._page = page;
     this._surveyId = surveyId ?? null;
+    this._workerIdx = workerIdx;
   }
 
   get page() {
@@ -128,9 +141,13 @@ export class SurveyEditPage {
 
   async fillBasicInfo(params: SurveyParams) {
     await this._page.getByRole('link', { name: 'Kyselyn perustiedot' }).click();
-    await this._page.getByLabel('Kyselyn otsikko *').fill(params.title);
+    await this._page
+      .getByLabel('Kyselyn otsikko *')
+      .fill(`${params.title}-${this._workerIdx}`);
     await this._page.getByLabel('Kyselyn aliotsikko').fill(params.subtitle);
-    await this._page.getByLabel('Kyselyn nimi *').fill(params.urlName);
+    await this._page
+      .getByLabel('Kyselyn nimi *')
+      .fill(`${params.urlName}-${this._workerIdx}`);
     await this._page
       .getByLabel('Kyselyn laatija/yhteyshenkil')
       .fill(params.author);
@@ -244,6 +261,57 @@ export class SurveyEditPage {
         .locator('div')
         .nth(2)
         .fill(radioQuestionParams.additionalInfo);
+    }
+    await this._page.getByLabel('save-changes').click();
+  }
+
+  async createRadioImageQuestion(
+    radioImageQuestionParams: RadioImageQuestionParams,
+  ) {
+    await this.goToPage(radioImageQuestionParams.pageName);
+    await this._page.getByLabel('add-radio-image-question').click();
+
+    const questionLocator = this._page.locator('.section-accordion-expanded');
+
+    await questionLocator
+      .getByLabel('Otsikko')
+      .fill(radioImageQuestionParams.title);
+
+    if (radioImageQuestionParams.isRequired) {
+      await questionLocator
+        .getByRole('checkbox', { name: 'Vastaus pakollinen' })
+        .check();
+    }
+
+    for (const [
+      idx,
+      option,
+    ] of radioImageQuestionParams.answerOptions.entries()) {
+      if (idx > 0)
+        await questionLocator.getByLabel('add-question-option').click();
+      await questionLocator
+        .getByTestId(`radio-image-input-option-${idx}`)
+        .getByRole('textbox', { name: 'Vastausvaihtoehdon selite' })
+        .fill(option.label);
+      if (option.altText)
+        await questionLocator
+          .getByTestId(`radio-image-input-option-${idx}`)
+          .getByLabel('Vaihtoehtoinen teksti kuvalle')
+          .fill(option.altText);
+      if (option.attributions)
+        await questionLocator
+          .getByTestId(`radio-image-input-option-${idx}`)
+          .getByLabel('Tekijänoikeustiedot')
+          .fill(option.attributions);
+    }
+
+    if (radioImageQuestionParams.additionalInfo) {
+      await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
+      await questionLocator
+        .getByLabel('rdw-editor')
+        .locator('div')
+        .nth(2)
+        .fill(radioImageQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
   }
@@ -576,7 +644,7 @@ export class SurveyEditPage {
       await groupLocator.getByLabel('Ryhmän nimi').fill(group.groupTitle);
 
       for (const [optionIndex, option] of group.answerOptions.entries()) {
-        await groupLocator.getByLabel('add-question-option').click();
+        await groupLocator.getByTestId('add-question-option').click();
         await groupLocator
           .getByTestId(`radio-input-option-${optionIndex}`)
           .locator('textarea')

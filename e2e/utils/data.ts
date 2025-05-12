@@ -7,6 +7,7 @@ import {
   MultiMatrixQuestionParams,
   NumericQuestionParams,
   PersonalInfoQuestionParams,
+  RadioImageQuestionParams,
   RadioQuestionParams,
   SliderQuestionParams,
   SortingQuestionParams,
@@ -48,6 +49,38 @@ export function getRadioQuestionData(pageName: string): RadioQuestionParams {
     pageName: pageName,
     title: 'Mikä on lempivärisi?',
     answerOptions: ['Punainen', 'Vihreä', 'Sininen'],
+    isRequired: false,
+    allowCustom: false,
+    additionalInfo: 'Valitse vain yksi vaihtoehto',
+  };
+}
+
+export function getRadioImageQuestionData(
+  pageName: string,
+): RadioImageQuestionParams {
+  return {
+    pageName: pageName,
+    title: 'Mikä on lempikuvasi?',
+    answerOptions: [
+      {
+        label: 'Punainen',
+        imageUrl: null,
+        altText: 'Punainen',
+        attributions: 'CC',
+      },
+      {
+        label: 'Vihreä',
+        imageUrl: null,
+        altText: 'Vihreä',
+        attributions: 'CC',
+      },
+      {
+        label: 'Sininen',
+        imageUrl: null,
+        altText: 'Sininen',
+        attributions: 'CC',
+      },
+    ],
     isRequired: false,
     allowCustom: false,
     additionalInfo: 'Valitse vain yksi vaihtoehto',

@@ -6,7 +6,8 @@
   "scripts": {
     "codegen": "playwright codegen http://localhost:8080/admin",
     "test-ui": "playwright test --ui",
-    "test": "playwright test --workers=1 --reporter=html"
+    "test": "playwright test --workers=1 --reporter=html",
+    "test-parallel": "playwright test "
   },
   "keywords": [],
   "author": "",
