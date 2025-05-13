@@ -68,7 +68,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
           return (
             <div
               key={`matrix-class-${index}`}
-              data-testId={`matrix-class-${index}`}
+              data-testid={`matrix-class-${index}`}
               style={{ position: 'relative' }}
             >
               <Tooltip title={entry[surveyLanguage] ?? ''}>

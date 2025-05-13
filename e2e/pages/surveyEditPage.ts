@@ -37,6 +37,17 @@ export interface RadioQuestionParams extends CommonQuestionParams {
   additionalInfo?: string;
 }
 
+export interface RadioImageQuestionParams extends CommonQuestionParams {
+  answerOptions: {
+    imageUrl: string | null;
+    altText: string | null;
+    attributions: string | null;
+    label: string;
+  }[];
+  allowCustom?: boolean;
+  additionalInfo?: string;
+}
+
 export interface CheckBoxQuestionParams extends CommonQuestionParams {
   answerOptions: string[];
   answerLimits?: { min: number; max: number };
@@ -92,10 +103,12 @@ export interface GroupedCheckboxQuestionParams extends CommonQuestionParams {
 export class SurveyEditPage {
   private _page: Page;
   private _surveyId: string | null;
+  private _workerIdx: number | null = null;
 
-  constructor(page: Page, surveyId?: string) {
+  constructor(page: Page, workerIdx: number, surveyId?: string) {
     this._page = page;
     this._surveyId = surveyId ?? null;
+    this._workerIdx = workerIdx;
   }
 
   get page() {
@@ -128,9 +141,13 @@ export class SurveyEditPage {
 
   async fillBasicInfo(params: SurveyParams) {
     await this._page.getByRole('link', { name: 'Kyselyn perustiedot' }).click();
-    await this._page.getByLabel('Kyselyn otsikko *').fill(params.title);
+    await this._page
+      .getByLabel('Kyselyn otsikko *')
+      .fill(`${params.title}-${this._workerIdx}`);
     await this._page.getByLabel('Kyselyn aliotsikko').fill(params.subtitle);
-    await this._page.getByLabel('Kyselyn nimi *').fill(params.urlName);
+    await this._page
+      .getByLabel('Kyselyn nimi *')
+      .fill(`${params.urlName}-${this._workerIdx}`);
     await this._page
       .getByLabel('Kyselyn laatija/yhteyshenkil')
       .fill(params.author);
@@ -155,16 +172,19 @@ export class SurveyEditPage {
       .nth(2)
       .fill(params.text);
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async goToPage(pageName: string) {
     await this._page.getByRole('link', { name: pageName }).click();
+    await this._page.getByLabel('Sivun nimi *').waitFor({ state: 'visible' });
   }
 
   async renamePage(oldName: string, newName: string) {
     await this.goToPage(oldName);
     await this._page.getByLabel('Sivun nimi *').fill(newName);
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createPersonalInfoQuestion(
@@ -210,6 +230,7 @@ export class SurveyEditPage {
         .fill(personalInfoQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createRadioQuestion(radioQuestionParams: RadioQuestionParams) {
@@ -246,6 +267,59 @@ export class SurveyEditPage {
         .fill(radioQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
+  }
+
+  async createRadioImageQuestion(
+    radioImageQuestionParams: RadioImageQuestionParams,
+  ) {
+    await this.goToPage(radioImageQuestionParams.pageName);
+    await this._page.getByLabel('add-radio-image-question').click();
+
+    const questionLocator = this._page.locator('.section-accordion-expanded');
+
+    await questionLocator
+      .getByLabel('Otsikko')
+      .fill(radioImageQuestionParams.title);
+
+    if (radioImageQuestionParams.isRequired) {
+      await questionLocator
+        .getByRole('checkbox', { name: 'Vastaus pakollinen' })
+        .check();
+    }
+
+    for (const [
+      idx,
+      option,
+    ] of radioImageQuestionParams.answerOptions.entries()) {
+      if (idx > 0)
+        await questionLocator.getByLabel('add-question-option').click();
+      await questionLocator
+        .getByTestId(`radio-image-input-option-${idx}`)
+        .getByRole('textbox', { name: 'Vastausvaihtoehdon selite' })
+        .fill(option.label);
+      if (option.altText)
+        await questionLocator
+          .getByTestId(`radio-image-input-option-${idx}`)
+          .getByLabel('Vaihtoehtoinen teksti kuvalle')
+          .fill(option.altText);
+      if (option.attributions)
+        await questionLocator
+          .getByTestId(`radio-image-input-option-${idx}`)
+          .getByLabel('Tekijänoikeustiedot')
+          .fill(option.attributions);
+    }
+
+    if (radioImageQuestionParams.additionalInfo) {
+      await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
+      await questionLocator
+        .getByLabel('rdw-editor')
+        .locator('div')
+        .nth(2)
+        .fill(radioImageQuestionParams.additionalInfo);
+    }
+    await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createCheckBoxQuestion(checkBoxQuestionParams: CheckBoxQuestionParams) {
@@ -295,6 +369,7 @@ export class SurveyEditPage {
         .fill(checkBoxQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createFreeTextQuestion(freeTextQuestionParams: FreeTextQuestionParams) {
@@ -323,6 +398,7 @@ export class SurveyEditPage {
         .fill(freeTextQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createNumericQuestion(numericQuestionParams: NumericQuestionParams) {
@@ -357,6 +433,7 @@ export class SurveyEditPage {
         .fill(numericQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMapQuestion(mapQuestionParams: MapQuestionParams) {
@@ -387,6 +464,7 @@ export class SurveyEditPage {
         .fill(mapQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createSortingQuestion(sortingQuestionParams: SortingQuestionParams) {
@@ -419,6 +497,7 @@ export class SurveyEditPage {
         .fill(sortingQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createSliderQuestion(sliderQuestionParams: SliderQuestionParams) {
@@ -455,6 +534,7 @@ export class SurveyEditPage {
         .fill(sliderQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMultiMatrixQuestion(
@@ -510,6 +590,7 @@ export class SurveyEditPage {
         .fill(multiMatrixQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createMatrixQuestion(matrixQuestionParams: MatrixQuestionParams) {
@@ -549,6 +630,7 @@ export class SurveyEditPage {
         .fill(matrixQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async createGroupedCheckboxQuestion(
@@ -569,6 +651,9 @@ export class SurveyEditPage {
       groupIndex,
       group,
     ] of groupedCheckboxQuestionParams.groups.entries()) {
+      await questionLocator
+        .getByLabel('add-checkbox-group')
+        .waitFor({ state: 'visible' }); // For some reason explicit wait is needed
       await questionLocator.getByLabel('add-checkbox-group').click();
       const groupLocator = questionLocator.getByTestId(
         `group-${groupIndex}-expanded`,
@@ -576,7 +661,11 @@ export class SurveyEditPage {
       await groupLocator.getByLabel('Ryhmän nimi').fill(group.groupTitle);
 
       for (const [optionIndex, option] of group.answerOptions.entries()) {
-        await groupLocator.getByLabel('add-question-option').click();
+        await groupLocator.getByTestId('add-question-option').click();
+        await groupLocator
+          .getByTestId(`radio-input-option-${optionIndex}`)
+          .locator('textarea')
+          .waitFor({ state: 'visible' }); // For some reason explicit wait is needed
         await groupLocator
           .getByTestId(`radio-input-option-${optionIndex}`)
           .locator('textarea')
@@ -593,6 +682,7 @@ export class SurveyEditPage {
         .fill(groupedCheckboxQuestionParams.additionalInfo);
     }
     await this._page.getByLabel('save-changes').click();
+    await this._page.getByTestId('info-toast').waitFor();
   }
 
   async deleteSurvey() {

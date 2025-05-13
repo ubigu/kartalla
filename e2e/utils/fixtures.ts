@@ -38,31 +38,31 @@ export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
       if (browserName !== 'chromium') {
         const chromiumBrowser = await chromium.launch();
         desktopContext = await chromiumBrowser.newContext({
-          viewport: { width: 1280, height: 720 },
+          viewport: { width: 1280, height: 3000 },
           isMobile: false,
           hasTouch: false,
         });
       } else {
         desktopContext = await browser.newContext({
-          viewport: { width: 1280, height: 720 },
+          viewport: { width: 1280, height: 3000 },
           isMobile: false,
           hasTouch: false,
         });
       }
       page = await desktopContext.newPage();
 
-      await use(new SurveyEditPage(page));
+      await use(new SurveyEditPage(page, test.info().workerIndex));
     },
     { scope: 'worker' },
   ],
   surveyEditPage: async ({ page }, use) => {
-    await use(new SurveyEditPage(page));
+    await use(new SurveyEditPage(page, test.info().workerIndex));
   },
   surveyAdminPage: async ({ page }, use) => {
-    await use(new SurveyAdminPage(page));
+    await use(new SurveyAdminPage(page, test.info().workerIndex));
   },
   surveyPage: async ({ page }, use) => {
-    await use(new PublishedSurveyPage(page));
+    await use(new PublishedSurveyPage(page, test.info().workerIndex));
   },
   makeAxeBuilder: async ({ page }, use) => {
     const makeAxeBuilder = (include: string) =>

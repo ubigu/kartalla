@@ -116,6 +116,7 @@ export default function SurveyListItem(props: Props) {
 
   return (
     <ListItem
+      data-testid="survey-list-item"
       sx={{
         padding: '8px 0',
         '@keyframes shiftRight': {
