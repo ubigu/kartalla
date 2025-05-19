@@ -39,7 +39,7 @@
     "node": "^20.5.0"
   },
   "dependencies": {
-    "@azure/identity": "^4.9.1",
+    "@azure/identity": "^4.10.0",
     "@azure/keyvault-secrets": "^4.9.0",
     "@types/async-retry": "^1.4.9",
     "@types/multer": "^1.4.12",
@@ -67,12 +67,12 @@
     "passport": "^0.7.0",
     "passport-azure-ad": "^4.3.5",
     "passport-google-oauth20": "^2.0.0",
-    "pdfmake": "^0.2.19",
-    "pg": "^8.15.6",
+    "pdfmake": "^0.2.20",
+    "pg": "^8.16.0",
     "pg-promise": "^10.15.4",
     "pug": "^3.0.3",
     "puppeteer": "^14.4.1",
-    "puppeteer-cluster": "^0.23.0",
+    "puppeteer-cluster": "^0.24.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^3.15.0",
     "winston": "^3.17.0"
