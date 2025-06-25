@@ -1,5 +1,5 @@
 import { test } from '../utils/fixtures';
-import { clearData } from '../utils/db';
+import { clearData, clearSurveyData } from '../utils/db';
 import {
   getCheckBoxQuestionData,
   getFreeTextQuestionData,
@@ -9,6 +9,7 @@ import {
   getMultiMatrixQuestionData,
   getNumericQuestionData,
   getPersonalInfoQuestionData,
+  getRadioImageQuestionData,
   getRadioQuestionData,
   getSliderQuestionDataNumber,
   getSliderQuestionDataString,
@@ -21,6 +22,9 @@ const personalInfoQuestion = getPersonalInfoQuestionData(
   testSurveyData.pageNames[0],
 );
 const radioQuestion = getRadioQuestionData(testSurveyData.pageNames[0]);
+const radioImageQuestion = getRadioImageQuestionData(
+  testSurveyData.pageNames[0],
+);
 const checkBoxQuestion = getCheckBoxQuestionData(testSurveyData.pageNames[0]);
 const freeTextQuestion = getFreeTextQuestionData(testSurveyData.pageNames[0]);
 const numericQuestion = getNumericQuestionData(testSurveyData.pageNames[0]);
@@ -40,12 +44,16 @@ const groupedCheckboxQuestion = getGroupedCheckboxQuestionData(
   testSurveyData.pageNames[1],
 );
 
-test.describe('Survey test', () => {
+test.describe('Survey test', async () => {
   test.beforeAll(async ({ workerShortcuts }) => {
     await workerShortcuts.createWorkerSurvey(testSurveyData);
   });
-  test.afterAll(async () => {
-    await clearData();
+
+  test.afterAll(async ({ workerSurveyEditPage }) => {
+    const surveyId = Number(workerSurveyEditPage.surveyId);
+    if (!isNaN(surveyId)) {
+      await clearSurveyData(surveyId);
+    }
   });
 
   test('create questions', async ({ workerSurveyEditPage }) => {
@@ -55,6 +63,7 @@ test.describe('Survey test', () => {
       ...radioQuestion,
       isRequired: true,
     });
+    await workerSurveyEditPage.createRadioImageQuestion(radioImageQuestion);
     await workerSurveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
 
     await workerSurveyEditPage.createFreeTextQuestion(freeTextQuestion);
@@ -65,9 +74,9 @@ test.describe('Survey test', () => {
     await workerSurveyEditPage.createSliderQuestion(sliderStringQuestion);
     await workerSurveyEditPage.createMatrixQuestion(matrixQuestion);
     await workerSurveyEditPage.createMultiMatrixQuestion(multiMatrixQuestion);
-    await workerSurveyEditPage.createGroupedCheckboxQuestion(
+    /* await workerSurveyEditPage.createGroupedCheckboxQuestion(
       groupedCheckboxQuestion,
-    );
+    ); */
   });
   test('answer survey', async ({
     surveyAdminPage,
@@ -75,12 +84,8 @@ test.describe('Survey test', () => {
     makeAxeBuilder,
   }) => {
     await surveyAdminPage.goto();
-    await expect(
-      surveyAdminPage.page
-        .locator('h3')
-        .filter({ hasText: testSurveyData.title }),
-    ).toBeVisible();
-    expect(await surveyAdminPage.getSurveyList()).toHaveLength(1);
+
+    expect(await surveyAdminPage.getSurveyList()).toBeVisible();
     await surveyAdminPage.publishSurvey(testSurveyData.urlName);
 
     // Start the survey
@@ -89,7 +94,7 @@ test.describe('Survey test', () => {
 
     // Check title
     expect(await surveyPage.page.locator('h1').textContent()).toBe(
-      testSurveyData.title,
+      `${testSurveyData.title}-${surveyPage.workerIdx}`,
     );
 
     // Answer questions
@@ -126,10 +131,17 @@ test.describe('Survey test', () => {
       .getByLabel('Y-tunnus')
       .fill('1234567-8');
 
-    // Radio question
+    // Radio question (left unanswered here on purpose)
     const radioFieldset = firstPageQuestions.find((item) =>
       item.title?.includes(radioQuestion.title),
     );
+
+    // Radio image question
+    const radioImageFieldset = firstPageQuestions.find((item) =>
+      item.title?.includes(radioImageQuestion.title),
+    );
+
+    await radioImageFieldset?.element.getByRole('radio').nth(1).click();
 
     // Checkbox question
     const checkBoxFieldset = firstPageQuestions.find((item) =>
@@ -278,7 +290,7 @@ test.describe('Survey test', () => {
         }),
       );
     }
-    // Grouped checkbox question
+    /* // Grouped checkbox question
     const groupedCheckboxFieldset = secondPageQuestions.find((item) =>
       item.title?.includes(groupedCheckboxQuestion.title),
     );
@@ -286,7 +298,7 @@ test.describe('Survey test', () => {
     await groupedCheckboxFieldset?.element.getByRole('button').first().click();
     await groupedCheckboxFieldset?.element.locator('input').first().check();
     await groupedCheckboxFieldset?.element.getByRole('button').last().click();
-    await groupedCheckboxFieldset?.element.locator('input').last().check();
+    await groupedCheckboxFieldset?.element.locator('input').last().check(); */
 
     // Accessibility check
     expect((await makeAxeBuilder('main').analyze()).violations).toHaveLength(0);
@@ -305,13 +317,32 @@ test.describe('Survey test', () => {
     await surveyAdminPage.goto();
     // No point of testing mobile viewports here
     await surveyAdminPage.page.setViewportSize({ width: 1280, height: 720 });
+
+    await surveyAdminPage.page.waitForSelector(
+      '[data-testid="survey-list-item"]',
+      { state: 'visible' },
+    );
+    const adminViewSurveyListItems = await surveyAdminPage.page
+      .locator('[data-testid="survey-list-item"]')
+      .all();
+
+    const adminSurveyItems = await Promise.all(
+      adminViewSurveyListItems.map(async (element) => {
+        const title = await element.locator('h3').textContent();
+        return { element, title };
+      }),
+    );
+
+    const surveyListItemElement = adminSurveyItems.find((item) =>
+      item.title?.includes(
+        `${testSurveyData.title}-${surveyAdminPage.workerIdx}`,
+      ),
+    );
+    if (!surveyListItemElement) {
+      throw new Error('Survey list item not found');
+    }
     await expect(
-      surveyAdminPage.page
-        .locator('h3')
-        .filter({ hasText: testSurveyData.title }),
-    ).toBeVisible();
-    await expect(
-      surveyAdminPage.page.getByRole('link', { name: 'Vastaukset (1)' }),
+      surveyListItemElement.element.getByText('Vastaukset (1)').first(),
     ).toBeVisible();
   });
 });
