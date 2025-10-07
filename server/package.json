@@ -61,7 +61,7 @@
     "node-cache": "^5.1.2",
     "node-fetch": "^2.7.0",
     "node-pg-migrate": "^7.9.1",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.7",
     "ogr2ogr": "^3.1.1",
     "parse-css-color": "^0.2.1",
     "passport": "^0.7.0",
