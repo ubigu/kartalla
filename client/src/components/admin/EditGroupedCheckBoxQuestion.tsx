@@ -167,7 +167,7 @@ export default function EditGroupedCheckBoxQuestion({
                       ref={provided.innerRef}
                       key={group.id}
                       className={classes.accordion}
-                      data-testId={`group-${index}-${
+                      data-testid={`group-${index}-${
                         openedGroupId === group.id ? 'expanded' : 'collapsed'
                       }`}
                       expanded={openedGroupId === group.id}

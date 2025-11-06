@@ -1,8 +1,10 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
-  retries: 1,
   testMatch: 'survey.test.ts',
+  use: {
+    trace: 'retain-on-failure',
+  },
   projects: [
     {
       name: 'Chrome',

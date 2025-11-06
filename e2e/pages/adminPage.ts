@@ -2,13 +2,19 @@ import { expect, Page } from '@playwright/test';
 
 export class SurveyAdminPage {
   private _page: Page;
+  private _workerIdx: number;
 
-  constructor(page: Page) {
+  constructor(page: Page, workerIdx: number) {
     this._page = page;
+    this._workerIdx = workerIdx;
   }
 
   get page() {
     return this._page;
+  }
+
+  get workerIdx() {
+    return this._workerIdx;
   }
 
   async goto() {
@@ -16,17 +22,17 @@ export class SurveyAdminPage {
   }
 
   async getSurveyList() {
-    return this._page.getByTestId('survey-admin-list').all();
+    return this._page.getByTestId('survey-admin-list');
   }
 
   async publishSurvey(surveyName: string) {
     const publishButton = this._page
       .getByRole('listitem')
-      .filter({ hasText: surveyName })
+      .filter({ hasText: `${surveyName}-${this._workerIdx}` })
       .getByRole('button', { name: 'julkaise' });
     const unPublishButton = this._page
       .getByRole('listitem')
-      .filter({ hasText: surveyName })
+      .filter({ hasText: `${surveyName}-${this._workerIdx}` })
       .getByRole('button', { name: 'Päätä kysely' });
 
     // Need to wait here because isVisible() does not wait for the element to be visible
