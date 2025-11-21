@@ -3,6 +3,7 @@ import {
   MapQuestionSelectionType,
   SurveyMapQuestion,
 } from '@interfaces/survey';
+import { harmaa } from '@src/themes/common';
 import { LineString, Point, Polygon } from 'geojson';
 import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
@@ -16,7 +17,6 @@ import React, {
   useRef,
 } from 'react';
 import { useTranslations } from './TranslationContext';
-import { harmaa } from '@src/themes/common';
 
 interface State {
   visibleLayers: (number | string)[];
@@ -169,8 +169,8 @@ function getFeatureStyle(
         style.strokeStyle === 'dashed'
           ? [30, 10]
           : style.strokeStyle === 'dotted'
-          ? [0, 14]
-          : null,
+            ? [0, 14]
+            : null,
       lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
     },
     fill: {
@@ -341,6 +341,8 @@ export function useSurveyMap() {
     );
     state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
     // Add current features one by one to get the correct styles
+    // For points: render as markers (for map questions and geo-budgeting)
+    // For lines/polygons: render as features
     geometries.features.forEach((feature) => {
       if (['Polygon', 'LineString'].includes(feature.geometry.type)) {
         state.rpcChannel.postRequest(
@@ -363,19 +365,19 @@ export function useSurveyMap() {
           ] as any,
         );
       } else {
-        const isCustomIcon =
-          !!feature.properties.question.featureStyles?.point?.markerIcon;
+        // Check for custom icon: geo-budgeting uses targetIcon, map questions use featureStyles
+        const customIcon =
+          feature.properties.targetIcon ||
+          feature.properties.question.featureStyles?.point?.markerIcon;
         state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
           {
             x: (feature.geometry as any).coordinates[0],
             y: (feature.geometry as any).coordinates[1],
-            shape: isCustomIcon
-              ? feature.properties.question.featureStyles?.point?.markerIcon
-              : 0,
+            shape: customIcon ? customIcon : 0,
             offsetX: 0,
             offsetY: 0,
             size:
-              isCustomIcon &&
+              Boolean(customIcon) &&
               state.oskariVersion >= 270 &&
               state.oskariVersion < 290
                 ? 64
@@ -477,7 +479,7 @@ export function useSurveyMap() {
       // Stop any previous drawing if the map is in a draw state
       if (state.questionId) {
         state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-          null,
+          getDrawingEventId(state.questionId, state.selectionType),
           true,
         ]);
       }
@@ -497,10 +499,10 @@ export function useSurveyMap() {
         type === 'point'
           ? 'Point'
           : type === 'line'
-          ? 'LineString'
-          : type === 'area'
-          ? 'Polygon'
-          : null,
+            ? 'LineString'
+            : type === 'area'
+              ? 'Polygon'
+              : null,
         {
           allowMultipleDrawing: false,
           style: {

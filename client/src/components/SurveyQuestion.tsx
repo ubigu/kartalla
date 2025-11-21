@@ -1,6 +1,7 @@
 import type {
   AnswerEntry,
   FileAnswer,
+  GeoBudgetingAnswer,
   MapQuestionAnswer,
   PersonalInfoAnswer,
   Submission,
@@ -14,6 +15,7 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import BudgetingQuestion from '@src/components/BudgetingQuestion';
+import GeoBudgetingQuestion from '@src/components/GeoBudgetingQuestion';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useRef, useState } from 'react';
@@ -359,6 +361,22 @@ function SurveyQuestion({
           question={question}
           value={value as number[]}
           setDirty={setDirty}
+          validationErrors={validationErrors}
+          onChange={(value) =>
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            })
+          }
+        />
+      )}
+      {question.type === 'geo-budgeting' && (
+        <GeoBudgetingQuestion
+          readOnly={readOnly}
+          question={question}
+          setDialogOpen={setDialogOpen}
+          value={value as GeoBudgetingAnswer[]}
           validationErrors={validationErrors}
           onChange={(value) =>
             updateAnswer({

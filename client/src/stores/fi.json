@@ -249,7 +249,8 @@
     "imageSection": "Lisää mediaosio",
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite",
-    "budgetingQuestion": "Lisää budjetointikysymys"
+    "budgetingQuestion": "Lisää budjetointikysymys",
+    "geoBudgetingQuestion": "Lisää geobudjetointikysymys"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Täysin eri mieltä",
@@ -274,6 +275,7 @@
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
     "budgetingQuestion": "Budjetointikysymys",
+    "geoBudgetingQuestion": "Geobudjetointikysymys",
     "question": "Kysymys"
   },
   "SurveySections": {
@@ -343,6 +345,17 @@
     "percentageLabel": "Prosenttiosuus",
     "decreaseValue": "Vähennä arvoa",
     "increaseValue": "Kasvata arvoa",
+    "helperText": "Opastus"
+  },
+  "GeoBudgetingQuestion": {
+    "totalBudget": "Kokonaisbudjetti",
+    "unit": "Yksikkö",
+    "targetName": "Kohteen nimi",
+    "targetPrice": "Hinta per kappale",
+    "selectIcon": "Valitse ikoni",
+    "allocationDirection": "Budjetin käytön suunta",
+    "allocationDirectionIncreasing": "Budjettia täytetään (nollasta ylöspäin)",
+    "allocationDirectionDecreasing": "Budjettia sijoitetaan (täydestä nollaan päin)",
     "helperText": "Opastus"
   },
   "fileValidator": {

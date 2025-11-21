@@ -5,6 +5,7 @@ import {
   SurveyDocumentSection,
   SurveyFollowUpSection,
   SurveyFreeTextQuestion,
+  SurveyGeoBudgetingQuestion,
   SurveyGroupedCheckboxQuestion,
   SurveyImageSection,
   SurveyMapQuestion,
@@ -29,6 +30,8 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import EditBudgetingQuestion from '@src/components/admin/EditBudgetingQuestion';
+import { EditGeoBudgetingQuestion } from '@src/components/admin/EditGeoBudgetingQuestion';
+import BudgetingIcon from '@src/components/icons/BudgetingIcon';
 import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
 import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
 import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
@@ -47,7 +50,6 @@ import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon
 import SliderIcon from '@src/components/icons/SliderIcon';
 import TextFieldIcon from '@src/components/icons/TextFieldIcon';
 import TextSectionIcon from '@src/components/icons/TextSectionIcon';
-import BudgetingIcon from '@src/components/icons/BudgetingIcon';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -318,6 +320,16 @@ export default function SurveySectionAccordion(props: Props) {
       form: (
         <EditBudgetingQuestion
           section={props.section as SurveyBudgetingQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'geo-budgeting': {
+      icon: <></>,
+      tooltip: tr.SurveySection.geoBudgetingQuestion,
+      form: (
+        <EditGeoBudgetingQuestion
+          section={props.section as SurveyGeoBudgetingQuestion}
           onChange={handleEdit}
         />
       ),

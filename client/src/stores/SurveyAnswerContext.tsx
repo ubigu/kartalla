@@ -166,6 +166,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: section.targets.map(() => 0),
       };
+    case 'geo-budgeting':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`,
@@ -319,6 +325,12 @@ export function useSurveyAnswers() {
       if (question.requireFullAllocation && sum !== expectedTotal) {
         errors.push('answerLimits');
       }
+    }
+
+    // Geo-budgeting question validation - no special requirements
+    // Just check if required and has at least one answer
+    if (question.type === 'geo-budgeting') {
+      // Validation is handled by the generic isRequired check below
     }
 
     if (question.isRequired) {

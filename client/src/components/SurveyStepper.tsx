@@ -209,45 +209,87 @@ export default function SurveyStepper({
 
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
-    const mapQuestions = currentPage.sections
+    const allSections = currentPage.sections
       .map((section) => [section, ...(section?.followUpSections ?? [])])
-      .flat(1)
-      .filter((section) => section.type === 'map');
+      .flat(1);
 
-    // Reduce all geometries from map question answers into a feature collection
-    return mapQuestions.reduce(
-      (featureCollection, question) => {
-        const answer = answers.find(
-          (answer) => answer.sectionId === question.id,
-        ) as AnswerEntry & { type: 'map' };
-        return {
-          ...featureCollection,
-          features: [
-            ...featureCollection.features,
-            ...answer.value.reduce(
-              (features, value, index) => [
-                ...features,
-                {
-                  ...value.geometry,
-                  // Add a unique index to prevent conflicts
-                  id: `feature-${question.id}-${index}`,
-                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode
-                  properties: {
-                    question,
-                    index,
-                  },
-                },
-              ],
-              [],
-            ),
-          ],
-        };
-      },
-      {
-        type: 'FeatureCollection',
-        features: [],
-      } as GeoJSON.FeatureCollection,
+    const mapQuestions = allSections.filter(
+      (section) => section.type === 'map',
     );
+    const geoBudgetingQuestions = allSections.filter(
+      (section) => section.type === 'geo-budgeting',
+    );
+
+    // Reduce all geometries from map and geo-budgeting question answers into a feature collection
+    let featureCollection: GeoJSON.FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [],
+    };
+
+    // Process map questions
+    featureCollection = mapQuestions.reduce((fc, question) => {
+      const answer = answers.find(
+        (answer) => answer.sectionId === question.id,
+      ) as AnswerEntry & { type: 'map' };
+      if (!answer?.value) {
+        return fc;
+      }
+      return {
+        ...fc,
+        features: [
+          ...fc.features,
+          ...answer.value.reduce(
+            (features, value, index) => [
+              ...features,
+              {
+                ...value.geometry,
+                // Add a unique index to prevent conflicts
+                id: `feature-${question.id}-${index}`,
+                // Pass entries question and answer index for reopening the subquestion dialog in edit mode
+                properties: {
+                  question,
+                  index,
+                },
+              },
+            ],
+            [],
+          ),
+        ],
+      };
+    }, featureCollection);
+
+    // Process geo-budgeting questions
+    featureCollection = geoBudgetingQuestions.reduce((fc, question) => {
+      const answer = answers.find(
+        (answer) => answer.sectionId === question.id,
+      ) as AnswerEntry & { type: 'geo-budgeting' };
+      if (!answer?.value) {
+        return fc;
+      }
+      return {
+        ...fc,
+        features: [
+          ...fc.features,
+          ...answer.value.map((geoBudgetAnswer, index) => ({
+            type: 'Feature' as const,
+            geometry: geoBudgetAnswer.geometry.geometry,
+            id: `feature-${question.id}-${index}`,
+            // Pass question, answer index, targetId, and target icon for marker rendering
+            properties: {
+              question,
+              index,
+              targetId: geoBudgetAnswer.targetId,
+              targetIcon: question.targets[geoBudgetAnswer.targetId]?.icon,
+            },
+            ...(geoBudgetAnswer.geometry.crs && {
+              crs: geoBudgetAnswer.geometry.crs,
+            }),
+          })),
+        ],
+      };
+    }, featureCollection);
+
+    return featureCollection;
   }, [currentPage, answers]);
 
   /**
@@ -649,8 +691,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.imageSize === 'original'
                     ? { margin: '0 auto' }
                     : currentPage.sidebar.imageSize === 'fitted'
-                    ? { margin: '0 auto', maxWidth: '100%' }
-                    : null
+                      ? { margin: '0 auto', maxWidth: '100%' }
+                      : null
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
@@ -848,8 +890,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.type === 'image'
                     ? tr.SurveyStepper.closeImage
                     : currentPage.sidebar.type === 'map'
-                    ? tr.SurveyStepper.closeMap
-                    : ''
+                      ? tr.SurveyStepper.closeMap
+                      : ''
                 }
               >
                 <Close />

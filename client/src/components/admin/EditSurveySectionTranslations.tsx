@@ -85,6 +85,24 @@ export default function EditSurveySectionTranslations({
             }}
           />
         ))}
+      {section.type === 'geo-budgeting' &&
+        section.targets?.map((target, targetIndex) => (
+          <TranslationField
+            key={`geo-target-field-${targetIndex}`}
+            value={target.name[languageCode]}
+            onChange={(event) => {
+              const updatedTargets = [...section.targets];
+              updatedTargets[targetIndex] = {
+                ...updatedTargets[targetIndex],
+                name: {
+                  ...target.name,
+                  [languageCode]: event.target.value,
+                },
+              };
+              onEdit({ ...section, targets: updatedTargets });
+            }}
+          />
+        ))}
       {section.type === 'radio-image' &&
         section.options?.map((option: SectionImageOption, optionIndex) => (
           <div key={`image-option-field-${optionIndex}`}>

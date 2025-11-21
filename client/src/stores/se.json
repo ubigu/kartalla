@@ -249,7 +249,8 @@
     "imageSection": "Lägg till mediaavsnitt",
     "documentSection": "Lägg till bilageavsnitt",
     "attachmentSection": "Lägg till svarsbilage",
-    "budgetingQuestion": "Lägg till budgeteringsfråga"
+    "budgetingQuestion": "Lägg till budgeteringsfråga",
+    "geoBudgetingQuestion": "Lägg till rumslig budgeteringsfråga"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Helt oenig",
@@ -274,6 +275,7 @@
     "documentSection": "Bilageavsnitt",
     "attachmentSection": "Svarsbilage",
     "budgetingQuestion": "Budgeteringsfråga",
+    "geoBudgetingQuestion": "Rumslig budgeteringsfråga",
     "question": "Fråga"
   },
   "SurveySections": {
@@ -344,6 +346,17 @@
     "percentageLabel": "Procent",
     "decreaseValue": "Minska värde",
     "increaseValue": "Öka värde",
+    "helperText": "Hjälptext"
+  },
+  "GeoBudgetingQuestion": {
+    "totalBudget": "Total budget",
+    "unit": "Enhet",
+    "targetName": "Målnamn",
+    "targetPrice": "Pris per styck",
+    "selectIcon": "Välj ikon",
+    "allocationDirection": "Riktning för budgetfördelning",
+    "allocationDirectionIncreasing": "Budgeten fylls (från noll och uppåt)",
+    "allocationDirectionDecreasing": "Budgeten förbrukas (från full till noll)",
     "helperText": "Hjälptext"
   },
   "fileValidator": {

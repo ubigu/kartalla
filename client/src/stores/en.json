@@ -249,7 +249,8 @@
     "imageSection": "Add media section",
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section",
-    "budgetingQuestion": "Add budgeting question"
+    "budgetingQuestion": "Add budgeting question",
+    "geoBudgetingQuestion": "Add spatial budgeting question"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Strongly disagree",
@@ -274,6 +275,7 @@
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
     "budgetingQuestion": "Budgeting question",
+    "geoBudgetingQuestion": "Spatial budgeting question",
     "question": "Question"
   },
   "PersonalInfoQuestion": {
@@ -343,6 +345,17 @@
     "percentageLabel": "Percentage",
     "decreaseValue": "Decrease value",
     "increaseValue": "Increase value",
+    "helperText": "Helper text"
+  },
+  "GeoBudgetingQuestion": {
+    "totalBudget": "Total budget",
+    "unit": "Unit",
+    "targetName": "Target name",
+    "targetPrice": "Price per piece",
+    "selectIcon": "Select icon",
+    "allocationDirection": "Budget allocation direction",
+    "allocationDirectionIncreasing": "Budget is filled (from zero upwards)",
+    "allocationDirectionDecreasing": "Budget is spent (from full to zero)",
     "helperText": "Helper text"
   },
   "fileValidator": {

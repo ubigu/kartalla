@@ -231,6 +231,16 @@ export default function AddSurveySectionActions(props: Props) {
       inputMode: 'absolute',
       helperText: initializeLocalizedObject(''),
     },
+    'geo-budgeting': {
+      type: 'geo-budgeting',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      totalBudget: 0,
+      unit: '€',
+      targets: [],
+      allocationDirection: 'increasing',
+      helperText: initializeLocalizedObject(''),
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -338,6 +348,12 @@ export default function AddSurveySectionActions(props: Props) {
           } as const,
         ]
       : []),
+    {
+      type: 'geo-budgeting',
+      label: tr.AddSurveySectionActions.geoBudgetingQuestion,
+      ariaLabel: 'add-geo-budgeting-section',
+      icon: <>TODO</>,
+    },
   ];
 
   const sectionButtons: {

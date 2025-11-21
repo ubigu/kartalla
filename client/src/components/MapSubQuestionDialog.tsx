@@ -263,21 +263,27 @@ export default function MapSubQuestionDialog({
           </Button>
         )}
         <div style={{ flexGrow: 1 }} />
-        <Button
-          className="cancel-button"
-          variant="outlined"
-          onClick={() => {
-            onCancel();
-          }}
-        >
-          {tr.commands.cancel}
-        </Button>
+        {subQuestions && subQuestions.length > 0 && (
+          <Button
+            className="cancel-button"
+            variant="outlined"
+            onClick={() => {
+              onCancel();
+            }}
+          >
+            {tr.commands.cancel}
+          </Button>
+        )}
         <Button
           variant="contained"
           onClick={() => {
             onSubmit(answers);
           }}
-          disabled={validationErrors?.some((error) => error.length > 0)}
+          disabled={
+            subQuestions &&
+            subQuestions.length > 0 &&
+            validationErrors?.some((error) => error.length > 0)
+          }
         >
           {tr.options.ok}
         </Button>

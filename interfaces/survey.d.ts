@@ -35,7 +35,8 @@ export type SurveyQuestion =
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
   | SurveyAttachmentQuestion
-  | SurveyBudgetingQuestion;
+  | SurveyBudgetingQuestion
+  | SurveyGeoBudgetingQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -320,6 +321,29 @@ export interface SurveyBudgetingQuestion extends CommonSurveyPageQuestion {
   allocationDirection: BudgetAllocationDirection;
   requireFullAllocation?: boolean;
   inputMode?: 'absolute' | 'percentage';
+  helperText?: LocalizedText;
+}
+
+/**
+ * Geo-budget target with optional icon
+ */
+export interface GeoBudgetTarget extends BudgetTarget {
+  /**
+   * SVG icon for the target (optional, for future icon selection feature)
+   */
+  icon?: string;
+}
+
+/**
+ * Geo-budgeting question - budget allocation with spatial targets
+ * Always uses pieces mode (one piece = one unit of the target)
+ */
+export interface SurveyGeoBudgetingQuestion extends CommonSurveyPageQuestion {
+  type: 'geo-budgeting';
+  totalBudget: number;
+  unit?: string;
+  targets: GeoBudgetTarget[];
+  allocationDirection: BudgetAllocationDirection;
   helperText?: LocalizedText;
 }
 
@@ -682,6 +706,21 @@ export interface MapQuestionAnswer {
 }
 
 /**
+ * Answer value for a single geo-budgeting point placement.
+ * Contains the point geometry and reference to the target (by index).
+ */
+export interface GeoBudgetingAnswer {
+  /**
+   * Index into the targets array (0-based)
+   */
+  targetId: number;
+  /**
+   * GeoJSON geometry of the placed point
+   */
+  geometry: GeoJSONWithCRS<GeoJSON.Feature<GeoJSON.Point>>;
+}
+
+/**
  * Submission entry interface
  */
 export type AnswerEntry = {
@@ -751,6 +790,10 @@ export type AnswerEntry = {
   | {
       type: 'budgeting';
       value: number[];
+    }
+  | {
+      type: 'geo-budgeting';
+      value: GeoBudgetingAnswer[];
     }
 );
 
