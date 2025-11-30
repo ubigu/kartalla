@@ -359,7 +359,9 @@
     "allocationDirectionDecreasing": "Budgeten förbrukas (från full till noll)",
     "helperText": "Hjälptext",
     "placed": "placerad",
-    "exceedsBudget": "överstiger budgeten"
+    "exceedsBudget": "överstiger budgeten",
+    "summary": "Sammanfattning",
+    "total": "Totalt"
   },
   "fileValidator": {
     "fileUploadError": "Fel vid uppladdning av filen.",

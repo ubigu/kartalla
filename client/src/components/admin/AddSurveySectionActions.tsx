@@ -347,14 +347,14 @@ export default function AddSurveySectionActions(props: Props) {
             ariaLabel: 'add-budgeting-section',
             icon: <BudgetingIcon />,
           } as const,
+          {
+            type: 'geo-budgeting',
+            label: tr.AddSurveySectionActions.geoBudgetingQuestion,
+            ariaLabel: 'add-geo-budgeting-section',
+            icon: <GeoBudgetingIcon />,
+          } as const,
         ]
       : []),
-    {
-      type: 'geo-budgeting',
-      label: tr.AddSurveySectionActions.geoBudgetingQuestion,
-      ariaLabel: 'add-geo-budgeting-section',
-      icon: <GeoBudgetingIcon />,
-    },
   ];
 
   const sectionButtons: {

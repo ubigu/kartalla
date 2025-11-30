@@ -1,4 +1,4 @@
-export type Feature = 'budgetingQuestion' | 'geoBudgetingQuestion';
+export type Feature = 'budgetingQuestion';
 
 function parseEnabledFeatures() {
   const featuresJson = ENABLED_FEATURES;

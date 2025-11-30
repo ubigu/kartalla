@@ -2,6 +2,7 @@ import { GeoJSONWithCRS } from '@interfaces/geojson';
 import {
   LanguageCode,
   MapQuestionSelectionType,
+  SurveyGeoBudgetingQuestion,
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import { Feature, LineString, Point, Polygon } from 'geojson';
@@ -30,7 +31,8 @@ export interface ScreenshotJobData {
     index: number;
     feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
     visibleLayerIds: (number | string)[];
-    question: SurveyMapQuestion;
+    question: SurveyMapQuestion | SurveyGeoBudgetingQuestion;
+    markerIcon?: string;
   }[];
 }
 
@@ -119,7 +121,7 @@ async function generateScreenshots({
   for (const answer of answers) {
     // Prepare the window for the next screenshot
     await page.evaluate(
-      ({ visibleLayerIds, feature, featureStyle, question }) => {
+      ({ visibleLayerIds, feature, featureStyle, question, markerIcon }) => {
         const sandbox = Oskari.getSandbox();
 
         sandbox
@@ -141,17 +143,14 @@ async function generateScreenshots({
 
         if (feature.geometry.type === 'Point') {
           // In case of adding a point, create a marker and zoom to it
-          const isCustomIcon = !!question.featureStyles?.point?.markerIcon;
           sandbox.postRequestByName('MapModulePlugin.AddMarkerRequest', [
             {
               x: feature.geometry.coordinates[0],
               y: feature.geometry.coordinates[1],
-              shape: isCustomIcon
-                ? question.featureStyles?.point?.markerIcon
-                : 0,
+              shape: markerIcon ? markerIcon : 0,
               offsetX: 0,
               offsetY: 0,
-              size: isCustomIcon ? 128 : 12,
+              size: markerIcon ? 128 : 12,
             },
           ]);
           sandbox.postRequestByName('MapMoveRequest', [
@@ -176,15 +175,22 @@ async function generateScreenshots({
       {
         visibleLayerIds: answer.visibleLayerIds,
         feature: answer.feature as any,
-        featureStyle: getFeatureStyle(
-          answer.feature.geometry.type === 'Point'
-            ? 'point'
-            : answer.feature.geometry.type === 'LineString'
-              ? 'line'
-              : 'area',
-          answer.question,
-        ),
+        featureStyle:
+          answer.question.type === 'map'
+            ? getFeatureStyle(
+                answer.feature.geometry.type === 'Point'
+                  ? 'point'
+                  : answer.feature.geometry.type === 'LineString'
+                    ? 'line'
+                    : 'area',
+                answer.question as SurveyMapQuestion,
+              )
+            : defaultFeatureStyle,
         question: answer.question as any,
+        markerIcon:
+          answer.question.type === 'map'
+            ? answer.question.featureStyles.point.markerIcon
+            : answer.markerIcon,
       },
     );
     try {

@@ -221,9 +221,18 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
 /**
  * Helper function for converting answer entries into a GeoJSON Feature
  * @param answer
+ * @param mapLayers
+ * @param questionDetails - Optional question details needed for geobudgeting target info
  * @returns
  */
-function geometryAnswerToFeature(answer: AnswerEntry, mapLayers: MapLayer[]) {
+function geometryAnswerToFeature(
+  answer: AnswerEntry,
+  mapLayers: MapLayer[],
+  questionDetails?: {
+    type: string;
+    targets?: { name: { [key: string]: string }; price?: number }[];
+  },
+) {
   // Some erroneous data might not have a geometry - return null for them to avoid further errors
   if (!answer.valueGeometry) {
     return null;
@@ -237,21 +246,41 @@ function geometryAnswerToFeature(answer: AnswerEntry, mapLayers: MapLayer[]) {
         : (layer?.name?.['fi'] ?? ''),
     )
     .filter(Boolean);
+
+  const properties = {
+    ['Vastaustunniste']: answer.submissionId,
+    ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
+    ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
+    ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
+      answer.sectionIndex + 1
+    }: ${answer.title?.['fi'] ?? ''}`,
+    ['Näkyvät tasot']: mapLayerNames.join(', '),
+  };
+
+  // Add target information for geobudgeting answers
+  if (
+    questionDetails?.type === 'geo-budgeting' &&
+    questionDetails?.targets &&
+    answer.valueNumeric !== null &&
+    answer.valueNumeric !== undefined
+  ) {
+    const targetIndex = answer.valueNumeric;
+    const target = questionDetails.targets[targetIndex];
+    if (target) {
+      properties['Kohde'] = target.name?.['fi'] ?? `Target ${targetIndex}`;
+      if (target.price !== undefined && target.price !== null) {
+        properties['Hinta'] = target.price;
+      }
+    }
+  }
+
   return {
     type: 'Feature',
     geometry: {
       type: answer.valueGeometry.type,
       coordinates: answer.valueGeometry.coordinates,
     },
-    properties: {
-      ['Vastaustunniste']: answer.submissionId,
-      ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
-      ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
-      ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
-        answer.sectionIndex + 1
-      }: ${answer.title?.['fi'] ?? ''}`,
-      ['Näkyvät tasot']: mapLayerNames.join(', '),
-    },
+    properties,
   };
 }
 
@@ -273,9 +302,24 @@ function dbEntriesToFeatures(
     submissionGroup[submissionId] = submissionGroup[submissionId] ?? {};
     // If answer doesn't have parentEntryId, it is the parent itself. Store following answers under the parent
     if (!answer.parentEntryId) {
+      const questionDetails =
+        answer.type === 'geo-budgeting'
+          ? {
+              type: answer.type,
+              targets: (
+                answer.details as unknown as {
+                  targets?: {
+                    name: { [key: string]: string };
+                    price?: number;
+                  }[];
+                }
+              )?.targets,
+            }
+          : undefined;
       submissionGroup[submissionId][answer.answerId] = geometryAnswerToFeature(
         answer,
         mapLayers,
+        questionDetails,
       );
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
@@ -754,7 +798,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
         LEFT JOIN data.option opt ON opt.id = ae.value_option_id
-        WHERE (type = 'map' OR parent_section IS NOT NULL)
+        WHERE (type = 'map' OR type = 'geo-budgeting' OR parent_section IS NOT NULL)
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
           ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index, opt.idx`,
@@ -1281,6 +1325,7 @@ export async function getAnswerCounts(surveyId: number) {
     alphaNumericAnswers: string;
     attachmentAnswers: string;
     mapAnswers: string;
+    geoBudgetingAnswers: string;
     personalInfoAnswers: string;
   }>(
     `
@@ -1295,18 +1340,20 @@ export async function getAnswerCounts(surveyId: number) {
       WHERE submission_id =  ANY(SELECT submission_id FROM answer_entries)
     )
     SELECT
-        COUNT(*) FILTER (WHERE type <> 'map' AND TYPE <> 'attachment' AND parent_section IS NULL) AS "alphaNumericAnswers",
+        COUNT(*) FILTER (WHERE type <> 'map' AND TYPE <> 'attachment' AND type <> 'geo-budgeting' AND parent_section IS NULL) AS "alphaNumericAnswers",
         COUNT(*) FILTER (WHERE type = 'attachment') AS "attachmentAnswers",
         COUNT(*) FILTER (WHERE type = 'map') AS "mapAnswers",
+        COUNT(*) FILTER (WHERE type = 'geo-budgeting') AS "geoBudgetingAnswers",
         (SELECT COUNT(*) FROM personal_info_entries) AS "personalInfoAnswers"
     FROM answer_entries;
   `,
     [surveyId],
   );
   return {
-    aplhaNumericAnswers: Number(result.alphaNumericAnswers),
+    alphaNumericAnswers: Number(result.alphaNumericAnswers),
     attachmentAnswers: Number(result.attachmentAnswers),
     mapAnswers: Number(result.mapAnswers),
+    geoBudgetingAnswers: Number(result.geoBudgetingAnswers),
     personalInfoAnswers: Number(result.personalInfoAnswers),
   };
 }

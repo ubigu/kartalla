@@ -7,6 +7,7 @@ import {
   Survey,
   SurveyBudgetingQuestion,
   SurveyFollowUpSection,
+  SurveyGeoBudgetingQuestion,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyPageSection,
@@ -19,6 +20,7 @@ import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
 
+import { formatPhoneNumber } from '@src/utils';
 import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
@@ -29,7 +31,6 @@ import {
   getImageOptionsForSurvey,
   getOptionsForSurvey,
 } from './survey';
-import { formatPhoneNumber } from '@src/utils';
 
 const fonts = {
   Courier: {
@@ -98,14 +99,15 @@ function findFollowUpMapQuestion(
   ] as SurveyMapQuestion;
 }
 
-function prepareMapAnswers(
+function prepareMapAndGeoBudgetingAnswers(
   survey: Survey,
   answerEntries: AnswerEntry[],
   language: LanguageCode,
 ): ScreenshotJobData {
   return answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'map' } => entry.type === 'map',
+      (entry): entry is AnswerEntry & { type: 'map' | 'geo-budgeting' } =>
+        entry.type === 'map' || entry.type === 'geo-budgeting',
     )
     .reduce(
       (jobData, entry) => {
@@ -122,17 +124,47 @@ function prepareMapAnswers(
           ...jobData,
           answers: [
             ...jobData.answers,
-            ...entry.value.map((answer, index) => ({
-              sectionId: entry.sectionId,
-              index,
-              feature: answer.geometry,
-              visibleLayerIds: answer.mapLayers ?? page.sidebar.mapLayers,
-              question:
-                page.sections.find(
-                  (section): section is SurveyMapQuestion =>
-                    section.id === entry.sectionId,
-                ) ?? findFollowUpMapQuestion(page.sections, entry.sectionId),
-            })),
+            ...entry.value.map((answer, index) => {
+              const question =
+                entry.type === 'map'
+                  ? (page.sections.find(
+                      (section): section is SurveyMapQuestion =>
+                        section.id === entry.sectionId,
+                    ) ??
+                    findFollowUpMapQuestion(page.sections, entry.sectionId))
+                  : page.sections.find(
+                      (section): section is SurveyGeoBudgetingQuestion =>
+                        section.id === entry.sectionId,
+                    );
+
+              // Get marker icon for geobudgeting questions
+              let markerIcon: string | undefined;
+              if (
+                entry.type === 'geo-budgeting' &&
+                question &&
+                'targets' in question
+              ) {
+                const geoBudgetingQuestion =
+                  question as SurveyGeoBudgetingQuestion;
+                const targetIndex = (answer as any).targetIndex;
+                const target = geoBudgetingQuestion.targets[targetIndex];
+                if (target && target.icon) {
+                  markerIcon = target.icon;
+                }
+              }
+
+              return {
+                sectionId: entry.sectionId,
+                index,
+                feature: answer.geometry,
+                visibleLayerIds:
+                  entry.type === 'map' && (answer as any).mapLayers
+                    ? (answer as any).mapLayers
+                    : page.sidebar.mapLayers,
+                question,
+                markerIcon,
+              };
+            }),
           ],
         };
       },
@@ -620,6 +652,106 @@ function getContent(
         },
       ];
     }
+    case 'geo-budgeting': {
+      if (!answerEntry.value.length) {
+        return [heading, { text: '-', style }];
+      }
+
+      const question = section as SurveyGeoBudgetingQuestion;
+
+      // Group placements by target and calculate counts/totals
+      const targetSummary = question.targets.map((target, targetIndex) => {
+        const placements = (answerEntry.value as any[]).filter(
+          (answer) => answer.targetIndex === targetIndex,
+        );
+        return {
+          targetIndex,
+          targetName: target.name[language],
+          price: target.price ?? 0,
+          count: placements.length,
+          total: placements.length * (target.price ?? 0),
+        };
+      });
+
+      // Calculate total budget used
+      const totalUsedBudget = targetSummary.reduce(
+        (sum, target) => sum + target.total,
+        0,
+      );
+
+      const summaryContent: Content[] = [
+        {
+          text: 'Yhteenveto',
+          style: 'subQuestionTitle',
+          margin: [0, 0, 0, 5] as [number, number, number, number],
+        },
+        ...targetSummary
+          .filter((target) => target.count > 0)
+          .map(
+            (target) =>
+              ({
+                text: `${target.targetName}: ${target.count} × ${target.price} ${question.unit || ''} = ${target.total} ${question.unit || ''}`,
+                style: 'subQuestionAnswer',
+                margin: [0, 0, 0, 3] as [number, number, number, number],
+              }) as Content,
+          ),
+        {
+          text: `Yhteensä: ${totalUsedBudget} / ${question.totalBudget} ${question.unit || ''}`,
+          style: 'subQuestionAnswer',
+          bold: true,
+          margin: [0, 5, 0, 10] as [number, number, number, number],
+        } as Content,
+      ];
+
+      // Individual placement screenshots
+      const placementContent: Content[] = (answerEntry.value as any[]).map(
+        (answer, index) => {
+          const targetIndex = answer.targetIndex;
+          const target = question.targets[targetIndex];
+          const screenshot = screenshots.find(
+            (screenshot) =>
+              screenshot.sectionId === answerEntry.sectionId &&
+              screenshot.index === index,
+          );
+
+          return {
+            columns: [
+              {
+                image:
+                  'data:image/png;base64,' +
+                  screenshot.image.toString('base64'),
+                width: 200,
+                style,
+              },
+              [
+                {
+                  text: `Merkintä: ${index + 1}/${answerEntry.value.length}`,
+                  style: 'subQuestionAnswer',
+                } as Content,
+                {
+                  text: `${target.name[language]} (${target.price ?? 0} ${question.unit || ''})`,
+                  style: 'subQuestionAnswer',
+                } as Content,
+                {
+                  text: 'Näkyvät tasot:',
+                  style: 'subQuestionTitle',
+                } as Content,
+                {
+                  text: !screenshot.layerNames.length
+                    ? '-'
+                    : screenshot.layerNames.join(', '),
+                  style: 'subQuestionAnswer',
+                  margin: [0, 0, 0, 10] as [number, number, number, number],
+                } as Content,
+              ],
+            ],
+            margin: [0, 0, 0, 15] as [number, number, number, number],
+          } as Content;
+        },
+      );
+
+      return [heading, ...summaryContent, ...placementContent];
+    }
     // Unlisted types are ignored in the PDF
     default:
       return [];
@@ -656,7 +788,11 @@ export async function generatePdf(
     [] as SurveyFollowUpSection[],
   );
 
-  const screenshotJobData = prepareMapAnswers(survey, answerEntries, language);
+  const screenshotJobData = prepareMapAndGeoBudgetingAnswers(
+    survey,
+    answerEntries,
+    language,
+  );
   const screenshots = await getScreenshots(screenshotJobData);
   const optionsWithImages = await Promise.all(
     imageOptions.map(async (option) => {

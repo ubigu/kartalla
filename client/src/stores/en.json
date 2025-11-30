@@ -358,7 +358,9 @@
     "allocationDirectionDecreasing": "Budget is spent (from full to zero)",
     "helperText": "Helper text",
     "placed": "placed",
-    "exceedsBudget": "exceeds budget"
+    "exceedsBudget": "exceeds budget",
+    "summary": "Summary",
+    "total": "Total"
   },
   "fileValidator": {
     "fileUploadError": "Error while uploading the file.",
