@@ -1,6 +1,7 @@
 import { CredentialsEntry } from '@interfaces/submission';
 import {
   AnswerEntry,
+  BudgetTarget,
   GeoBudgetingAnswer,
   LanguageCode,
   LocalizedText,
@@ -205,6 +206,7 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   await Promise.all([
     validateEntriesByAnswerLimits(answerEntries),
     validateEntriesByIsRequired(answerEntries),
+    validateBudgetingEntries(answerEntries),
   ]);
 }
 
@@ -241,6 +243,113 @@ async function validateAttachmentEntries(answerEntries: AnswerEntry[]) {
       await validateBinaryFile(fileBuffer, 'attachment');
     }
   }
+}
+
+/**
+ * Validate budgeting question entries to ensure allocations don't exceed total budget.
+ * Applies to both 'budgeting' and 'geo-budgeting' question types.
+ * @param answerEntries Answer entries to validate
+ */
+async function validateBudgetingEntries(answerEntries: AnswerEntry[]) {
+  // Get all budgeting questions and their constraints from db
+  const budgetingQuestions = await getDb().manyOrNone<{
+    id: number;
+    totalBudget: number;
+    requireFullAllocation: boolean;
+    inputMode?: 'absolute' | 'percentage';
+    type: 'budgeting' | 'geo-budgeting';
+    budgetingMode?: 'pieces' | 'direct';
+    targets: BudgetTarget[];
+  }>(
+    `SELECT
+      id,
+      (details->>'totalBudget')::numeric as "totalBudget",
+      (details->>'requireFullAllocation')::boolean as "requireFullAllocation",
+      details->>'inputMode' as "inputMode",
+      details->>'type' as "type",
+      details->>'budgetingMode' as "budgetingMode",
+      details->'targets' as "targets"
+    FROM data.page_section
+    WHERE
+      id = ANY ($1) AND
+      "type" IN ('budgeting', 'geo-budgeting') AND
+      predecessor_section IS NULL`,
+    [answerEntries.map((entry) => entry.sectionId)],
+  );
+
+  // For each budgeting question, validate the sum of all matching answer entries
+  budgetingQuestions.forEach((question) => {
+    // Find all answer entries for this question
+    const matchingEntries = answerEntries.filter(
+      (entry) => entry.sectionId === question.id,
+    );
+
+    // Skip if no answers provided for this question
+    if (matchingEntries.length === 0) {
+      return;
+    }
+
+    let totalUsed = 0;
+
+    // Aggregate all allocations for this question
+    matchingEntries.forEach((entry) => {
+      if (entry.type === 'budgeting') {
+        // For budgeting questions, calculate based on budgetingMode
+        const values = entry.value as number[];
+
+        if (question.budgetingMode === 'pieces') {
+          // Pieces mode: multiply count by per-piece price for each target
+          values.forEach((count, targetIndex) => {
+            const target = (question.targets as BudgetTarget[])?.[targetIndex];
+            const price = target?.price ?? 0;
+            totalUsed += (count || 0) * price;
+          });
+        } else {
+          // Direct mode: values are monetary amounts, sum directly
+          totalUsed += values.reduce((sum, val) => sum + (val || 0), 0);
+        }
+      } else if (entry.type === 'geo-budgeting') {
+        // For geo-budgeting, count placements per target and multiply by price
+        const placements = entry.value as GeoBudgetingAnswer[];
+        const placementsByTarget: Record<number, number> = {};
+
+        placements.forEach((placement) => {
+          placementsByTarget[placement.targetIndex] =
+            (placementsByTarget[placement.targetIndex] ?? 0) + 1;
+        });
+
+        // Sum up the cost for all placements
+        Object.entries(placementsByTarget).forEach(
+          ([targetIndexStr, count]) => {
+            const targetIndex = parseInt(targetIndexStr, 10);
+            const target = (question.targets as BudgetTarget[])?.[targetIndex];
+            const price = target?.price ?? 0;
+            totalUsed += count * price;
+          },
+        );
+      }
+    });
+
+    // Determine the limit to check against
+    // For percentage mode, the effective limit is always 100
+    // For absolute mode, use the totalBudget value
+    const isPercentageMode = question.inputMode === 'percentage';
+    const budgetLimit = isPercentageMode ? 100 : question.totalBudget;
+
+    // Validate total doesn't exceed budget
+    if (totalUsed > budgetLimit) {
+      throw new BadRequestError(
+        `Budget for question ${question.id} exceeds limit: ${totalUsed} > ${budgetLimit}`,
+      );
+    }
+
+    // If requireFullAllocation is set, validate that budget is fully used
+    if (question.requireFullAllocation && totalUsed !== budgetLimit) {
+      throw new BadRequestError(
+        `Budget for question ${question.id} must be fully allocated: ${totalUsed} != ${budgetLimit}`,
+      );
+    }
+  });
 }
 
 /** Encrypt and save personal info question answers to database */

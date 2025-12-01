@@ -47,6 +47,9 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 
+// TODO split pane typings are broken since upgrade to TS v5.9.3, just skip the typings for now
+const SplitPaneTyped = SplitPane as React.ComponentType<any>;
+
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
@@ -746,7 +749,7 @@ export default function SurveyStepper({
       )}
       {/* Desktop: side pane exists */}
       {mdUp && sidePane && (
-        <SplitPane
+        <SplitPaneTyped
           split="vertical"
           defaultSize="50%"
           style={{ position: 'static' }}
@@ -776,7 +779,7 @@ export default function SurveyStepper({
         >
           {stepperPane}
           {sidePane}
-        </SplitPane>
+        </SplitPaneTyped>
       )}
       {/* Mobile: side pane exists but current page has none */}
       {!mdUp && sidePane && currentPage.sidebar.type === 'none' && (

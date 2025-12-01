@@ -10,7 +10,7 @@
       "ts-jest",
       {
         "tsConfig": "<rootDir>/client/tsconfig.json",
-        "jsx": "react"
+        "jsx": "react-jsx"
       }
     ],
     "^.+\\.js$": "babel-jest"

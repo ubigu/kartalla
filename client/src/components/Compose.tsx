@@ -1,7 +1,8 @@
-import React, { ComponentType } from 'react';
-import { ReactNode } from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 
-type Components = ComponentType | [ComponentType, { [key: string]: any }];
+type Components =
+  | ComponentType<any>
+  | [ComponentType<any>, { [key: string]: any }];
 
 interface Props {
   components: Components[];

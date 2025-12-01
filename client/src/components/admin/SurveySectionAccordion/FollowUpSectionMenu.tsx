@@ -1,14 +1,14 @@
-import { Divider, Typography, Box, Button } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import AddSurveySectionActions from '../AddSurveySectionActions';
-import { useSurvey } from '@src/stores/SurveyContext';
 import {
   SurveyFollowUpSection,
   SurveyFollowUpSectionParent,
 } from '@interfaces/survey';
-import { FollowUpSectionDetails } from './FollowUpSectionDetails';
+import { Box, Button, Divider, Typography } from '@mui/material';
+import { useSurvey } from '@src/stores/SurveyContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import AddSurveySectionActions from '../AddSurveySectionActions';
 import { FollowUpSectionConditions } from './FollowUpSectionConditions';
+import { FollowUpSectionDetails } from './FollowUpSectionDetails';
 
 interface Props {
   accordion: {
@@ -55,10 +55,13 @@ export function FollowUpSectionMenu({
       'multi-matrix': 'multiMatrixQuestion',
       numeric: 'numericQuestion',
       radio: 'radioQuestion',
+      'radio-image': 'radioImageQuestion',
       slider: 'sliderQuestion',
       sorting: 'sortingQuestion',
       text: 'textSection',
       'personal-info': 'personalInfoQuestion',
+      budgeting: 'budgetingQuestion',
+      'geo-budgeting': 'geoBudgetingQuestion',
     };
 
     if (!Object.keys(translationEntries).includes(type))

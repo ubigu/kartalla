@@ -14,6 +14,8 @@ import CloseIcon from '@src/components/icons/CloseIcon';
 import React, { ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
 
+const SplitPaneTyped = SplitPane as React.ComponentType<any>;
+
 interface Props {
   mainPane: ReactNode;
   sidePane: ReactNode | false;
@@ -56,7 +58,7 @@ export default function SplitPaneLayout({
       )}
       {/* Desktop: side pane exists */}
       {mdUp && sidePane != null && (
-        <SplitPane
+        <SplitPaneTyped
           split="vertical"
           style={{ position: 'static' }}
           minSize={200}
@@ -77,7 +79,7 @@ export default function SplitPaneLayout({
         >
           {mainPane}
           {sidePane || <div />}
-        </SplitPane>
+        </SplitPaneTyped>
       )}
       {/* Mobile: side pane exists but current page has none */}
       {!mdUp && sidePane === false && (

@@ -1325,7 +1325,6 @@ export async function getAnswerCounts(surveyId: number) {
     alphaNumericAnswers: string;
     attachmentAnswers: string;
     mapAnswers: string;
-    geoBudgetingAnswers: string;
     personalInfoAnswers: string;
   }>(
     `
@@ -1342,8 +1341,7 @@ export async function getAnswerCounts(surveyId: number) {
     SELECT
         COUNT(*) FILTER (WHERE type <> 'map' AND TYPE <> 'attachment' AND type <> 'geo-budgeting' AND parent_section IS NULL) AS "alphaNumericAnswers",
         COUNT(*) FILTER (WHERE type = 'attachment') AS "attachmentAnswers",
-        COUNT(*) FILTER (WHERE type = 'map') AS "mapAnswers",
-        COUNT(*) FILTER (WHERE type = 'geo-budgeting') AS "geoBudgetingAnswers",
+        COUNT(*) FILTER (WHERE type IN ('map', 'geo-budgeting')) AS "mapAnswers",
         (SELECT COUNT(*) FROM personal_info_entries) AS "personalInfoAnswers"
     FROM answer_entries;
   `,
@@ -1353,7 +1351,6 @@ export async function getAnswerCounts(surveyId: number) {
     alphaNumericAnswers: Number(result.alphaNumericAnswers),
     attachmentAnswers: Number(result.attachmentAnswers),
     mapAnswers: Number(result.mapAnswers),
-    geoBudgetingAnswers: Number(result.geoBudgetingAnswers),
     personalInfoAnswers: Number(result.personalInfoAnswers),
   };
 }

@@ -1,8 +1,7 @@
-import React from 'react';
 import { Box, Toolbar } from '@mui/material';
-import SurveyList from './SurveyList';
-import { AdminAppBar } from './AdminAppBar';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { AdminAppBar } from './AdminAppBar';
+import SurveyList from './SurveyList';
 
 export default function AdminFrontPage() {
   const { tr } = useTranslations();

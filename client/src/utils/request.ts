@@ -73,5 +73,5 @@ export async function request<Response = unknown>(
   }
 
   // In case of JSON parse error, fail silently - e.g. empty responses might cause this
-  return (await response.json().catch(() => null)) as Response;
+  return (await response.json().catch((): null => null)) as Response;
 }

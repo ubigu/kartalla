@@ -1,9 +1,11 @@
 import {
+  SurveyBudgetingQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
   SurveyFollowUpSectionParent,
   SurveyFreeTextQuestion,
+  SurveyGeoBudgetingQuestion,
   SurveyGroupedCheckboxQuestion,
   SurveyImageSection,
   SurveyMapQuestion,
@@ -18,22 +20,7 @@ import {
   SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
-import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
-import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
-import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
-import MapIcon from '@src/components/icons/MapIcon';
-import TextFieldIcon from '@src/components/icons/TextFieldIcon';
-import TextSectionIcon from '@src/components/icons/TextSectionIcon';
-import OrderedIcon from '@src/components/icons/OrderedIcon';
-import SliderIcon from '@src/components/icons/SliderIcon';
-import MatrixIcon from '@src/components/icons/MatrixIcon';
-import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
-import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
-import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
-import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
-import PaperclipIcon from '@src/components/icons/PaperclipIcon';
-import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
-import DraggableIcon from '@src/components/icons/DraggableIcon';
+import { Person } from '@mui/icons-material';
 import {
   Accordion,
   AccordionSummary,
@@ -41,30 +28,47 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
+import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
+import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
+import DraggableIcon from '@src/components/icons/DraggableIcon';
 import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
+import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
+import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
+import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
+import MapIcon from '@src/components/icons/MapIcon';
+import MatrixIcon from '@src/components/icons/MatrixIcon';
+import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
+import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
+import OrderedIcon from '@src/components/icons/OrderedIcon';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
+import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
+import SliderIcon from '@src/components/icons/SliderIcon';
+import TextFieldIcon from '@src/components/icons/TextFieldIcon';
+import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
+import EditBudgetingQuestion from '../EditBudgetingQuestion';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
 import EditDocumentSection from '../EditDocumentSection';
 import EditFreeTextQuestion from '../EditFreeTextQuestion';
+import { EditGeoBudgetingQuestion } from '../EditGeoBudgetingQuestion';
 import EditGroupedCheckBoxQuestion from '../EditGroupedCheckBoxQuestion';
 import EditImageSection from '../EditImageSection';
 import EditMapQuestion from '../EditMapQuestion';
 import EditMatrixQuestion from '../EditMatrixQuestion';
 import { EditMultiMatrixQuestion } from '../EditMultiMatrixQuestion';
 import EditNumericQuestion from '../EditNumericQuestion';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditRadioImageQuestion from '../EditRadioImageQuestion';
 import EditRadioQuestion from '../EditRadioQuestion';
 import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
-import { Person } from '@mui/icons-material';
-import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
-import EditRadioImageQuestion from '../EditRadioImageQuestion';
-import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 
 const useStyles = makeStyles({
   accordion: {
@@ -298,6 +302,26 @@ export function FollowUpSectionAccordion(props: Props) {
       icon: <PaperclipIcon />,
       tooltip: tr.SurveySection.attachmentSection,
       form: <EditAttachmentSection />,
+    },
+    budgeting: {
+      icon: <PaperclipIcon />,
+      tooltip: tr.SurveySection.budgetingQuestion,
+      form: (
+        <EditBudgetingQuestion
+          section={props.section as SurveyBudgetingQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'geo-budgeting': {
+      icon: <MapIcon />,
+      tooltip: tr.SurveySection.geoBudgetingQuestion,
+      form: (
+        <EditGeoBudgetingQuestion
+          section={props.section as SurveyGeoBudgetingQuestion}
+          onChange={handleEdit}
+        />
+      ),
     },
   };
 
