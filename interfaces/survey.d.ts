@@ -930,3 +930,14 @@ export interface Conditions {
 }
 
 export type SurveyPageConditions = Record<SurveyPageSection['id'], Conditions>;
+
+/**
+ * Custom SVG icon
+ */
+export interface SvgIcon {
+  id: number;
+  organizationId: string;
+  svgContent: string;
+  originalFilename?: string;
+  createdAt: string;
+}

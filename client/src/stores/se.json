@@ -465,6 +465,25 @@
     "selectIcon": "Välj ikon",
     "errorFetchingIcons": "Det uppstod ett fel vid hämtning av ikoner. Försök igen senare."
   },
+  "SvgIconSelect": {
+    "emoji": "Emoji",
+    "customSvgs": "Anpassade SVG-ikoner",
+    "uploadSvgIcon": "Ladda upp SVG-ikon",
+    "noCustomIcons": "Inga anpassade SVG-ikoner ännu",
+    "uploadSuccess": "SVG-ikon uppladdad framgångsrikt",
+    "uploadError": "Det gick inte att ladda upp SVG-ikonen",
+    "deleteConfirm": "Är du säker på att du vill ta bort denna SVG-ikon?",
+    "deleteSuccess": "SVG-ikon borttagen framgångsrikt",
+    "deleteError": "Det gick inte att ta bort SVG-ikonen",
+    "cancel": "Avbryt",
+    "delete": "Ta bort"
+  },
+  "EmojiPicker": {
+    "loading": "Laddar",
+    "empty": "Tomt",
+    "selectEmoji": "Välj en emoji…",
+    "search": "Sök…"
+  },
   "StrokeStyleSelect": {
     "strokeStyle": "Linjestil",
     "selectStrokeStyle": "Välj linjestil",

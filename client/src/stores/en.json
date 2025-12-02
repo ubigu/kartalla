@@ -464,6 +464,25 @@
     "selectIcon": "Select an icon",
     "errorFetchingIcons": "Error while accessing icons. Please try again later."
   },
+  "SvgIconSelect": {
+    "emoji": "Emoji",
+    "customSvgs": "Custom SVG icons",
+    "uploadSvgIcon": "Upload SVG icon",
+    "noCustomIcons": "No custom SVG icons yet",
+    "uploadSuccess": "SVG icon uploaded successfully",
+    "uploadError": "Failed to upload SVG icon",
+    "deleteConfirm": "Are you sure you want to delete this SVG icon?",
+    "deleteSuccess": "SVG icon deleted successfully",
+    "deleteError": "Failed to delete SVG icon",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "EmojiPicker": {
+    "loading": "Loading",
+    "empty": "Empty",
+    "selectEmoji": "Select an emoji…",
+    "search": "Search…"
+  },
   "StrokeStyleSelect": {
     "strokeStyle": "Stroke style",
     "selectStrokeStyle": "Select stroke style",
