@@ -2,7 +2,6 @@ import { LocalizedText } from '@interfaces/survey';
 import { Badge, Stack, ToggleButton, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getNumberFormatter } from '@src/utils/format';
-import React from 'react';
 
 interface Props {
   icon: string;
@@ -60,10 +59,10 @@ export default function GeoBudgetingTargetButton({
           }}
         >
           <img
-            style={{ height: '1rem', width: '1rem' }}
+            style={{ height: '1.5rem', width: '1.5rem' }}
             src={
               icon
-                ? `data:image/svg+xml;base64,${btoa(icon)}`
+                ? `data:image/svg+xml;utf8,${encodeURIComponent(icon)}`
                 : '/api/feature-styles/icons/point_icon'
             }
             alt=""

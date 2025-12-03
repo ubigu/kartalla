@@ -465,6 +465,25 @@
     "selectIcon": "Valitse ikoni",
     "errorFetchingIcons": "Ikonien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
   },
+  "SvgIconSelect": {
+    "emoji": "Emoji",
+    "customSvgs": "Omat SVG-ikonit",
+    "uploadSvgIcon": "Lataa SVG-ikoni",
+    "noCustomIcons": "Ei omia SVG-ikoneita vielä",
+    "uploadSuccess": "SVG-ikoni ladattu onnistuneesti",
+    "uploadError": "SVG-ikonin lataaminen epäonnistui",
+    "deleteConfirm": "Haluatko varmasti poistaa tämän SVG-ikonin?",
+    "deleteSuccess": "SVG-ikoni poistettu onnistuneesti",
+    "deleteError": "SVG-ikonin poistaminen epäonnistui",
+    "cancel": "Peruuta",
+    "delete": "Poista"
+  },
+  "EmojiPicker": {
+    "loading": "Lataa",
+    "empty": "Tyhjä",
+    "selectEmoji": "Valitse emoji…",
+    "search": "Hae…"
+  },
   "StrokeStyleSelect": {
     "strokeStyle": "Viivan tyyli",
     "selectStrokeStyle": "Valitse viivan tyyli",

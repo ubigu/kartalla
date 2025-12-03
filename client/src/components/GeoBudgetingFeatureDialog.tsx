@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   open: boolean;
@@ -37,7 +36,7 @@ export default function GeoBudgetingFeatureDialog({
       >
         {targetIcon && (
           <img
-            src={`data:image/svg+xml;base64,${btoa(targetIcon)}`}
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(targetIcon)}`}
             alt=""
             style={{ height: '1.5rem', width: '1.5rem' }}
             aria-hidden="true"

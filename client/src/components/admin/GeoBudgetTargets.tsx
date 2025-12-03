@@ -14,10 +14,10 @@ import {
 
 import AddIcon from '@src/components/icons/AddIcon';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
-import MarkerIconSelect from '@src/components/admin/MarkerIconSelect';
 
+import { SvgIconSelect } from '@src/components/admin/SvgIconSelect';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo } from 'react';
+import { createRef, useEffect, useMemo } from 'react';
 
 const styles = {
   wrapper: {
@@ -118,7 +118,7 @@ export function GeoBudgetTargets({
           <Box sx={{ ...styles.row, ...styles.option }} key={index}>
             <Box sx={styles.optionContainer}>
               <Box display="flex" gap="1rem" alignItems="flex-start">
-                <MarkerIconSelect
+                <SvgIconSelect
                   value={target.icon ?? ''}
                   onChange={(icon) => {
                     updateTarget(index, {
