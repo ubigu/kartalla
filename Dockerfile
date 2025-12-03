@@ -63,7 +63,8 @@ RUN apk update && apk add \
   freetype \
   harfbuzz \
   ca-certificates \
-  ttf-freefont
+  ttf-freefont \
+  font-noto-emoji
 
 # Add non-root user with explicit UID and GID
 RUN addgroup --system --gid 1001 appGroup && \
