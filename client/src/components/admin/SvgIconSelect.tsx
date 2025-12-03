@@ -1,6 +1,5 @@
-import { SvgIcon } from '@interfaces/survey';
+import { MapMarkerIcon, SvgIcon } from '@interfaces/survey';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
@@ -8,19 +7,18 @@ import {
   Dialog,
   DialogContent,
   FormControl,
-  Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Popover,
   Select,
   Tab,
   Tabs,
-  Tooltip,
 } from '@mui/material';
 import { EmojiPicker } from '@src/components/admin/EmojiPicker';
+import { IconGrid } from '@src/components/admin/IconGrid';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { request } from '@src/utils/request';
 import {
   deleteSvgIcon,
   getSvgIcons,
@@ -45,9 +43,13 @@ export function SvgIconSelect(props: Props) {
   const { showToast } = useToasts();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(props.value);
-  const [tabValue, setTabValue] = useState<'emoji' | 'custom'>('emoji');
+  const [tabValue, setTabValue] = useState<'emoji' | 'appIcons' | 'custom'>(
+    'emoji',
+  );
   const [customIcons, setCustomIcons] = useState<SvgIcon[]>([]);
+  const [appIcons, setAppIcons] = useState<MapMarkerIcon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [appIconsLoading, setAppIconsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     open: boolean;
@@ -67,6 +69,8 @@ export function SvgIconSelect(props: Props) {
   useEffect(() => {
     if (isOpen && tabValue === 'custom') {
       loadCustomIcons();
+    } else if (isOpen && tabValue === 'appIcons') {
+      loadAppIcons();
     }
   }, [isOpen, tabValue]);
 
@@ -82,6 +86,23 @@ export function SvgIconSelect(props: Props) {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadAppIcons() {
+    try {
+      setAppIconsLoading(true);
+      const icons = await request<MapMarkerIcon[]>(
+        '/api/feature-styles/marker-icons',
+      );
+      setAppIcons(icons);
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: 'Failed to load app icons',
+      });
+    } finally {
+      setAppIconsLoading(false);
     }
   }
 
@@ -142,11 +163,14 @@ export function SvgIconSelect(props: Props) {
             />
           )}
           onClick={() => setIsOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              setIsOpen(true);
-            }
+          SelectDisplayProps={{
+            onKeyDown: (event) => {
+              if (['Enter', ' ', 'ArrowDown'].includes(event.key)) {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsOpen(true);
+              }
+            },
           }}
         >
           <MenuItem value="true" sx={{ display: 'none' }} />
@@ -163,14 +187,17 @@ export function SvgIconSelect(props: Props) {
           horizontal: 'left',
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: 280 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: 420 }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
               value={tabValue}
               onChange={(_, newValue) => setTabValue(newValue)}
+              variant="scrollable"
+              scrollButtons="auto"
             >
               <Tab label={tr.SvgIconSelect.emoji} value="emoji" />
-              <Tab label={tr.SvgIconSelect.customSvgs} value="custom" />
+              <Tab label={tr.SvgIconSelect.appIcons} value="appIcons" />
+              <Tab label={tr.SvgIconSelect.customIcons} value="custom" />
             </Tabs>
           </Box>
           {tabValue === 'emoji' && (
@@ -180,6 +207,22 @@ export function SvgIconSelect(props: Props) {
                   setValue(emojiToSvg(selectedEmoji, 32));
                   setIsOpen(false);
                 }}
+              />
+            </Box>
+          )}
+
+          {tabValue === 'appIcons' && (
+            <Box sx={{ p: 2 }}>
+              <IconGrid
+                icons={appIcons}
+                loading={appIconsLoading}
+                emptyMessage={tr.SvgIconSelect.noCustomIcons}
+                showDeleteButton={false}
+                onSelect={(svgContent) => {
+                  setValue(svgContent);
+                  setIsOpen(false);
+                }}
+                onDeleteRequest={() => {}}
               />
             </Box>
           )}
@@ -216,82 +259,22 @@ export function SvgIconSelect(props: Props) {
                 </Button>
               </Box>
 
-              {isLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                  <CircularProgress />
-                </Box>
-              ) : customIcons.length === 0 ? (
-                <Box
-                  sx={{ textAlign: 'center', p: 3, color: 'text.secondary' }}
-                >
-                  {tr.SvgIconSelect.noCustomIcons}
-                </Box>
-              ) : (
-                <Grid container spacing={1}>
-                  {customIcons.map((icon) => (
-                    <Grid item xs={4} key={icon.id}>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          cursor: 'pointer',
-                          p: 1,
-                          border: '1px solid #ddd',
-                          borderRadius: 1,
-                          '&:hover': { bgcolor: '#f5f5f5' },
-                        }}
-                        onClick={() => {
-                          setValue(icon.svgContent);
-                          setIsOpen(false);
-                        }}
-                        onMouseEnter={(e) => {
-                          const btn = e.currentTarget.querySelector(
-                            '[data-delete-btn]',
-                          ) as HTMLElement;
-                          if (btn) btn.style.opacity = '1';
-                        }}
-                        onMouseLeave={(e) => {
-                          const btn = e.currentTarget.querySelector(
-                            '[data-delete-btn]',
-                          ) as HTMLElement;
-                          if (btn) btn.style.opacity = '0';
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src={`data:image/svg+xml;utf8,${encodeURIComponent(icon.svgContent)}`}
-                          sx={{
-                            width: '100%',
-                            height: 'auto',
-                            maxHeight: 50,
-                          }}
-                        />
-                        <Tooltip title={tr.SvgIconSelect.delete}>
-                          <IconButton
-                            data-delete-btn
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteConfirmDialog({
-                                open: true,
-                                iconId: icon.id,
-                              });
-                            }}
-                            sx={{
-                              position: 'absolute',
-                              top: 0,
-                              right: 0,
-                              opacity: 0,
-                              transition: 'opacity 0.2s',
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              )}
+              <IconGrid
+                icons={customIcons}
+                loading={isLoading}
+                emptyMessage={tr.SvgIconSelect.noCustomIcons}
+                showDeleteButton={true}
+                onSelect={(svgContent) => {
+                  setValue(svgContent);
+                  setIsOpen(false);
+                }}
+                onDeleteRequest={(iconId) => {
+                  setDeleteConfirmDialog({
+                    open: true,
+                    iconId: iconId as number,
+                  });
+                }}
+              />
             </Box>
           )}
         </Box>

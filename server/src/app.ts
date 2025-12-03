@@ -1,15 +1,15 @@
 import compression from 'compression';
 import express from 'express';
+import helmet from 'helmet';
 import morgan, { compile } from 'morgan';
 import * as path from 'path';
 import { initializePuppeteerCluster } from './application/screenshot';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
 import { initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
+import { initSecrets, secrets } from './keyVaultSecrets';
 import logger from './logger';
 import rootRouter from './routes';
-import { initSecrets, secrets } from './keyVaultSecrets';
-import helmet from 'helmet';
 
 async function start() {
   const app = express();
@@ -38,6 +38,7 @@ async function start() {
             'connect-src': [
               "'self'",
               'https://gist.githubusercontent.com/zit0un/3ac0575eb0f3aabdc645c3faad47ab4a/raw/8db5e3ab89418def3a15474979e494c92b69592e/GeoJSON-OAS3.yaml',
+              'https://cdn.jsdelivr.net',
             ], // References in openapi.yaml
             'worker-src': 'blob:', // For openAPI docs to work
             'frame-src': secrets.allowedFrameSources ?? "'self'",
