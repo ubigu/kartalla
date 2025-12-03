@@ -130,7 +130,7 @@ export function GeoBudgetTargets({
                   data-testid={`geo-budget-target-name-${index}`}
                   label={tr.GeoBudgetingQuestion.targetName}
                   inputRef={inputRefs[index]}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minWidth: '150px' }}
                   variant="standard"
                   disabled={disabled}
                   size="small"

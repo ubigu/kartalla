@@ -21,6 +21,7 @@ RUN apk update && apk add \
   harfbuzz \
   ca-certificates \
   ttf-freefont \
+  font-noto-emoji \
   curl
 
 WORKDIR /app/server

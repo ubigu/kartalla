@@ -6,7 +6,6 @@ import {
 } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 import RichTextEditor from '../RichTextEditor';
 import TranslationField from './TranslationField';
 
@@ -67,42 +66,88 @@ export default function EditSurveySectionTranslations({
             }}
           />
         ))}
-      {section.type === 'budgeting' &&
-        section.targets?.map((target, targetIndex) => (
-          <TranslationField
-            key={`target-field-${targetIndex}`}
-            value={target.name[languageCode]}
-            onChange={(event) => {
-              const updatedTargets = [...section.targets];
-              updatedTargets[targetIndex] = {
-                ...updatedTargets[targetIndex],
-                name: {
-                  ...target.name,
-                  [languageCode]: event.target.value,
-                },
-              };
-              onEdit({ ...section, targets: updatedTargets });
+      {section.type === 'budgeting' && (
+        <>
+          {section.targets?.map((target, targetIndex) => (
+            <TranslationField
+              key={`target-field-${targetIndex}`}
+              value={target.name[languageCode]}
+              onChange={(event) => {
+                const updatedTargets = [...section.targets];
+                updatedTargets[targetIndex] = {
+                  ...updatedTargets[targetIndex],
+                  name: {
+                    ...target.name,
+                    [languageCode]: event.target.value,
+                  },
+                };
+                onEdit({ ...section, targets: updatedTargets });
+              }}
+            />
+          ))}
+          <div
+            style={{
+              wordBreak: 'break-word',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              position: 'relative',
             }}
-          />
-        ))}
-      {section.type === 'geo-budgeting' &&
-        section.targets?.map((target, targetIndex) => (
-          <TranslationField
-            key={`geo-target-field-${targetIndex}`}
-            value={target.name[languageCode]}
-            onChange={(event) => {
-              const updatedTargets = [...section.targets];
-              updatedTargets[targetIndex] = {
-                ...updatedTargets[targetIndex],
-                name: {
-                  ...target.name,
-                  [languageCode]: event.target.value,
-                },
-              };
-              onEdit({ ...section, targets: updatedTargets });
+          >
+            <RichTextEditor
+              value={section.helperText?.[languageCode]}
+              missingValue={Boolean(!section.helperText?.[languageCode])}
+              onChange={(value) => {
+                onEdit({
+                  ...section,
+                  helperText: { ...section.helperText, [languageCode]: value },
+                });
+              }}
+              editorHeight={'100px'}
+            />
+          </div>
+        </>
+      )}
+      {section.type === 'geo-budgeting' && (
+        <>
+          {section.targets?.map((target, targetIndex) => (
+            <TranslationField
+              key={`geo-target-field-${targetIndex}`}
+              value={target.name[languageCode]}
+              onChange={(event) => {
+                const updatedTargets = [...section.targets];
+                updatedTargets[targetIndex] = {
+                  ...updatedTargets[targetIndex],
+                  name: {
+                    ...target.name,
+                    [languageCode]: event.target.value,
+                  },
+                };
+                onEdit({ ...section, targets: updatedTargets });
+              }}
+            />
+          ))}
+          <div
+            style={{
+              wordBreak: 'break-word',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              position: 'relative',
             }}
-          />
-        ))}
+          >
+            <RichTextEditor
+              value={section.helperText?.[languageCode]}
+              missingValue={Boolean(!section.helperText?.[languageCode])}
+              onChange={(value) => {
+                onEdit({
+                  ...section,
+                  helperText: { ...section.helperText, [languageCode]: value },
+                });
+              }}
+              editorHeight={'100px'}
+            />
+          </div>
+        </>
+      )}
       {section.type === 'radio-image' &&
         section.options?.map((option: SectionImageOption, optionIndex) => (
           <div key={`image-option-field-${optionIndex}`}>

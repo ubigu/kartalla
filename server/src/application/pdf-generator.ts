@@ -556,6 +556,7 @@ function getContent(
                 }),
               ],
             ],
+            unbreakable: true,
           };
         }),
       ];
@@ -745,6 +746,7 @@ function getContent(
                 } as Content,
               ],
             ],
+            unbreakable: true,
             margin: [0, 0, 0, 15] as [number, number, number, number],
           } as Content;
         },

@@ -826,7 +826,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
-            map_layers: null,
+            map_layers: value.mapLayers ?? null,
           };
         });
         break;
