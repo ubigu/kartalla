@@ -48,6 +48,7 @@ export default function GeoBudgetingQuestion({
     stopDrawing,
     onModify,
     questionId: mapContextQuestionId,
+    visibleLayers,
   } = useSurveyMap();
 
   const [activeTargetId, setActiveTargetId] = useState<number | null>(null);
@@ -175,6 +176,7 @@ export default function GeoBudgetingQuestion({
         {
           targetIndex,
           geometry: geometry as any,
+          mapLayers: visibleLayers,
         },
       ]);
 

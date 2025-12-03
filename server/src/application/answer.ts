@@ -155,6 +155,20 @@ interface SubmissionPersonalInfo {
 }
 
 /**
+ * Type-safe representation of page section details stored in database
+ * Used for geometry answer processing (GPKG generation, etc.)
+ */
+interface PageSectionDetails {
+  unit?: string;
+  targets?: Array<{
+    name: LocalizedText;
+    price?: number;
+    icon?: string;
+  }>;
+  [key: string]: any; // Allow additional fields for extensibility
+}
+
+/**
  * Interface for section details
  */
 interface TypeDetails {
@@ -222,16 +236,15 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
  * Helper function for converting answer entries into a GeoJSON Feature
  * @param answer
  * @param mapLayers
- * @param questionDetails - Optional question details needed for geobudgeting target info
+ * @param questionDetails - Full page section details for accessing question configuration
+ * @param answerType - Type of the answer (map or geo-budgeting)
  * @returns
  */
 function geometryAnswerToFeature(
   answer: AnswerEntry,
   mapLayers: MapLayer[],
-  questionDetails?: {
-    type: string;
-    targets?: { name: { [key: string]: string }; price?: number }[];
-  },
+  questionDetails?: PageSectionDetails,
+  answerType?: string,
 ) {
   // Some erroneous data might not have a geometry - return null for them to avoid further errors
   if (!answer.valueGeometry) {
@@ -259,7 +272,7 @@ function geometryAnswerToFeature(
 
   // Add target information for geobudgeting answers
   if (
-    questionDetails?.type === 'geo-budgeting' &&
+    answerType === 'geo-budgeting' &&
     questionDetails?.targets &&
     answer.valueNumeric !== null &&
     answer.valueNumeric !== undefined
@@ -270,6 +283,9 @@ function geometryAnswerToFeature(
       properties['Kohde'] = target.name?.['fi'] ?? `Target ${targetIndex}`;
       if (target.price !== undefined && target.price !== null) {
         properties['Hinta'] = target.price;
+        if (questionDetails.unit) {
+          properties['Yksikkö'] = questionDetails.unit;
+        }
       }
     }
   }
@@ -302,24 +318,13 @@ function dbEntriesToFeatures(
     submissionGroup[submissionId] = submissionGroup[submissionId] ?? {};
     // If answer doesn't have parentEntryId, it is the parent itself. Store following answers under the parent
     if (!answer.parentEntryId) {
-      const questionDetails =
-        answer.type === 'geo-budgeting'
-          ? {
-              type: answer.type,
-              targets: (
-                answer.details as unknown as {
-                  targets?: {
-                    name: { [key: string]: string };
-                    price?: number;
-                  }[];
-                }
-              )?.targets,
-            }
-          : undefined;
+      // Pass full page section details for both map and geobudgeting answers
+      const questionDetails = answer.details as PageSectionDetails;
       submissionGroup[submissionId][answer.answerId] = geometryAnswerToFeature(
         answer,
         mapLayers,
         questionDetails,
+        answer.type,
       );
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer

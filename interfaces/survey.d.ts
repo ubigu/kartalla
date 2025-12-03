@@ -718,6 +718,10 @@ export interface GeoBudgetingAnswer {
    * GeoJSON geometry of the placed point
    */
   geometry: GeoJSONWithCRS<GeoJSON.Feature<GeoJSON.Point>>;
+  /**
+   * IDs of visible map layers when the point was placed
+   */
+  mapLayers?: (number | string)[];
 }
 
 /**
