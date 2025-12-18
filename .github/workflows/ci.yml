@@ -13,7 +13,7 @@ env:
   IMAGE_NAME_PROD: ${{ secrets.ACR_REGISTRY_ADDRESS }}/kartalla
   APP_VERSION: ${{ github.event_name == 'release' && github.event.release.name || format('build {0}', github.sha) }}
   ENABLED_FEATURES_TEST: '["budgetingQuestion"]'
-  ENABLED_FEATURES_PROD: "[]"
+  ENABLED_FEATURES_PROD: '["budgetingQuestion"]'
 
 jobs:
   deploy:
