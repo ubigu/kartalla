@@ -258,6 +258,22 @@ declare module 'oskari-rpc' {
     font?: string;
   }
 
+  export interface State {
+    mapfull: {
+      state: {
+        north: number;
+        east: number;
+        selectedLayers: {
+          id: number;
+          opacity: number;
+          style?: string;
+        }[];
+        srs: string;
+        zoom: number;
+      };
+    };
+  }
+
   /**
    * All Oskari events
    */
@@ -312,6 +328,7 @@ declare module 'oskari-rpc' {
     getSupportedFunctions: (callback: (functions: unknown[]) => void) => void;
     getInfo: (callback: (info: any) => void) => void;
     getMapPosition: (callback: (position: any) => void) => void;
+    getCurrentState: (callback: (state: State) => void) => void;
     /**
      * Post an Oskari request
      */
