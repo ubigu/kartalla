@@ -836,27 +836,29 @@ export default function SurveyMapProvider({
    */
   useEffect(() => {
     if (!state.rpcChannel) {
-      if (state.isInitialized) {
-        dispatch({ type: 'SET_IS_INITIALIZED', value: false });
-      }
       return;
     }
 
-    const timeout = setTimeout(() => {
-      dispatch({ type: 'SET_IS_INITIALIZED', value: true });
-    }, 1000);
-
-    return () => clearTimeout(timeout);
+    // getAllLayers does work here, but we need to wait until Oskari assigns the layers all the way to the internal map state, thus the polling...
+    // This issue should resolve the problem in some better way: https://github.com/oskariorg/oskari-documentation/issues/58
+    const interval = setInterval(() => {
+      state.rpcChannel.getCurrentState(({ mapfull }) => {
+        const layers = mapfull.state.selectedLayers.map((layer) => layer.id);
+        if (!layers.length) {
+          return;
+        }
+        clearInterval(interval);
+        dispatch({ type: 'SET_ALL_LAYERS', layers });
+        dispatch({ type: 'SET_IS_INITIALIZED', value: true });
+      });
+    }, 100);
   }, [state.rpcChannel]);
 
   useEffect(() => {
-    if (state.isInitialized && state.rpcChannel) {
-      state.rpcChannel.getAllLayers((allLayers) => {
-        const layers = allLayers.map((layer) => layer.id);
-        dispatch({ type: 'SET_ALL_LAYERS', layers });
-      });
+    if (!state.rpcChannel && state.isInitialized) {
+      dispatch({ type: 'SET_IS_INITIALIZED', value: false });
     }
-  }, [state.isInitialized, state.rpcChannel]);
+  }, [state.rpcChannel, state.isInitialized]);
 
   /**
    * Whenever changes are made to visible layers, update the visibility to state
