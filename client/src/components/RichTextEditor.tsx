@@ -144,6 +144,9 @@ export async function markdownToEditorState(
       if (nodeName === 'a' && node instanceof HTMLAnchorElement) {
         return createEntity('LINK', 'MUTABLE', {
           url: node.getAttribute('href'),
+          ...(node.getAttribute('target') && {
+            targetOption: node.getAttribute('target'),
+          }),
         });
       }
       return undefined;
