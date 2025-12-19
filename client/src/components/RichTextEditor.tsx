@@ -6,12 +6,7 @@ import { convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown } from 'markdown-draft-js';
 import remarkRehype from 'remark-rehype';
 
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import rehypeFormat from 'rehype-format';
 import rehypeRaw from 'rehype-raw';
@@ -183,6 +178,13 @@ function editorStateToMarkdown(
   return draftToMarkdown(rawObject, {
     styleItems: fontSizeStyles,
     preserveNewlines: true,
+    entityItems: {
+      LINK: {
+        open: (entity: { data: { url: string; targetOption?: string } }) =>
+          `<a href="${entity?.data.url}" ${entity?.data.targetOption ? `target="${entity?.data.targetOption}"` : ''} rel="noopener noreferrer">`,
+        close: () => '</a>',
+      },
+    },
   });
 }
 
