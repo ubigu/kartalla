@@ -1,7 +1,8 @@
 import { SurveyPage } from '@interfaces/survey';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import OskariRPC from 'oskari-rpc';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { CircularProgress, Box } from '@mui/material';
 
 interface Props {
   url: string;
@@ -60,18 +61,33 @@ export function AdminMap({ url, page, allowDrawing = false }: Props) {
   }, [isMapReady]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      style={{
-        border: 0,
-        width: '100%',
-        height: '100%',
-        margin: '0 auto',
-      }}
-      src={url}
-      allow="geolocation"
-      allowFullScreen
-      loading="lazy"
-    />
+    <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+      {!isMapReady && (
+        <CircularProgress
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            marginTop: '-20px',
+            marginLeft: '-20px',
+            zIndex: 1,
+          }}
+        />
+      )}
+      <iframe
+        ref={iframeRef}
+        style={{
+          opacity: isMapReady ? 1 : 0,
+          border: 0,
+          width: '100%',
+          height: '100%',
+          margin: '0 auto',
+        }}
+        src={url}
+        allow="geolocation"
+        allowFullScreen
+        loading="lazy"
+      />
+    </Box>
   );
 }

@@ -1,10 +1,10 @@
-import { Fab, Tooltip } from '@mui/material';
 import { Check, Edit } from '@mui/icons-material';
+import { Box, CircularProgress, Fab, Tooltip } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { visuallyHidden } from '@mui/utils';
 import OskariRPC from 'oskari-rpc';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   url: string;
@@ -110,19 +110,34 @@ export default function SurveyMap(props: Props) {
     props.url && (
       <>
         <p style={visuallyHidden}>{tr.SurveyMap.browsingInstructions}</p>
-        <iframe
-          ref={iframeRef}
-          title={tr.SurveyMap.iFrameTitle}
-          aria-describedby="mapEmbedInstructions"
-          style={{
-            border: 0,
-            width: '100%',
-            height: '100%',
-          }}
-          src={props.url}
-          allow="geolocation"
-          allowFullScreen
-        />
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+          {!isMapReady && (
+            <CircularProgress
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-20px',
+                marginLeft: '-20px',
+                zIndex: 1,
+              }}
+            />
+          )}
+          <iframe
+            ref={iframeRef}
+            title={tr.SurveyMap.iFrameTitle}
+            aria-describedby="mapEmbedInstructions"
+            style={{
+              opacity: isMapReady ? 1 : 0,
+              border: 0,
+              width: '100%',
+              height: '100%',
+            }}
+            src={props.url}
+            allow="geolocation"
+            allowFullScreen
+          />
+        </Box>
         {!drawing && !modifying && answerGeometries?.features.length > 0 && (
           <Tooltip title={tr.SurveyMap.editGeometries}>
             <Fab
