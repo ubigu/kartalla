@@ -1,7 +1,6 @@
-import React from 'react';
 import { SurveyTextSection } from '@interfaces/survey';
-import RichTextEditor from '../RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
+import RichTextEditor from '../RichTextEditor';
 import ColorSelect from './ColorSelect';
 
 interface Props {

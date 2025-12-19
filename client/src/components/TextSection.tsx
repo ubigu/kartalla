@@ -1,10 +1,9 @@
 import { SurveyTextSection } from '@interfaces/survey';
+import { Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
-import SectionInfo from './SectionInfo';
-import { Typography } from '@mui/material';
 import { MarkdownView } from './MarkdownView';
+import SectionInfo from './SectionInfo';
 
 interface Props {
   section: SurveyTextSection;
