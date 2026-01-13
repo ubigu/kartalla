@@ -114,7 +114,7 @@ async function generateScreenshots({
   // Open the index map if enabled
   await page.evaluate(() => {
     // @ts-ignore
-    document.querySelector('.indexmapToggle')?.click();
+    document.querySelector('.indexmapToggle button')?.click();
     document.querySelector('.indexmapToggle')?.remove();
   });
 
