@@ -11,6 +11,8 @@ updates:
       npm:
         patterns:
           - '*'
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: 'npm'
     directory: '/e2e'
@@ -22,6 +24,8 @@ updates:
       npm:
         patterns:
           - '*'
+    cooldown:
+      default-days: 7
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
@@ -30,6 +34,8 @@ updates:
       prefix: 'DOCKER: '
       include: 'scope'
     target-branch: 'dependabot-target'
+    cooldown:
+      default-days: 7
 
   # Weekly checks
   - package-ecosystem: 'npm'
@@ -45,6 +51,8 @@ updates:
     ignore: # ignore major updates
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
+    cooldown:
+      default-days: 7
   - package-ecosystem: 'npm'
     directory: '/server'
     schedule:
@@ -58,6 +66,8 @@ updates:
     ignore: # ignore major updates
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
+    cooldown:
+      default-days: 7
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
@@ -68,3 +78,5 @@ updates:
       github-actions:
         patterns:
           - '*'
+    cooldown:
+      default-days: 7
