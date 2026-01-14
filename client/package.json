@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/ubigu/kartalla#readme",
   "engines": {
-    "node": "^22.22.0"
+    "node": "^22.21.0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
