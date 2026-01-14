@@ -2092,13 +2092,19 @@ function surveySectionsToRows(
       id,
       type,
       title,
+      //@ts-ignore
       body = undefined,
+      //@ts-ignore
       options = undefined,
+      //@ts-ignore
       subQuestions = undefined,
       followUpSections = undefined,
       info = undefined,
+      //@ts-ignore
       groups = undefined,
+      //@ts-ignore
       fileUrl = undefined,
+      //@ts-ignore
       conditions = undefined,
       ...details
     } = { ...surveySection };
