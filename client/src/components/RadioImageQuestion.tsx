@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useRef } from 'react';
+import { createRef, useEffect, useRef } from 'react';
 
 interface Props {
   autoFocus?: boolean;

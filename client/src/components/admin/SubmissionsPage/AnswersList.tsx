@@ -1,7 +1,7 @@
 import {
   AnswerEntry,
-  Submission,
   SurveyQuestion as Question,
+  Submission,
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import {
@@ -12,10 +12,10 @@ import {
 } from '@mui/material';
 import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
+import { SurveyFollowUpSections } from '@src/components/SurveyFollowUpSections';
 import SurveyQuestion from '@src/components/SurveyQuestion';
 import { format } from 'date-fns';
-import { SurveyFollowUpSections } from '@src/components/SurveyFollowUpSections';
 
 interface Props {
   answers: AnswerItem[];

@@ -1,4 +1,5 @@
 import { SurveyGroupedCheckboxQuestion } from '@interfaces/survey';
+import { ArrowForwardIosSharp } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
@@ -11,11 +12,10 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
-import { ArrowForwardIosSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
-import React, { useMemo, useState } from 'react';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
 declare module '@mui/material/Chip' {

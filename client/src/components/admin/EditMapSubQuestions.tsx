@@ -1,6 +1,6 @@
 import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
-import React from 'react';
+
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 

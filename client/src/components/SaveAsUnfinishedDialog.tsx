@@ -12,7 +12,7 @@ import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface Props {
   open: boolean;

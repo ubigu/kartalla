@@ -2,8 +2,9 @@ import { Box, CircularProgress, Toolbar, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useUser } from '@src/stores/UserContext';
 import { usePreventUnload } from '@src/utils/usePreventUnload';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Redirect,
   Route,
@@ -20,7 +21,6 @@ import EditSurveyPage from './EditSurveyPage';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslations from './EditSurveyTranslations';
-import { useUser } from '@src/stores/UserContext';
 
 const sideBarWidth = 320;
 

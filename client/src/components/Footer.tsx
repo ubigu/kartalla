@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
-import React, { ReactNode } from 'react';
+import { Children, CSSProperties, ReactNode } from 'react';
 
 type FooterProps = {
   children?: ReactNode;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
 export default function Footer(props: FooterProps) {
@@ -31,7 +31,7 @@ export default function Footer(props: FooterProps) {
     >
       <nav>
         <ul>
-          {React.Children.map(props.children, (child: React.ReactNode) => {
+          {Children.map(props.children, (child: ReactNode) => {
             return child ? <li>{child}</li> : null;
           })}
         </ul>

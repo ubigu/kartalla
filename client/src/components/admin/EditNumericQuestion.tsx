@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   section: SurveyNumericQuestion;

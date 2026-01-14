@@ -1,6 +1,5 @@
 import { Backdrop, Box, CircularProgress, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   open: boolean;

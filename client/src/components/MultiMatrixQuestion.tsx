@@ -13,14 +13,22 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  useMediaQuery,
   Theme,
+  useMediaQuery,
 } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
 import { visuallyHidden } from '@mui/utils';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface Props {
   value: string[][];
@@ -34,7 +42,7 @@ interface Props {
     | 'maxValue'
     | 'custom'
   )[];
-  setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setBackdropOpen: Dispatch<SetStateAction<boolean>>;
   readOnly?: boolean;
 }
 
@@ -94,7 +102,7 @@ export default function MultiMatrixQuestion({
     }
   }, [value]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!radioRef.current) {
       return;
     }
@@ -126,7 +134,7 @@ export default function MultiMatrixQuestion({
     };
   }, [componentState.isOverflow, isMobileWidth]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!selectRef.current) {
       return;
     }
@@ -206,10 +214,10 @@ export default function MultiMatrixQuestion({
       question.answerLimits.min && question.answerLimits.max
         ? tr.MultiMatrixQuestion.answerLimitsMinMax
         : question.answerLimits.min
-        ? tr.MultiMatrixQuestion.answerLimitsMin
-        : question.answerLimits.max
-        ? tr.MultiMatrixQuestion.answerLimitsMax
-        : ''
+          ? tr.MultiMatrixQuestion.answerLimitsMin
+          : question.answerLimits.max
+            ? tr.MultiMatrixQuestion.answerLimitsMax
+            : ''
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);

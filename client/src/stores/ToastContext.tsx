@@ -1,15 +1,14 @@
-import React, {
+import { Alert, AlertProps, IconButton, Snackbar } from '@mui/material';
+import CloseIcon from '@src/components/icons/CloseIcon';
+import {
   createContext,
+  Dispatch,
   ReactNode,
   useContext,
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { Alert, AlertProps } from '@mui/material';
-import { Snackbar } from '@mui/material';
-import { IconButton } from '@mui/material';
-import CloseIcon from '@src/components/icons/CloseIcon';
 
 export interface Toast {
   severity: AlertProps['severity'];
@@ -48,7 +47,7 @@ type Action =
 /**
  * Context type
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * State default values
@@ -128,7 +127,7 @@ function reducer(state: State, action: Action): State {
 export default function ToastProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

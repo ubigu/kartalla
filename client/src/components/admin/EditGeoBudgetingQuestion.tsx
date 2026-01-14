@@ -13,7 +13,6 @@ import {
 import { GeoBudgetTargets } from '@src/components/admin/GeoBudgetTargets';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   section: SurveyGeoBudgetingQuestion;

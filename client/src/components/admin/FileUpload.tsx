@@ -2,12 +2,12 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
-import DropZone from '../DropZone';
-import { getFileName, getFullFilePath } from '@src/utils/path';
-import DownloadIcon from '../icons/DownloadIcon';
-import { FileWithPath } from 'react-dropzone/.';
 import { useFileValidator } from '@src/utils/fileValidator';
+import { getFileName, getFullFilePath } from '@src/utils/path';
+import { useEffect, useMemo, useState } from 'react';
+import { FileWithPath } from 'react-dropzone/.';
+import DropZone from '../DropZone';
+import DownloadIcon from '../icons/DownloadIcon';
 
 interface Props {
   forMedia?: boolean;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SurveyCheckboxQuestion } from '@interfaces/survey';
 import {
   Checkbox,
@@ -6,8 +5,8 @@ import {
   FormGroup,
   TextField,
 } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { makeStyles } from '@mui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
 import QuestionOptions from './QuestionOptions';
 
 const useStyles = makeStyles({

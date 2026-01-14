@@ -5,8 +5,7 @@ import {
 import { Box, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { PropsWithChildren } from 'react';
-import { useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
 const labelWrapperStyle = (labelColor?: string) => ({
   display: 'flex',

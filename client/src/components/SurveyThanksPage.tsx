@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
 import Footer from './Footer';
 import { MarkdownView } from './MarkdownView';
 

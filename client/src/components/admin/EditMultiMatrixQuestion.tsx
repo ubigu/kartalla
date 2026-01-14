@@ -1,6 +1,4 @@
 import { LocalizedText, SurveyMultiMatrixQuestion } from '@interfaces/survey';
-import AddIcon from '@src/components/icons/AddIcon';
-import CancelIcon from '@src/components/icons/CancelIcon';
 import {
   Checkbox,
   Fab,
@@ -11,9 +9,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React from 'react';
-import QuestionOptions from './QuestionOptions';
+import AddIcon from '@src/components/icons/AddIcon';
+import CancelIcon from '@src/components/icons/CancelIcon';
+
 import { useTranslations } from '@src/stores/TranslationContext';
+import QuestionOptions from './QuestionOptions';
 
 interface Props {
   section: SurveyMultiMatrixQuestion;

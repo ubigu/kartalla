@@ -23,7 +23,7 @@ import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
 import { Toast, useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   surveyId: number;

@@ -8,7 +8,7 @@ import {
 } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Feature } from 'geojson';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OskariMap from './OskariMap';
 

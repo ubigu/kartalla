@@ -2,7 +2,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { MegaphoneIcon } from '@src/components/icons/MegaphoneIcon';
 import { useGeneralNotifications } from '@src/stores/GeneralNotificationContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
 import { useHistory } from 'react-router-dom';
 
 export function GeneralNotificationNavigationButton() {

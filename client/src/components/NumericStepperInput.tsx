@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { Box, Fab, TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import { ChangeEvent } from 'react';
 
 interface Props {
   value: number;
@@ -34,7 +34,7 @@ export function NumericStepperInput({
     onChange(newValue);
   }
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const inputValue = Number(event.target.value);
     const clampedValue = Math.max(min, Math.min(max, inputValue));
     onChange(clampedValue);

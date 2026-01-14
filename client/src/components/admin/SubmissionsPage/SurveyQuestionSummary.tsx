@@ -1,15 +1,15 @@
-import React from 'react';
-import { PageQuestionList } from './PageQuestionList';
+import { SurveyQuestion } from '@interfaces/survey';
+import { Box, Typography } from '@mui/material';
 import {
   nonQuestionSectionTypes,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
-import { Box, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { SurveyQuestion } from '@interfaces/survey';
+import { Dispatch, SetStateAction } from 'react';
+import { PageQuestionList } from './PageQuestionList';
 
 interface Props {
-  setSelectedQuestion: React.Dispatch<React.SetStateAction<SurveyQuestion>>;
+  setSelectedQuestion: Dispatch<SetStateAction<SurveyQuestion>>;
 }
 
 export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {

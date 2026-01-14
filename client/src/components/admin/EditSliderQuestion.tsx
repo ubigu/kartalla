@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface Props {
   section: SurveySliderQuestion;

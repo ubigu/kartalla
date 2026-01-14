@@ -1,10 +1,10 @@
 import { FileAnswer, SurveyAttachmentQuestion } from '@interfaces/survey';
-import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { IconButton, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
-import DropZone from './DropZone';
+
 import { useFileValidator } from '@src/utils/fileValidator';
+import DropZone from './DropZone';
 
 interface Props {
   value: FileAnswer[];

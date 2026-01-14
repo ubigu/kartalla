@@ -20,14 +20,21 @@ import { visuallyHidden } from '@mui/utils';
 import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 interface Props {
   value: string[];
   onChange: (value: string[]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyMatrixQuestion;
-  setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setBackdropOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 interface ComponentState {
@@ -74,7 +81,7 @@ export default function MatrixQuestion({
   const radioRef = useRef(null);
   const selectRef = useRef(null);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!radioRef.current) {
       return;
     }
@@ -106,7 +113,7 @@ export default function MatrixQuestion({
     };
   }, [componentState.isOverflow, isMobileWidth]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!selectRef.current) {
       return;
     }
@@ -131,7 +138,7 @@ export default function MatrixQuestion({
 
   function handleChange(
     subjectIndex: number,
-    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent,
+    event: ChangeEvent<HTMLInputElement> | SelectChangeEvent,
     type: 'radio' | 'select' = 'radio',
   ) {
     // Ignore if the value is false

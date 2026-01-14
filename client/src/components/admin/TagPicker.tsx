@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { getOrgTags } from '@src/controllers/SurveyController';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 interface Props {
   selectedTags: string[];
   addEnabled: boolean;

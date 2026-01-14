@@ -7,7 +7,8 @@ import { harmaa } from '@src/themes/common';
 import { LineString, Point, Polygon } from 'geojson';
 import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
-import React, {
+import {
+  Dispatch,
   ReactNode,
   createContext,
   useContext,
@@ -96,7 +97,7 @@ type Action =
       value: boolean;
     };
 
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 const stateDefaults: State = {
   visibleLayers: [],
@@ -826,7 +827,7 @@ export default function SurveyMapProvider({
 }) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

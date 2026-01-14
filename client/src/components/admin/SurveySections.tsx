@@ -1,7 +1,7 @@
 import { SurveyPage } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
-import React from 'react';
+
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FollowUpSections } from './SurveySectionAccordion/FollowUpSections';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';

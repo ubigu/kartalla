@@ -11,10 +11,10 @@ import {
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@src/components/icons/CloseIcon';
-import React, { ReactNode, useState } from 'react';
+import { ComponentType, ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
 
-const SplitPaneTyped = SplitPane as React.ComponentType<any>;
+const SplitPaneTyped = SplitPane as ComponentType<any>;
 
 interface Props {
   mainPane: ReactNode;

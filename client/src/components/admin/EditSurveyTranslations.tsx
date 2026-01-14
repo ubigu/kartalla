@@ -8,13 +8,13 @@ import {
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
+import { useToasts } from '@src/stores/ToastContext';
 import CopyToClipboard from '../CopyToClipboard';
 import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
-import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   rowContainer: {

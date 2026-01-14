@@ -1,9 +1,4 @@
-import React, { useEffect } from 'react';
 import { Survey } from '@interfaces/survey';
-import { useState } from 'react';
-import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
-import { useToasts } from '@src/stores/ToastContext';
-import SurveyListItem from './SurveyListItem';
 import {
   FormControlLabel,
   List,
@@ -13,11 +8,15 @@ import {
   Tabs,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
-import LoadingButton from '../LoadingButton';
-import { useHistory } from 'react-router-dom';
 import { TagPicker } from '@src/components/admin/TagPicker';
+import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import LoadingButton from '../LoadingButton';
 import { LoadingBackdrop } from './LoadingBackdrop';
+import SurveyListItem from './SurveyListItem';
 
 const useStyles = makeStyles({
   root: {

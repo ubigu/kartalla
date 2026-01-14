@@ -9,7 +9,7 @@ import {
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import KeyValueForm from './KeyValueForm';

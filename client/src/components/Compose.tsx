@@ -1,4 +1,4 @@
-import React, { ComponentType, ReactNode } from 'react';
+import { ComponentType, ReactNode } from 'react';
 
 type Components =
   | ComponentType<any>

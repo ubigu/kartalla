@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { Survey } from '@interfaces/survey';
 import {
   Button,
   Dialog,
@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { Survey } from '@interfaces/survey';
+import { useState } from 'react';
 
 interface Props {
   open: boolean;

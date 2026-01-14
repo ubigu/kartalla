@@ -15,7 +15,7 @@ import { MarkdownView } from '@src/components/MarkdownView';
 import { NumericStepperInput } from '@src/components/NumericStepperInput';
 import { SliderWithLimit } from '@src/components/SliderWithLimit';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 
 interface Props {
   question: SurveyBudgetingQuestion;
@@ -245,7 +245,7 @@ export default function BudgetingQuestion({
               );
 
               return (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                   <Box
                     role="row"
                     sx={{
@@ -321,7 +321,7 @@ export default function BudgetingQuestion({
                       }}
                     />
                   )}
-                </React.Fragment>
+                </Fragment>
               );
             })}
           </Box>
@@ -381,7 +381,7 @@ export default function BudgetingQuestion({
               const limit = getLimit(index);
 
               return (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                   <Box role="row" sx={{ display: 'contents' }}>
                     <Box
                       role="cell"
@@ -481,7 +481,7 @@ export default function BudgetingQuestion({
                       }}
                     />
                   )}
-                </React.Fragment>
+                </Fragment>
               );
             })}
           </Box>

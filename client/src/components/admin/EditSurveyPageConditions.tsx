@@ -8,16 +8,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { ConditionRow } from './ConditionRow';
-import { useTranslations } from '@src/stores/TranslationContext';
+
 import {
   Conditions,
   SurveyPage,
   SurveyPageConditions,
 } from '@interfaces/survey';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
+import { useParams } from 'react-router-dom';
+import { ConditionRow } from './ConditionRow';
 
 interface SurveyPageConditionProps {
   pages: SurveyPage[];
@@ -271,7 +271,7 @@ export function EditSurveyPageConditions() {
               value={
                 conditionList.length > 0
                   ? conditionList[0][0]
-                  : String(previousQuestions?.[0].id) ?? ''
+                  : (String(previousQuestions?.[0].id) ?? '')
               }
               onChange={(event) => handleQuestionSelect(event)}
             >

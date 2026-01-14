@@ -3,7 +3,7 @@ import { FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import SectionInfo from './SectionInfo';
 
 interface Props {

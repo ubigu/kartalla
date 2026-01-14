@@ -18,7 +18,7 @@ import BudgetingQuestion from '@src/components/BudgetingQuestion';
 import GeoBudgetingQuestion from '@src/components/GeoBudgetingQuestion';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useRef, useState } from 'react';
+import { FocusEvent, useMemo, useRef, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -86,7 +86,7 @@ function SurveyQuestion({
       aria-invalid={validationErrors.includes('required')}
       error={validationErrors.length > 0}
       style={{ width: '100%' }}
-      onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+      onBlur={(e: FocusEvent<HTMLFieldSetElement>) => {
         if (
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&

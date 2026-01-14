@@ -8,7 +8,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { isFeatureSupported } from '@src/utils/enabledFeatures';
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BudgetingIcon from '../icons/BudgetingIcon';
 import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';

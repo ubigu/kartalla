@@ -1,18 +1,18 @@
 import { Submission } from '@interfaces/survey';
 import {
+  Bar,
+  ComposedChart,
+  Label,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Bar,
-  ResponsiveContainer,
-  ComposedChart,
-  Line,
-  Label,
-  Tooltip,
 } from 'recharts';
-import React from 'react';
-import { format, getWeek, getYear, parse } from 'date-fns';
+
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { format, getWeek, getYear, parse } from 'date-fns';
 
 interface SubmissionData {
   date: string;

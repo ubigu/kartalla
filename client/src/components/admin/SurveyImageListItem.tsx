@@ -1,9 +1,8 @@
-import React from 'react';
-import { useState } from 'react';
 import { File } from '@interfaces/survey';
-import { ImageListItem, CircularProgress } from '@mui/material';
+import { CircularProgress, ImageListItem } from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { getFileName } from '@src/utils/path';
+import { useState } from 'react';
 
 interface Props {
   image: File;

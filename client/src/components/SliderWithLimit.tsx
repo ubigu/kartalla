@@ -1,5 +1,4 @@
 import { Slider, SliderProps, useTheme } from '@mui/material';
-import React from 'react';
 
 interface Props {
   value: number;

@@ -1,4 +1,5 @@
 import { SurveySortingQuestion } from '@interfaces/survey';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   Box,
   Checkbox,
@@ -7,17 +8,16 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { visuallyHidden } from '@mui/utils';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   DragDropContext,
-  Droppable,
   Draggable,
+  Droppable,
   DropResult,
   ResponderProvided,
 } from 'react-beautiful-dnd';
-import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { visuallyHidden } from '@mui/utils';
 
 interface Props {
   value: number[];

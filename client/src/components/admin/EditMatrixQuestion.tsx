@@ -12,7 +12,7 @@ import {
 import AddIcon from '@src/components/icons/AddIcon';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
 import QuestionOptions from './QuestionOptions';
 
 interface Props {

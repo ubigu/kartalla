@@ -1,23 +1,23 @@
 import { SurveyGroupedCheckboxQuestion } from '@interfaces/survey';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
-  Fab,
-  TextField,
+  AccordionSummary,
   Button,
-  FormGroup,
-  FormControlLabel,
   Checkbox,
+  Fab,
+  FormControlLabel,
+  FormGroup,
+  TextField,
+  Typography,
 } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
-import AddIcon from '../icons/AddIcon';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import AddIcon from '../icons/AddIcon';
 import QuestionOptions from './QuestionOptions';
 
 interface Props {

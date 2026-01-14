@@ -10,7 +10,7 @@ import {
   FormLabel,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import EditMapSubQuestions from './EditMapSubQuestions';
 import MarkerIconSelect from './MarkerIconSelect';

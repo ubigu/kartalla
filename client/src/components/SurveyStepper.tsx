@@ -33,7 +33,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentType, useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
 import Footer from './Footer';
@@ -48,7 +48,7 @@ import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 
 // TODO split pane typings are broken since upgrade to TS v5.9.3, just skip the typings for now
-const SplitPaneTyped = SplitPane as React.ComponentType<any>;
+const SplitPaneTyped = SplitPane as ComponentType<any>;
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

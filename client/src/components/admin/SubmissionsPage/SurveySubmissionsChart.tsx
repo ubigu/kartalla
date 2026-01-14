@@ -1,7 +1,7 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
 import { Box, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,

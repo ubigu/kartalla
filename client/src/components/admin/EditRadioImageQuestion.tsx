@@ -1,4 +1,3 @@
-import React from 'react';
 import { SurveyRadioImageQuestion } from '@interfaces/survey';
 
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';

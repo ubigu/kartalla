@@ -1,6 +1,6 @@
 import { SurveyDocumentSection } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
-import React from 'react';
+
 import FileUpload from './FileUpload';
 
 interface Props {

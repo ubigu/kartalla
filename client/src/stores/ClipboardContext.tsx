@@ -1,5 +1,7 @@
 import { SurveyPage, SurveyPageSection } from '@interfaces/survey';
-import React, {
+import {
+  createContext,
+  Dispatch,
   ReactNode,
   useContext,
   useEffect,
@@ -31,7 +33,7 @@ type Action =
 /**
  * Type of stored context (state & reducer returned from useReducer)
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * Type of provider props
@@ -46,7 +48,7 @@ const stateDefaults: State = {
   clipboardSection: null,
 };
 
-export const ClipboardContext = React.createContext<Context>(null);
+export const ClipboardContext = createContext<Context>(null);
 
 /** Custom hook for accessing the workspace context */
 export function useClipboard() {
@@ -144,7 +146,7 @@ export default function ClipboardProvider({ children }: Props) {
   }, []);
 
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

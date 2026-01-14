@@ -22,7 +22,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SurveyImageListItem from './SurveyImageListItem';
 
@@ -204,7 +204,7 @@ export default function SurveyImageList({
     }
   }
 
-  async function handleDeletingImage(event: React.MouseEvent, fileUrl: string) {
+  async function handleDeletingImage(event: MouseEvent, fileUrl: string) {
     event.stopPropagation();
     try {
       await fetch(`/api/file/${fileUrl}`, { method: 'DELETE' });

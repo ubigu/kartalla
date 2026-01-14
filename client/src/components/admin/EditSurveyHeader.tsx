@@ -1,7 +1,7 @@
 import { useSurvey } from '@src/stores/SurveyContext';
-import React from 'react';
-import { AdminAppBar } from './AdminAppBar';
+
 import { useTranslations } from '@src/stores/TranslationContext';
+import { AdminAppBar } from './AdminAppBar';
 
 interface Props {
   sideBarWidth: number;

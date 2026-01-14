@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
 interface Props {

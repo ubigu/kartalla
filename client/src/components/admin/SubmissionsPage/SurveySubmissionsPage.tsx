@@ -27,19 +27,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
 import DataExport from '../DataExport';
+import DataPublish from '../DataPublish';
 import AnswerMap from './AnswerMap';
 import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
 import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
-import DataPublish from '../DataPublish';
-import React from 'react';
-
-function isMapEntry(
-  entry: AnswerEntry,
-): entry is AnswerEntry & { type: 'map' } {
-  return entry.type === 'map';
-}
 
 function answerEntryToItems(
   submission: Submission,

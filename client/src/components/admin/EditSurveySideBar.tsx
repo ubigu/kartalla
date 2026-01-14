@@ -26,7 +26,7 @@ import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';

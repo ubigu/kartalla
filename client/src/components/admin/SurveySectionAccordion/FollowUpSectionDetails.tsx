@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 interface Props {
   section: SurveyPageSection;
@@ -20,7 +20,7 @@ interface Props {
     tooltip: string;
     form: ReactNode;
   };
-  setDeleteConfirmDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDeleteConfirmDialogOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export function FollowUpSectionDetails({

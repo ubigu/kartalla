@@ -1,6 +1,4 @@
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
-import ClearIcon from '@src/components/icons/ClearIcon';
-import CheckIcon from '@src/components/icons/CheckIcon';
 import {
   Box,
   Button,
@@ -25,11 +23,14 @@ import {
   useTheme,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import CheckIcon from '@src/components/icons/CheckIcon';
+import ClearIcon from '@src/components/icons/ClearIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
+import { getLayerName } from '@src/utils/oskariHelpers';
+import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
@@ -38,7 +39,6 @@ import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
-import { getLayerName } from '@src/utils/oskariHelpers';
 
 const useStyles = makeStyles({
   button: {

@@ -1,18 +1,18 @@
 import { Box, Collapse, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React from 'react';
+
 import {
   AnswerEntry,
   SurveyFollowUpQuestion,
   SurveyFollowUpSection,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
-import SurveyQuestion from './SurveyQuestion';
-import DocumentSection from './DocumentSection';
-import ImageSection from './ImageSection';
-import TextSection from './TextSection';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { AnswerItem } from './admin/SubmissionsPage/AnswersList';
+import DocumentSection from './DocumentSection';
+import ImageSection from './ImageSection';
+import SurveyQuestion from './SurveyQuestion';
+import TextSection from './TextSection';
 
 function FollowUpSectionAnswers({
   section,

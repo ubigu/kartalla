@@ -1,15 +1,16 @@
 import { fiFI } from '@mui/material/locale';
 import { createTheme } from '@mui/material/styles';
+import { CSSProperties } from 'react';
 import { surveyCardOverrides, ubiElevated, ubiTheme } from './common';
 import { buttonOverrides } from './survey';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
-    published: React.CSSProperties;
+    published: CSSProperties;
   }
 
   interface TypographyVariantsOptions {
-    published?: React.CSSProperties;
+    published?: CSSProperties;
   }
 }
 declare module '@mui/material/Typography' {
