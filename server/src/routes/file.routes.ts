@@ -202,9 +202,14 @@ router.get(
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
+    const { compressed } = req.query;
     const filePathArray = filePath?.split('/') ?? [];
     // For now, use the first organization
-    const row = await getImages(filePathArray, res.locals.fileOrganizations[0]);
+    const row = await getImages(
+      filePathArray,
+      res.locals.fileOrganizations[0],
+      compressed === 'true',
+    );
 
     res.status(200).json(row);
   }),

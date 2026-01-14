@@ -2,9 +2,9 @@ import { MapMarkerIcon, MapStrokeColor } from '@interfaces/survey';
 import { ensureAuthenticated } from '@src/auth';
 import { getDb } from '@src/database';
 import { NotFoundError } from '@src/error';
+import { iconCacher } from '@src/middleware';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { iconCacher } from '@src/middleware';
 import NodeCache from 'node-cache';
 
 const iconCache = new NodeCache({
@@ -17,7 +17,7 @@ const router = Router();
 router.get(
   '/marker-icons',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const icons = await getDb().manyOrNone<MapMarkerIcon>(
       `SELECT id, name, svg FROM application.map_marker_icon ORDER BY idx ASC`,
     );
@@ -28,7 +28,7 @@ router.get(
 router.get(
   '/stroke-colors',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const colors = await getDb().manyOrNone<MapStrokeColor>(
       `SELECT name, value FROM application.map_stroke_color ORDER BY idx ASC`,
     );
