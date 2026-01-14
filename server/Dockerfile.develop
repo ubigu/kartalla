@@ -2,7 +2,7 @@
 # Development image for Node.js server
 ##
 
-FROM node:20.5-alpine
+FROM node:22.22-alpine
 
 # Define Git directory and install Git for running Jest only on changed files
 ENV GIT_WORK_TREE=/app/server

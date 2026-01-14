@@ -499,8 +499,8 @@ async function answerEntriesToCSV(
         'DD-MM-YYYY HH:mm',
       )},${submissions[i].submissionLanguage}${getPersonalInfoRowValues(submissionPersonalInfo)}`;
 
-      headers.forEach((headerObj, index) => {
-        for (const [headerKey, headerValue] of Object.entries(headerObj)) {
+      headers.forEach((headerObj, _index) => {
+        for (const [headerKey, _headerValue] of Object.entries(headerObj)) {
           csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
             ? `,"${Object.values(submissions[i])[0][headerKey]}"`
             : ',';
@@ -914,7 +914,7 @@ function getHeaderKey(
 
 function getSectionDetailsForHeader(section, predecessorIndexes) {
   if (section.predecessorSection) {
-    const [pageIndex, sectionIndex] =
+    const [pageIndex, _sectionIndex] =
       predecessorIndexes[section.predecessorSection].split('-');
     return `s${Number(pageIndex) + 1}k${
       Number(section.questionIndex) + 1
@@ -1202,7 +1202,7 @@ function submissionAnswersToJson(
         ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
-        sectionDetails.details.subjects.forEach((subject, index) => {
+        sectionDetails.details.subjects.forEach((_subject, index) => {
           const classIndexes = JSON.stringify(answer.valueJson?.[index]);
           JSON.parse(classIndexes).forEach((optionIndex: string) => {
             const optionIdx = Number(optionIndex);
@@ -1258,7 +1258,7 @@ function submissionAnswersToJson(
         const budgetValues = answer.valueJson
           ? JSON.parse(JSON.stringify(answer.valueJson))
           : [];
-        sectionDetails.details.targets?.forEach((target, index) => {
+        sectionDetails.details.targets?.forEach((_target, index) => {
           const key = getHeaderKey(
             sectionDetails.pageIndex,
             answer.sectionIndex,

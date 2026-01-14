@@ -152,24 +152,24 @@ async function start() {
     ensureAuthenticated({
       redirectToLogin: true,
     }),
-    (req, res) => {
+    (_req, res) => {
       res.removeHeader('Clear-Site-Data');
       res.sendFile(path.join(__dirname, '../static/admin/index.html'));
     },
   );
 
-  app.get('/logout-success', (req, res) => {
+  app.get('/logout-success', (_req, res) => {
     res.set('Clear-Site-Data', '"cache", "cookies", "storage"');
     res.redirect('/');
   });
 
   // Serve frontend files from remaining URLs
-  app.get('/*', (req, res, next) => {
+  app.get('/*', (_req, res, _next) => {
     res.sendFile(path.join(__dirname, '../static/index.html'));
   });
 
   // Default error handler
-  app.use((error: HttpResponseError, req, res, next) => {
+  app.use((error: HttpResponseError, _req, res, _next) => {
     logger.error(`Request error: ${error.message}`);
     console.error(error);
     res.status(error.status || 500);

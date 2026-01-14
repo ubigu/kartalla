@@ -121,7 +121,7 @@ async function generateScreenshots({
   for (const answer of answers) {
     // Prepare the window for the next screenshot
     await page.evaluate(
-      ({ visibleLayerIds, feature, featureStyle, question, markerIcon }) => {
+      ({ visibleLayerIds, feature, featureStyle, markerIcon }) => {
         const sandbox = Oskari.getSandbox();
 
         sandbox
@@ -195,7 +195,7 @@ async function generateScreenshots({
     );
     try {
       await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
-    } catch (error) {
+    } catch {
       // Ignore timeout errors
     }
 

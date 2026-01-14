@@ -86,7 +86,7 @@ router.get(
   '/',
   ensureAuthenticated(),
   ensureFileGroupAccess(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const organizations = res.locals.fileOrganizations;
     if (!organizations || organizations.length === 0) {
       throw new ForbiddenError('Unauthorized organization');
