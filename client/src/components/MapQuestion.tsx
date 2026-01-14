@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
 import MapSubQuestionDialog from './MapSubQuestionDialog';
 
@@ -23,7 +23,7 @@ interface Props {
   value: MapQuestionAnswer[];
   onChange: (value: MapQuestionAnswer[]) => void;
   question: SurveyMapQuestion;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
   mobileDrawerOpen?: boolean;
 }
 

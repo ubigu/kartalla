@@ -37,6 +37,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -45,6 +46,7 @@ import {
 
 import {
   geometryToGeoJSONFeatureCollection,
+  getCompressedFileString,
   getLocalizedMapUrls,
 } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -278,7 +280,7 @@ const surveyPageColumnSet = (inputSRID: number) =>
 /**
  * Helper function for creating section option column set for database queries
  */
-const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
+const _sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   'section_id',
   'idx',
   { name: 'text', cast: 'json' },
@@ -2090,13 +2092,19 @@ function surveySectionsToRows(
       id,
       type,
       title,
+      //@ts-ignore
       body = undefined,
+      //@ts-ignore
       options = undefined,
+      //@ts-ignore
       subQuestions = undefined,
       followUpSections = undefined,
       info = undefined,
+      //@ts-ignore
       groups = undefined,
+      //@ts-ignore
       fileUrl = undefined,
+      //@ts-ignore
       conditions = undefined,
       ...details
     } = { ...surveySection };
@@ -2288,7 +2296,10 @@ export async function storeFile({
   surveyId: number;
   organizationId: string;
 }) {
-  // Check if duplicate file exists
+  const isImage = mimetype.startsWith('image/');
+  const compressedFileString = isImage
+    ? getCompressedFileString(buffer, 20)
+    : null;
 
   const fileString = `\\x${buffer.toString('hex')}`;
   const splittedFileNameArray = name.split('.');
@@ -2316,10 +2327,11 @@ export async function storeFile({
 
   const row = await getDb().oneOrNone<{ url: string }>(
     `
-    INSERT INTO data.files (file, details, mime_type, survey_id, url, organization)
-    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organizationId))
+    INSERT INTO data.files (file, compressed_file, details, mime_type, survey_id, url, organization)
+    VALUES ($(fileString), $(compressedFileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organizationId))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
+      compressed_file = $(compressedFileString),
       details = $(details),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
@@ -2328,6 +2340,7 @@ export async function storeFile({
     `,
     {
       fileString,
+      compressedFileString,
       details,
       mimetype,
       surveyId,
@@ -2375,14 +2388,19 @@ export async function getFile(fileUrl: string) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[], organizationId: string) {
+export async function getImages(
+  imagePath: string[],
+  organizationId: string,
+  getCompressed = false,
+) {
   const filePattern = `${organizationId}/${imagePath.join('/')}%`;
+  logger.info(`FILEPATTERN: ${filePattern}`);
   const rows = await getDb().manyOrNone(
     `
     SELECT 
       id, 
       details, 
-      file, 
+      ${getCompressed ? 'compressed_file AS file' : 'file'}, 
       url
     FROM data.files 
     WHERE url LIKE $1;
@@ -2392,7 +2410,7 @@ export async function getImages(imagePath: string[], organizationId: string) {
 
   return rows.map((row) => ({
     id: row.id,
-    data: row.file.toString('base64'),
+    data: row.file?.toString('base64'),
     attributions: row.details?.attributions,
     altText: row.details?.imageAltText,
     fileUrl: row.url,

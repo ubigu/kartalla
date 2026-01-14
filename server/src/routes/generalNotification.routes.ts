@@ -8,12 +8,12 @@ import {
   updateGeneralNotification,
 } from '@src/application/generalNotification';
 import { ensureAuthenticated, ensureSuperUserAccess } from '@src/auth';
+import logger from '@src/logger';
 import { validateRequest } from '@src/utils';
+import EventEmitter from 'events';
 import { Response, Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
-import EventEmitter from 'events';
-import logger from '@src/logger';
 
 const router = Router();
 const eventEmitter = new EventEmitter({ captureRejections: true });
@@ -76,7 +76,7 @@ router.get(
 router.get(
   '/',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const response = await getGeneralNotifications();
     if (!response) {
       res.status(404).send('Not found');
@@ -89,7 +89,7 @@ router.get(
 router.get(
   '/recent-count',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const response = await getRecentGeneralNotificationCount();
     if (!response) {
       res.status(404).send('Not found');

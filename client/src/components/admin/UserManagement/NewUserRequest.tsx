@@ -10,7 +10,7 @@ import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
 import UserAddSmallIcon from '@src/components/icons/UserAddSmallIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 interface FormElements extends HTMLFormControlsCollection {
   userName: HTMLInputElement;
@@ -94,7 +94,7 @@ export function NewUserRequest({
       }}
     >
       <FormControl
-        onSubmit={async (e: React.FormEvent<UsernameFormElement>) => {
+        onSubmit={async (e: FormEvent<UsernameFormElement>) => {
           const currentTarget = e.currentTarget;
           e.preventDefault();
 

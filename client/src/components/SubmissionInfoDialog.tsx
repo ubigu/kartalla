@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface Props {
   open: boolean;

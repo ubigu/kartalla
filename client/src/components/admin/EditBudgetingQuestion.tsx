@@ -15,7 +15,6 @@ import {
 import { QuestionBudgetTargets } from '@src/components/admin/QuestionBudgetTargets';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   section: SurveyBudgetingQuestion;

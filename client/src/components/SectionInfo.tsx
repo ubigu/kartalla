@@ -1,3 +1,4 @@
+import { Help as HelpIcon } from '@mui/icons-material';
 import {
   Button,
   Dialog,
@@ -6,16 +7,20 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Help as HelpIcon } from '@mui/icons-material';
-import { useTranslations } from '@src/stores/TranslationContext';
 import useId from '@mui/material/utils/useId';
+import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  CSSProperties,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import { MarkdownView } from './MarkdownView';
 
 interface Props {
   subject: string;
   infoText: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   hiddenFromScreenReader?: boolean;
 }
 

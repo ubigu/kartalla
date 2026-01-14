@@ -10,16 +10,16 @@ import SurveyThemeProvider from '@src/stores/SurveyThemeProvider';
 import ToastProvider from '@src/stores/ToastContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import fiLocale from 'date-fns/locale/fi';
-import React from 'react';
+
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { A11yStatement } from './A11yStatement';
 import Compose from './Compose';
 import { DataProtectionStatement } from './DataProtectionStatement';
 import { NotFoundPage } from './NotFoundPage';
-import SurveyLanguageRouter from './SurveyLanguageRouter';
-import SurveyPage from './SurveyPage';
 import './react-split-pane.css';
 import { RootPage } from './RootPage';
+import SurveyLanguageRouter from './SurveyLanguageRouter';
+import SurveyPage from './SurveyPage';
 
 /** Application entry point wrapper component */
 const Application = () => {

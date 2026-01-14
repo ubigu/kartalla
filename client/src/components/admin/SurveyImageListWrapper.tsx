@@ -1,7 +1,6 @@
-import React from 'react';
+import { File } from '@interfaces/survey';
 import { useState } from 'react';
 import SurveyImageList from './SurveyImageList';
-import { File } from '@interfaces/survey';
 
 interface Props {
   canEdit?: boolean;

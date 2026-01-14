@@ -3,7 +3,6 @@ import { FormGroup, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
-import React from 'react';
 import { ConditionRow } from '../ConditionRow';
 
 interface Props {

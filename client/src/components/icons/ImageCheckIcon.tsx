@@ -1,5 +1,4 @@
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
-import React from 'react';
 
 export function ImageCheckIcon(props: SvgIconProps) {
   return (

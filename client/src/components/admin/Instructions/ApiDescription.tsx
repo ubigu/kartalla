@@ -1,8 +1,7 @@
-import React from 'react';
-import { RedocStandalone } from 'redoc';
-import { AdminAppBar } from '../AdminAppBar';
 import { Box, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { RedocStandalone } from 'redoc';
+import { AdminAppBar } from '../AdminAppBar';
 
 export function ApiInstructions() {
   const { tr } = useTranslations();

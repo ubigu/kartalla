@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useUser } from '@src/stores/UserContext';
-import React from 'react';
+
 import { PropsWithChildren } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router-dom';
 

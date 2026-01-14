@@ -1,7 +1,6 @@
 import { SurveyNumericQuestion } from '@interfaces/survey';
 import { FormHelperText, TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 interface Props {
   autoFocus?: boolean;

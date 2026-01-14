@@ -8,7 +8,8 @@ import {
 import { getSurvey, updateSurvey } from '@src/controllers/SurveyController';
 import { request } from '@src/utils/request';
 import { useDebounce } from '@src/utils/useDebounce';
-import React, {
+import {
+  Dispatch,
   ReactNode,
   createContext,
   useContext,
@@ -142,7 +143,7 @@ type Action =
 /**
  * Context type
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * State default values
@@ -829,7 +830,7 @@ function reducer(state: State, action: Action): State {
 export default function SurveyProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

@@ -1,9 +1,9 @@
+import { SurveyPage } from '@interfaces/survey';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import SaveAsUnfinishedDialog from './SaveAsUnfinishedDialog';
-import { SurveyPage } from '@interfaces/survey';
 
 const useStyles = makeStyles({
   root: {

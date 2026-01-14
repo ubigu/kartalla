@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { makeStyles } from '@mui/styles';
+import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { InstructionsDialog } from './InstructionsDialog';
 import { useUser } from '@src/stores/UserContext';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { InstructionsDialog } from './InstructionsDialog';
 
 const useStyles = makeStyles({
   root: {

@@ -1,12 +1,12 @@
 import { LocalizedText, SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 
-import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import AddIcon from '@src/components/icons/AddIcon';
+import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo } from 'react';
+import { createRef, useEffect, useMemo } from 'react';
 import OptionInfoDialog from './OptionInfoDialog';
 
 const useStyles = makeStyles({

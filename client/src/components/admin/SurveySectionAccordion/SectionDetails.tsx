@@ -12,7 +12,7 @@ import RichTextEditor from '@src/components/RichTextEditor';
 import { NewLineIcon } from '@src/components/icons/NewLineIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 
 interface Props {
   disabled: boolean;
@@ -23,7 +23,7 @@ interface Props {
     tooltip: string;
     form: ReactNode;
   };
-  setDeleteConfirmDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDeleteConfirmDialogOpen: Dispatch<SetStateAction<boolean>>;
   pageId?: number;
 }
 

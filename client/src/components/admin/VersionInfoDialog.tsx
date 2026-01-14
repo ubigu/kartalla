@@ -9,12 +9,12 @@ import {
   SxProps,
   Typography,
 } from '@mui/material';
-import React from 'react';
+
 import CloseIcon from '../icons/CloseIcon';
 
-import UbiguLogoWhite from '../icons/UbiguLogoWhite';
 import { useTranslations } from '@src/stores/TranslationContext';
 import KartallaLogoInfo from '../icons/KartallaLogoWhite';
+import UbiguLogoWhite from '../icons/UbiguLogoWhite';
 
 interface Props {
   isOpen: boolean;

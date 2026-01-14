@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { AdminAppBar } from '../AdminAppBar';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { UserList } from './UserList';
-import { Box } from '@mui/material';
-import { NewUserRequest } from './NewUserRequest';
 import { User } from '@interfaces/user';
-import { useUser } from '@src/stores/UserContext';
-import { useToasts } from '@src/stores/ToastContext';
-import { UserGroupManagement } from './UserGroupManagement';
 import { UserGroup } from '@interfaces/userGroup';
+import { Box } from '@mui/material';
 import {
   getAllUserGroups,
   getUserGroups,
 } from '@src/controllers/UserGroupController';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useUser } from '@src/stores/UserContext';
+import { useEffect, useState } from 'react';
+import { AdminAppBar } from '../AdminAppBar';
+import { NewUserRequest } from './NewUserRequest';
+import { UserGroupManagement } from './UserGroupManagement';
+import { UserList } from './UserList';
 
 export function UserManagement() {
   const { tr } = useTranslations();

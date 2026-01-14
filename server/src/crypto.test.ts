@@ -1,4 +1,4 @@
-import { encrypt, decrypt } from './crypto';
+import { decrypt, encrypt } from './crypto';
 
 describe('Crypto', () => {
   it('should do normal encoding fine', () => {

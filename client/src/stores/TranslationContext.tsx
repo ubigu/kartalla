@@ -3,7 +3,14 @@ import {
   LanguageCode,
   LocalizedText,
 } from '@interfaces/survey';
-import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
 import fi from './fi.json';
@@ -46,7 +53,7 @@ type Action =
 /**
  * Type of stored context (state & reducer returned from useReducer)
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * Type of provider props
@@ -62,7 +69,7 @@ const stateDefaults: State = {
   languages: ['fi', 'en', 'se'],
 };
 
-export const TranslationContext = React.createContext<Context>(null);
+export const TranslationContext = createContext<Context>(null);
 
 /** Custom hook for accessing the workspace context */
 export function useTranslations() {
@@ -139,7 +146,7 @@ function reducer(state: State, action: Action): State {
 export default function TranslationProvider({ children }: Props) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

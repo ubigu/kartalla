@@ -3,7 +3,9 @@ import { ImageType } from '@interfaces/survey';
 import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { Geometry } from 'geojson';
+import sharp from 'sharp';
 import { BadRequestError } from './error';
+import logger from './logger';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -12,7 +14,7 @@ import { BadRequestError } from './error';
 export function validateRequest(chains: ValidationChain[]) {
   return [
     ...chains,
-    (req: Request, res: Response, next: NextFunction) => {
+    (req: Request, _res: Response, next: NextFunction) => {
       try {
         validationResult(req).throw();
         next();
@@ -83,6 +85,24 @@ export function assertNever(value: never): never {
   throw new Error(
     `Unhandled discriminated union member: ${JSON.stringify(value)}`,
   );
+}
+
+/** Creates a compressed JPEG image buffer */
+function compressImage(image: Buffer, quality: number) {
+  return sharp(image).rotate().toFormat('jpeg', { quality }).toBuffer();
+}
+
+/** Compresses an image to JPEG format and returns it as a hexadecimal string with \x prefix. */
+export async function getCompressedFileString(image: Buffer, _quality: number) {
+  let compressedFileString: string | null = null;
+  try {
+    compressedFileString = `\\x${(await compressImage(image, 20)).toString(
+      'hex',
+    )}`;
+  } catch (error) {
+    logger.info(`Error while compressing image: ${error}`);
+  }
+  return compressedFileString;
 }
 
 /**

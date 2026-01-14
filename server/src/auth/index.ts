@@ -2,6 +2,7 @@ import {
   getPublicationAccesses,
   getSurveyOrganizationAndGroups,
 } from '@src/application/survey';
+import { ForbiddenError } from '@src/error';
 import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
@@ -13,14 +14,13 @@ import {
 } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
+import asyncHandler from 'express-async-handler';
 import expressSession from 'express-session';
 import passport from 'passport';
 import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
-import { ForbiddenError } from '@src/error';
-import asyncHandler from 'express-async-handler';
 
 const SESSION_COOKIE_NAME = '_Secure-connect.sid';
 
@@ -87,7 +87,7 @@ export function configureAuth(app: Express) {
       if (err) {
         return req.next(err);
       }
-      req.session.destroy((err) => {
+      req.session.destroy((_err) => {
         res.redirect(process.env.AUTH_LOGOUT_URL);
       });
     });
@@ -172,7 +172,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
         if (err) {
           return req.next(err);
         }
-        req.session.destroy((err) => {
+        req.session.destroy((_err) => {
           fail();
         });
       });
@@ -183,7 +183,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
 }
 
 export function ensureAdminAccess() {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (isSuperUser(req.user)) {
       return next();
     }
@@ -195,7 +195,7 @@ export function ensureAdminAccess() {
 }
 
 export function ensureSuperUserAccess() {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (isSuperUser(req.user)) {
       return next();
     }
@@ -218,7 +218,7 @@ export function getLimitingUserGroups(req: Request) {
 export function ensureSurveyGroupAccess(surveyIdIdentifier: string = 'id') {
   return asyncHandler(
     // Note! Super important to wrap this in asyncHandler to catch errors as express doesn't catch async errors by default
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, _res: Response, next: NextFunction) => {
       // Super user has access to all surveys
       if (isSuperUser(req.user)) {
         return next();

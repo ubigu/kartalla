@@ -3,10 +3,8 @@ import {
   ensureAuthenticated,
   ensureSuperUserAccess,
 } from '@src/auth';
-import { validateRequest } from '@src/utils';
-import { Router } from 'express';
-import { param } from 'express-validator';
-import asyncHandler from 'express-async-handler';
+import { ForbiddenError } from '@src/error';
+import { isSuperUser } from '@src/user';
 import {
   addUserGroup,
   deleteUserGroup,
@@ -14,8 +12,10 @@ import {
   getUserGroup,
   getUserGroups,
 } from '@src/userGroup';
-import { isSuperUser } from '@src/user';
-import { ForbiddenError } from '@src/error';
+import { validateRequest } from '@src/utils';
+import { Router } from 'express';
+import asyncHandler from 'express-async-handler';
+import { param } from 'express-validator';
 
 const router = Router();
 
@@ -34,7 +34,7 @@ router.get(
   '/all',
   ensureAuthenticated(),
   ensureSuperUserAccess(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const userGroups = await getAllUserGroups();
     res.json(userGroups);
   }),

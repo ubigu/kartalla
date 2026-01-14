@@ -1,5 +1,3 @@
-import { getSurveys } from './survey';
-
 describe('Survey', () => {
   // TODO: replace with an actual test case
   it('test dummy', async () => {

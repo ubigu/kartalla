@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { useState } from 'react';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';

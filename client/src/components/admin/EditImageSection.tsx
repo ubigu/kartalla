@@ -2,7 +2,7 @@ import { SurveyImageSection } from '@interfaces/survey';
 import { TextField } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+
 import FileUpload from './FileUpload';
 
 interface Props {

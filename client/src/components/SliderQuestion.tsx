@@ -1,9 +1,9 @@
 import { SurveySliderQuestion } from '@interfaces/survey';
 import { FormLabel, Slider } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
-import React, { useMemo, useRef } from 'react';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useMemo, useRef } from 'react';
 
 interface Props {
   value: number;

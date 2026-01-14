@@ -114,14 +114,14 @@ async function generateScreenshots({
   // Open the index map if enabled
   await page.evaluate(() => {
     // @ts-ignore
-    document.querySelector('.indexmapToggle')?.click();
+    document.querySelector('.indexmapToggle button')?.click();
     document.querySelector('.indexmapToggle')?.remove();
   });
 
   for (const answer of answers) {
     // Prepare the window for the next screenshot
     await page.evaluate(
-      ({ visibleLayerIds, feature, featureStyle, question, markerIcon }) => {
+      ({ visibleLayerIds, feature, featureStyle, markerIcon }) => {
         const sandbox = Oskari.getSandbox();
 
         sandbox
@@ -195,7 +195,7 @@ async function generateScreenshots({
     );
     try {
       await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
-    } catch (error) {
+    } catch {
       // Ignore timeout errors
     }
 

@@ -1,7 +1,7 @@
 import { Link, ListItem } from '@mui/material';
-import OpenInNewIcon from '@src/components/icons/OpenInNewIcon';
 import { makeStyles } from '@mui/styles';
-import React, { ReactNode } from 'react';
+import OpenInNewIcon from '@src/components/icons/OpenInNewIcon';
+import { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 
 interface Props {

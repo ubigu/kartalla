@@ -27,15 +27,15 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 
+import { CredentialsEntry } from '@interfaces/submission';
+import { theme } from '@src/themes/admin';
+import { request } from '@src/utils/request';
 import { format } from 'date-fns';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
-import { theme } from '@src/themes/admin';
-import { request } from '@src/utils/request';
-import { CredentialsEntry } from '@interfaces/submission';
 
 const fadeTimeout = 350;
 

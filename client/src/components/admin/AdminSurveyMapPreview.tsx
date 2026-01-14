@@ -1,18 +1,19 @@
 import { Backdrop, Box, Button, Typography } from '@mui/material';
-import React from 'react';
-import { AdminMap } from './AdminMap';
+
 import { SurveyPage } from '@interfaces/survey';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { Dispatch, SetStateAction } from 'react';
+import { AdminMap } from './AdminMap';
 
 interface Props {
   isOpen: boolean;
   url: string;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   handleSave: () => void;
   page: SurveyPage;
   modifyView: boolean;
-  setModifyView: React.Dispatch<React.SetStateAction<boolean>>;
+  setModifyView: Dispatch<SetStateAction<boolean>>;
 }
 
 export function AdminSurveyMapPreview({

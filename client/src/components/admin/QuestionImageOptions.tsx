@@ -1,8 +1,4 @@
-import {
-  LocalizedText,
-  SectionImageOption,
-  SectionOption,
-} from '@interfaces/survey';
+import { SectionImageOption } from '@interfaces/survey';
 import {
   Box,
   Fab,
@@ -14,15 +10,15 @@ import {
   useTheme,
 } from '@mui/material';
 
-import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import AddIcon from '@src/components/icons/AddIcon';
+import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
-import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo } from 'react';
-import OptionInfoDialog from './OptionInfoDialog';
-import FileUpload from './FileUpload';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { createRef, useEffect, useMemo } from 'react';
 import { HelpCircleIcon } from '../icons/HelpCircleIcon';
+import FileUpload from './FileUpload';
+import OptionInfoDialog from './OptionInfoDialog';
 
 const styles = {
   wrapper: {

@@ -58,7 +58,7 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';

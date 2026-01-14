@@ -1,8 +1,7 @@
-import React from 'react';
-import { useSurvey } from '@src/stores/SurveyContext';
-import Fieldset from '../Fieldset';
 import { TextField } from '@mui/material';
+import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import SurveyImageList from './SurveyImageList';
 

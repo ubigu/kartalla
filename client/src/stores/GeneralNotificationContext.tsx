@@ -1,4 +1,7 @@
-import React, {
+import { request } from '@src/utils/request';
+import {
+  createContext,
+  Dispatch,
   ReactNode,
   useContext,
   useEffect,
@@ -8,7 +11,6 @@ import React, {
 } from 'react';
 import { useToasts } from './ToastContext';
 import { useTranslations } from './TranslationContext';
-import { request } from '@src/utils/request';
 
 /**
  * Context state type
@@ -28,7 +30,7 @@ type Action = {
 /**
  * Type of stored context (state & reducer returned from useReducer)
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * Type of provider props
@@ -42,7 +44,7 @@ const stateDefaults: State = {
   newNotifications: false,
 };
 
-export const GenralNotificationContext = React.createContext<Context>(null);
+export const GenralNotificationContext = createContext<Context>(null);
 
 /** Custom hook for accessing the general notification context */
 export function useGeneralNotifications() {
@@ -77,7 +79,7 @@ export default function GeneralNotificationProvider({ children }: Props) {
   const [sseReconnects, setSseReconnects] = useState(0);
 
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => {

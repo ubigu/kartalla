@@ -15,8 +15,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import React, { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AnswerCounts {
   aplhaNumericAnswers: number;

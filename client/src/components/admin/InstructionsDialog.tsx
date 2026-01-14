@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button,
   Typography,
 } from '@mui/material';
 import PaperclipIcon from '@src/components/icons/PaperclipIcon';
-import { useToasts } from '@src/stores/ToastContext';
-import DropZone from '../DropZone';
-import { useTranslations } from '@src/stores/TranslationContext';
+import UploadIcon from '@src/components/icons/UploadIcon';
 import {
   getInstructionFilename,
   storeAdminInstructions,
 } from '@src/controllers/AdminFileController';
-import UploadIcon from '@src/components/icons/UploadIcon';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import DropZone from '../DropZone';
 
 interface Props {
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setMenuOpen: Dispatch<SetStateAction<boolean>>;
 }
 const MEGAS = 10;
 const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes

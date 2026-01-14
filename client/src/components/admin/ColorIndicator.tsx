@@ -1,5 +1,4 @@
 import { makeStyles } from '@mui/styles';
-import React from 'react';
 
 interface Props {
   color: string;

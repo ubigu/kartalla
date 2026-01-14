@@ -11,11 +11,10 @@ import {
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
-import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
-import Footer from './Footer';
 import { defaultSchema } from 'hast-util-sanitize';
+import Footer from './Footer';
 import { MarkdownView } from './MarkdownView';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({

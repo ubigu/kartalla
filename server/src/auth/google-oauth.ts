@@ -1,6 +1,5 @@
 import { decrypt } from '@src/crypto';
 import { Express } from 'express';
-import session, { Session, SessionData } from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { upsertUser } from '../user';

@@ -15,7 +15,14 @@ import {
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getNumberFormatter } from '@src/utils/format';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ConfirmDialog from './ConfirmDialog';
 import GeoBudgetingFeatureDialog from './GeoBudgetingFeatureDialog';
 import GeoBudgetingTargetButton from './GeoBudgetingTargetButton';
@@ -25,7 +32,7 @@ interface Props {
   value: GeoBudgetingAnswer[];
   onChange: (value: GeoBudgetingAnswer[]) => void;
   question: SurveyGeoBudgetingQuestion;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
   readOnly?: boolean;
   validationErrors?: string[];
 }

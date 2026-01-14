@@ -1,4 +1,5 @@
 import { User } from '@interfaces/user';
+import { UserGroup } from '@interfaces/userGroup';
 import {
   Box,
   CircularProgress,
@@ -12,9 +13,8 @@ import {
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { UserGroupSelect } from './UserGroupSelect';
-import { UserGroup } from '@interfaces/userGroup';
 
 export function UserList({
   users,

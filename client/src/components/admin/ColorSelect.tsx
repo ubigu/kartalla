@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Select, FormControl, MenuItem, InputLabel } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useMemo } from 'react';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {

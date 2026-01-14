@@ -1,4 +1,5 @@
 import { User } from '@interfaces/user';
+import { UserGroup } from '@interfaces/userGroup';
 import {
   Autocomplete,
   Box,
@@ -17,28 +18,27 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { TagPicker } from '@src/components/admin/TagPicker';
+import { getUserGroups } from '@src/controllers/UserGroupController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getLayerName } from '@src/utils/oskariHelpers';
 import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
 import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from '../../stores/UserContext';
 import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
+import RichTextEditor from '../RichTextEditor';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
 import ThemeSelect from './ThemeSelect';
-import { getUserGroups } from '@src/controllers/UserGroupController';
-import { UserGroup } from '@interfaces/userGroup';
-import RichTextEditor from '../RichTextEditor';
-import { getLayerName } from '@src/utils/oskariHelpers';
 
 const useStyles = makeStyles({
   dateTimePicker: {

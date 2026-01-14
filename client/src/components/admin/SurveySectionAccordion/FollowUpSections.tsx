@@ -1,8 +1,8 @@
 import { SurveyPage, SurveyPageSection } from '@interfaces/survey';
-import React, { useState } from 'react';
+import { useSurvey } from '@src/stores/SurveyContext';
+import { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FollowUpSectionAccordion } from './FollowUpSectionAccordion';
-import { useSurvey } from '@src/stores/SurveyContext';
 
 interface Props {
   parentSection: Extract<

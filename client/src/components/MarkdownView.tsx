@@ -1,4 +1,4 @@
-import React from 'react';
+import { ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import rehypeFormat from 'rehype-format';
@@ -6,7 +6,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 
-interface Props extends React.ComponentPropsWithoutRef<typeof ReactMarkdown> {
+interface Props extends ComponentPropsWithoutRef<typeof ReactMarkdown> {
   sanitizeCustomSchema?: object;
 }
 

@@ -1,5 +1,4 @@
 import { SvgIcon, SvgIconProps } from '@mui/material';
-import React from 'react';
 
 export function CityIcon(props: SvgIconProps) {
   return (

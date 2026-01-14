@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
 
 const useStyles = makeStyles({
   infoContainer: {

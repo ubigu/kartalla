@@ -2,7 +2,7 @@ import { SurveyRadioQuestion } from '@interfaces/survey';
 import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles({
   labelStyles: {

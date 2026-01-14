@@ -1,13 +1,13 @@
 import { ensureAuthenticated } from '@src/auth';
-import { Router } from 'express';
-import jsYaml from 'js-yaml';
-import fs from 'fs';
 import logger from '@src/logger';
+import { Router } from 'express';
+import fs from 'fs';
+import jsYaml from 'js-yaml';
 
 const router = Router();
 
 /** Endpoint for OpenAPI description */
-router.get('/', ensureAuthenticated(), (req, res) => {
+router.get('/', ensureAuthenticated(), (_req, res) => {
   const pathName = __dirname + '/../openapi/openapi.yaml';
   fs.readFile(pathName, { encoding: 'utf-8' }, (err, data) => {
     if (err) {

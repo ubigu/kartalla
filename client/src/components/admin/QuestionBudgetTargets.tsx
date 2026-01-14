@@ -13,7 +13,7 @@ import AddIcon from '@src/components/icons/AddIcon';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo } from 'react';
+import { createRef, useEffect, useMemo } from 'react';
 
 const styles = {
   wrapper: {

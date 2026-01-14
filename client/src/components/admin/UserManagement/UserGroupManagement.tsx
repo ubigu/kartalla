@@ -20,7 +20,7 @@ import {
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import React, { SyntheticEvent } from 'react';
+import { SyntheticEvent } from 'react';
 
 interface FormElements extends HTMLFormControlsCollection {
   groupNameInput: HTMLInputElement;

@@ -1,5 +1,7 @@
 import { User } from '@interfaces/user';
-import React, {
+import {
+  createContext,
+  Dispatch,
   ReactNode,
   useContext,
   useEffect,
@@ -43,7 +45,7 @@ type Action =
 /**
  * Type of stored context (state & reducer returned from useReducer)
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * Type of provider props
@@ -60,7 +62,7 @@ const stateDefaults: State = {
   allUsers: null,
 };
 
-export const UserContext = React.createContext<Context>(null);
+export const UserContext = createContext<Context>(null);
 
 /** Custom hook for accessing the user context */
 export function useUser() {
@@ -118,7 +120,7 @@ export default function UserProvider({ children }: Props) {
   const { tr } = useTranslations();
 
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => {

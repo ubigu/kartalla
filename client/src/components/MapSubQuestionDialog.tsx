@@ -19,13 +19,13 @@ import {
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FocusEvent, useEffect, useMemo, useRef, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import NumericQuestion from './NumericQuestion';
+import { RadioImageQuestion } from './RadioImageQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
-import { RadioImageQuestion } from './RadioImageQuestion';
 
 const useStyles = makeStyles({
   content: {
@@ -126,7 +126,7 @@ export default function MapSubQuestionDialog({
             key={question.id}
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
-            onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+            onBlur={(e: FocusEvent<HTMLFieldSetElement>) => {
               if (
                 e.relatedTarget &&
                 !(e.relatedTarget as HTMLButtonElement).classList.contains(

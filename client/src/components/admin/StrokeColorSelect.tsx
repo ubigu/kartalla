@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {

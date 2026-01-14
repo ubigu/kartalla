@@ -7,9 +7,9 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import React, { useState } from 'react';
 import QuestionmarkSmallIcon from '@src/components/icons/QuestionmarkSmallIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useState } from 'react';
 import RichTextEditor from '../RichTextEditor';
 
 interface Props {

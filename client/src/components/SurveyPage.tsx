@@ -5,7 +5,7 @@ import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { NotFoundPage } from './NotFoundPage';
 import SurveyLandingPage from './SurveyLandingPage';

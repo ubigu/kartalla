@@ -9,13 +9,13 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import React from 'react';
+
 import { GeneralNotification } from '@interfaces/generalNotification';
 import { Edit, ExpandMore } from '@mui/icons-material';
 
-import { useTranslations } from '@src/stores/TranslationContext';
 import { MegaphoneIcon } from '@src/components/icons/MegaphoneIcon';
 import { MarkdownView } from '@src/components/MarkdownView';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 const notificationListStyle = (theme: Theme) => ({
   marginBottom: theme.spacing(1),

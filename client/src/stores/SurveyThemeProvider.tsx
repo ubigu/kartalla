@@ -10,7 +10,14 @@ import {
   inputOverrides,
   stepperOverrides,
 } from '@src/themes/survey';
-import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 
 /**
  * Reducer state type
@@ -30,7 +37,7 @@ type Action = {
 /**
  * Type of stored context (state & reducer returned from useReducer)
  */
-type Context = [State, React.Dispatch<Action>];
+type Context = [State, Dispatch<Action>];
 
 /**
  * Type of provider props
@@ -44,7 +51,7 @@ const stateDefaults: State = {
   theme: defaultSurveyTheme,
 };
 
-export const SurveyThemeContext = React.createContext<Context>(null);
+export const SurveyThemeContext = createContext<Context>(null);
 
 /** Custom hook for accessing the theme context */
 export function useSurveyTheme() {
@@ -98,7 +105,7 @@ function reducer(state: State, action: Action): State {
 export default function SurveyThemeProvider({ children }: Props) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   /**
-   * Use React.useMemo here to avoid unnecessary rerenders
+   * Use useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
   const value = useMemo<Context>(() => [state, dispatch], [state]);

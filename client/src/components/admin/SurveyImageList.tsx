@@ -2,7 +2,9 @@
 
 import { File, ImageType } from '@interfaces/survey';
 import {
+  Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -20,7 +22,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SurveyImageListItem from './SurveyImageListItem';
 
@@ -72,6 +74,7 @@ export default function SurveyImageList({
   const [imageAttributions, setImageAttributions] = useState<string>('');
   const [imageAltText, setImageAltText] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<File | null>(null);
+  const [loadingImages, setLoadingImages] = useState(false);
   const limitToSvg = ['topMarginImage', 'bottomMarginImage'].includes(
     imageType,
   );
@@ -136,16 +139,19 @@ export default function SurveyImageList({
     return surveyOrganizationId
       ? {
           post: `${baseUrls.post}?organization=${surveyOrganizationId}`,
-          get: `${baseUrls.get}?organization=${surveyOrganizationId}`,
+          get: `${baseUrls.get}?organization=${surveyOrganizationId}&compress=true`,
         }
-      : baseUrls;
+      : { ...baseUrls, get: `${baseUrls.get}?compress=true` };
   }
 
   async function getImages() {
+    setLoadingImages(true);
     try {
       const res = await request<File[]>(getApiFilePath(imageType).get);
+      setLoadingImages(false);
       props.setImages?.(res) ?? setImages(res);
     } catch (error) {
+      setLoadingImages(false);
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.multipleImagesDownloadError,
@@ -198,7 +204,7 @@ export default function SurveyImageList({
     }
   }
 
-  async function handleDeletingImage(event: React.MouseEvent, fileUrl: string) {
+  async function handleDeletingImage(event: MouseEvent, fileUrl: string) {
     event.stopPropagation();
     try {
       await fetch(`/api/file/${fileUrl}`, { method: 'DELETE' });
@@ -453,87 +459,127 @@ export default function SurveyImageList({
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        <Typography
-          style={{
-            textTransform: 'none',
-            maxWidth: '400px',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            paddingRight: '0.5rem',
-          }}
-        >
-          {getSelectorHeader()}
-        </Typography>
-        {activeImage && (
-          <img
-            src={activeImageSrc}
-            srcSet={activeImageSrc}
-            alt={`survey-image-${getFileName(activeImage.fileUrl)}`}
-            loading="lazy"
-            style={{
-              height: '60px',
-              width: '60px',
-              filter: 'drop-shadow(0px 0px 4px lightgrey)',
+        {loadingImages ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              paddingLeft: '1rem',
             }}
-          />
+          >
+            <Typography>{tr.SurveyImageList.loadingImages}</Typography>
+            <CircularProgress size={'1rem'} />
+          </Box>
+        ) : (
+          <>
+            <Typography
+              style={{
+                textTransform: 'none',
+                maxWidth: '400px',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                paddingRight: '0.5rem',
+              }}
+            >
+              {getSelectorHeader()}
+            </Typography>
+            {activeImage && (
+              <img
+                src={activeImageSrc}
+                srcSet={activeImageSrc}
+                alt={`survey-image-${getFileName(activeImage.fileUrl)}`}
+                loading="lazy"
+                style={{
+                  height: '60px',
+                  width: '60px',
+                  filter: 'drop-shadow(0px 0px 4px lightgrey)',
+                }}
+              />
+            )}
+          </>
         )}
       </Button>
       <Dialog onClose={() => closeDialog()} open={imageDialogOpen}>
         <DialogContent>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-            }}
-          ></div>
-          <ImageList
-            sx={{ minWidth: 200, minHeight: 200 }}
-            cols={3}
-            rowHeight={164}
-          >
-            <ImageListItem
-              className={classes.noImageBackground}
-              style={getEmptyImageBorderStyle()}
-              onClick={() => handleEmptyImage()}
+          {loadingImages ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                paddingLeft: '1rem',
+              }}
             >
-              <Container
+              <Typography>{tr.SurveyImageList.loadingImages}</Typography>
+              <CircularProgress size={'1rem'} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                '@keyframes fadeIn': {
+                  from: { opacity: 0 },
+                  to: { opacity: 1 },
+                },
+                animation: 'fadeIn 0.3s',
+              }}
+            >
+              <div
                 style={{
+                  width: '100%',
                   display: 'flex',
-                  padding: '0px 4px',
-                  height: '100%',
-                  maxWidth: '155px',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
                 }}
+              />
+              <ImageList
+                sx={{ minWidth: 200, minHeight: 200 }}
+                cols={3}
+                rowHeight={164}
               >
-                <Typography
-                  style={{
-                    textAlign: 'center',
-                  }}
+                <ImageListItem
+                  className={classes.noImageBackground}
+                  style={getEmptyImageBorderStyle()}
+                  onClick={() => handleEmptyImage()}
                 >
-                  {getEmptyImageSelectionPlaceholder()}
-                </Typography>
-              </Container>
-            </ImageListItem>
-            {images.map((image) => {
-              const imageSrc = `data:image/${
-                limitToSvg ? 'svg+xml' : ''
-              };base64,${image.data}`;
-              return (
-                <SurveyImageListItem
-                  key={image.fileUrl}
-                  image={image}
-                  src={imageSrc}
-                  altText={imageAltText}
-                  onClick={handleListItemClick}
-                  onDelete={handleDeletingImage}
-                />
-              );
-            })}
-          </ImageList>
+                  <Container
+                    style={{
+                      display: 'flex',
+                      padding: '0px 4px',
+                      height: '100%',
+                      maxWidth: '155px',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        textAlign: 'center',
+                      }}
+                    >
+                      {getEmptyImageSelectionPlaceholder()}
+                    </Typography>
+                  </Container>
+                </ImageListItem>
+                {images.map((image) => {
+                  const imageSrc = `data:image/${
+                    limitToSvg ? 'svg+xml' : ''
+                  };base64,${image.data}`;
+                  return (
+                    <SurveyImageListItem
+                      key={image.fileUrl}
+                      image={image}
+                      src={imageSrc}
+                      altText={imageAltText}
+                      onClick={handleListItemClick}
+                      onDelete={handleDeletingImage}
+                    />
+                  );
+                })}
+              </ImageList>
+            </Box>
+          )}
         </DialogContent>
         <section className={classes.container}>
           <div {...getRootProps({ className: 'dropzone' })}>

@@ -6,9 +6,9 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import React from 'react';
-import { KartallaLogoDark } from './icons/KartallaLogoDark';
+
 import { CityIcon } from './icons/CityIcon';
+import { KartallaLogoDark } from './icons/KartallaLogoDark';
 import { UbiguLogoGreen } from './icons/UbiguLogoGreen';
 
 const pageStyle = {

@@ -20,7 +20,6 @@ import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
-import React from 'react';
 
 interface Props {
   questions: SurveyQuestion[];

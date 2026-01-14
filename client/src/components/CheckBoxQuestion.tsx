@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Max length of a custom answer in radio/checkbox questions

@@ -1,12 +1,11 @@
-import { MenuItem, Select, Tooltip } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
-import { makeStyles } from '@mui/styles';
+import { MenuItem, Select, Tooltip } from '@mui/material';
+import { CSSProperties, makeStyles } from '@mui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
 import LanguageIcon from './icons/LanguageIcon';
-import React from 'react';
 
 interface Props {
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   changeUILanguage?: boolean;
 }
 

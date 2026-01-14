@@ -1,7 +1,5 @@
-import { CircularProgress } from '@mui/material';
-import { Button, ButtonProps } from '@mui/material';
+import { Button, ButtonProps, CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React from 'react';
 
 // Size of the circular progress component
 const progressSize = 24;

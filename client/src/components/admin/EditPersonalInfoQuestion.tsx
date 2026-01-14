@@ -1,4 +1,5 @@
 import { SurveyPersonalInfoQuestion } from '@interfaces/survey';
+import { Check } from '@mui/icons-material';
 import {
   Checkbox,
   FormControlLabel,
@@ -7,8 +8,6 @@ import {
   Input,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { Check } from '@mui/icons-material';
-import React from 'react';
 
 interface Props {
   section: SurveyPersonalInfoQuestion;

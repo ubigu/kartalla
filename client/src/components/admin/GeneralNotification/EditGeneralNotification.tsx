@@ -10,7 +10,14 @@ import AddIcon from '@src/components/icons/AddIcon';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import {
+  FormEvent,
+  forwardRef,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 interface FormElements extends HTMLFormControlsCollection {
   notificationTitle: HTMLInputElement;
@@ -34,7 +41,7 @@ interface Props {
 export const EditGeneralNotification = forwardRef(
   function EditGeneralNotification(
     { notification, onSubmit, onCancel, editing, onEdit, onDelete }: Props,
-    ref: React.RefObject<{ setEditorValue: (value: string) => void } | null>,
+    ref: RefObject<{ setEditorValue: (value: string) => void } | null>,
   ) {
     const { tr } = useTranslations();
     const [formData, setFormData] = useState({
@@ -83,7 +90,7 @@ export const EditGeneralNotification = forwardRef(
                 to: { opacity: 1, maxHeight: '500px' },
               },
             }}
-            onSubmit={async (e: React.FormEvent<NotificationFormElements>) => {
+            onSubmit={async (e: FormEvent<NotificationFormElements>) => {
               const currentTarget = e.currentTarget;
               e.preventDefault();
               await onSubmit(formData, notification?.id);

@@ -1,12 +1,12 @@
 import { LanguageCode } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 function useQuery() {
   const { search } = useLocation();
 
-  return React.useMemo(() => new URLSearchParams(search), [search]);
+  return useMemo(() => new URLSearchParams(search), [search]);
 }
 
 export default function LanguageRouter(): null {
