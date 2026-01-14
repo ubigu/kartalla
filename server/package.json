@@ -88,7 +88,7 @@
     "@types/jest": "^27.5.2",
     "@types/markdown-it": "^12.2.3",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^15.14.9",
+    "@types/node": "^25.0.8",
     "@types/nodemailer": "^6.4.17",
     "@types/passport": "^1.0.17",
     "@types/passport-azure-ad": "^4.3.6",
