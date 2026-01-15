@@ -139,9 +139,9 @@ export default function SurveyImageList({
     return surveyOrganizationId
       ? {
           post: `${baseUrls.post}?organization=${surveyOrganizationId}`,
-          get: `${baseUrls.get}?organization=${surveyOrganizationId}&compress=true`,
+          get: `${baseUrls.get}?organization=${surveyOrganizationId}&compressed=true`,
         }
-      : { ...baseUrls, get: `${baseUrls.get}?compress=true` };
+      : { ...baseUrls, get: `${baseUrls.get}?compressed=true` };
   }
 
   async function getImages() {
