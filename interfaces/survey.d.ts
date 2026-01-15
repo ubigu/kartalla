@@ -824,7 +824,7 @@ export interface File {
    */
   id: number;
   /**
-   * File data as a base64 encoded string
+   * File data as a Buffer
    */
   data: Buffer;
   /**
@@ -853,6 +853,10 @@ export interface SurveyImage extends File {
    * Alternative text for the picture entered by the user
    */
   altText: string;
+  /**
+   * Data as a base64 encoded string
+   */
+  data: string;
 }
 
 /**
