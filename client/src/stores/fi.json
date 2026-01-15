@@ -383,6 +383,7 @@
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
+    "imageDeleted": "Kuva poistettu",
     "files": "Tiedosto",
     "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
     "imageTypeError": "Kuvan tulee olla .svg -muodossa",

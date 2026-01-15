@@ -22,7 +22,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SurveyImageListItem from './SurveyImageListItem';
 
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   imageType: ImageType;
   images?: File[];
-  setImages?: (images: File[]) => void;
+  setImages?: Dispatch<SetStateAction<File[]>>;
   canEdit?: boolean;
 }
 
@@ -78,6 +78,8 @@ export default function SurveyImageList({
   const limitToSvg = ['topMarginImage', 'bottomMarginImage'].includes(
     imageType,
   );
+
+  const handleSetImages = props.setImages ?? setImages;
   const activeImageSrc = activeImage
     ? `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${activeImage.data}`
     : '';
@@ -149,7 +151,7 @@ export default function SurveyImageList({
     try {
       const res = await request<File[]>(getApiFilePath(imageType).get);
       setLoadingImages(false);
-      props.setImages?.(res) ?? setImages(res);
+      handleSetImages(res);
     } catch (error) {
       setLoadingImages(false);
       showToast({
@@ -233,8 +235,14 @@ export default function SurveyImageList({
         message: tr.SurveyImageList.imageDeleteError,
       });
     }
-
-    getImages();
+    handleSetImages((prev) =>
+      prev.filter((image) => image.fileUrl !== fileUrl),
+    );
+    showToast({
+      severity: 'success',
+      message: tr.SurveyImageList.imageDeleted,
+      autoHideDuration: 2000,
+    });
   }
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
