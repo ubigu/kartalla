@@ -8,8 +8,8 @@ interface Props {
   image: File;
   src: string;
   altText: string;
-  onClick: Function;
-  onDelete: Function;
+  onClick: (imageUrl: string) => void;
+  onDelete: (event: React.MouseEvent, imageUrl: string) => Promise<void>;
 }
 
 export default function SurveyImageListItem(props: Props) {

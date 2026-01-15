@@ -45,7 +45,7 @@ export default function RadioQuestion({
 
   useEffect(() => {
     // autoFocus prop won't trigger focus styling, must be done manually
-    autoFocus && actionRef.current[0]?.current.focusVisible();
+    if (autoFocus) actionRef.current[0]?.current.focusVisible();
   }, []);
 
   // Update custom answer value if value from context is string

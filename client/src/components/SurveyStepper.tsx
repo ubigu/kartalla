@@ -352,7 +352,7 @@ export default function SurveyStepper({
       );
       setLoading(false);
       onComplete();
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.SurveyStepper.errorSubmittingSurvey,
@@ -530,7 +530,7 @@ export default function SurveyStepper({
                     />
                   )}
 
-                  {page.sections.map((section, _index) => (
+                  {page.sections.map((section) => (
                     <div className={classes.section} key={section.id}>
                       {section.type === 'text' ? (
                         <TextSection section={section} />

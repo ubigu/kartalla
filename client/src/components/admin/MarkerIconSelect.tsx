@@ -25,7 +25,7 @@ export default function MarkerIconSelect({ value, onChange }: Props) {
           '/api/feature-styles/marker-icons',
         );
         setIcons(icons);
-      } catch (error) {
+      } catch {
         setIcons([]);
         showToast({
           message: tr.MarkerIconSelect.errorFetchingIcons,

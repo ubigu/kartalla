@@ -29,7 +29,7 @@ export function FollowUpSections({
       droppableId={`follow-up-sections-${parentSection.id}`}
       type={`followUpSection-${parentSection.id}`}
     >
-      {(provided, _snapshot) => (
+      {(provided) => (
         <div {...provided.droppableProps} ref={provided.innerRef}>
           {parentSection?.followUpSections?.map((sect, index) => (
             <Draggable
@@ -37,7 +37,7 @@ export function FollowUpSections({
               draggableId={String(sect.id)}
               index={index}
             >
-              {(provided, _snapshot) => {
+              {(provided) => {
                 return (
                   <div
                     style={{ margin: '10px' }}

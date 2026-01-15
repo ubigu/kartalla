@@ -52,8 +52,7 @@ export function useOskari() {
     useState<DrawingEventHandler | null>(null);
   const [allLayers, setAllLayers] = useState<number[] | null>(null);
   const [features, setFeatures] = useState<Feature[]>([]);
-  const [_defaultMapView, setDefaultMapView] =
-    useState<FeatureCollection>(null);
+  const [, setDefaultMapView] = useState<FeatureCollection>(null);
   const [oskariVersion, setOskariVersion] = useState(null);
 
   // Make current features available inside callbacks

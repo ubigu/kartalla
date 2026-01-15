@@ -90,7 +90,7 @@ export default function EditSurveyPage(props: Props) {
         } else {
           setIsEditable(true);
         }
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.EditSurveyPage.errorFetchingSubmissions,

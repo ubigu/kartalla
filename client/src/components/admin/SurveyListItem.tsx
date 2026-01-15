@@ -323,7 +323,7 @@ export default function SurveyListItem(props: Props) {
                         message: tr.SurveyList.restoreSuccessful,
                       });
                     }, fadeTimeout);
-                  } catch (error) {
+                  } catch {
                     showToast({
                       severity: 'error',
                       message: tr.SurveyList.restoreFailed,
@@ -373,7 +373,7 @@ export default function SurveyListItem(props: Props) {
               severity: 'success',
               message: tr.SurveyList.publishSuccessful,
             });
-          } catch (error) {
+          } catch {
             showToast({
               severity: 'error',
               message: tr.SurveyList.publishFailed,
@@ -403,7 +403,7 @@ export default function SurveyListItem(props: Props) {
               severity: 'success',
               message: tr.SurveyList.unpublishSuccessful,
             });
-          } catch (error) {
+          } catch {
             showToast({
               severity: 'error',
               message: tr.SurveyList.unpublishFailed,
@@ -442,7 +442,7 @@ export default function SurveyListItem(props: Props) {
                 message: tr.SurveyList.archiveSuccessful,
               });
             }, fadeTimeout);
-          } catch (error) {
+          } catch {
             showToast({
               severity: 'error',
               message: tr.SurveyList.archiveFailed,

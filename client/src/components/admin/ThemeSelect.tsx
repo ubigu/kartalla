@@ -41,7 +41,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
           (response) => response.json() as Promise<SurveyTheme[]>,
         );
         setThemes(themes);
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.EditSurveyInfo.themeFetchFailed,

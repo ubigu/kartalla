@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 import { File, ImageType } from '@interfaces/survey';
@@ -152,7 +153,7 @@ export default function SurveyImageList({
       const res = await request<File[]>(getApiFilePath(imageType).get);
       setLoadingImages(false);
       handleSetImages(res);
-    } catch (error) {
+    } catch {
       setLoadingImages(false);
       showToast({
         severity: 'error',
@@ -229,7 +230,7 @@ export default function SurveyImageList({
           }),
         },
       });
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.imageDeleteError,
@@ -271,7 +272,7 @@ export default function SurveyImageList({
 
   const closeDialog = () => {
     setImageDialogOpen((prev) => !prev);
-    acceptedFiles?.length && acceptedFiles?.shift();
+    if (acceptedFiles?.length) acceptedFiles?.shift();
   };
 
   async function handleImageUpload() {
@@ -280,7 +281,7 @@ export default function SurveyImageList({
     const formData = new FormData();
     formData.append('file', acceptedFiles[0]);
     formData.append('attributions', imageAttributions);
-    imageAltText && formData.append('imageAltText', imageAltText);
+    if (imageAltText) formData.append('imageAltText', imageAltText);
     const res = await fetch(getApiFilePath(imageType).post, {
       method: 'POST',
       body: formData,
@@ -372,29 +373,6 @@ export default function SurveyImageList({
           ) ?? null
         );
     }
-  }
-
-  function getImageBorderStyle(image: File) {
-    let style: { border: string } | {} = {};
-    switch (imageType) {
-      case 'backgroundImage':
-        image?.fileUrl === activeSurvey?.backgroundImageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'thanksPageImage':
-        image?.fileUrl === activeSurvey?.thanksPage.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'topMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.top?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'bottomMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.bottom?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-    }
-
-    return style;
   }
 
   function getEmptyImageBorderStyle() {

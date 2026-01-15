@@ -351,9 +351,8 @@ export function useSurvey() {
         movedPage = {
           ...movedPage,
           conditions: Object.fromEntries(
-            Object.entries(movedPage.conditions).filter(
-              ([sectionId, _conditions]) =>
-                previousSectionIds.includes(Number(sectionId)),
+            Object.entries(movedPage.conditions).filter(([sectionId]) =>
+              previousSectionIds.includes(Number(sectionId)),
             ),
           ),
         };
@@ -367,8 +366,7 @@ export function useSurvey() {
         ...page,
         conditions: Object.fromEntries(
           Object.entries(page.conditions).filter(
-            ([sectionId, _conditions]) =>
-              !movedPageSectionIds.includes(Number(sectionId)),
+            ([sectionId]) => !movedPageSectionIds.includes(Number(sectionId)),
           ),
         ),
       }));

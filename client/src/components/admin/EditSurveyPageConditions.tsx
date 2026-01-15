@@ -271,7 +271,8 @@ export function EditSurveyPageConditions() {
               value={
                 conditionList.length > 0
                   ? conditionList[0][0]
-                  : (String(previousQuestions?.[0].id) ?? '')
+                  : // eslint-disable-next-line no-constant-binary-expression
+                    (String(previousQuestions?.[0].id) ?? '')
               }
               onChange={(event) => handleQuestionSelect(event)}
             >
@@ -294,7 +295,7 @@ export function EditSurveyPageConditions() {
             </Select>
           </FormControl>
           <>
-            {conditionList.map(([sectionId, _conditions]) => (
+            {conditionList.map(([sectionId]) => (
               <SurveyPageCondition
                 key={sectionId}
                 pages={previousNonConditionalPages}

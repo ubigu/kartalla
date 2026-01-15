@@ -49,7 +49,7 @@ export default function EditMapSubQuestions(props: Props) {
       }}
     >
       <Droppable droppableId="map-sub-sections">
-        {(provided, _snapshot) => (
+        {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
             {(props.mapQuestion.subQuestions ?? []).map((section, index) => (
               <Draggable
@@ -57,7 +57,7 @@ export default function EditMapSubQuestions(props: Props) {
                 draggableId={String(section.id)}
                 index={index}
               >
-                {(provided, _snapshot) => (
+                {(provided) => (
                   <div ref={provided.innerRef} {...provided.draggableProps}>
                     <SurveySectionAccordion
                       disableSectionCopying

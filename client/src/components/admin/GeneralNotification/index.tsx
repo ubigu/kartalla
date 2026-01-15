@@ -108,7 +108,7 @@ export function GeneralNotifications() {
       setActiveNotification({ data: null, editing: false });
       editorRef.current?.setEditorValue('');
       fetchNotifications();
-    } catch (e) {
+    } catch {
       showToast({
         message: tr.GeneralNotification.updateFailed,
         severity: 'error',
@@ -128,7 +128,7 @@ export function GeneralNotifications() {
       setActiveNotification({ data: null, editing: false });
       editorRef.current?.setEditorValue('');
       fetchNotifications();
-    } catch (e) {
+    } catch {
       showToast({
         message: tr.GeneralNotification.deleteFailed,
         severity: 'error',

@@ -54,7 +54,7 @@ export function useGeneralNotifications() {
       'useGeneralNotifications must be used within the GeneralNotificationProvider',
     );
   }
-  const [state, _dispatch] = context;
+  const [state] = context;
 
   return state;
 }

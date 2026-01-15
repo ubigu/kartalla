@@ -65,7 +65,7 @@ export default function SurveyList() {
           ),
         );
         abortController = null;
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.SurveyList.errorFetchingSurveys,
@@ -142,7 +142,7 @@ export default function SurveyList() {
                 const newSurvey = await createNewSurvey();
                 setNewSurveyLoading(false);
                 history.push(`/kyselyt/${newSurvey.id}`);
-              } catch (error) {
+              } catch {
                 showToast({
                   severity: 'error',
                   message: tr.SurveyList.errorCreatingNewSurvey,

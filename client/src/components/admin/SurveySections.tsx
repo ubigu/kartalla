@@ -55,7 +55,7 @@ export default function SurveySections(props: Props) {
       }}
     >
       <Droppable droppableId="sections" type="section">
-        {(provided, _snapshot) => (
+        {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
             {props.page.sections.map((section, index) => {
               return (
@@ -64,7 +64,7 @@ export default function SurveySections(props: Props) {
                   draggableId={String(section.id)}
                   index={index}
                 >
-                  {(provided, _snapshot) => (
+                  {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps}>
                       <SurveySectionAccordion
                         pageId={props.page.id}

@@ -1,25 +1,25 @@
 import eslint from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
+export default defineConfig(
   eslint.configs.recommended,
+  ...tseslint.configs.recommended,
   {
     ...reactPlugin.configs.flat.recommended,
     settings: { react: { version: 'detect' } },
   },
   reactPlugin.configs.flat['jsx-runtime'],
-  ...tseslint.configs.recommended,
+
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       globals: { ...globals.browser },
-      parser: tsParser,
     },
-
     rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
       'no-redeclare': 'off',
       'no-undef': 'off',
       'no-unused-vars': 'off',
@@ -31,4 +31,4 @@ export default [
   {
     ignores: ['node_modules/**/*', 'dist/**/*'],
   },
-];
+);
