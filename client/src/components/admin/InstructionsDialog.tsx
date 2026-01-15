@@ -42,7 +42,7 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
       try {
         const filename = await getInstructionFilename();
         setInstructionFileName(filename);
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.InstructionsDialog.fetchingError,

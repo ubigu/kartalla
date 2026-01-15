@@ -28,7 +28,7 @@ export default function EditSurveyEmail() {
       try {
         const emails = await request<string[]>('/api/surveys/report-emails');
         setAutocompleteEmails(emails);
-      } catch (error) {
+      } catch {
         // Ignore network errors
         setAutocompleteEmails([]);
       }

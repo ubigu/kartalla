@@ -19,7 +19,7 @@ export function useImageHeaderQuery(
         const headers = await JSON.parse(res.headers.get('File-details'));
         setIsLoading(false);
         setImageHeaders(headers);
-      } catch (error) {
+      } catch {
         setError(true);
       }
     }

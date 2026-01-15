@@ -145,7 +145,7 @@ export default function UserProvider({ children }: Props) {
           users: [currentUser, ...otherUsers],
         });
         dispatch({ type: 'SET_INITIALIZED', isInitialized: true });
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.EditSurveyInfo.userFetchFailed,

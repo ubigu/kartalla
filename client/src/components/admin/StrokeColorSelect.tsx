@@ -38,7 +38,7 @@ export default function StrokeColorSelect({ value, onChange }: Props) {
           '/api/feature-styles/stroke-colors',
         );
         setColors(colors);
-      } catch (error) {
+      } catch {
         setColors([]);
         showToast({
           message: tr.StrokeColorSelect.errorFetchingColors,

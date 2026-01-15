@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 import { File, ImageType } from '@interfaces/survey';
@@ -22,7 +23,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SurveyImageListItem from './SurveyImageListItem';
 
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   imageType: ImageType;
   images?: File[];
-  setImages?: (images: File[]) => void;
+  setImages?: Dispatch<SetStateAction<File[]>>;
   canEdit?: boolean;
 }
 
@@ -78,6 +79,8 @@ export default function SurveyImageList({
   const limitToSvg = ['topMarginImage', 'bottomMarginImage'].includes(
     imageType,
   );
+
+  const handleSetImages = props.setImages ?? setImages;
   const activeImageSrc = activeImage
     ? `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${activeImage.data}`
     : '';
@@ -139,9 +142,9 @@ export default function SurveyImageList({
     return surveyOrganizationId
       ? {
           post: `${baseUrls.post}?organization=${surveyOrganizationId}`,
-          get: `${baseUrls.get}?organization=${surveyOrganizationId}&compress=true`,
+          get: `${baseUrls.get}?organization=${surveyOrganizationId}&compressed=true`,
         }
-      : { ...baseUrls, get: `${baseUrls.get}?compress=true` };
+      : { ...baseUrls, get: `${baseUrls.get}?compressed=true` };
   }
 
   async function getImages() {
@@ -149,8 +152,8 @@ export default function SurveyImageList({
     try {
       const res = await request<File[]>(getApiFilePath(imageType).get);
       setLoadingImages(false);
-      props.setImages?.(res) ?? setImages(res);
-    } catch (error) {
+      handleSetImages(res);
+    } catch {
       setLoadingImages(false);
       showToast({
         severity: 'error',
@@ -227,14 +230,20 @@ export default function SurveyImageList({
           }),
         },
       });
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.imageDeleteError,
       });
     }
-
-    getImages();
+    handleSetImages((prev) =>
+      prev.filter((image) => image.fileUrl !== fileUrl),
+    );
+    showToast({
+      severity: 'success',
+      message: tr.SurveyImageList.imageDeleted,
+      autoHideDuration: 2000,
+    });
   }
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
@@ -263,7 +272,7 @@ export default function SurveyImageList({
 
   const closeDialog = () => {
     setImageDialogOpen((prev) => !prev);
-    acceptedFiles?.length && acceptedFiles?.shift();
+    if (acceptedFiles?.length) acceptedFiles?.shift();
   };
 
   async function handleImageUpload() {
@@ -272,7 +281,7 @@ export default function SurveyImageList({
     const formData = new FormData();
     formData.append('file', acceptedFiles[0]);
     formData.append('attributions', imageAttributions);
-    imageAltText && formData.append('imageAltText', imageAltText);
+    if (imageAltText) formData.append('imageAltText', imageAltText);
     const res = await fetch(getApiFilePath(imageType).post, {
       method: 'POST',
       body: formData,
@@ -364,29 +373,6 @@ export default function SurveyImageList({
           ) ?? null
         );
     }
-  }
-
-  function getImageBorderStyle(image: File) {
-    let style: { border: string } | {} = {};
-    switch (imageType) {
-      case 'backgroundImage':
-        image?.fileUrl === activeSurvey?.backgroundImageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'thanksPageImage':
-        image?.fileUrl === activeSurvey?.thanksPage.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'topMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.top?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'bottomMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.bottom?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-    }
-
-    return style;
   }
 
   function getEmptyImageBorderStyle() {

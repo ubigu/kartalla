@@ -382,6 +382,7 @@
     "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
+    "imageDeleted": "Image deleted",
     "files": "File",
     "imageSizeExceeded": "Image maximum size is {x} MB",
     "imageTypeError": "Image type must be .svg",

@@ -154,7 +154,7 @@ export function UserGroupManagement(props: Props) {
             await createUserGroup(groupName);
             form.reset();
             await props.onGroupChange();
-          } catch (error) {
+          } catch {
             showToast({
               message: `${tr.UserGroupManagement.groupCreationFailed}}`,
               severity: 'error',

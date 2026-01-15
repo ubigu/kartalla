@@ -56,7 +56,7 @@ export async function request<Response = unknown>(
     try {
       // Try to parse the error as JSON
       error = JSON.parse(error);
-    } catch (error) {
+    } catch {
       // Could not parse the error as JSON - fail silently
     }
     throw {

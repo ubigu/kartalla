@@ -37,7 +37,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -192,6 +191,18 @@ interface DBSurveyUserGroup {
   id?: number;
   survey_id: number;
   group_id: number;
+}
+
+/**
+ * DB row of table data.files
+ */
+interface DBFile {
+  id: number;
+  details: Record<string, any>;
+  file: Buffer | null;
+  compressed_file: Buffer | null;
+  mime_type: string | null;
+  url: string;
 }
 
 /**
@@ -2296,9 +2307,9 @@ export async function storeFile({
   surveyId: number;
   organizationId: string;
 }) {
-  const isImage = mimetype.startsWith('image/');
+  const isImage = mimetype.startsWith('image/') && !mimetype.includes('svg');
   const compressedFileString = isImage
-    ? getCompressedFileString(buffer, 20)
+    ? await getCompressedFileString(buffer, 20)
     : null;
 
   const fileString = `\\x${buffer.toString('hex')}`;
@@ -2394,13 +2405,22 @@ export async function getImages(
   getCompressed = false,
 ) {
   const filePattern = `${organizationId}/${imagePath.join('/')}%`;
-  logger.info(`FILEPATTERN: ${filePattern}`);
-  const rows = await getDb().manyOrNone(
+
+  function getImageData(fileRow: DBFile) {
+    if (getCompressed && !fileRow.mime_type.includes('svg')) {
+      return fileRow.compressed_file;
+    }
+    return fileRow.file;
+  }
+
+  const rows = await getDb().manyOrNone<DBFile>(
     `
     SELECT 
       id, 
       details, 
-      ${getCompressed ? 'compressed_file AS file' : 'file'}, 
+      file,
+      compressed_file, 
+      mime_type,
       url
     FROM data.files 
     WHERE url LIKE $1;
@@ -2408,13 +2428,14 @@ export async function getImages(
     [filePattern],
   );
 
-  return rows.map((row) => ({
+  return rows.map<SurveyImage>((row) => ({
     id: row.id,
-    data: row.file?.toString('base64'),
+    data: getImageData(row).toString('base64'),
     attributions: row.details?.attributions,
     altText: row.details?.imageAltText,
     fileUrl: row.url,
-  })) as SurveyImage[];
+    mimeType: row.mime_type,
+  }));
 }
 
 /**

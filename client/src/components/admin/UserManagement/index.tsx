@@ -34,7 +34,7 @@ export function UserManagement() {
       );
       const usersData = (await response.json()) as User[];
       setUsers({ data: usersData, loading: false });
-    } catch (error) {
+    } catch {
       setUsers((prev) => ({ ...prev, loading: false }));
       showToast({
         severity: 'error',
@@ -50,7 +50,7 @@ export function UserManagement() {
         : await getUserGroups();
 
       setAvailableUserGroups(userGroups);
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.UserManagement.userGroupFetchFailed,

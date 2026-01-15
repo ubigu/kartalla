@@ -113,8 +113,9 @@ export default function ClipboardProvider({ children }: Props) {
         }: { clipboardSection: SurveyPageSection; clipboardPage: SurveyPage } =
           clipboardContent;
 
-        clipboardPage && dispatch({ type: 'SET_PAGE', clipboardPage });
-        clipboardSection && dispatch({ type: 'SET_SECTION', clipboardSection });
+        if (clipboardPage) dispatch({ type: 'SET_PAGE', clipboardPage });
+        if (clipboardSection)
+          dispatch({ type: 'SET_SECTION', clipboardSection });
       }
     };
 
@@ -136,8 +137,8 @@ export default function ClipboardProvider({ children }: Props) {
     }: { clipboardSection: SurveyPageSection; clipboardPage: SurveyPage } =
       clipboardContent;
 
-    clipboardPage && dispatch({ type: 'SET_PAGE', clipboardPage });
-    clipboardSection && dispatch({ type: 'SET_SECTION', clipboardSection });
+    if (clipboardPage) dispatch({ type: 'SET_PAGE', clipboardPage });
+    if (clipboardSection) dispatch({ type: 'SET_SECTION', clipboardSection });
 
     // Clean up the event listener when the component unmounts
     return () => {

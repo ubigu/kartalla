@@ -79,7 +79,7 @@ export function SvgIconSelect(props: Props) {
       setIsLoading(true);
       const icons = await getSvgIcons();
       setCustomIcons(icons);
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: 'Failed to load custom SVG icons',
@@ -96,7 +96,7 @@ export function SvgIconSelect(props: Props) {
         '/api/feature-styles/marker-icons',
       );
       setAppIcons(icons);
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: 'Failed to load app icons',
@@ -115,7 +115,7 @@ export function SvgIconSelect(props: Props) {
         severity: 'success',
         message: tr.SvgIconSelect.uploadSuccess,
       });
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.SvgIconSelect.uploadError,
@@ -137,7 +137,7 @@ export function SvgIconSelect(props: Props) {
         severity: 'success',
         message: tr.SvgIconSelect.deleteSuccess,
       });
-    } catch (error) {
+    } catch {
       showToast({
         severity: 'error',
         message: tr.SvgIconSelect.deleteError,

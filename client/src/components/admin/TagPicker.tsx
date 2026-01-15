@@ -21,7 +21,7 @@ export function TagPicker({
     async function updateOrgTags() {
       try {
         setTags(await getOrgTags());
-      } catch (error) {
+      } catch {
         // retry after a failure
         setTimeout(updateOrgTags, 2000);
       }

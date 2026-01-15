@@ -145,9 +145,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
       return {
         sectionId: section.id,
         type: section.type,
-        value: new Array(section.subjects?.length ?? 1).fill(
-          new Array().fill(null),
-        ),
+        value: new Array(section.subjects?.length ?? 1).fill([].fill(null)),
       };
     case 'grouped-checkbox':
       return {

@@ -59,7 +59,7 @@ export default function FileUpload({
       if (value) {
         try {
           await Promise.all((value ?? []).map(({ url }) => deleteFile(url)));
-        } catch (error) {
+        } catch {
           showToast({
             severity: 'error',
             message: tr.FileUpload.errorDeletingFile,
@@ -93,7 +93,7 @@ export default function FileUpload({
             resJson.id.url ??
             getFullFilePath(surveyOrganizationId, targetPath, file.name),
         });
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.FileUpload.errorUploadingFile,
@@ -141,7 +141,7 @@ export default function FileUpload({
                   try {
                     await deleteFile(url);
                     onDelete({ url });
-                  } catch (error) {
+                  } catch {
                     showToast({
                       severity: 'error',
                       message: tr.FileUpload.errorDeletingFile,

@@ -87,6 +87,7 @@ export function EmojiPicker({ onSelect }: Props) {
                 {category.label}
               </Typography>
             ),
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             Emoji: ({ emoji, color, ...props }) => (
               <IconButton size="small" sx={{ color: 'black' }} {...props}>
                 {emoji.emoji}

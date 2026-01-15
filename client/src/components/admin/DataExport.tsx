@@ -242,9 +242,9 @@ export default function DataExport({ surveyId }: Props) {
             }
             onClick={() => {
               setDisplayDialog(false);
-              selectedFileFormats.csv && exportCSV();
-              selectedFileFormats.geopackage && exportGeoPackage();
-              selectedFileFormats.attachments && exportAttachments();
+              if (selectedFileFormats.csv) exportCSV();
+              if (selectedFileFormats.geopackage) exportGeoPackage();
+              if (selectedFileFormats.attachments) exportAttachments();
             }}
           >
             {' '}

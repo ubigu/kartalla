@@ -83,7 +83,7 @@ export default function EditSurveyInfo(props: Props) {
       try {
         const userGroups = await getUserGroups();
         setAvailableUserGroups(userGroups);
-      } catch (error) {
+      } catch {
         showToast({
           severity: 'error',
           message: tr.EditSurveyInfo.userGroupFetchFailed,
@@ -552,7 +552,7 @@ export default function EditSurveyInfo(props: Props) {
                 severity: 'success',
                 message: tr.EditSurvey.deleteSurveySuccessful,
               });
-            } catch (error) {
+            } catch {
               setDeleteSurveyLoading(false);
               showToast({
                 severity: 'error',

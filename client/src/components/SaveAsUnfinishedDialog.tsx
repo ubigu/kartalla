@@ -72,7 +72,7 @@ export default function SaveAsUnfinishedDialog({
       });
       setUnfinishedToken(token);
       onSave(token);
-    } catch (error) {
+    } catch {
       showToast({
         message: tr.SaveAsUnfinishedDialog.errorSaving,
         severity: 'error',

@@ -24,7 +24,7 @@ export default function CopyToClipboard({ data, tooltip }: Props) {
                 severity: 'success',
                 message: tr.CopyToClipboard.successful,
               });
-            } catch (error) {
+            } catch {
               showToast({
                 severity: 'error',
                 message: tr.CopyToClipboard.fail,
