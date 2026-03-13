@@ -71,7 +71,7 @@ async function start() {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   if (process.env.AUTH_ENABLED === 'true') {
-    configureAuth(app);
+    await configureAuth(app);
     logger.info('Authentication configured');
   } else {
     await configureMockAuth(app);
