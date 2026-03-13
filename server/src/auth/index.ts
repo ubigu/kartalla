@@ -20,6 +20,7 @@ import passport from 'passport';
 import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
+import { configureAzureAuth as configureAzureAuthV2 } from './azureV2';
 import { configureGoogleOAuth } from './google-oauth';
 
 const SESSION_COOKIE_NAME = '_Secure-connect.sid';
@@ -43,7 +44,7 @@ function basicAuth(req: Request): { name: string; pass: string } {
  * Configures authentication for given Express application.
  * @param app Express application
  */
-export function configureAuth(app: Express) {
+export async function configureAuth(app: Express) {
   // User serialization
   passport.serializeUser((user: Express.User, done) => {
     done(null, user.id);
@@ -100,7 +101,12 @@ export function configureAuth(app: Express) {
   // Configure auth method specific authentications
   switch (process.env.AUTH_METHOD) {
     case 'azure':
-      configureAzureAuth(app);
+      if (process.env.AZURE_AUTH_VERSION === 'V2') {
+        await configureAzureAuthV2(app);
+      } else {
+        configureAzureAuth(app);
+      }
+
       break;
     case 'google-oauth':
       configureGoogleOAuth(app);
