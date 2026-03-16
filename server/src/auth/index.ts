@@ -101,12 +101,12 @@ export async function configureAuth(app: Express) {
   // Configure auth method specific authentications
   switch (process.env.AUTH_METHOD) {
     case 'azure':
-      if (process.env.AZURE_AUTH_VERSION === 'V2') {
+      configureAzureAuth(app);
+      logger.info('Azure auth V1 configured');
+      if (process.env.AUTH_V2_IDENTITY_METADATA) {
         await configureAzureAuthV2(app);
-      } else {
-        configureAzureAuth(app);
+        logger.info('Azure auth V2 configured');
       }
-
       break;
     case 'google-oauth':
       configureGoogleOAuth(app);
@@ -155,7 +155,8 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (
       process.env['AUTH_ENABLED'] !== 'true' ||
-      req.path === '/login' ||
+      req.path === '/login/v1' ||
+      req.path === '/login/v2' ||
       req.isAuthenticated()
     ) {
       return next();

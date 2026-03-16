@@ -19,10 +19,10 @@ import {
 export async function configureAzureAuth(app: Express) {
   try {
     const oidcDiscoveryOptions = {
-      server: new URL(process.env.AUTH_IDENTITY_METADATA),
-      clientId: process.env.AUTH_CLIENT_ID,
-      clientSecret: process.env.AUTH_CLIENT_SECRET,
-      redirectUrl: process.env.AUTH_REDIRECT_URL,
+      server: new URL(process.env.AUTH_V2_IDENTITY_METADATA),
+      clientId: process.env.AUTH_V2_CLIENT_ID,
+      clientSecret: process.env.AUTH_V2_CLIENT_SECRET,
+      redirectUrl: process.env.AUTH_V2_REDIRECT_URL,
     };
 
     const config = await discovery(
@@ -80,7 +80,7 @@ export async function configureAzureAuth(app: Express) {
     );
 
     // Login route
-    app.get('/login', (req, res, next) => {
+    app.get('/login/v2', (req, res, next) => {
       req.session.redirectUrl = decrypt(req.query.redirect as string);
       req.session.save(() => {
         passport.authenticate('openid', {
@@ -92,9 +92,9 @@ export async function configureAzureAuth(app: Express) {
 
     // Callback route for authentication
     app.get(
-      '/.auth/login/aad/callback',
+      '/.auth/login/v2/aad/callback',
       passport.authenticate('openid', {
-        failureRedirect: '/',
+        failureRedirect: '/login?error=auth_failed',
         keepSessionInfo: true, // To keep the redirectUrl
       }),
       (req, res) => {

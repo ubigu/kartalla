@@ -42,6 +42,10 @@ async function start() {
             ], // References in openapi.yaml
             'worker-src': 'blob:', // For openAPI docs to work
             'frame-src': secrets.allowedFrameSources ?? "'self'",
+            'script-src': [
+              "'self'",
+              "'sha256-akiPVdLAnKpbE9p6HKbK57nJ8z55GUgOK58yVmNldeU='",
+            ], // login.html inline script
           },
         },
       })(req, res, next);
@@ -163,9 +167,19 @@ async function start() {
     res.redirect('/');
   });
 
+  // Serve login page - redirect to /admin if already authenticated
+  app.get('/login', (req, res) => {
+    if (req.isAuthenticated()) {
+      return res.redirect('/admin');
+    }
+    res.sendFile(path.join(__dirname, '../static/login.html'));
+  });
+
   // Serve frontend files from remaining URLs
-  app.get('/*', (_req, res, _next) => {
-    res.sendFile(path.join(__dirname, '../static/index.html'));
+  app.get('/*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../static/index.html'), (err) => {
+      if (err) res.status(404).end();
+    });
   });
 
   // Default error handler
