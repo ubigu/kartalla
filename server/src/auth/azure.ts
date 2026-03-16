@@ -59,7 +59,7 @@ export function configureAzureAuth(app: Express) {
   );
 
   // Login route
-  app.get('/login', (req, res, next) => {
+  app.get('/login/v1', (req, res, next) => {
     return passport.authenticate('azuread-openidconnect', {
       successRedirect: '/',
       failureRedirect: '/',
@@ -71,8 +71,7 @@ export function configureAzureAuth(app: Express) {
   app.post(
     '/.auth/login/aad/callback',
     passport.authenticate('azuread-openidconnect', {
-      // TODO: If authentication fails, redirect somewhere else to log the errors and tell the user about it
-      failureRedirect: '/',
+      failureRedirect: '/login?error=auth_failed',
     }),
     (req, res) => {
       // Redirect to original request URL

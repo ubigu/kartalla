@@ -22,6 +22,7 @@ services:
       - ./server:/app/server:cached
       - ./interfaces:/app/interfaces:cached
       - /app/server/node_modules
+      - ./client/public:/app/server/static:cached
     ports:
       - '3000:3000'
   database:

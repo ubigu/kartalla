@@ -20,6 +20,7 @@ import passport from 'passport';
 import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
+import { configureAzureAuth as configureAzureAuthV2 } from './azureV2';
 import { configureGoogleOAuth } from './google-oauth';
 
 const SESSION_COOKIE_NAME = '_Secure-connect.sid';
@@ -43,7 +44,7 @@ function basicAuth(req: Request): { name: string; pass: string } {
  * Configures authentication for given Express application.
  * @param app Express application
  */
-export function configureAuth(app: Express) {
+export async function configureAuth(app: Express) {
   // User serialization
   passport.serializeUser((user: Express.User, done) => {
     done(null, user.id);
@@ -101,6 +102,11 @@ export function configureAuth(app: Express) {
   switch (process.env.AUTH_METHOD) {
     case 'azure':
       configureAzureAuth(app);
+      logger.info('Azure auth V1 configured');
+      if (process.env.AUTH_V2_IDENTITY_METADATA) {
+        await configureAzureAuthV2(app);
+        logger.info('Azure auth V2 configured');
+      }
       break;
     case 'google-oauth':
       configureGoogleOAuth(app);
@@ -149,7 +155,8 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (
       process.env['AUTH_ENABLED'] !== 'true' ||
-      req.path === '/login' ||
+      req.path === '/login/v1' ||
+      req.path === '/login/v2' ||
       req.isAuthenticated()
     ) {
       return next();
