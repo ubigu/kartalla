@@ -37,7 +37,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -2394,7 +2393,6 @@ export async function getImages(
   getCompressed = false,
 ) {
   const filePattern = `${organizationId}/${imagePath.join('/')}%`;
-  logger.info(`FILEPATTERN: ${filePattern}`);
   const rows = await getDb().manyOrNone(
     `
     SELECT 

@@ -11,9 +11,9 @@ import { initSecrets, secrets } from './keyVaultSecrets';
 import logger from './logger';
 import rootRouter from './routes';
 
-async function start() {
+export async function createApp({ staticRoot }: { staticRoot?: string } = {}) {
+  const resolvedStaticRoot = staticRoot ?? path.join(__dirname, '../static');
   const app = express();
-  await initSecrets();
 
   app.use((_req, res, next) => {
     res.set('Cache-Control', 'no-store, max-age=0');
@@ -51,21 +51,6 @@ async function start() {
       })(req, res, next);
     }
   });
-
-  const port = Number(process.env.PORT ?? 3000);
-  // Database initialization and connection test
-  try {
-    await initializeDatabase();
-  } catch (error) {
-    logger.error('Error initializing database:', error);
-    process.exit(1);
-  }
-
-  // Execute migrations
-  await migrateUp();
-
-  // Start up Puppeteer cluster for taking screenshots
-  await initializePuppeteerCluster();
 
   // Add compression
   app.use(compression());
@@ -143,9 +128,9 @@ async function start() {
     ensureAuthenticated({
       redirectToLogin: true,
     }),
-    express.static('static/admin'),
+    express.static(path.join(resolvedStaticRoot, 'admin')),
   );
-  app.use('/', express.static('static'));
+  app.use('/', express.static(resolvedStaticRoot));
 
   // Root router for the API
   app.use('/api', rootRouter);
@@ -158,7 +143,7 @@ async function start() {
     }),
     (_req, res) => {
       res.removeHeader('Clear-Site-Data');
-      res.sendFile(path.join(__dirname, '../static/admin/index.html'));
+      res.sendFile(path.join(resolvedStaticRoot, 'admin/index.html'));
     },
   );
 
@@ -172,12 +157,12 @@ async function start() {
     if (req.isAuthenticated()) {
       return res.redirect('/admin');
     }
-    res.sendFile(path.join(__dirname, '../static/login.html'));
+    res.sendFile(path.join(resolvedStaticRoot, 'login.html'));
   });
 
   // Serve frontend files from remaining URLs
   app.get('/*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../static/index.html'), (err) => {
+    res.sendFile(path.join(resolvedStaticRoot, 'index.html'), (err) => {
       if (err) res.status(404).end();
     });
   });
@@ -193,9 +178,34 @@ async function start() {
     });
   });
 
+  return app;
+}
+
+async function start() {
+  await initSecrets();
+
+  const port = Number(process.env.PORT ?? 3000);
+  // Database initialization and connection test
+  try {
+    await initializeDatabase();
+  } catch (error) {
+    logger.error('Error initializing database:', error);
+    process.exit(1);
+  }
+
+  // Execute migrations
+  await migrateUp();
+
+  // Start up Puppeteer cluster for taking screenshots
+  await initializePuppeteerCluster();
+
+  const app = await createApp();
+
   app.listen(port, () => {
     logger.info(`Server listening to port ${port}`);
   });
 }
 
-start();
+if (process.env.NODE_ENV !== 'test') {
+  start();
+}

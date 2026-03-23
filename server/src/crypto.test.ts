@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { decrypt, encrypt } from './crypto';
 
 describe('Crypto', () => {
