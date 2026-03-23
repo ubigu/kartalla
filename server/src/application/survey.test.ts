@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 describe('Survey', () => {
   // TODO: replace with an actual test case
   it('test dummy', async () => {
