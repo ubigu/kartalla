@@ -158,11 +158,13 @@ export function configureTestAuth(app: Express) {
  */
 export async function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
-  const mockOrganization = ['test-group-id-1'];
+  const mockOrganization = (
+    process.env.MOCK_USER_ORGANIZATION ?? 'test-group-id-2'
+  ).split(',');
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij3',
-    fullName: 'testiheppu',
-    email: 'testi@heppu.fi',
+    id: process.env.MOCK_USER_ID ?? '12345-67890-abcde-fghij3',
+    fullName: process.env.MOCK_USER_FULL_NAME ?? 'testiheppu',
+    email: process.env.MOCK_USER_EMAIL ?? 'testi@heppu.fi',
     organizations: mockOrganization.map((id) =>
       dbOrganizationIdToOrganization(id),
     ),
