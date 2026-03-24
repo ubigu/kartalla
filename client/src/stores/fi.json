@@ -281,6 +281,7 @@
     "question": "Kysymys"
   },
   "SurveySections": {
+    "personalInfoFollowUpDisablesCopying": "Jatkokysymyksenä oleva henkilötietokysymys estää kopioinnin.",
     "limitAnswers": "Rajoita vastauslukumäärää",
     "minAnswers": "Vastauksia vähintään",
     "maxAnswers": "Vastauksia enintään",

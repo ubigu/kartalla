@@ -281,6 +281,7 @@
     "question": "Fråga"
   },
   "SurveySections": {
+    "personalInfoFollowUpDisablesCopying": "En personuppgiftsfråga som följdfråga förhindrar kopiering.",
     "limitAnswers": "Begränsa svarsantal",
     "minAnswers": "Minst svar",
     "maxAnswers": "Högst svar",

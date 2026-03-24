@@ -1,17 +1,34 @@
 import { fileURLToPath, URL } from 'url';
 import { defineConfig } from 'vitest/config';
 
+const alias = {
+  '@src': fileURLToPath(new URL('./src', import.meta.url)),
+  '@interfaces': fileURLToPath(new URL('../interfaces', import.meta.url)),
+  '@tests': fileURLToPath(new URL('./src/tests', import.meta.url)),
+};
+
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@src': fileURLToPath(new URL('./src', import.meta.url)),
-      '@interfaces': fileURLToPath(new URL('../interfaces', import.meta.url)),
-    },
-  },
   test: {
-    environment: 'node',
     globals: true,
-    include: ['src/**/*.test.ts'],
-    setupFiles: ['./src/routes/test-setup.ts'],
+    projects: [
+      {
+        resolve: { alias },
+        test: {
+          name: 'routes',
+          environment: 'node',
+          include: ['src/routes/**/*.test.ts', 'src/app.test.ts'],
+          setupFiles: ['./src/routes/test-setup.ts'],
+        },
+      },
+      {
+        resolve: { alias },
+        test: {
+          name: 'unit',
+          environment: 'node',
+          include: ['src/**/*.test.ts'],
+          exclude: ['src/routes/**/*.test.ts', 'src/app.test.ts'],
+        },
+      },
+    ],
   },
 });

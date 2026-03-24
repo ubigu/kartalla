@@ -51,6 +51,12 @@ import {
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 
+const surveySectionCountLimitations: Partial<
+  Record<SurveyPageSection['type'], number>
+> = {
+  'personal-info': 1,
+};
+
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
   'checkbox',
@@ -1613,11 +1619,34 @@ async function updateSurveySections(survey: Survey, t: pgPromise.ITask<{}>) {
   );
 }
 
+function collectAllSections(
+  sections: SurveyPageSection[],
+): SurveyPageSection[] {
+  return sections.flatMap((section) => [
+    section,
+    ...collectAllSections(section.followUpSections ?? []),
+  ]);
+}
+
+function areSectionCountLimitsRespected(survey: Survey): boolean {
+  const allSections = collectAllSections(
+    survey.pages.flatMap((page) => page.sections),
+  );
+  return Object.entries(surveySectionCountLimitations).every(
+    ([type, limit]) =>
+      allSections.filter((s) => s.type === type).length <= limit,
+  );
+}
+
 /**
  * Updates a premade survey entry
  * @param survey
  */
 export async function updateSurvey(survey: Survey) {
+  if (!areSectionCountLimitsRespected(survey)) {
+    throw new BadRequestError('Section count limits not respected.');
+  }
+
   // Wrap all upserting inside a single transaction
   await getDb().tx(async (t) => {
     // Update the survey itself

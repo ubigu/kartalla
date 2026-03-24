@@ -20,7 +20,7 @@ import {
   SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
-import { Person } from '@mui/icons-material';
+import { ContentCopy, Person } from '@mui/icons-material';
 import {
   Accordion,
   AccordionSummary,
@@ -105,6 +105,11 @@ const useStyles = makeStyles({
   },
 });
 
+interface CopyingSettings {
+  copyingDisabled?: boolean;
+  disabledTooltip?: string;
+}
+
 interface Props {
   index: number;
   section: SurveyPageSection;
@@ -116,7 +121,7 @@ interface Props {
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
   provided: DraggableProvided;
-  disableSectionCopying?: boolean;
+  copyingSettings?: CopyingSettings;
   pageId?: number;
 }
 
@@ -375,7 +380,15 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          {!props.disableSectionCopying && (
+          {props.copyingSettings?.copyingDisabled &&
+            props.copyingSettings?.disabledTooltip && (
+              <Tooltip title={props.copyingSettings.disabledTooltip}>
+                <span>
+                  <ContentCopy color="disabled" />
+                </span>
+              </Tooltip>
+            )}
+          {!props.copyingSettings?.copyingDisabled && (
             <IconButton
               onClick={async (event) => {
                 event.stopPropagation();
