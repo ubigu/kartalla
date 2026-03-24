@@ -7,6 +7,10 @@ import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { PropsWithChildren, useState } from 'react';
 
+function getInputFieldId(id: number, inputType: string) {
+  return `${id}-${inputType}`;
+}
+
 const labelWrapperStyle = (labelColor?: string) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -34,14 +38,14 @@ interface Props {
 }
 
 interface WrapperProps {
-  id: string;
+  errorId: string;
   errorMessage: string;
   showError: boolean;
   labelColor?: string;
 }
 
 function PersonalInfoInputWrapper({
-  id,
+  errorId,
   errorMessage,
   showError,
   labelColor,
@@ -51,7 +55,7 @@ function PersonalInfoInputWrapper({
     <Box sx={labelWrapperStyle(labelColor)}>
       {children}
       <div aria-live="polite">
-        <Typography fontSize={12} color="error" id={`${id}-error`}>
+        <Typography fontSize={12} color="error" id={errorId}>
           {showError && errorMessage}
         </Typography>
       </div>
@@ -97,17 +101,17 @@ export function PersonalInfoQuestion({
     >
       {question.askName && (
         <PersonalInfoInputWrapper
-          id={`${question.id}-nameInput`}
+          errorId={`${getInputFieldId(question.id, 'nameInput')}-error`}
           showError={showInputErrorsFor.name}
           errorMessage={tr.PersonalInfoQuestion.nameError}
           labelColor={survey.sectionTitleColor}
         >
-          <label htmlFor={`${question.id}-nameInput`}>
+          <label htmlFor={getInputFieldId(question.id, 'nameInput')}>
             {tr.PersonalInfoQuestion.nameLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-nameError`}
-            id={`${question.id}-nameInput`}
+            aria-describedby={`${getInputFieldId(question.id, 'nameInput')}-error`}
+            id={getInputFieldId(question.id, 'nameInput')}
             disabled={readOnly}
             autoFocus={autoFocus}
             value={value?.name ?? ''}
@@ -136,17 +140,17 @@ export function PersonalInfoQuestion({
       )}
       {question.askEmail && (
         <PersonalInfoInputWrapper
-          id={`${question.id}-emailInput`}
+          errorId={`${getInputFieldId(question.id, 'emailInput')}-error`}
           showError={showInputErrorsFor.email}
           errorMessage={tr.PersonalInfoQuestion.emailError}
           labelColor={survey.sectionTitleColor}
         >
-          <label htmlFor={`${question.id}-emailInput`}>
+          <label htmlFor={getInputFieldId(question.id, 'emailInput')}>
             {tr.PersonalInfoQuestion.emailLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-emailError`}
-            id={`${question.id}-emailInput`}
+            aria-describedby={`${getInputFieldId(question.id, 'emailInput')}-error`}
+            id={getInputFieldId(question.id, 'emailInput')}
             type="email"
             disabled={readOnly}
             autoFocus={autoFocus}
@@ -176,18 +180,18 @@ export function PersonalInfoQuestion({
       )}
       {question.askPhone && (
         <PersonalInfoInputWrapper
-          id={`${question.id}-phoneInput`}
+          errorId={`${getInputFieldId(question.id, 'phoneInput')}-error`}
           showError={showInputErrorsFor.phone}
           errorMessage={tr.PersonalInfoQuestion.phoneError}
           labelColor={survey.sectionTitleColor}
         >
-          <label htmlFor={`${question.id}-phoneInput`}>
+          <label htmlFor={getInputFieldId(question.id, 'phoneInput')}>
             {tr.PersonalInfoQuestion.phoneLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-phoneError`}
+            aria-describedby={`${getInputFieldId(question.id, 'phoneInput')}-error`}
             type="tel"
-            id={`${question.id}-phoneInput`}
+            id={getInputFieldId(question.id, 'phoneInput')}
             disabled={readOnly}
             autoFocus={autoFocus}
             maxLength={25}
@@ -222,17 +226,17 @@ export function PersonalInfoQuestion({
       )}
       {question.askAddress && (
         <PersonalInfoInputWrapper
-          id={`${question.id}-addressInput`}
+          errorId={`${getInputFieldId(question.id, 'addressInput')}-error`}
           showError={showInputErrorsFor.address}
           errorMessage={tr.PersonalInfoQuestion.addressError}
           labelColor={survey.sectionTitleColor}
         >
-          <label htmlFor={`${question.id}-addressInput`}>
+          <label htmlFor={getInputFieldId(question.id, 'addressInput')}>
             {tr.PersonalInfoQuestion.addressLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-addressError`}
-            id={`${question.id}-addressInput`}
+            aria-describedby={`${getInputFieldId(question.id, 'addressInput')}-error`}
+            id={getInputFieldId(question.id, 'addressInput')}
             disabled={readOnly}
             autoFocus={autoFocus}
             value={value?.address ?? ''}
@@ -260,7 +264,7 @@ export function PersonalInfoQuestion({
       )}
       {question.askCustom && (
         <PersonalInfoInputWrapper
-          id={`${question.id}-customInput`}
+          errorId={`${getInputFieldId(question.id, 'customInput')}-error`}
           showError={showInputErrorsFor.custom}
           errorMessage={tr.PersonalInfoQuestion.customError.replace(
             '{label}',
@@ -268,12 +272,12 @@ export function PersonalInfoQuestion({
           )}
           labelColor={survey.sectionTitleColor}
         >
-          <label htmlFor={`${question.id}-customInput`}>
+          <label htmlFor={getInputFieldId(question.id, 'customInput')}>
             {question?.customLabel?.[surveyLanguage] ?? ''}
           </label>
           <input
-            aria-describedby={`${question.id}-customError`}
-            id={`${question.id}-customInput`}
+            aria-describedby={`${getInputFieldId(question.id, 'customInput')}-error`}
+            id={getInputFieldId(question.id, 'customInput')}
             disabled={readOnly}
             autoFocus={autoFocus}
             value={value?.custom ?? ''}
