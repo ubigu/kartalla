@@ -1,5 +1,5 @@
 /**
- * Seed script: creates a test survey covering every question type.
+ * Seed script: creates a demo survey about Tievelho road-network data service.
  *
  * Run from the server/ directory:
  *   npx ts-node -r tsconfig-paths/register src/scripts/createTestSurvey.ts
@@ -10,7 +10,6 @@
  *   npx ts-node -r tsconfig-paths/register src/scripts/createTestSurvey.ts
  */
 
-import PgPromise from 'pg-promise';
 import {
   BudgetAllocationDirection,
   LocalizedText,
@@ -32,13 +31,14 @@ import {
   SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
-import { initializeDatabase, getDb } from '@src/database';
+import { getDb, initializeDatabase } from '@src/database';
+import PgPromise from 'pg-promise';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const SURVEY_NAME = 'test-all-question-types';
+const SURVEY_NAME = 'tievelho-kayttajakysely';
 
 /** Builds a LocalizedText with the same value for all three languages. */
 function loc(fi: string, en: string, se = en): LocalizedText {
@@ -46,192 +46,282 @@ function loc(fi: string, en: string, se = en): LocalizedText {
 }
 
 // ---------------------------------------------------------------------------
-// Survey data – all question types defined with full TypeScript types
+// Survey data – Tievelho user experience survey
 // ---------------------------------------------------------------------------
 
-// Page 1 ─────────────────────────────────────────────────────────────────────
+// Page 1 – Vastaajan taustatiedot ───────────────────────────────────────────
 const page1Sections: SurveyPageSection[] = [
   {
     type: 'text',
-    title: loc('Tervetuloa', 'Welcome', 'Välkommen'),
-    body: loc(
-      'Tämä kyselylomake testaa kaikkia kysymystyyppejä.',
-      'This survey tests all question types.',
-      'Denna enkät testar alla frågetyper.',
+    title: loc(
+      'Tievelho-käyttäjäkysely 2025',
+      'Tievelho User Survey 2025',
+      'Tievelho användarundersökning 2025',
     ),
-    bodyColor: '#000000',
+    body: loc(
+      'Tievelho on Väyläviraston ylläpitämä tietietopalvelu, joka tarjoaa kattavat aineistot tieverkosta, tien kunnosta ja hoitohistoriasta. Tämän kyselyn avulla kehitämme palvelua vastaamaan paremmin tarpeisiinne. Vastaaminen vie noin 10 minuuttia.',
+      "Tievelho is the Finnish Transport Infrastructure Agency's road data service providing comprehensive data on the road network, road conditions and maintenance history. This survey helps us improve the service to better meet your needs. The survey takes about 10 minutes.",
+      'Tievelho är Trafikledsverkets vägdatatjänst som erbjuder heltäckande data om vägnätet, vägskick och underhållshistorik. Denna enkät hjälper oss att förbättra tjänsten. Det tar ca 10 minuter att svara.',
+    ),
+    bodyColor: '#003087',
   } satisfies SurveyTextSection,
 
   {
     type: 'personal-info',
-    title: loc('Henkilötiedot', 'Personal information', 'Personuppgifter'),
+    title: loc('Yhteystiedot', 'Contact details', 'Kontaktuppgifter'),
     isRequired: false,
     askName: true,
     askEmail: true,
-    askPhone: true,
+    askPhone: false,
     askAddress: false,
     askCustom: false,
   } satisfies SurveyPersonalInfoQuestion,
 
   {
-    type: 'free-text',
-    title: loc(
-      'Vapaamuotoinen kommentti',
-      'Free text comment',
-      'Fritextkommentar',
-    ),
-    isRequired: false,
-    maxLength: 500,
-  } satisfies SurveyFreeTextQuestion,
-];
-
-// Page 2 ─────────────────────────────────────────────────────────────────────
-const page2Sections: SurveyPageSection[] = [
-  {
     type: 'radio',
     title: loc(
-      'Yksi valinta (radio)',
-      'Single choice (radio)',
-      'Enstaka val (radio)',
+      'Millä sektorilla pääasiassa työskentelette?',
+      'In which sector do you mainly work?',
+      'Inom vilket sektor arbetar du huvudsakligen?',
     ),
     isRequired: true,
     allowCustomAnswer: false,
     options: [
-      { text: loc('Vaihtoehto A', 'Option A', 'Alternativ A') },
-      { text: loc('Vaihtoehto B', 'Option B', 'Alternativ B') },
-      { text: loc('Vaihtoehto C', 'Option C', 'Alternativ C') },
-      { text: loc('Vaihtoehto D', 'Option D', 'Alternativ D') },
+      {
+        text: loc(
+          'Tienpitourakoitsija',
+          'Road maintenance contractor',
+          'Vägunderhållsentreprenör',
+        ),
+      },
+      {
+        text: loc(
+          'Tiesuunnittelija / konsultti',
+          'Road designer / consultant',
+          'Vägplanerare / konsult',
+        ),
+      },
+      {
+        text: loc(
+          'Viranomainen (ELY, kunta tms.)',
+          'Public authority (ELY, municipality, etc.)',
+          'Myndighet (NTM, kommun o.d.)',
+        ),
+      },
+      {
+        text: loc(
+          'Tutkimus tai kehitys',
+          'Research or development',
+          'Forskning eller utveckling',
+        ),
+      },
+      { text: loc('Jokin muu', 'Other', 'Annat') },
     ],
   } satisfies SurveyRadioQuestion,
+];
 
-  {
-    type: 'radio-image',
-    title: loc(
-      'Kuvavalintakysymys',
-      'Image option question',
-      'Bildalternativsfråga',
-    ),
-    isRequired: false,
-    allowCustomAnswer: false,
-    options: [
-      {
-        text: loc('Kuva A', 'Image A', 'Bild A'),
-        imageUrl: null,
-        altText: loc('Kuvavaihtoehto A', 'Image option A', 'Bildalternativ A'),
-        attributions: '',
-      },
-      {
-        text: loc('Kuva B', 'Image B', 'Bild B'),
-        imageUrl: null,
-        altText: loc('Kuvavaihtoehto B', 'Image option B', 'Bildalternativ B'),
-        attributions: '',
-      },
-      {
-        text: loc('Kuva C', 'Image C', 'Bild C'),
-        imageUrl: null,
-        altText: loc('Kuvavaihtoehto C', 'Image option C', 'Bildalternativ C'),
-        attributions: '',
-      },
-    ],
-  } satisfies SurveyRadioImageQuestion,
-
+// Page 2 – Tievelhon käyttö ─────────────────────────────────────────────────
+const page2Sections: SurveyPageSection[] = [
   {
     type: 'checkbox',
     title: loc(
-      'Monivalinta (checkbox, max 3)',
-      'Multiple choice (checkbox, max 3)',
-      'Flerval (kryssruta, max 3)',
+      'Mitä Tievelhon aineistoja käytätte työssänne? (Valitse kaikki sopivat)',
+      'Which Tievelho datasets do you use in your work? (Select all that apply)',
+      'Vilka Tievelho-dataset använder du i ditt arbete? (Välj alla som gäller)',
     ),
-    isRequired: false,
+    isRequired: true,
     allowCustomAnswer: true,
-    answerLimits: { min: 1, max: 3 },
+    answerLimits: { min: 1, max: null },
     options: [
-      { text: loc('Valinta 1', 'Choice 1', 'Val 1') },
       {
-        text: loc('Valinta 2', 'Choice 2', 'Val 2'),
+        text: loc('Tieverkkoaineisto', 'Road network data', 'Vägnätsdata'),
         info: loc(
-          'Lisätietoa valinnasta 2',
-          'More info about choice 2',
-          'Mer info om val 2',
+          'Tieosat, tienumerot ja hallinnollinen luokitus',
+          'Road sections, road numbers and administrative classification',
+          'Vägavsnitt, vägnummer och administrativ klassificering',
         ),
       },
-      { text: loc('Valinta 3', 'Choice 3', 'Val 3') },
-      { text: loc('Valinta 4', 'Choice 4', 'Val 4') },
+      {
+        text: loc(
+          'Päällysteen kuntotiedot',
+          'Pavement condition data',
+          'Beläggningsskicksdata',
+        ),
+      },
+      {
+        text: loc(
+          'Hoitohistoria ja -rekisteri',
+          'Maintenance history and register',
+          'Underhållshistorik och -register',
+        ),
+      },
+      {
+        text: loc(
+          'Liikennemäärätiedot (KVL)',
+          'Traffic volume data (AADT)',
+          'Trafikvolymdata (ÅMT)',
+        ),
+      },
+      {
+        text: loc(
+          'Silta- ja taitorakennerekisteri',
+          'Bridge and structure register',
+          'Bro- och konstruktionsregister',
+        ),
+      },
+      {
+        text: loc(
+          'Geometria ja korkeusmallit',
+          'Road geometry and elevation models',
+          'Väggeometri och höjdmodeller',
+        ),
+      },
+      {
+        text: loc(
+          'Nopeusrajoitustiedot',
+          'Speed limit data',
+          'Hastighetsbegränsningsdata',
+        ),
+      },
     ],
   } satisfies SurveyCheckboxQuestion,
 
   {
+    type: 'radio',
+    title: loc(
+      'Kuinka usein käytätte Tievelhoa?',
+      'How often do you use Tievelho?',
+      'Hur ofta använder du Tievelho?',
+    ),
+    isRequired: true,
+    allowCustomAnswer: false,
+    options: [
+      { text: loc('Päivittäin', 'Daily', 'Dagligen') },
+      {
+        text: loc(
+          'Useita kertoja viikossa',
+          'Several times a week',
+          'Flera gånger i veckan',
+        ),
+      },
+      { text: loc('Viikoittain', 'Weekly', 'Veckovis') },
+      { text: loc('Kuukausittain', 'Monthly', 'Månadsvis') },
+      { text: loc('Harvemmin', 'Less often', 'Mer sällan') },
+    ],
+  } satisfies SurveyRadioQuestion,
+
+  {
     type: 'sorting',
-    title: loc('Järjestelykysymys', 'Sorting question', 'Sorteringsfråga'),
+    title: loc(
+      'Järjestäkää seuraavat käyttötarkoitukset tärkeysjärjestykseen (tärkein ensin)',
+      'Sort the following use cases by importance (most important first)',
+      'Rangordna följande användningsfall efter prioritet (viktigast först)',
+    ),
     isRequired: false,
     options: [
-      { text: loc('Kohde 1', 'Item 1', 'Objekt 1') },
-      { text: loc('Kohde 2', 'Item 2', 'Objekt 2') },
-      { text: loc('Kohde 3', 'Item 3', 'Objekt 3') },
-      { text: loc('Kohde 4', 'Item 4', 'Objekt 4') },
+      {
+        text: loc(
+          'Urakan suunnittelu ja tarjouslaskenta',
+          'Contract planning and tendering',
+          'Entreprenadplanering och anbudsberäkning',
+        ),
+      },
+      {
+        text: loc(
+          'Tienpidon laadunvalvonta',
+          'Road maintenance quality control',
+          'Kvalitetskontroll av vägunderhåll',
+        ),
+      },
+      {
+        text: loc(
+          'Raportointi ja viranomaisvaatimukset',
+          'Reporting and regulatory requirements',
+          'Rapportering och myndighetskrav',
+        ),
+      },
+      {
+        text: loc(
+          'Investointi- ja korjaussuunnittelu',
+          'Investment and repair planning',
+          'Investerings- och reparationsplanering',
+        ),
+      },
+      {
+        text: loc(
+          'Tutkimus ja analytiikka',
+          'Research and analytics',
+          'Forskning och analys',
+        ),
+      },
     ],
   } satisfies SurveySortingQuestion,
 
   {
     type: 'grouped-checkbox',
     title: loc(
-      'Ryhmitelty monivalinta',
-      'Grouped checkbox',
-      'Grupperad kryssruta',
+      'Mitä Tievelhon käyttötapoja hyödynnätte?',
+      'Which Tievelho access methods do you use?',
+      'Vilka åtkomstmetoder i Tievelho använder du?',
     ),
     isRequired: false,
     answerLimits: { min: null, max: null },
     groups: [
       {
-        id: null as unknown as number, // assigned by DB on insert
-        name: loc('Ryhmä 1', 'Group 1', 'Grupp 1'),
+        id: null as unknown as number,
+        name: loc('Käyttöliittymä', 'User interface', 'Användargränssnitt'),
         options: [
           {
             text: loc(
-              'R1 – vaihtoehto A',
-              'G1 – option A',
-              'G1 – alternativ A',
+              'Selainpohjainen karttanäkymä',
+              'Browser-based map view',
+              'Webbläsarbaserad kartvy',
             ),
           },
           {
             text: loc(
-              'R1 – vaihtoehto B',
-              'G1 – option B',
-              'G1 – alternativ B',
+              'Hakutoiminnot ja suodattimet',
+              'Search and filter functions',
+              'Sök- och filterfunktioner',
             ),
           },
           {
             text: loc(
-              'R1 – vaihtoehto C',
-              'G1 – option C',
-              'G1 – alternativ C',
+              'Raporttien luonti käyttöliittymässä',
+              'Report generation in UI',
+              'Rapportgenerering i gränssnittet',
             ),
           },
         ],
       },
       {
-        id: null as unknown as number, // assigned by DB on insert
-        name: loc('Ryhmä 2', 'Group 2', 'Grupp 2'),
+        id: null as unknown as number,
+        name: loc(
+          'Rajapinnat ja lataukset',
+          'APIs and downloads',
+          'API:er och nedladdningar',
+        ),
         options: [
+          { text: loc('REST-rajapinta (API)', 'REST API', 'REST-API') },
           {
             text: loc(
-              'R2 – vaihtoehto A',
-              'G2 – option A',
-              'G2 – alternativ A',
+              'WFS/WMS-karttapalvelut',
+              'WFS/WMS map services',
+              'WFS/WMS-karttjänster',
             ),
           },
           {
             text: loc(
-              'R2 – vaihtoehto B',
-              'G2 – option B',
-              'G2 – alternativ B',
+              'Massalataukset (Extranet)',
+              'Bulk downloads (Extranet)',
+              'Massanedladdningar (Extranet)',
             ),
           },
           {
             text: loc(
-              'R2 – vaihtoehto C',
-              'G2 – option C',
-              'G2 – alternativ C',
+              'GeoPackage / Shapefile -vienti',
+              'GeoPackage / Shapefile export',
+              'GeoPackage / Shapefile-export',
             ),
           },
         ],
@@ -240,99 +330,236 @@ const page2Sections: SurveyPageSection[] = [
   } satisfies SurveyGroupedCheckboxQuestion,
 ];
 
-// Page 3 ─────────────────────────────────────────────────────────────────────
+// Page 3 – Tyytyväisyys palveluun ───────────────────────────────────────────
 const page3Sections: SurveyPageSection[] = [
   {
-    type: 'numeric',
-    title: loc(
-      'Numerokysymys (1–100)',
-      'Numeric question (1–100)',
-      'Numerisk fråga (1–100)',
-    ),
-    isRequired: false,
-    minValue: 1,
-    maxValue: 100,
-  } satisfies SurveyNumericQuestion,
-
-  {
     type: 'slider',
-    title: loc('Liukusäädin (0–10)', 'Slider (0–10)', 'Skjutreglage (0–10)'),
-    isRequired: false,
+    title: loc(
+      'Kuinka tyytyväinen olette Tievelhoon kokonaisuutena? (0 = erittäin tyytymätön, 10 = erittäin tyytyväinen)',
+      'How satisfied are you with Tievelho overall? (0 = very dissatisfied, 10 = very satisfied)',
+      'Hur nöjd är du med Tievelho totalt sett? (0 = mycket missnöjd, 10 = mycket nöjd)',
+    ),
+    isRequired: true,
     presentationType: 'numeric',
     minValue: 0,
     maxValue: 10,
-    minLabel: loc('Ei lainkaan', 'Not at all', 'Inte alls'),
-    maxLabel: loc('Erittäin paljon', 'Very much', 'Väldigt mycket'),
+    minLabel: loc(
+      'Erittäin tyytymätön',
+      'Very dissatisfied',
+      'Mycket missnöjd',
+    ),
+    maxLabel: loc('Erittäin tyytyväinen', 'Very satisfied', 'Mycket nöjd'),
   } satisfies SurveySliderQuestion,
-];
 
-// Page 4 ─────────────────────────────────────────────────────────────────────
-const page4Sections: SurveyPageSection[] = [
+  {
+    type: 'numeric',
+    title: loc(
+      'Kuinka monella projektilla tai urakka-alueella käytitte Tievelhoa viimeisen 12 kuukauden aikana?',
+      'On how many projects or contract areas did you use Tievelho in the past 12 months?',
+      'På hur många projekt eller kontraktsområden använde du Tievelho under de senaste 12 månaderna?',
+    ),
+    isRequired: false,
+    minValue: 0,
+    maxValue: 500,
+  } satisfies SurveyNumericQuestion,
+
   {
     type: 'matrix',
-    title: loc('Matriisikysymys', 'Matrix question', 'Matrisfråga'),
+    title: loc(
+      'Arvioikaa Tievelhon eri osa-alueet',
+      'Rate the following aspects of Tievelho',
+      'Betygsätt följande aspekter av Tievelho',
+    ),
     isRequired: false,
     allowEmptyAnswer: true,
     classes: [
-      loc('Täysin samaa mieltä', 'Strongly agree', 'Håller helt med'),
-      loc('Samaa mieltä', 'Agree', 'Håller med'),
-      loc('Eri mieltä', 'Disagree', 'Håller inte med'),
-      loc('Täysin eri mieltä', 'Strongly disagree', 'Håller inte alls med'),
+      loc('Erinomainen', 'Excellent', 'Utmärkt'),
+      loc('Hyvä', 'Good', 'Bra'),
+      loc('Tyydyttävä', 'Satisfactory', 'Tillfredsställande'),
+      loc('Heikko', 'Poor', 'Dålig'),
     ],
     subjects: [
-      loc('Väite 1', 'Statement 1', 'Påstående 1'),
-      loc('Väite 2', 'Statement 2', 'Påstående 2'),
-      loc('Väite 3', 'Statement 3', 'Påstående 3'),
+      loc('Tietojen ajantasaisuus', 'Data timeliness', 'Datans aktualitet'),
+      loc('Tietojen kattavuus', 'Data coverage', 'Datans täckning'),
+      loc('Tietojen tarkkuus', 'Data accuracy', 'Datans noggrannhet'),
+      loc(
+        'Käyttöliittymän helppokäyttöisyys',
+        'UI ease of use',
+        'Gränssnittets användarvänlighet',
+      ),
+      loc(
+        'Rajapintojen toimivuus',
+        'API reliability',
+        'API:ernas funktionalitet',
+      ),
+      loc(
+        'Dokumentaatio ja ohjeet',
+        'Documentation and guides',
+        'Dokumentation och guider',
+      ),
+      loc('Asiakastuki', 'Customer support', 'Kundsupport'),
     ],
   } satisfies SurveyMatrixQuestion,
+];
 
+// Page 4 – Kehittäminen ─────────────────────────────────────────────────────
+const page4Sections: SurveyPageSection[] = [
   {
     type: 'multi-matrix',
-    title: loc('Monivalintamatriisi', 'Multi-matrix', 'Flervals-matris'),
+    title: loc(
+      'Kuinka hyvin seuraavien aineistotyyppien tiedot vastaavat tarpeitanne?',
+      'How well do the following data types meet your needs?',
+      'Hur väl uppfyller följande datatyper dina behov?',
+    ),
     isRequired: false,
     allowEmptyAnswer: true,
     answerLimits: { min: null, max: null },
     classes: [
-      loc('Luokka A', 'Class A', 'Klass A'),
-      loc('Luokka B', 'Class B', 'Klass B'),
-      loc('Luokka C', 'Class C', 'Klass C'),
+      loc('Täysin riittävä', 'Fully sufficient', 'Fullt tillräcklig'),
+      loc('Pääosin riittävä', 'Mostly sufficient', 'Mestadels tillräcklig'),
+      loc(
+        'Osittain puutteellinen',
+        'Partially insufficient',
+        'Delvis otillräcklig',
+      ),
+      loc(
+        'Selvästi puutteellinen',
+        'Clearly insufficient',
+        'Tydligt otillräcklig',
+      ),
     ],
     subjects: [
-      loc('Aihe 1', 'Topic 1', 'Ämne 1'),
-      loc('Aihe 2', 'Topic 2', 'Ämne 2'),
+      loc(
+        'Päällysteen kuntotiedot',
+        'Pavement condition data',
+        'Beläggningsskicksdata',
+      ),
+      loc('Hoitohistoria', 'Maintenance history', 'Underhållshistorik'),
+      loc('Liikennemäärät', 'Traffic volumes', 'Trafikvolymer'),
+      loc('Siltatiedot', 'Bridge data', 'Brodata'),
+      loc(
+        'Geometria ja sijaintitieto',
+        'Geometry and location data',
+        'Geometri och positionsdata',
+      ),
     ],
   } satisfies SurveyMultiMatrixQuestion,
 
   {
+    type: 'radio-image',
+    title: loc(
+      'Minkä tyyppistä kehittämistä toivotte eniten Tievelhoon lähivuosina?',
+      'What type of development do you most wish to see in Tievelho in the coming years?',
+      'Vilken typ av utveckling önskar du mest för Tievelho de kommande åren?',
+    ),
+    isRequired: false,
+    allowCustomAnswer: false,
+    options: [
+      {
+        text: loc(
+          'Reaaliaikaisempi tieto',
+          'More real-time data',
+          'Mer realtidsdata',
+        ),
+        imageUrl: null,
+        altText: loc('Reaaliaikainen tieto', 'Real-time data', 'Realtidsdata'),
+        attributions: '',
+      },
+      {
+        text: loc('Parempi rajapinta (API)', 'Better API', 'Bättre API'),
+        imageUrl: null,
+        altText: loc('Rajapinta', 'API', 'API'),
+        attributions: '',
+      },
+      {
+        text: loc(
+          'Selkeämpi käyttöliittymä',
+          'Clearer user interface',
+          'Tydligare användargränssnitt',
+        ),
+        imageUrl: null,
+        altText: loc('Käyttöliittymä', 'User interface', 'Användargränssnitt'),
+        attributions: '',
+      },
+      {
+        text: loc(
+          'Laajempi aineistokattavuus',
+          'Broader data coverage',
+          'Bredare datatäckning',
+        ),
+        imageUrl: null,
+        altText: loc('Aineistokattavuus', 'Data coverage', 'Datatäckning'),
+        attributions: '',
+      },
+    ],
+  } satisfies SurveyRadioImageQuestion,
+
+  {
     type: 'budgeting',
     title: loc(
-      'Budjetointikysymys (1000 €)',
-      'Budgeting question (€1000)',
-      'Budgeteringsfråga (1000 €)',
+      'Kuvitelkaa, että teillä on 100 000 € käytettävissä Tievelhon kehittämiseen. Miten jakaisitte budjetin?',
+      'Imagine you have €100,000 to invest in developing Tievelho. How would you allocate the budget?',
+      'Föreställ dig att du har 100 000 € att investera i att utveckla Tievelho. Hur skulle du fördela budgeten?',
     ),
     isRequired: false,
     budgetingMode: 'direct',
-    totalBudget: 1000,
+    totalBudget: 100000,
     unit: '€',
     allocationDirection: 'decreasing' as BudgetAllocationDirection,
-    requireFullAllocation: false,
+    requireFullAllocation: true,
     inputMode: 'absolute',
     targets: [
-      { name: loc('Kohde A', 'Target A', 'Mål A'), price: 100 },
-      { name: loc('Kohde B', 'Target B', 'Mål B'), price: 200 },
-      { name: loc('Kohde C', 'Target C', 'Mål C'), price: 150 },
-      { name: loc('Kohde D', 'Target D', 'Mål D'), price: 50 },
+      {
+        name: loc(
+          'Tietojen laadun ja ajantasaisuuden parantaminen',
+          'Improving data quality and timeliness',
+          'Förbättring av datakvalitet och aktualitet',
+        ),
+        price: 1000,
+      },
+      {
+        name: loc(
+          'Rajapintojen kehittäminen (API, WFS)',
+          'API and WFS interface development',
+          'Utveckling av API och WFS',
+        ),
+        price: 1000,
+      },
+      {
+        name: loc(
+          'Käyttöliittymän uudistaminen',
+          'User interface renewal',
+          'Förnyelse av användargränssnittet',
+        ),
+        price: 1000,
+      },
+      {
+        name: loc(
+          'Dokumentaation ja koulutuksen parantaminen',
+          'Improving documentation and training',
+          'Förbättring av dokumentation och utbildning',
+        ),
+        price: 1000,
+      },
+      {
+        name: loc(
+          'Uusien aineistotyyppien lisääminen',
+          'Adding new data types',
+          'Lägga till nya datatyper',
+        ),
+        price: 1000,
+      },
     ],
   } satisfies SurveyBudgetingQuestion,
 ];
 
-// Page 5 ─────────────────────────────────────────────────────────────────────
+// Page 5 – Kartta ja avoin palaute ──────────────────────────────────────────
 const mapSubQuestion: SurveyFreeTextQuestion = {
   type: 'free-text',
   title: loc(
-    'Miksi valitsit tämän kohdan?',
-    'Why did you choose this location?',
-    'Varför valde du denna plats?',
+    'Kuvailkaa lyhyesti, miksi merkitsitte juuri tämän kohdan (esim. puuttuva tieto, virheellinen kunto)',
+    'Briefly describe why you marked this location (e.g. missing data, incorrect condition info)',
+    'Beskriv kort varför du markerade denna plats (t.ex. saknad data, felaktig skicksinformation)',
   ),
   isRequired: false,
 };
@@ -341,16 +568,16 @@ const page5Sections: SurveyPageSection[] = [
   {
     type: 'map',
     title: loc(
-      'Karttakysymys (piste, viiva, alue)',
-      'Map question (point, line, area)',
-      'Kartfråga (punkt, linje, yta)',
+      'Merkitkää kartalle tiejaksoja tai -kohteita, joissa Tievelhon aineisto on erityisen puutteellista tai virheellistä',
+      'Mark on the map any road sections or locations where Tievelho data is particularly incomplete or inaccurate',
+      'Markera på kartan vägavsnitt eller platser där Tievelho-data är särskilt ofullständig eller felaktig',
     ),
     isRequired: false,
-    selectionTypes: ['point', 'line', 'area'],
+    selectionTypes: ['point', 'line'],
     featureStyles: {
       point: { markerIcon: null },
-      line: { strokeStyle: 'solid', strokeColor: '#0055bb' },
-      area: { strokeStyle: 'solid', strokeColor: '#0055bb' },
+      line: { strokeStyle: 'solid', strokeColor: '#cc0000' },
+      area: { strokeStyle: 'solid', strokeColor: '#cc0000' },
     },
     subQuestions: [mapSubQuestion],
   } satisfies SurveyMapQuestion,
@@ -358,24 +585,50 @@ const page5Sections: SurveyPageSection[] = [
   {
     type: 'geo-budgeting',
     title: loc(
-      'Geo-budjetointikysymys (5 kpl)',
-      'Geo-budgeting question (5 pieces)',
-      'Geo-budgeteringsfråga (5 st)',
+      'Priorisoikaa ELY-alueet sen mukaan, kuinka tärkeää Tievelhon kattavuuden parantaminen on niillä (5 pistettä käytössä)',
+      'Prioritise ELY regions by how important it is to improve Tievelho coverage there (5 points to allocate)',
+      'Prioritera NTM-regioner efter hur viktigt det är att förbättra Tievelho-täckningen där (5 poäng att fördela)',
     ),
     isRequired: false,
     totalBudget: 5,
-    unit: 'kpl',
+    unit: 'pistettä',
     allocationDirection: 'decreasing' as BudgetAllocationDirection,
     targets: [
-      { name: loc('Geo-kohde A', 'Geo-target A', 'Geo-mål A') },
-      { name: loc('Geo-kohde B', 'Geo-target B', 'Geo-mål B') },
-      { name: loc('Geo-kohde C', 'Geo-target C', 'Geo-mål C') },
+      { name: loc('Uusimaa', 'Uusimaa', 'Nyland') },
+      { name: loc('Pirkanmaa', 'Pirkanmaa', 'Birkaland') },
+      {
+        name: loc(
+          'Pohjois-Pohjanmaa',
+          'Northern Ostrobothnia',
+          'Norra Österbotten',
+        ),
+      },
+      { name: loc('Pohjois-Savo', 'Northern Savo', 'Norra Savolax') },
+      { name: loc('Lappi', 'Lapland', 'Lappland') },
+      {
+        name: loc('Varsinais-Suomi', 'Southwest Finland', 'Egentliga Finland'),
+      },
     ],
   } satisfies SurveyGeoBudgetingQuestion,
 
   {
+    type: 'free-text',
+    title: loc(
+      'Vapaa palaute ja kehitysehdotukset',
+      'Open feedback and development suggestions',
+      'Öppen feedback och utvecklingsförslag',
+    ),
+    isRequired: false,
+    maxLength: 2000,
+  } satisfies SurveyFreeTextQuestion,
+
+  {
     type: 'attachment',
-    title: loc('Tiedostoliite', 'File attachment', 'Bilaga'),
+    title: loc(
+      'Halutessanne voitte liittää kuvakaappauksen tai muun liitteen (esim. virheilmoitus tai esimerkki puuttuvasta tiedosta)',
+      'You may optionally attach a screenshot or other file (e.g. an error message or example of missing data)',
+      'Du kan valfritt bifoga en skärmdump eller annan fil (t.ex. felmeddelande eller exempel på saknad data)',
+    ),
     isRequired: false,
     fileUrl: null,
   } satisfies SurveyAttachmentQuestion,
@@ -383,35 +636,35 @@ const page5Sections: SurveyPageSection[] = [
 
 const pages = [
   {
-    title: loc('Teksti ja tiedot', 'Text & info', 'Text och info'),
+    title: loc('Taustatiedot', 'Background', 'Bakgrundsinformation'),
     sidebarType: 'none' as const,
     sections: page1Sections,
   },
   {
-    title: loc('Valintakysymykset', 'Selection questions', 'Valfrågor'),
+    title: loc('Tievelhon käyttö', 'Tievelho usage', 'Användning av Tievelho'),
     sidebarType: 'none' as const,
     sections: page2Sections,
   },
   {
     title: loc(
-      'Numerot ja liukusäädin',
-      'Numeric & slider',
-      'Numeriska och skjutreglage',
+      'Tyytyväisyys palveluun',
+      'Service satisfaction',
+      'Nöjdhet med tjänsten',
     ),
     sidebarType: 'none' as const,
     sections: page3Sections,
   },
   {
     title: loc(
-      'Matriisi ja budjetointi',
-      'Matrix & budgeting',
-      'Matris och budgetering',
+      'Kehittämistoiveet',
+      'Development wishes',
+      'Önskemål om utveckling',
     ),
     sidebarType: 'none' as const,
     sections: page4Sections,
   },
   {
-    title: loc('Kartta ja liitteet', 'Map & attachments', 'Karta och bilagor'),
+    title: loc('Kartta ja palaute', 'Map & feedback', 'Karta och feedback'),
     sidebarType: 'map' as const,
     sections: page5Sections,
   },
@@ -594,18 +847,28 @@ async function main() {
       [
         SURVEY_NAME,
         JSON.stringify(
-          loc('Kaikki kysymystyypit', 'All question types', 'Alla frågetyper'),
-        ),
-        JSON.stringify(loc('Testikyselylomake', 'Test survey', 'Testenkät')),
-        JSON.stringify(
           loc(
-            'Tämä kyselylomake testaa kaikkia kysymystyyppejä.',
-            'This survey tests all question types.',
-            'Denna enkät testar alla frågetyper.',
+            'Tievelho-käyttäjäkysely 2025',
+            'Tievelho User Survey 2025',
+            'Tievelho användarundersökning 2025',
           ),
         ),
-        'Seed Script',
-        'Test Unit',
+        JSON.stringify(
+          loc(
+            'Väylävirasto kehittää tietopalvelujaan käyttäjiensä tarpeiden pohjalta',
+            'The Finnish Transport Infrastructure Agency develops its data services based on user needs',
+            'Trafikledsverket utvecklar sina datatjänster utifrån användarnas behov',
+          ),
+        ),
+        JSON.stringify(
+          loc(
+            'Tievelho on Väyläviraston ylläpitämä tietietopalvelu. Tämän kyselyn avulla kehitämme palvelua vastaamaan paremmin tarpeisiinne.',
+            "Tievelho is the Finnish Transport Infrastructure Agency's road data service. This survey helps us improve it to better meet your needs.",
+            'Tievelho är Trafikledsverkets vägdatatjänst. Denna enkät hjälper oss att förbättra den.',
+          ),
+        ),
+        'Väylävirasto',
+        'Tietopalvelut',
         ['fi', 'en', 'se'],
         USER_GROUP_ORG,
       ],
@@ -638,7 +901,7 @@ async function main() {
     );
 
     console.log('');
-    console.log('✓ Test survey created successfully');
+    console.log('✓ Tievelho demo survey created successfully');
     console.log(`  Survey ID   : ${survey.id}`);
     console.log(`  Survey name : ${SURVEY_NAME}`);
     console.log(`  Admin URL   : /admin/surveys/${survey.id}/submissions`);
