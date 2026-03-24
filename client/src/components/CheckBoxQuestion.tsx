@@ -114,8 +114,6 @@ export default function CheckBoxQuestion({
             }
             sx={{
               lineHeight: 1.2,
-              marginBottom: '0.5em',
-              marginTop: '0.5em',
             }}
           />
         ))}
