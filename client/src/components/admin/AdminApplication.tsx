@@ -16,6 +16,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Compose from '../Compose';
 import LanguageRouter from '../LanguageRouter';
 import AdminFrontPage from './AdminFrontPage';
+import { AdminMapPublications } from './AdminMapPublications';
 import EditSurvey from './EditSurvey';
 import { GeneralNotifications } from './GeneralNotification';
 import { ApiInstructions } from './Instructions/ApiDescription';
@@ -60,6 +61,9 @@ export default function AdminApplication() {
           </ProtectedRoute>
           <Route path="/tiedotteet">
             <GeneralNotifications />
+          </Route>
+          <Route path="/karttajulkaisut">
+            <AdminMapPublications />
           </Route>
           <Route path="/" exact>
             <AdminFrontPage />

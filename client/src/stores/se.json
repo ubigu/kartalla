@@ -84,6 +84,8 @@
     "editorsHelperText": "Användare som definieras förutom den ursprungliga skaparen av undersökningen, som kan se undersökningsinformation och redigera undersökningen.",
     "viewers": "Undersökningens tittare",
     "viewersHelperText": "Användare som kan se undersökningsinformation och svaren.",
+    "mapPublicationSelect": "Välj kartpublikation",
+    "mapPublicationSelectHelperText": "Välj en fördefinierad Oskari-kartpublikation eller ange kartpublikationens adress som skapats för din undersökning i fältet nedan.",
     "mapUrl": "Oskari-kartpubliceringens adress",
     "mapUrlError": "Misslyckades att hämta kartlager för den angivna adressen. Kontrollera adressen och försök igen.",
     "availableMapLayers": "Tillgängliga kartlager:",
@@ -699,13 +701,15 @@
   "AppBar": {
     "generalNotifications": "Meddelanden",
     "generalNotificationsNew": "Nya meddelanden",
-    "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden"
+    "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden",
+    "mapPublications": "Kartpublikationer"
   },
   "AppBarUserMenu": {
     "label": "Användarmeny",
     "logout": "Logga ut",
     "updateInstructions": "Uppdatera instruktioner",
-    "userManagement": "Användarhantering"
+    "userManagement": "Användarhantering",
+    "editMapPublications": "Redigera kartpublikationer"
   },
   "AppBarInstructionsMenu": {
     "label": "Instruktioner",
@@ -868,5 +872,21 @@
   },
   "LoadingBackdrop": {
     "copying": "Kopierar enkät"
+  },
+  "AdminMapPublications": {
+    "name": "Namn",
+    "url": "Oskari-kartpubliceringens adress",
+    "addNew": "Lägg till ny kartpublikation",
+    "publicationName": "Publikationsnamn",
+    "noLayersAvailable": "Inga kartlager tillgängliga på denna adress.",
+    "duplicateUrl": "Adressen används redan.",
+    "emptyState": "Inga kartpublikationer",
+    "deleteConfirm": "Är du säker på att du vill ta bort denna kartpublikation?",
+    "nameAndUrlRequired": "Namn och adress är obligatoriska.",
+    "createSuccess": "Kartpublikation skapad.",
+    "createFailed": "Det gick inte att skapa kartpublikationen.",
+    "deleteSuccess": "Kartpublikation borttagen.",
+    "deleteFailed": "Det gick inte att ta bort kartpublikationen.",
+    "fetchFailed": "Det gick inte att läsa in kartpublikationer."
   }
 }

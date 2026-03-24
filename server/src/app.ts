@@ -1,5 +1,5 @@
 import compression from 'compression';
-import express from 'express';
+import express, { type Express } from 'express';
 import helmet from 'helmet';
 import morgan, { compile } from 'morgan';
 import * as path from 'path';
@@ -11,7 +11,13 @@ import { initSecrets, secrets } from './keyVaultSecrets';
 import logger from './logger';
 import rootRouter from './routes';
 
-export async function createApp({ staticRoot }: { staticRoot?: string } = {}) {
+export async function createApp({
+  staticRoot,
+  configureAuthFn,
+}: {
+  staticRoot?: string;
+  configureAuthFn: (app: Express) => void | Promise<void>;
+}) {
   const resolvedStaticRoot = staticRoot ?? path.join(__dirname, '../static');
   const app = express();
 
@@ -59,13 +65,7 @@ export async function createApp({ staticRoot }: { staticRoot?: string } = {}) {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  if (process.env.AUTH_ENABLED === 'true') {
-    await configureAuth(app);
-    logger.info('Authentication configured');
-  } else {
-    await configureMockAuth(app);
-    logger.info('Authentication not enabled, using a mock user');
-  }
+  await configureAuthFn(app);
 
   // Use logging middleware for HTTP requests
   app.use(
@@ -199,7 +199,18 @@ async function start() {
   // Start up Puppeteer cluster for taking screenshots
   await initializePuppeteerCluster();
 
-  const app = await createApp();
+  const configureAuthFn =
+    process.env.AUTH_ENABLED === 'true'
+      ? (app: Express) => {
+          logger.info('Authentication configured');
+          return configureAuth(app);
+        }
+      : (app: Express) => {
+          logger.info('Authentication not enabled, using a mock user');
+          return configureMockAuth(app);
+        };
+
+  const app = await createApp({ configureAuthFn });
 
   app.listen(port, () => {
     logger.info(`Server listening to port ${port}`);

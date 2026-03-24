@@ -58,6 +58,11 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
+        {activeUserIsAdmin && (
+          <MenuItem onClick={() => history.push('/karttajulkaisut')}>
+            {tr.AppBarUserMenu.editMapPublications}
+          </MenuItem>
+        )}
         {(activeUserIsAdmin || activeUserIsSuperUser) && (
           <MenuItem
             onClick={() => {

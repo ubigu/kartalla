@@ -36,7 +36,10 @@ describe('no-cache headers on index.html routes', () => {
 
   beforeAll(async () => {
     const { createApp } = await import('./app.js');
-    app = await createApp({ staticRoot: mockStaticRoot });
+    app = await createApp({
+      staticRoot: mockStaticRoot,
+      configureAuthFn: vi.fn(),
+    });
   });
 
   it('sets Cache-Control: no-store on public route', async () => {
