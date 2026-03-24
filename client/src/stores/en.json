@@ -84,6 +84,8 @@
     "editorsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
     "viewers": "Survey viewers",
     "viewersHelperText": "Users who can view the survey and its answers.",
+    "mapPublicationSelect": "Select map publication",
+    "mapPublicationSelectHelperText": "Select a pre-defined Oskari map publication, or enter the map publication URL created for your survey in the field below.",
     "mapUrl": "URL for the Oskari map publication",
     "mapUrlError": "Failed to fetch map layers with given url. Check the url and try again later.",
     "availableMapLayers": "Available map layers:",
@@ -699,13 +701,15 @@
   "AppBar": {
     "generalNotifications": "Notifications",
     "generalNotificationsNew": "New notifications",
-    "generalNotificationsError": "Error while fetching general notifications"
+    "generalNotificationsError": "Error while fetching general notifications",
+    "mapPublications": "Map publications"
   },
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
     "updateInstructions": "Update user instructions",
-    "userManagement": "User management"
+    "userManagement": "User management",
+    "editMapPublications": "Edit map publications"
   },
   "AppBarInstructionsMenu": {
     "label": "Instructions",
@@ -868,5 +872,21 @@
   },
   "LoadingBackdrop": {
     "copying": "Copying survey"
+  },
+  "AdminMapPublications": {
+    "name": "Name",
+    "url": "Oskari map publication URL",
+    "addNew": "Add new map publication",
+    "publicationName": "Publication name",
+    "noLayersAvailable": "No layers available at this URL.",
+    "duplicateUrl": "Duplicate URL",
+    "emptyState": "No map publications yet",
+    "deleteConfirm": "Are you sure you want to delete this map publication?",
+    "nameAndUrlRequired": "Name and URL are required.",
+    "createSuccess": "Map publication created.",
+    "createFailed": "Failed to create map publication.",
+    "deleteSuccess": "Map publication deleted.",
+    "deleteFailed": "Failed to delete map publication.",
+    "fetchFailed": "Failed to load map publications."
   }
 }

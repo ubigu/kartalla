@@ -1,3 +1,4 @@
+import { MapPublication } from '@interfaces/mapPublications';
 import { User } from '@interfaces/user';
 import { UserGroup } from '@interfaces/userGroup';
 import {
@@ -18,6 +19,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { TagPicker } from '@src/components/admin/TagPicker';
+import { getMapPublications } from '@src/controllers/MapPublicationsController';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -60,6 +62,8 @@ export default function EditSurveyInfo(props: Props) {
   const [availableUserGroups, setAvailableUserGroups] = useState<UserGroup[]>(
     [],
   );
+  const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
+  const [mapPublicationsLoading, setMapPublicationsLoading] = useState(true);
 
   const {
     activeSurvey,
@@ -91,6 +95,20 @@ export default function EditSurveyInfo(props: Props) {
       }
     }
     refreshUserGroups();
+  }, []);
+
+  useEffect(() => {
+    async function fetchMapPublications() {
+      try {
+        const publications = await getMapPublications();
+        setMapPublications(publications);
+      } catch (error) {
+        // non-critical — fall back to manual URL entry
+      } finally {
+        setMapPublicationsLoading(false);
+      }
+    }
+    fetchMapPublications();
   }, []);
 
   const testSurveyUrl = useMemo(() => {
@@ -156,7 +174,6 @@ export default function EditSurveyInfo(props: Props) {
             })
           }
         />
-
         <RichTextEditor
           toolbarOptions={{
             options: ['inline', 'fontSize'],
@@ -225,21 +242,6 @@ export default function EditSurveyInfo(props: Props) {
             });
           }}
         />
-        <TextField
-          error={validationErrors.includes('survey.mapUrl')}
-          label={tr.EditSurveyInfo.mapUrl}
-          value={activeSurvey.mapUrl ?? ''}
-          onChange={(event) => {
-            editSurvey({
-              ...activeSurvey,
-              mapUrl: event.target.value,
-            });
-          }}
-          helperText={
-            validationErrors.includes('survey.mapUrl') &&
-            tr.EditSurveyInfo.mapUrlError
-          }
-        />
         <Autocomplete
           multiple
           filterSelectedOptions
@@ -273,7 +275,6 @@ export default function EditSurveyInfo(props: Props) {
             });
           }}
         />
-
         <Autocomplete
           multiple
           filterSelectedOptions
@@ -368,6 +369,47 @@ export default function EditSurveyInfo(props: Props) {
             });
           }}
         />
+        {mapPublicationsLoading ? (
+          <Skeleton variant="rectangular" height={40} />
+        ) : (
+          <Autocomplete
+            options={mapPublications}
+            getOptionLabel={(pub) => pub.name}
+            value={
+              mapPublications.find((pub) => pub.url === activeSurvey.mapUrl) ??
+              null
+            }
+            onChange={(_, value) => {
+              editSurvey({
+                ...activeSurvey,
+                mapUrl: value?.url ?? '',
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="standard"
+                label={tr.EditSurveyInfo.mapPublicationSelect}
+                helperText={tr.EditSurveyInfo.mapPublicationSelectHelperText}
+              />
+            )}
+          />
+        )}
+        <TextField
+          error={validationErrors.includes('survey.mapUrl')}
+          label={tr.EditSurveyInfo.mapUrl}
+          value={activeSurvey.mapUrl ?? ''}
+          onChange={(event) => {
+            editSurvey({
+              ...activeSurvey,
+              mapUrl: event.target.value,
+            });
+          }}
+          helperText={
+            validationErrors.includes('survey.mapUrl') &&
+            tr.EditSurveyInfo.mapUrlError
+          }
+        />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
         )}
@@ -392,7 +434,6 @@ export default function EditSurveyInfo(props: Props) {
           canEdit={props.canEdit}
         />
         <SurveyMarginImageList canEdit={props.canEdit} />
-
         <Box
           sx={{
             width: '220px',
@@ -452,7 +493,6 @@ export default function EditSurveyInfo(props: Props) {
             />
           </LocalizationProvider>
         </Box>
-
         <FormControlLabel
           control={
             <Checkbox
@@ -521,7 +561,6 @@ export default function EditSurveyInfo(props: Props) {
             {tr.EditSurveyInfo.allowTestSurveyHelperText}
           </FormHelperText>
         </div>
-
         {props.canEdit && (
           <div className={classes.actions}>
             <LoadingButton

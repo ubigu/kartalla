@@ -121,11 +121,44 @@ export async function configureAuth(app: Express) {
 }
 
 /**
+ * Sets up session-based auth for integration tests.
+ * Uses an in-memory session store and passport, and exposes a /test-login
+ * endpoint that establishes a real session for a given user.
+ */
+export function configureTestAuth(app: Express) {
+  const userStore = new Map<string, Express.User>();
+
+  passport.serializeUser((user: Express.User, done) => done(null, user.id));
+  passport.deserializeUser((id: string, done) =>
+    done(null, userStore.get(id) ?? null),
+  );
+
+  app.use(
+    expressSession({
+      secret: 'test-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  app.post('/test-login', (req, res, next) => {
+    const user = req.body as Express.User;
+    userStore.set(user.id, user);
+    req.login(user, (err) => {
+      if (err) return next(err);
+      res.status(200).end();
+    });
+  });
+}
+
+/**
  * Injects mock user to request when actual auth is not enabled
  */
 export async function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
-  const mockOrganization = ['test-group-id-2'];
+  const mockOrganization = ['test-group-id-1'];
   const mockUser: Express.User = {
     id: '12345-67890-abcde-fghij3',
     fullName: 'testiheppu',

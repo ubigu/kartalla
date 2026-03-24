@@ -13,6 +13,7 @@ import generalNotificationRouter from './generalNotification.routes';
 import userGroupRouter from './userGroup.routes';
 import keyVaultRouter from './keyvault.routes';
 import svgIconRouter from './svg-icon.routes';
+import mapPublicationsRouter from './map-publications.routes';
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use('/openapi', openApiRouter);
 router.use('/general-notifications', generalNotificationRouter);
 router.use('/user-groups', userGroupRouter);
 router.use('/keyvault', keyVaultRouter);
+router.use('/map-publications', mapPublicationsRouter);
 
 export default router;
