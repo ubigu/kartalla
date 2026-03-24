@@ -784,7 +784,14 @@
       },
       "yAxisTotalLabel": "Svarssammanställning",
       "yAxisLabel": "Svar"
-    }
+    },
+    "date": "Datum"
+  },
+  "SurveySubmissionsChart": {
+    "downloadData": "Ladda ner svar",
+    "option": "Alternativ",
+    "answerCount": "Antal svar",
+    "averageEuro": "Medelvärde (€)"
   },
   "UserManagement": {
     "name": "Namn",

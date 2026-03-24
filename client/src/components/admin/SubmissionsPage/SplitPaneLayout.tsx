@@ -11,7 +11,7 @@ import {
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@src/components/icons/CloseIcon';
-import { ComponentType, ReactNode, useState } from 'react';
+import { CSSProperties, ComponentType, ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
 
 const SplitPaneTyped = SplitPane as ComponentType<any>;
@@ -19,6 +19,7 @@ const SplitPaneTyped = SplitPane as ComponentType<any>;
 interface Props {
   mainPane: ReactNode;
   sidePane: ReactNode | false;
+  sidePaneStyle?: CSSProperties;
   mobileDrawer: {
     open: boolean;
     setOpen: (open: boolean) => void;
@@ -33,6 +34,7 @@ interface Props {
 export default function SplitPaneLayout({
   mainPane,
   sidePane,
+  sidePaneStyle,
   mobileDrawer,
   height,
 }: Props) {
@@ -72,7 +74,10 @@ export default function SplitPaneLayout({
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
-          pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
+          pane2Style={{
+            pointerEvents: isResizing ? 'none' : 'auto',
+            ...sidePaneStyle,
+          }}
           allowResize={false}
           onDragStarted={() => setIsResizing(true)}
           onDragFinished={() => setIsResizing(false)}

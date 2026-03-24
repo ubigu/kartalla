@@ -784,7 +784,14 @@
       },
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
-    }
+    },
+    "date": "Date"
+  },
+  "SurveySubmissionsChart": {
+    "downloadData": "Download answers",
+    "option": "Option",
+    "answerCount": "Answers",
+    "averageEuro": "Average (€)"
   },
   "UserManagement": {
     "name": "Name",

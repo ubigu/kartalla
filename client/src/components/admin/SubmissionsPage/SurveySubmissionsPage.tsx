@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
+import { AnswerTable } from './AnswerTable';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
@@ -33,6 +34,15 @@ import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
 import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
+
+const CHART_TYPES: SurveyQuestion['type'][] = [
+  'numeric',
+  'slider',
+  'radio',
+  'radio-image',
+  'checkbox',
+  'budgeting',
+];
 
 function answerEntryToItems(
   submission: Submission,
@@ -317,13 +327,19 @@ export default function SurveySubmissionsPage() {
             )}
           </Box>
         }
+        sidePaneStyle={{ overflowY: 'auto' }}
         sidePane={
-          <>
+          CHART_TYPES.includes(selectedQuestion?.type) ? (
             <Chart
               submissions={submissions}
               selectedQuestion={selectedQuestion}
             />
-
+          ) : selectedQuestion?.type === 'free-text' ? (
+            <AnswerTable
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+            />
+          ) : (
             <AnswerMap
               survey={survey}
               submissions={submissions}
@@ -336,7 +352,7 @@ export default function SurveySubmissionsPage() {
               surveyQuestions={surveyQuestions}
               questions={questions}
             />
-          </>
+          )
         }
         mobileDrawer={{
           open: mobileDrawerOpen,
