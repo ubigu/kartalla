@@ -1,5 +1,6 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
-import { Box, useTheme } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
+import { Download } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { FunctionComponent, useMemo, useState } from 'react';
 import {
@@ -70,7 +71,9 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   const minBuckets = 5;
 
   if (answersList[0].type === 'slider') {
-    return Array.from({ length: 11 }, (_, i) => i);
+    const min = range.min ?? 0;
+    const max = range.max ?? 10;
+    return Array.from({ length: max - min + 1 }, (_, i) => min + i);
   }
 
   // If range min/max are provided, use those. Otherwise find min/max values
@@ -122,7 +125,7 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
 }
 
 const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
-  const { x, y, payload } = props;
+  const { x, y, payload, rotate } = props;
   const tickValue =
     payload.value.length > 12
       ? payload.value.slice(0, 11) + '...'
@@ -133,9 +136,9 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
         x={0}
         y={0}
         dy={16}
-        textAnchor="end"
+        textAnchor={rotate ? 'end' : 'middle'}
         fill="#666"
-        transform="rotate(-35)"
+        {...(rotate && { transform: 'rotate(-35)' })}
       >
         {tickValue}
       </text>
@@ -144,11 +147,41 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
 };
 
 export default function Chart({ submissions, selectedQuestion }: Props) {
-  const [chartWidth, setChartWidth] = useState(240);
-  const { surveyLanguage } = useTranslations();
+  const [chartWidth, setChartWidth] = useState(380);
+  const { surveyLanguage, language } = useTranslations();
   const theme = useTheme();
   const { tr } = useTranslations();
   const [tooltip, setTooltip] = useState(null);
+
+  const secondColumnHeader: Partial<
+    Record<SurveyQuestion['type'], keyof typeof tr.SurveySubmissionsChart>
+  > = {
+    budgeting: 'averageEuro',
+  };
+
+  const downloadChartData = () => {
+    if (!answerData) return;
+
+    const secondColumnKey =
+      secondColumnHeader[selectedQuestion.type] ?? 'answerCount';
+    const csvRows = [
+      [
+        tr.SurveySubmissionsChart.option,
+        tr.SurveySubmissionsChart[secondColumnKey],
+      ],
+      ...answerData.options.map((option) => [option.text, option.count]),
+    ];
+
+    const csvContent = csvRows
+      .map((row) => row.map((cell) => `"${cell}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${selectedQuestion.title[language] ?? 'data'}.csv`;
+    link.click();
+  };
 
   const answerData = useMemo(() => {
     if (!selectedQuestion) return;
@@ -291,50 +324,70 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     const optionCount = base?.options.length;
     setChartWidth(
       optionCount <= 3
-        ? 220
-        : 220 + Math.min(760, Math.log2(optionCount - 2) * 180),
+        ? 380
+        : 380 + ((optionCount > 20 ? optionCount / 2 : optionCount) - 2) * 65,
     );
     return base;
   }, [selectedQuestion, surveyLanguage]);
 
-  return answerData ? (
-    <Box position={'relative'}>
-      <ResponsiveContainer
-        minWidth={250}
-        height={340}
-        style={{
-          backgroundColor: '#ffffffdd',
-          borderBottomRightRadius: '7px',
-          maxWidth: `${chartWidth}px`,
-        }}
+  if (!answerData) return null;
+
+  return (
+    <Box
+      sx={{
+        padding: '1rem',
+        width: `${chartWidth}px`,
+        minWidth: '550px',
+      }}
+    >
+      <Button
+        startIcon={<Download />}
+        size="small"
+        variant="contained"
+        onClick={downloadChartData}
+        sx={{ marginLeft: '60px', position: 'sticky', left: '60px' }}
       >
-        <BarChart
-          style={{ fontWeight: 600 }}
-          data={answerData.options}
-          margin={{
-            top: 25,
-            right: 30,
-            left: 20,
-            bottom: 60,
+        {tr.SurveySubmissionsChart.downloadData}
+      </Button>
+      <Box position="relative">
+        <ResponsiveContainer
+          minWidth={380}
+          height={700}
+          style={{
+            backgroundColor: '#ffffffdd',
+            borderBottomRightRadius: '7px',
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="text"
-            tick={<CustomizedAxisTick />}
-            interval={0}
-            onMouseEnter={(params) => setTooltip(params)}
-            onMouseLeave={() => setTooltip(null)}
-          />
-          <YAxis />
-          <Tooltip formatter={answerData.tooltipFormatter} />
+          <BarChart
+            style={{ fontWeight: 600 }}
+            data={answerData.options}
+            margin={{
+              top: 25,
+              right: 30,
+              left: 0,
+              bottom: 60,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="text"
+              tick={
+                <CustomizedAxisTick
+                  rotate={answerData.options.some((o) => o.text.length > 3)}
+                />
+              }
+              interval={0}
+              onMouseEnter={(params) => setTooltip(params)}
+              onMouseLeave={() => setTooltip(null)}
+            />
+            <YAxis allowDecimals={false} domain={[0, 'dataMax']} />
+            <Tooltip formatter={answerData.tooltipFormatter} />
 
-          <Bar dataKey="count" fill={theme.palette.primary.main} />
-        </BarChart>
-      </ResponsiveContainer>
-      <LabelTooltip tooltip={tooltip} />
+            <Bar dataKey="count" fill={theme.palette.primary.main} />
+          </BarChart>
+        </ResponsiveContainer>
+        <LabelTooltip tooltip={tooltip} />
+      </Box>
     </Box>
-  ) : (
-    <></>
   );
 }

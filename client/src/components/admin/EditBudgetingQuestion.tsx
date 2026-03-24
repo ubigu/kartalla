@@ -139,7 +139,7 @@ export default function EditBudgetingQuestion({ section, onChange }: Props) {
         />
       </RadioGroup>
       <RichTextEditor
-        value={section.helperText[surveyLanguage]}
+        value={section.helperText?.[surveyLanguage]}
         label={tr.BudgetingQuestion.helperText}
         onChange={(value) =>
           onChange({
