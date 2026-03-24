@@ -57,7 +57,13 @@ export default function AddSurveySectionActions(props: Props) {
   }>();
 
   const personalInfoDisabled = activeSurvey.pages.some((page) =>
-    page.sections.some((section) => section.type === 'personal-info'),
+    page.sections.some(
+      (section) =>
+        section.type === 'personal-info' ||
+        section.followUpSections?.some(
+          (followUp) => followUp.type === 'personal-info',
+        ),
+    ),
   );
 
   // Sequence for making each section ID unique before they're added to database

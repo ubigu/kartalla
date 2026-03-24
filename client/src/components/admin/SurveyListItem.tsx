@@ -38,8 +38,45 @@ import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
 
 const fadeTimeout = 350;
+const CARD_BORDER_RADIUS = '8px';
 
-const cardStyles = (theme: Theme, loading: boolean, published: boolean) => ({
+function BarberPoleBorder({ published }: { published: boolean }) {
+  return (
+    <Box
+      sx={{
+        alignSelf: 'stretch',
+        width: '8px',
+        borderRadius: CARD_BORDER_RADIUS,
+        margin: '6px',
+        border: '0.5px solid var rgba(233, 236, 239, 1))',
+        boxShadow: '1px 1px 2.5px 0px rgba(0, 0, 0, 0.23) inset',
+        ...(published
+          ? {
+              background: `repeating-linear-gradient(
+                -45deg,
+                ${theme.palette.primary.main},
+                ${theme.palette.primary.main} 32px,
+                ${theme.palette.primary.light} 32px,
+                ${theme.palette.primary.light} 64px
+              )`,
+              backgroundSize: '100% 90.5px',
+              '@keyframes barberPole': {
+                '0%': { backgroundPosition: '0 0' },
+                '100%': { backgroundPosition: '0 90.5px' },
+              },
+              animation: 'barberPole 3s linear infinite',
+            }
+          : {
+              backgroundColor: '#F6F8FA',
+            }),
+      }}
+    />
+  );
+}
+
+const cardStyles = (theme: Theme, loading: boolean) => ({
+  borderRadius: CARD_BORDER_RADIUS,
+  display: 'flex',
   width: '100%',
   '@keyframes pulse': {
     '0%': {
@@ -57,11 +94,8 @@ const cardStyles = (theme: Theme, loading: boolean, published: boolean) => ({
     pointerEvents: 'none',
     filter: 'grayscale(100%)',
   }),
-  ...(published && {
-    borderLeft: 'solid 5px',
-    borderLeftColor: theme.palette.primary.main,
-  }),
 });
+
 interface Props {
   survey: Survey;
   onArchive?: (surveyId: number) => void;
@@ -143,214 +177,224 @@ export default function SurveyListItem(props: Props) {
             : 'none',
       }}
     >
-      <Card sx={cardStyles(theme, loading, survey.isPublished)}>
-        <CardContent sx={{ paddingBottom: '8px' }}>
-          <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
-            {!survey.title?.[surveyLanguage] ? (
-              <em>{tr.SurveyList.untitledSurvey}</em>
-            ) : (
-              (survey?.title?.[surveyLanguage] ?? '')
-            )}
-          </Typography>
-          <Typography color="textSecondary" component="h4" gutterBottom>
-            {survey.subtitle?.[surveyLanguage]}
-          </Typography>
-          <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
-            {survey.tags.map((tag, i) => (
-              <Chip label={tag} key={i} />
-            ))}
-          </Box>
-          <Stack direction="row">
-            <div>
-              <LinkSmallIcon
-                color="primary"
-                fontSize="small"
-                sx={{ marginTop: 1, marginRight: 1 }}
-              />
-            </div>
-            {surveyUrl && (
-              <Typography variant="body1" color="textSecondary" gutterBottom>
-                <Link
-                  href={`${surveyUrl}${
-                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                  }`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {`${surveyUrl}${
-                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                  }`}
-                </Link>
-                <CopyToClipboard
-                  data={`${surveyUrl}${
-                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                  }`}
-                />
-              </Typography>
-            )}
-          </Stack>
-          <Stack direction="row">
-            <div>
-              <UserSmallIcon
-                color="primary"
-                fontSize="small"
-                sx={{ marginTop: 0, marginRight: 1 }}
-              />
-            </div>
-            <Typography
-              variant="body1"
-              fontSize="bigger"
-              color="textSecondary"
-              gutterBottom
-            >
-              {survey.author}
-              {survey.authorUnit && `, ${survey.authorUnit}`}
+      <Card sx={cardStyles(theme, loading)}>
+        <BarberPoleBorder published={survey.isPublished} />
+        <Box flex={1}>
+          <CardContent sx={{ paddingBottom: '8px' }}>
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
+              {!survey.title?.[surveyLanguage] ? (
+                <em>{tr.SurveyList.untitledSurvey}</em>
+              ) : (
+                (survey?.title?.[surveyLanguage] ?? '')
+              )}
             </Typography>
-          </Stack>
+            <Typography color="textSecondary" component="h4" gutterBottom>
+              {survey.subtitle?.[surveyLanguage]}
+            </Typography>
+            <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
+              {survey.tags.map((tag, i) => (
+                <Chip label={tag} key={i} />
+              ))}
+            </Box>
+            <Stack direction="row">
+              <div>
+                <LinkSmallIcon
+                  color="primary"
+                  fontSize="small"
+                  sx={{ marginTop: 1, marginRight: 1 }}
+                />
+              </div>
+              {surveyUrl && (
+                <Typography variant="body1" color="textSecondary" gutterBottom>
+                  <Link
+                    href={`${surveyUrl}${
+                      survey.localisationEnabled
+                        ? '?lang=' + surveyLanguage
+                        : ''
+                    }`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {`${surveyUrl}${
+                      survey.localisationEnabled
+                        ? '?lang=' + surveyLanguage
+                        : ''
+                    }`}
+                  </Link>
+                  <CopyToClipboard
+                    data={`${surveyUrl}${
+                      survey.localisationEnabled
+                        ? '?lang=' + surveyLanguage
+                        : ''
+                    }`}
+                  />
+                </Typography>
+              )}
+            </Stack>
+            <Stack direction="row">
+              <div>
+                <UserSmallIcon
+                  color="primary"
+                  fontSize="small"
+                  sx={{ marginTop: 0, marginRight: 1 }}
+                />
+              </div>
+              <Typography
+                variant="body1"
+                fontSize="bigger"
+                color="textSecondary"
+                gutterBottom
+              >
+                {survey.author}
+                {survey.authorUnit && `, ${survey.authorUnit}`}
+              </Typography>
+            </Stack>
 
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            {/* Scheduling info (start/end dates) */}
-            <CalendarSmallIcon
-              fontSize="small"
-              color="primary"
-              sx={{ marginRight: 1 }}
-            />
-            {survey.startDate && survey.endDate ? (
-              <Typography variant="body1" color="primary" gutterBottom>
-                {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
-                {format(survey.endDate, 'd.M.yyyy')}
-              </Typography>
-            ) : survey.startDate ? (
-              <Typography variant="body1" color="primary" gutterBottom>
-                {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
-              </Typography>
-            ) : null}
-            {/* Current publish status */}
-            {survey.isPublished ? (
-              <Typography
-                variant="published"
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              {/* Scheduling info (start/end dates) */}
+              <CalendarSmallIcon
+                fontSize="small"
                 color="primary"
-                style={{ paddingLeft: '0.5rem' }}
-              >
-                {' '}
-                - {tr.SurveyList.published}
-              </Typography>
-            ) : (
-              <Typography
-                variant="published"
-                color="primary"
-                style={{ paddingLeft: '0.5rem' }}
-              >
-                {' '}
-                - {tr.SurveyList.notPublished}
-              </Typography>
-            )}
-          </div>
-        </CardContent>
-        <CardActions
-          style={{
-            paddingTop: '0',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <Button
-            component={NavLink}
-            to={`${url}kyselyt/${survey.id}`}
-            disabled={disableUsersViewAccessToSurvey}
-          >
-            {!survey.isArchived &&
-            (activeUserIsSuperUser ||
-              activeUserIsAdmin ||
-              survey.editors.includes(activeUser?.id) ||
-              activeUser?.id === survey.authorId)
-              ? tr.SurveyList.editSurvey
-              : tr.SurveyList.viewSurvey}
-          </Button>
-          {/* Allow publish only if it isn't yet published, has a name, and is not archived */}
-          {!survey.isPublished && survey.name && !survey.isArchived && (
-            <Button
-              disabled={disableUsersWriteAccessToSurvey}
-              onClick={() => {
-                setPublishConfirmDialogOpen(true);
-              }}
-            >
-              {tr.SurveyList.publishNow}
-            </Button>
-          )}
-          {/* Allow unpublish when survey is published and is not archived */}
-          {survey.isPublished && !survey.isArchived && (
-            <Button
-              disabled={disableUsersWriteAccessToSurvey}
-              onClick={() => {
-                setUnpublishConfirmDialogOpen(true);
-              }}
-            >
-              {tr.SurveyList.unpublish}
-            </Button>
-          )}
-          <Button
-            disabled={disableUsersViewAccessToSurvey}
-            onClick={async () => {
-              props.onCopyStart?.();
-              const newSurveyId = await creteSurveyFromPrevious(survey.id);
-              if (!newSurveyId) return;
-              props.onCopyEnd?.();
-              window.open(`/admin/kyselyt/${newSurveyId}`);
+                sx={{ marginRight: 1 }}
+              />
+              {survey.startDate && survey.endDate ? (
+                <Typography variant="body1" color="primary" gutterBottom>
+                  {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
+                  {format(survey.endDate, 'd.M.yyyy')}
+                </Typography>
+              ) : survey.startDate ? (
+                <Typography variant="body1" color="primary" gutterBottom>
+                  {tr.SurveyList.openFrom}{' '}
+                  {format(survey.startDate, 'd.M.yyyy')}
+                </Typography>
+              ) : null}
+              {/* Current publish status */}
+              {survey.isPublished ? (
+                <Typography
+                  variant="published"
+                  color="primary"
+                  style={{ paddingLeft: '0.5rem' }}
+                >
+                  {' '}
+                  - {tr.SurveyList.published}
+                </Typography>
+              ) : (
+                <Typography
+                  variant="published"
+                  color="primary"
+                  style={{ paddingLeft: '0.5rem' }}
+                >
+                  {' '}
+                  - {tr.SurveyList.notPublished}
+                </Typography>
+              )}
+            </div>
+          </CardContent>
+          <CardActions
+            style={{
+              paddingTop: '0',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
             }}
           >
-            {' '}
-            {tr.SurveyList.copySurvey}{' '}
-          </Button>
-
-          {(activeUserIsSuperUser ||
-            activeUserIsAdmin ||
-            survey.editors.includes(activeUser?.id) ||
-            activeUser?.id === survey.authorId) && (
-            <LoadingButton
+            <Button
+              component={NavLink}
+              to={`${url}kyselyt/${survey.id}`}
+              disabled={disableUsersViewAccessToSurvey}
+            >
+              {!survey.isArchived &&
+              (activeUserIsSuperUser ||
+                activeUserIsAdmin ||
+                survey.editors.includes(activeUser?.id) ||
+                activeUser?.id === survey.authorId)
+                ? tr.SurveyList.editSurvey
+                : tr.SurveyList.viewSurvey}
+            </Button>
+            {/* Allow publish only if it isn't yet published, has a name, and is not archived */}
+            {!survey.isPublished && survey.name && !survey.isArchived && (
+              <Button
+                disabled={disableUsersWriteAccessToSurvey}
+                onClick={() => {
+                  setPublishConfirmDialogOpen(true);
+                }}
+              >
+                {tr.SurveyList.publishNow}
+              </Button>
+            )}
+            {/* Allow unpublish when survey is published and is not archived */}
+            {survey.isPublished && !survey.isArchived && (
+              <Button
+                disabled={disableUsersWriteAccessToSurvey}
+                onClick={() => {
+                  setUnpublishConfirmDialogOpen(true);
+                }}
+              >
+                {tr.SurveyList.unpublish}
+              </Button>
+            )}
+            <Button
+              disabled={disableUsersViewAccessToSurvey}
               onClick={async () => {
-                if (survey.isArchived) {
-                  try {
-                    await restoreSurvey(survey);
-                    setFadeLeft(true);
-
-                    setTimeout(() => {
-                      props.onRestore?.(survey.id);
-                      showToast({
-                        severity: 'success',
-                        message: tr.SurveyList.restoreSuccessful,
-                      });
-                    }, fadeTimeout);
-                  } catch (error) {
-                    showToast({
-                      severity: 'error',
-                      message: tr.SurveyList.restoreFailed,
-                    });
-                  }
-                } else {
-                  setArchiveConfirmDialogOpen(true);
-                }
+                props.onCopyStart?.();
+                const newSurveyId = await creteSurveyFromPrevious(survey.id);
+                if (!newSurveyId) return;
+                props.onCopyEnd?.();
+                window.open(`/admin/kyselyt/${newSurveyId}`);
               }}
             >
-              {survey.isArchived
-                ? tr.SurveyList.restore
-                : tr.SurveyList.archive}
-            </LoadingButton>
-          )}
-          <Button
-            disabled={
-              disableUsersViewAccessToSurvey || survey?.submissionCount === 0
-            }
-            component={NavLink}
-            style={{ marginLeft: 'auto' }}
-            variant="contained"
-            to={`vastaukset/${survey.id}`}
-          >
-            {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
-          </Button>
-        </CardActions>
+              {' '}
+              {tr.SurveyList.copySurvey}{' '}
+            </Button>
+
+            {(activeUserIsSuperUser ||
+              activeUserIsAdmin ||
+              survey.editors.includes(activeUser?.id) ||
+              activeUser?.id === survey.authorId) && (
+              <LoadingButton
+                onClick={async () => {
+                  if (survey.isArchived) {
+                    try {
+                      await restoreSurvey(survey);
+                      setFadeLeft(true);
+
+                      setTimeout(() => {
+                        props.onRestore?.(survey.id);
+                        showToast({
+                          severity: 'success',
+                          message: tr.SurveyList.restoreSuccessful,
+                        });
+                      }, fadeTimeout);
+                    } catch (error) {
+                      showToast({
+                        severity: 'error',
+                        message: tr.SurveyList.restoreFailed,
+                      });
+                    }
+                  } else {
+                    setArchiveConfirmDialogOpen(true);
+                  }
+                }}
+              >
+                {survey.isArchived
+                  ? tr.SurveyList.restore
+                  : tr.SurveyList.archive}
+              </LoadingButton>
+            )}
+            <Button
+              style={{ marginLeft: 'auto' }}
+              disabled={
+                disableUsersViewAccessToSurvey || survey?.submissionCount === 0
+              }
+              component={NavLink}
+              variant="contained"
+              to={`vastaukset/${survey.id}`}
+            >
+              {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
+            </Button>
+          </CardActions>
+        </Box>
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}

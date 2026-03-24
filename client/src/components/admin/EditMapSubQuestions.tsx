@@ -60,7 +60,7 @@ export default function EditMapSubQuestions(props: Props) {
                 {(provided, _snapshot) => (
                   <div ref={provided.innerRef} {...provided.draggableProps}>
                     <SurveySectionAccordion
-                      disableSectionCopying
+                      copyingSettings={{ copyingDisabled: true }}
                       index={index}
                       provided={provided}
                       key={index}

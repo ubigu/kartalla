@@ -71,6 +71,14 @@ export default function CheckBoxQuestion({
     setCustomAnswerValue(customValue ?? '');
   }, [value]);
 
+  function isOptionDisabled(optionValue: string | number) {
+    return (
+      question.answerLimits?.max != null &&
+      question.answerLimits.max === value.length &&
+      !value.includes(optionValue)
+    );
+  }
+
   return (
     <>
       {answerLimitText && (
@@ -100,6 +108,7 @@ export default function CheckBoxQuestion({
                 autoFocus={index === 0 && autoFocus}
                 // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
                 checked={value.includes(option.id)}
+                disabled={isOptionDisabled(option.id)}
                 onChange={(event) => {
                   setDirty(true);
                   const newValue = event.currentTarget.checked
@@ -114,8 +123,6 @@ export default function CheckBoxQuestion({
             }
             sx={{
               lineHeight: 1.2,
-              marginBottom: '0.5em',
-              marginTop: '0.5em',
             }}
           />
         ))}
@@ -124,6 +131,7 @@ export default function CheckBoxQuestion({
             control={
               <Checkbox
                 checked={value.includes(customAnswerValue)}
+                disabled={isOptionDisabled(customAnswerValue)}
                 onChange={(event) => {
                   const newValue = event.currentTarget.checked
                     ? // Add the custom answer to the array

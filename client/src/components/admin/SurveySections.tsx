@@ -1,5 +1,6 @@
 import { SurveyPage } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
 
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
@@ -16,6 +17,7 @@ interface Props {
 export default function SurveySections(props: Props) {
   const { editSection, deleteSection, moveSection, moveFollowUpSection } =
     useSurvey();
+  const { tr } = useTranslations();
 
   return (
     <DragDropContext
@@ -86,6 +88,16 @@ export default function SurveySections(props: Props) {
                           deleteSection(props.page.id, index);
                           // Reset expanded section to null
                           props.onExpandedSectionChange(null);
+                        }}
+                        copyingSettings={{
+                          copyingDisabled:
+                            section.type === 'personal-info' ||
+                            section.followUpSections?.some(
+                              (s) => s.type === 'personal-info',
+                            ),
+                          disabledTooltip:
+                            tr.SurveySections
+                              .personalInfoFollowUpDisablesCopying,
                         }}
                       />
                       {isFollowUpSectionParentType(section) && (
