@@ -118,7 +118,7 @@ export default function BudgetingQuestion({
 
   return (
     <>
-      <MarkdownView>{question.helperText[language]}</MarkdownView>
+      <MarkdownView>{question.helperText?.[language]}</MarkdownView>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, mt: 2 }}>
         <Stack alignItems="center" sx={{ minWidth: '80px' }}>
           <Typography variant="caption" color="text.secondary">
