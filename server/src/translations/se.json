@@ -27,5 +27,12 @@
     "amount": "Antal",
     "total": "Totalt",
     "perPiece": "st"
+  },
+  "MapQuestion": {
+    "annotation": "Anteckning",
+    "visibleLayers": "Synliga lager"
+  },
+  "GeoBudgetingQuestion": {
+    "summary": "Sammanfattning"
   }
 }

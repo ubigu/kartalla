@@ -27,5 +27,12 @@
     "amount": "Amount",
     "total": "Total",
     "perPiece": "pc"
+  },
+  "MapQuestion": {
+    "annotation": "Annotation",
+    "visibleLayers": "Visible layers"
+  },
+  "GeoBudgetingQuestion": {
+    "summary": "Summary"
   }
 }
