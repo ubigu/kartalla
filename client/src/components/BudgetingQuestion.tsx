@@ -258,7 +258,7 @@ export default function BudgetingQuestion({
                       role="cell"
                       sx={{
                         gridColumn: { xs: '1 / -1', sm: '2' },
-                        gridRow: { xs: 'auto', sm: index + 2 },
+                        gridRow: { xs: 'auto', sm: index * 2 + 2 },
                         py: 1,
                       }}
                     >
@@ -279,7 +279,7 @@ export default function BudgetingQuestion({
                       role="cell"
                       sx={{
                         gridColumn: { xs: '1', sm: '1' },
-                        gridRow: { xs: 'auto', sm: index + 2 },
+                        gridRow: { xs: 'auto', sm: index * 2 + 2 },
                         py: 1,
                         // Make the grid not squish the stepper (making buttons seem oval)
                         width: 'fit-content',
@@ -301,7 +301,7 @@ export default function BudgetingQuestion({
                       role="cell"
                       sx={{
                         gridColumn: { xs: '2', sm: '3' },
-                        gridRow: { xs: 'auto', sm: index + 2 },
+                        gridRow: { xs: 'auto', sm: index * 2 + 2 },
                         textAlign: 'right',
                         py: 1,
                       }}
@@ -316,6 +316,7 @@ export default function BudgetingQuestion({
                     <Box
                       sx={{
                         gridColumn: '1 / -1',
+                        gridRow: { xs: 'auto', sm: index * 2 + 3 },
                         height: '1px',
                         backgroundColor: theme.palette.divider,
                       }}
