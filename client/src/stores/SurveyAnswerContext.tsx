@@ -9,7 +9,11 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { request } from '@src/utils/request';
-import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
+import {
+  isFollowUpSectionParentType,
+  isString,
+  isSurveyQuestion,
+} from '@src/utils/typeCheck';
 import {
   Dispatch,
   ReactNode,
@@ -60,13 +64,6 @@ const stateDefaults: State = {
   survey: null,
   unfinishedToken: null,
 };
-
-// Section types that won't have an answer (e.g. text sections)
-export const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
-  'text',
-  'image',
-  'document',
-];
 
 /**
  * Context containing the state object and dispatch function.
@@ -566,7 +563,7 @@ export function useSurveyAnswers() {
           [],
         )
         // Skip sections that shouldn't get answers
-        .filter((section) => !nonQuestionSectionTypes.includes(section.type));
+        .filter((section) => isSurveyQuestion(section));
 
       dispatch({
         type: 'SET_ANSWERS',
@@ -590,10 +587,7 @@ export function useSurveyAnswers() {
     isPageValid(page: SurveyPage) {
       return !page.sections
         // Skip sections that shouldn't get answers
-        .filter(
-          (section): section is SurveyQuestion =>
-            !nonQuestionSectionTypes.includes(section.type),
-        )
+        .filter((section) => isSurveyQuestion(section))
         .some((section) => {
           const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
 
@@ -605,7 +599,7 @@ export function useSurveyAnswers() {
               .filter(
                 (sect): sect is SurveyQuestion & { conditions: Conditions } =>
                   displayedFollowUpIds.includes(sect.id) &&
-                  !nonQuestionSectionTypes.includes(sect.type),
+                  isSurveyQuestion(sect),
               )
               .some((s) => getValidationErrors(s).length);
           }
@@ -622,10 +616,7 @@ export function useSurveyAnswers() {
       return (
         page.sections
           // Skip sections that shouldn't get answers
-          .filter(
-            (section): section is SurveyQuestion =>
-              !nonQuestionSectionTypes.includes(section.type),
-          )
+          .filter<SurveyQuestion>((section) => isSurveyQuestion(section))
           .map((section) => ({
             [section.title[surveyLanguage]]: getValidationErrors(section),
           }))

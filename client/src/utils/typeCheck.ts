@@ -1,6 +1,7 @@
 import {
   SurveyFollowUpSectionParent,
   SurveyPageSection,
+  SurveyQuestion,
 } from '@interfaces/survey';
 
 export function assertNever(value: never): never {
@@ -15,6 +16,16 @@ export function isString(text: unknown): text is string {
 
 export function isNumeric(val: unknown): val is number {
   return val && !isNaN(Number(val)) && !isNaN(parseFloat(String(val)));
+}
+
+export function isSurveyQuestion(
+  section: SurveyPageSection,
+): section is SurveyQuestion {
+  return (
+    section.type !== 'text' &&
+    section.type !== 'image' &&
+    section.type !== 'document'
+  );
 }
 
 export function isFollowUpSectionParentType(
