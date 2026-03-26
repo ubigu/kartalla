@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { isPageNavigationDisabled } from './SurveyStepperUtils';
 
 describe('stepper page navigation for a page', () => {
