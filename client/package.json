@@ -65,7 +65,7 @@
     "react-router-dom": "^5.3.4",
     "react-split-pane": "^0.1.92",
     "recharts": "^2.15.3",
-    "redoc": "^2.5.0",
+    "redoc": "^2.5.2",
     "rehype-external-links": "^3.0.0",
     "rehype-format": "^5.0.1",
     "rehype-parse": "^9.0.1",
