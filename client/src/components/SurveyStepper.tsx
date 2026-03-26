@@ -508,7 +508,7 @@ export default function SurveyStepper({
                     ...stepButtonSx,
                     ...(pageNumber !== index &&
                       !directNavigationIsDisabled(index) &&
-                      availableStepButtonSx),
+                      availableStepButtonSx(theme)),
                   }}
                 >
                   <span style={visuallyHidden}>
