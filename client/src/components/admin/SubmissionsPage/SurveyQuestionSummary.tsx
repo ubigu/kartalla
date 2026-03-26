@@ -1,10 +1,8 @@
 import { SurveyQuestion } from '@interfaces/survey';
 import { Box, Typography } from '@mui/material';
-import {
-  nonQuestionSectionTypes,
-  useSurveyAnswers,
-} from '@src/stores/SurveyAnswerContext';
+import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { isSurveyQuestion } from '@src/utils/typeCheck';
 import { Dispatch, SetStateAction } from 'react';
 import { PageQuestionList } from './PageQuestionList';
 
@@ -31,9 +29,8 @@ export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {
             handleClick={(question: SurveyQuestion) =>
               setSelectedQuestion(question)
             }
-            questions={page.sections.filter(
-              (section): section is SurveyQuestion =>
-                !nonQuestionSectionTypes.includes(section.type),
+            questions={page.sections.filter<SurveyQuestion>((section) =>
+              isSurveyQuestion(section),
             )}
           />
         </Box>

@@ -529,12 +529,18 @@ function getContent(
                 style,
               },
               [
-                { text: 'Merkintä:', style: 'subQuestionTitle' },
+                {
+                  text: `${tr.MapQuestion.annotation}:`,
+                  style: 'subQuestionTitle',
+                },
                 {
                   text: `${index + 1}/${answerEntry.value.length}`,
                   style: 'subQuestionAnswer',
                 },
-                { text: 'Näkyvät tasot:', style: 'subQuestionTitle' },
+                {
+                  text: `${tr.MapQuestion.visibleLayers}:`,
+                  style: 'subQuestionTitle',
+                },
                 {
                   text: !screenshot.layerNames.length
                     ? '-'
@@ -682,7 +688,7 @@ function getContent(
 
       const summaryContent: Content[] = [
         {
-          text: 'Yhteenveto',
+          text: tr.GeoBudgetingQuestion.summary,
           style: 'subQuestionTitle',
           margin: [0, 0, 0, 5] as [number, number, number, number],
         },
@@ -697,7 +703,7 @@ function getContent(
               }) as Content,
           ),
         {
-          text: `Yhteensä: ${totalUsedBudget} / ${question.totalBudget} ${question.unit || ''}`,
+          text: `${tr.BudgetingQuestion.total}: ${totalUsedBudget} / ${question.totalBudget} ${question.unit || ''}`,
           style: 'subQuestionAnswer',
           bold: true,
           margin: [0, 5, 0, 10] as [number, number, number, number],
@@ -726,7 +732,7 @@ function getContent(
               },
               [
                 {
-                  text: `Merkintä: ${index + 1}/${answerEntry.value.length}`,
+                  text: `${tr.MapQuestion.annotation}: ${index + 1}/${answerEntry.value.length}`,
                   style: 'subQuestionAnswer',
                 } as Content,
                 {
@@ -734,7 +740,7 @@ function getContent(
                   style: 'subQuestionAnswer',
                 } as Content,
                 {
-                  text: 'Näkyvät tasot:',
+                  text: `${tr.MapQuestion.visibleLayers}:`,
                   style: 'subQuestionTitle',
                 } as Content,
                 {

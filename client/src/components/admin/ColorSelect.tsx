@@ -6,7 +6,7 @@ import ColorIndicator from './ColorIndicator';
 
 interface Props {
   label?: string;
-  value: string;
+  value: string | null;
   onChange: (color: string) => void;
 }
 
@@ -50,7 +50,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
         classes={{
           select: classes.select,
         }}
-        value={value}
+        value={value ?? ''}
         onChange={(event) => {
           onChange(event.target.value);
         }}

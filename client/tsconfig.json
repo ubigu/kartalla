@@ -18,6 +18,7 @@
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "types": ["vitest/globals"],
     "paths": {
       "@src/*": ["src/*"],
       "@interfaces/*": ["../interfaces/*"]

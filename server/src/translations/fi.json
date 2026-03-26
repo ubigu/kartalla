@@ -27,5 +27,12 @@
     "amount": "Määrä",
     "total": "Yhteensä",
     "perPiece": "kpl"
+  },
+  "MapQuestion": {
+    "annotation": "Merkintä",
+    "visibleLayers": "Näkyvät tasot"
+  },
+  "GeoBudgetingQuestion": {
+    "summary": "Yhteenveto"
   }
 }

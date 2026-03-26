@@ -112,11 +112,11 @@ interface Props {
  * @returns Draft.js editor state
  */
 export async function markdownToEditorState(
-  markdown: string,
+  markdown?: string,
 ): Promise<EditorState> {
   // Step 1: Markdown → HTML
   // Replace each newline with <br/> to preserve line breaks
-  const markdownWithBreaks = markdown.replace(/\n/g, '<br/>');
+  const markdownWithBreaks = markdown?.replace(/\n/g, '<br/>');
 
   const vFile = await remark()
     .use(remarkRehype, { allowDangerousHtml: true })

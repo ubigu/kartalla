@@ -15,15 +15,14 @@ import {
   Typography,
 } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
-import { AnswerTable } from './AnswerTable';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
-  nonQuestionSectionTypes,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
+import { isSurveyQuestion } from '@src/utils/typeCheck';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
@@ -31,6 +30,7 @@ import DataExport from '../DataExport';
 import DataPublish from '../DataPublish';
 import AnswerMap from './AnswerMap';
 import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
+import { AnswerTable } from './AnswerTable';
 import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
@@ -171,10 +171,7 @@ export default function SurveySubmissionsPage() {
     return survey.pages.reduce(
       (questions, page) => [
         ...questions,
-        ...page.sections.filter(
-          (section): section is SurveyQuestion =>
-            !nonQuestionSectionTypes.includes(section.type),
-        ),
+        ...page.sections.filter((section) => isSurveyQuestion(section)),
       ],
       [
         {

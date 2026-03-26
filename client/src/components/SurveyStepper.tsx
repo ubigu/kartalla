@@ -17,8 +17,8 @@ import {
   Link,
   Paper,
   Step,
+  StepButton,
   StepContent,
-  StepLabel,
   Stepper,
   Theme,
   Typography,
@@ -45,10 +45,32 @@ import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
+import { isPageNavigationDisabled } from './SurveyStepperUtils';
 import TextSection from './TextSection';
 
 // TODO split pane typings are broken since upgrade to TS v5.9.3, just skip the typings for now
 const SplitPaneTyped = SplitPane as ComponentType<any>;
+
+const stepButtonSx = {
+  '& .MuiStepLabel-label': {
+    fontWeight: 'bold',
+  },
+  '& .MuiStepLabel-label.Mui-active': { fontSize: '1.1rem' },
+};
+
+const availableStepButtonSx = (theme: Theme) => ({
+  '& .MuiStepIcon-root': {
+    overflow: 'visible',
+  },
+  '& .MuiStepIcon-root circle': {
+    fill: 'white',
+    stroke: theme.palette.primary.main,
+    strokeWidth: 2,
+  },
+  '& .MuiStepIcon-text': {
+    fill: theme.palette.primary.main,
+  },
+});
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -78,15 +100,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   section: {
     margin: '1rem 0',
   },
-  stepHeader: {
-    fontWeight: 'bold !important' as any,
-    color: '#22437b !important' as any,
-  },
   stepHeaderError: {
     color: 'red !important' as any,
-  },
-  stepActive: {
-    fontSize: '1.1rem',
   },
   stepIconUnfinised: {
     '& svg': {
@@ -148,6 +163,20 @@ export default function SurveyStepper({
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [visiblePages, setVisiblePages] = useState<number[]>(getVisiblePages());
+
+  const surveyHasConditionalPages = survey.pages.some(
+    (page) => Object.keys(page.conditions).length > 0,
+  );
+
+  function directNavigationIsDisabled(pageIndex: number) {
+    const previousPageErrors = survey.pages
+      .slice(0, pageIndex)
+      .map((page) => getPageInvalidQuestions(page));
+    return isPageNavigationDisabled(
+      surveyHasConditionalPages,
+      previousPageErrors,
+    );
+  }
 
   function getVisiblePages() {
     return survey.pages
@@ -424,7 +453,6 @@ export default function SurveyStepper({
     }
     return `${page.title?.[surveyLanguage]} (${tr.SurveyStepper.conditionalPage})`;
   }
-
   const stepperPane = (
     <>
       {survey.localisationEnabled &&
@@ -450,40 +478,48 @@ export default function SurveyStepper({
           activeStep={pageNumber}
           orientation="vertical"
           connector={null}
+          nonLinear={!surveyHasConditionalPages}
         >
           {survey.pages.map((page, index) => (
             <Step
               key={page.id}
               completed={index < pageNumber && visiblePages.includes(page.id)}
             >
-              <StepLabel
-                id={`${index}-page-top`}
-                aria-current={index === pageNumber ? 'step' : false}
-                classes={{
-                  active: classes.stepActive,
-                  label: classes.stepHeader,
+              <Typography
+                id={`${index}-page-heading`}
+                component="h2"
+                tabIndex={-1}
+                sx={{
+                  display: 'flex',
+                  margin: 0,
+                  fontSize: '1em',
+                  alignItems: 'center',
+                  '&:focus-visible, &:focus': { outline: 'none' },
+
+                  color: pageConditionsPassed(page) ? '#697586' : '',
                 }}
               >
-                <Typography
-                  id={`${index}-page-heading`}
-                  component="h2"
-                  tabIndex={-1}
+                <StepButton
+                  disabled={directNavigationIsDisabled(index)}
+                  onClick={() => setPageNumber(index)}
+                  id={`${index}-page-top`}
+                  aria-current={index === pageNumber ? 'step' : false}
                   sx={{
-                    margin: 0,
-                    fontSize: '1em',
-                    '&:focus': { outline: 'none' },
-                    color: pageConditionsPassed(page) ? '#697586' : '',
+                    ...stepButtonSx,
+                    ...(pageNumber !== index &&
+                      !directNavigationIsDisabled(index) &&
+                      availableStepButtonSx),
                   }}
                 >
                   <span style={visuallyHidden}>
                     {index < pageNumber && tr.SurveyStepper.completedStep}
-                    {index > pageNumber && tr.SurveyStepper.futureStep}
+                    {index > pageNumber && tr.SurveyStepper.futureStep}{' '}
                     {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf}{' '}
                     {survey?.pages?.length}
                   </span>
                   {getConditionalPageTitle(page)}
-                </Typography>
-              </StepLabel>
+                </StepButton>
+              </Typography>
 
               <StepContent
                 transitionDuration={0}
