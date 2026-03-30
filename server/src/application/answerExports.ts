@@ -684,10 +684,7 @@ async function answerEntriesToCSV(
     }
 
     const headerRow = Object.entries(personalInfo?.details ?? {})
-      .filter(
-        ([key, value]) =>
-          key !== 'isRequired' && key !== 'customLabel' && value,
-      )
+      .filter(([key, value]) => Object.keys(headerMap).includes(key) && value)
       .map(([key, _value]) => headerMap[key])
       .join(', ');
 
@@ -711,7 +708,10 @@ async function answerEntriesToCSV(
     };
 
     return Object.entries(personalInfo?.details ?? {})
-      .filter(([key, value]) => key !== 'isRequired' && value)
+      .filter(
+        ([key, value]) =>
+          Object.keys(personalInfoRowMap).includes(key) && value,
+      )
       .map(([key, _value]) => personalInfoRowMap[key])
       .join('');
   }
