@@ -445,12 +445,14 @@ async function answerEntriesToCSV(
   function getPersonalInfoRowValues(
     personalInfo?: SubmissionPersonalInfo | null,
   ) {
+    const q = (s: string | null | undefined) =>
+      `"${(s ?? '').replace(/"/g, '""')}"`;
     const personalInfoRowMap = {
-      askName: `,${personalInfo?.name}`,
-      askEmail: `,${personalInfo?.email}`,
-      askPhone: `,${personalInfo?.phone}`,
-      askAddress: `,${personalInfo?.address}`,
-      askCustom: `,${personalInfo?.custom}`,
+      askName: `,${q(personalInfo?.name)}`,
+      askEmail: `,${q(personalInfo?.email)}`,
+      askPhone: `,${q(personalInfo?.phone)}`,
+      askAddress: `,${q(personalInfo?.address)}`,
+      askCustom: `,${q(personalInfo?.custom)}`,
     };
 
     return Object.entries(personalInfo?.details ?? {})
