@@ -29,6 +29,15 @@ const translations = {
 export type Language = keyof typeof translations;
 
 /**
+ * Locale map for supported languages
+ */
+const localeMap: Record<Language, string> = {
+  fi: 'fi-FI',
+  en: 'en-GB',
+  se: 'sv-SE',
+};
+
+/**
  * Reducer state type
  */
 type State = {
@@ -115,6 +124,7 @@ export function useTranslations() {
       }, {} as LocalizedText);
     },
     languages: state.languages,
+    activeLanguageLocale: localeMap[state.language],
   };
 }
 
