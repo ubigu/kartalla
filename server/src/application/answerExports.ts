@@ -78,6 +78,10 @@ interface SectionHeader {
   questionIndex: number;
 }
 
+function parseToCSVText(str: string | null | undefined) {
+  return `"${(str ?? '').replace(/"/g, '""')}"`;
+}
+
 /** Get decrypted personal info question answers entries for the given survey id */
 export async function getPersonalInfosForSurvey(surveyId: number) {
   return getDb().manyOrNone<SubmissionPersonalInfo>(
@@ -632,7 +636,7 @@ function getValue(answer: AnswerEntry, answerType: string) {
     case 'numeric':
       return answer.valueNumeric;
     case 'free-text':
-      return answer.valueText.replace(/\r?\n/g, '').replace(/,/g, '');
+      return (answer.valueText ?? '').replace(/\r?\n/g, '');
   }
 }
 
@@ -699,11 +703,11 @@ async function answerEntriesToCSV(
     personalInfo?: SubmissionPersonalInfo | null,
   ) {
     const personalInfoRowMap = {
-      askName: `,${personalInfo?.name}`,
-      askEmail: `,${personalInfo?.email}`,
-      askPhone: `,${personalInfo?.phone}`,
-      askAddress: `,${personalInfo?.address}`,
-      askCustom: `,${personalInfo?.custom}`,
+      askName: `,${parseToCSVText(personalInfo?.name)}`,
+      askEmail: `,${parseToCSVText(personalInfo?.email)}`,
+      askPhone: `,${parseToCSVText(personalInfo?.phone)}`,
+      askAddress: `,${parseToCSVText(personalInfo?.address)}`,
+      askCustom: `,${parseToCSVText(personalInfo?.custom)}`,
     };
 
     return Object.entries(personalInfo?.details ?? {})
@@ -755,7 +759,7 @@ async function answerEntriesToCSV(
       headers.forEach((headerObj, _index) => {
         for (const [headerKey, _headerValue] of Object.entries(headerObj)) {
           csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
-            ? `,"${Object.values(submissions[i])[0][headerKey]}"`
+            ? `,${parseToCSVText(String(Object.values(submissions[i])[0][headerKey]))}`
             : ',';
         }
       });
