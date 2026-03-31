@@ -2499,7 +2499,7 @@ export async function getImages(
     SELECT 
       id, 
       details, 
-      ${getCompressed ? 'compressed_file AS file' : 'file'}, 
+      ${getCompressed ? 'COALESCE(CASE WHEN octet_length(compressed_file) <= 50 THEN NULL ELSE compressed_file END, file)  AS file' : 'file'},  
       url
     FROM data.files 
     WHERE url LIKE $1;
