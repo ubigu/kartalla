@@ -59,7 +59,7 @@ export function GeneralNotificationList({
   editing,
   editingEnabled,
 }: Props) {
-  const { tr } = useTranslations();
+  const { tr, activeLanguageLocale } = useTranslations();
   const theme = useTheme();
 
   if (loading) {
@@ -131,7 +131,10 @@ export function GeneralNotificationList({
                   <Typography color={'#c4c4c4'} fontSize={'14px'}>
                     {notification.publisher ??
                       tr.GeneralNotification.maintenance}
-                    , {new Date(notification.createdAt).toLocaleDateString()}
+                    ,{' '}
+                    {new Date(notification.createdAt).toLocaleDateString(
+                      activeLanguageLocale,
+                    )}
                   </Typography>
                 </Box>
               </AccordionSummary>
