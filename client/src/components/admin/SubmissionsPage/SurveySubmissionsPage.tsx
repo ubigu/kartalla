@@ -44,6 +44,10 @@ const CHART_TYPES: SurveyQuestion['type'][] = [
   'budgeting',
 ];
 
+const MAP_TYPES: SurveyQuestion['type'][] = ['map'];
+
+const DEFAULT_VIEW_SECTION_ID = 0;
+
 function answerEntryToItems(
   submission: Submission,
   entry: AnswerEntry,
@@ -175,7 +179,7 @@ export default function SurveySubmissionsPage() {
       ],
       [
         {
-          id: 0,
+          id: DEFAULT_VIEW_SECTION_ID,
           title: { [surveyLanguage]: tr.SurveySubmissionsPage.summary },
         },
       ] as SurveyQuestion[],
@@ -214,6 +218,40 @@ export default function SurveySubmissionsPage() {
             !isAnswerEmpty(selectedQuestion, answer.entry.value),
         );
   }, [allAnswers, selectedQuestion]);
+
+  function renderSidePane() {
+    if (CHART_TYPES.includes(selectedQuestion?.type)) {
+      return (
+        <Chart submissions={submissions} selectedQuestion={selectedQuestion} />
+      );
+    }
+    if (selectedQuestion?.type === 'free-text') {
+      return (
+        <AnswerTable
+          submissions={submissions}
+          selectedQuestion={selectedQuestion}
+        />
+      );
+    }
+    if (
+      MAP_TYPES.includes(selectedQuestion?.type) ||
+      selectedQuestion?.id === DEFAULT_VIEW_SECTION_ID
+    ) {
+      return (
+        <AnswerMap
+          survey={survey}
+          submissions={submissions}
+          selectedQuestion={selectedQuestion}
+          onAnswerClick={(answer) => setSelectedAnswer(answer)}
+          onSelectQuestion={(question) => setSelectedQuestion(question)}
+          selectedAnswer={selectedAnswer}
+          surveyQuestions={surveyQuestions}
+          questions={questions}
+        />
+      );
+    }
+    return false as const;
+  }
 
   return loading ? (
     <Box
@@ -282,7 +320,8 @@ export default function SurveySubmissionsPage() {
               </Select>
             </FormControl>
 
-            {selectedQuestion?.id === 0 ? (
+            {!selectedQuestion ||
+            selectedQuestion.id === DEFAULT_VIEW_SECTION_ID ? (
               <>
                 <Typography sx={{ fontWeight: 500, fontSize: '14px' }}>
                   {tr.SurveySubmissionsPage.answerCount.replace(
@@ -325,32 +364,7 @@ export default function SurveySubmissionsPage() {
           </Box>
         }
         sidePaneStyle={{ overflowY: 'auto' }}
-        sidePane={
-          CHART_TYPES.includes(selectedQuestion?.type) ? (
-            <Chart
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-            />
-          ) : selectedQuestion?.type === 'free-text' ? (
-            <AnswerTable
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-            />
-          ) : (
-            <AnswerMap
-              survey={survey}
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-              onAnswerClick={(answer) => {
-                setSelectedAnswer(answer);
-              }}
-              onSelectQuestion={(question) => setSelectedQuestion(question)}
-              selectedAnswer={selectedAnswer}
-              surveyQuestions={surveyQuestions}
-              questions={questions}
-            />
-          )
-        }
+        sidePane={renderSidePane()}
         mobileDrawer={{
           open: mobileDrawerOpen,
           setOpen: (open) => {
