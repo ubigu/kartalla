@@ -12,7 +12,7 @@ jobs:
         working-directory: client
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22.22.0'
       - name: Install dependencies
@@ -28,7 +28,7 @@ jobs:
         working-directory: server
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22.22.0'
       - name: Install dependencies
@@ -46,7 +46,7 @@ jobs:
         working-directory: e2e
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22.22.0'
           cache: 'npm'
@@ -55,7 +55,7 @@ jobs:
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "version=$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -78,7 +78,7 @@ jobs:
         if: failure()
       # Execute the E2E tests
       - run: npm test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
