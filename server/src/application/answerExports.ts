@@ -670,28 +670,48 @@ async function answerEntriesToCSV(
 ): Promise<string> {
   let csvData: string;
 
+  const personalInfoColumns: {
+    key: string;
+    header: (info: SubmissionPersonalInfo) => string;
+    value: (info: SubmissionPersonalInfo) => string;
+  }[] = [
+    {
+      key: 'askName',
+      header: () => 'Vastaajan nimi',
+      value: (info) => `,${parseToCSVText(info.name)}`,
+    },
+    {
+      key: 'askEmail',
+      header: () => 'Vastaajan sähköposti',
+      value: (info) => `,${parseToCSVText(info.email)}`,
+    },
+    {
+      key: 'askPhone',
+      header: () => 'Vastaajan puhelinnumero',
+      value: (info) => `,${parseToCSVText(info.phone)}`,
+    },
+    {
+      key: 'askAddress',
+      header: () => 'Vastaajan osoite',
+      value: (info) => `,${parseToCSVText(info.address)}`,
+    },
+    {
+      key: 'askCustom',
+      header: (info) => info.details?.customLabel?.['fi'] ?? '',
+      value: (info) => `,${parseToCSVText(info.custom)}`,
+    },
+  ];
+
+  function getActiveColumns(personalInfo: SubmissionPersonalInfo) {
+    return personalInfoColumns.filter((col) => personalInfo.details?.[col.key]);
+  }
+
   function getPersonalInfoHeaders(personalInfo: SubmissionPersonalInfo | null) {
-    const headerMap = {
-      askName: 'Vastaajan nimi',
-      askEmail: 'Vastaajan sähköposti',
-      askPhone: 'Vastaajan puhelinnumero',
-      askAddress: 'Vastaajan osoite',
-      askCustom: personalInfo?.details?.customLabel?.['fi'],
-    };
-
-    if (!personalInfo) {
-      return '';
-    }
-
-    const headerRow = Object.entries(personalInfo?.details ?? {})
-      .filter(([key, value]) => Object.keys(headerMap).includes(key) && value)
-      .map(([key, _value]) => headerMap[key])
+    if (!personalInfo) return '';
+    const headerRow = getActiveColumns(personalInfo)
+      .map((col) => col.header(personalInfo))
       .join(', ');
-
-    if (headerRow.length > 0) {
-      return `,${headerRow}`;
-    }
-    return '';
+    return headerRow.length > 0 ? `,${headerRow}` : '';
   }
 
   const personalInfoHeaders = getPersonalInfoHeaders(personalInfoRows?.[0]);
@@ -699,20 +719,9 @@ async function answerEntriesToCSV(
   function getPersonalInfoRowValues(
     personalInfo?: SubmissionPersonalInfo | null,
   ) {
-    const personalInfoRowMap = {
-      askName: `,${parseToCSVText(personalInfo?.name)}`,
-      askEmail: `,${parseToCSVText(personalInfo?.email)}`,
-      askPhone: `,${parseToCSVText(personalInfo?.phone)}`,
-      askAddress: `,${parseToCSVText(personalInfo?.address)}`,
-      askCustom: `,${parseToCSVText(personalInfo?.custom)}`,
-    };
-
-    return Object.entries(personalInfo?.details ?? {})
-      .filter(
-        ([key, value]) =>
-          Object.keys(personalInfoRowMap).includes(key) && value,
-      )
-      .map(([key, _value]) => personalInfoRowMap[key])
+    if (!personalInfo) return '';
+    return getActiveColumns(personalInfo)
+      .map((col) => col.value(personalInfo))
       .join('');
   }
 
