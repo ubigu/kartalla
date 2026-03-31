@@ -201,21 +201,46 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
       case 'checkbox':
         base = {
           id: selectedQuestion.id,
-          options: selectedQuestion.options.map((option) => {
-            return {
-              id: option.id,
-              text: option.text[surveyLanguage],
-              count: questionAnswers.reduce(
-                (count, qa: AnswerEntry & { type: 'checkbox' | 'radio' }) => {
-                  return qa.value === option.id ||
-                    (Array.isArray(qa.value) && qa.value.includes(option.id))
-                    ? count + 1
-                    : count;
-                },
-                0,
-              ),
-            };
-          }),
+          options: [
+            ...selectedQuestion.options.map((option) => {
+              return {
+                id: option.id,
+                text: option.text[surveyLanguage],
+                count: questionAnswers.reduce(
+                  (count, qa: AnswerEntry & { type: 'checkbox' | 'radio' }) => {
+                    return qa.value === option.id ||
+                      (Array.isArray(qa.value) && qa.value.includes(option.id))
+                      ? count + 1
+                      : count;
+                  },
+                  0,
+                ),
+              };
+            }),
+            ...(selectedQuestion.allowCustomAnswer
+              ? [
+                  {
+                    id: -1,
+                    text: tr.SurveyQuestion.customAnswer,
+                    count: questionAnswers.reduce(
+                      (
+                        count,
+                        qa: AnswerEntry & { type: 'checkbox' | 'radio' },
+                      ) => {
+                        return Array.isArray(qa.value)
+                          ? qa.value.some((v) => typeof v === 'string')
+                            ? count + 1
+                            : count
+                          : typeof qa.value === 'string'
+                            ? count + 1
+                            : count;
+                      },
+                      0,
+                    ),
+                  },
+                ]
+              : []),
+          ],
           tooltipFormatter: (value) => [
             value,
             tr.SurveySubmissionsPage.dataChart.tooltipCurrent,
