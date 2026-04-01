@@ -160,7 +160,10 @@ export async function createApp({
     if (process.env.SHOW_LOGIN_PAGE) {
       res.sendFile(path.join(resolvedStaticRoot, 'login.html'));
     } else {
-      res.redirect('/login/v1');
+      const redirectParam = req.query.redirect
+        ? `?redirect=${req.query.redirect}`
+        : '';
+      res.redirect(`/login/v1${redirectParam}`);
     }
   });
 
