@@ -157,7 +157,11 @@ export async function createApp({
     if (req.isAuthenticated()) {
       return res.redirect('/admin');
     }
-    res.sendFile(path.join(resolvedStaticRoot, 'login.html'));
+    if (process.env.SHOW_LOGIN_PAGE) {
+      res.sendFile(path.join(resolvedStaticRoot, 'login.html'));
+    } else {
+      res.redirect('/login/v1');
+    }
   });
 
   // Serve frontend files from remaining URLs
