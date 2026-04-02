@@ -14,6 +14,7 @@ import { useState } from 'react';
 
 interface Props {
   open: boolean;
+  loading: boolean;
   onCancel: () => void;
   onSubmit: (info: SubmissionInfo) => void;
   emailRequired: boolean;
@@ -27,6 +28,7 @@ const useStyles = makeStyles({
 
 export default function SubmissionInfoDialog({
   open,
+  loading,
   onCancel,
   onSubmit,
   emailRequired,
@@ -83,7 +85,7 @@ export default function SubmissionInfoDialog({
       <DialogActions>
         <Button onClick={onCancel}>{tr.commands.cancel}</Button>
         <Button
-          disabled={!emailValid}
+          disabled={!emailValid || loading}
           variant="contained"
           onClick={() => {
             onSubmit({ email });
