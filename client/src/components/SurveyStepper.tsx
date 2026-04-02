@@ -966,6 +966,7 @@ export default function SurveyStepper({
       <SubmissionInfoDialog
         emailRequired={survey.email.required}
         open={submissionInfoDialogOpen}
+        loading={loading}
         onCancel={() => {
           setSubmissionInfoDialogOpen(false);
         }}
