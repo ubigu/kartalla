@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyRadioImageQuestion } from '@interfaces/survey';
 import {
   Box,

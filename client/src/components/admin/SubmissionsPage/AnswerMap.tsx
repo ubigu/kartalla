@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   AnswerEntry,
   GeoBudgetingAnswer,
@@ -25,8 +26,7 @@ interface BaseAnswerFeatureProperties {
 /**
  * Additional properties specific to geo-budgeting answer features
  */
-interface GeoBudgetingAnswerFeatureProperties
-  extends BaseAnswerFeatureProperties {
+interface GeoBudgetingAnswerFeatureProperties extends BaseAnswerFeatureProperties {
   targetIndex: number;
   targetIcon: string | undefined;
 }
@@ -44,7 +44,7 @@ interface Props {
   selectedQuestion: SurveyQuestion;
   onSelectQuestion: (question: SurveyQuestion) => void;
   onAnswerClick: (answer: AnswerSelection) => void;
-  selectedAnswer: AnswerSelection;
+  selectedAnswer: AnswerSelection | null;
   surveyQuestions: SurveyQuestion[];
   questions: SurveyQuestion[];
 }

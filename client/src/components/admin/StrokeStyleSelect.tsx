@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FeatureStrokeStyle } from '@interfaces/survey';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';

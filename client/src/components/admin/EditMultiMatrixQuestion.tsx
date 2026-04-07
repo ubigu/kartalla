@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { LocalizedText, SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
   Checkbox,

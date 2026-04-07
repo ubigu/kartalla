@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SettingsIcon from '@src/components/icons/SettingsIcon';

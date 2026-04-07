@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyImageSection } from '@interfaces/survey';
 import { TextField } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';

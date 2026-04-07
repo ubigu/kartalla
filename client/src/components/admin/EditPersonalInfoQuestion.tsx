@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPersonalInfoQuestion } from '@interfaces/survey';
 import { Check } from '@mui/icons-material';
 import {

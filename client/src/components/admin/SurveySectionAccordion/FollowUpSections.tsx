@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPage, SurveyPageSection } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useState } from 'react';

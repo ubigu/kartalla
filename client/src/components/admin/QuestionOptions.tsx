@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { LocalizedText, SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 

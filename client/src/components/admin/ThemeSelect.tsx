@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyTheme } from '@interfaces/survey';
 import {
   FormControl,

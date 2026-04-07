@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Survey } from '@interfaces/survey';
 import { Box, CircularProgress } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';

@@ -24,8 +24,8 @@ interface Props {
     open: boolean;
     setOpen: (open: boolean) => void;
     chipProps: ChipProps;
-    title: string;
-    helperText: string;
+    title: string | null;
+    helperText: string | null;
   };
   defaultSize?: string;
   height?: string;

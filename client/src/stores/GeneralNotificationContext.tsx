@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { request } from '@src/utils/request';
 import {
   createContext,

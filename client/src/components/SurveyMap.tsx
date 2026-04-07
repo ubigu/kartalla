@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Check, Edit } from '@mui/icons-material';
 import { Box, CircularProgress, Fab, Tooltip } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';

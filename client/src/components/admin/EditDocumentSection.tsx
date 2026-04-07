@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyDocumentSection } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
 

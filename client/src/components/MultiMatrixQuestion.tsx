@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
   Checkbox,

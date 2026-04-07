@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { BudgetTarget, SurveyBudgetingQuestion } from '@interfaces/survey';
 import {
   Box,

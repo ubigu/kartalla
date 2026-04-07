@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPage } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';

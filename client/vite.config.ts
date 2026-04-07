@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import react from '@vitejs/plugin-react';
 import 'dotenv/config';
 import { resolve } from 'path';

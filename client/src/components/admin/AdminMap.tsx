@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPage } from '@interfaces/survey';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import OskariRPC from 'oskari-rpc';

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Alert, AlertProps, IconButton, Snackbar } from '@mui/material';
 import CloseIcon from '@src/components/icons/CloseIcon';
 import {

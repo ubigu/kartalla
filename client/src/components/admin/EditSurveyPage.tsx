@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
 import {
   Box,

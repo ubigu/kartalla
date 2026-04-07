@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "outDir": "./dist/",
@@ -20,9 +20,13 @@
     "noUnusedParameters": true,
     "types": ["vitest/globals"],
     "paths": {
-      "@src/*": ["src/*"],
+      "@src/*": ["./src/*"],
       "@interfaces/*": ["../interfaces/*"]
     },
-    "baseUrl": "."
+    "plugins": [
+      {
+        "name": "typescript-strict-plugin"
+      }
+    ]
   }
 }

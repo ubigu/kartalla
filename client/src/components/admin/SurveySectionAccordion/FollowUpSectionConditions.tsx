@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { FormGroup, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';

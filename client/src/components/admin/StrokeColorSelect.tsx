@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { MapStrokeColor } from '@interfaces/survey';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { makeStyles } from '@mui/styles';

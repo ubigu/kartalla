@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   AnswerEntry,
   Conditions,
@@ -27,8 +28,8 @@ import { useTranslations } from './TranslationContext';
 
 interface State {
   answers: AnswerEntry[];
-  survey: Survey;
-  unfinishedToken: string;
+  survey: Survey | null;
+  unfinishedToken: string | null;
 }
 
 type Action =
@@ -68,7 +69,7 @@ const stateDefaults: State = {
 /**
  * Context containing the state object and dispatch function.
  */
-export const SurveyAnswerContext = createContext<Context>(null);
+export const SurveyAnswerContext = createContext<Context | null>(null);
 
 export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
   switch (section.type) {
@@ -533,7 +534,7 @@ export function useSurveyAnswers() {
      * Initializes empty answers for given survey
      * @param survey
      */
-    setSurvey(survey: Survey) {
+    setSurvey(survey: Survey | null) {
       if (!survey) {
         dispatch({ type: 'SET_SURVEY', survey });
         dispatch({ type: 'SET_ANSWERS', answers: [] });

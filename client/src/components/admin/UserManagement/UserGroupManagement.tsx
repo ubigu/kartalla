@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { UserGroup } from '@interfaces/userGroup';
 import {
   Box,

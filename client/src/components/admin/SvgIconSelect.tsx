@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { MapMarkerIcon, SvgIcon } from '@interfaces/survey';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {

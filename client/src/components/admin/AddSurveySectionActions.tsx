@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';

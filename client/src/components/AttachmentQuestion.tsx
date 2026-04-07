@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FileAnswer, SurveyAttachmentQuestion } from '@interfaces/survey';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, Typography } from '@mui/material';

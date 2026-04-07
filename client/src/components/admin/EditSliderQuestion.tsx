@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveySliderQuestion } from '@interfaces/survey';
 import {
   Checkbox,
