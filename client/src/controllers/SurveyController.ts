@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { CredentialsEntry } from '@interfaces/submission';
 import { Survey } from '@interfaces/survey';
 import { request } from '@src/utils/request';

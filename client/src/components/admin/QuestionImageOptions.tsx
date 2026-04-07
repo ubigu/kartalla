@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SectionImageOption } from '@interfaces/survey';
 import {
   Box,

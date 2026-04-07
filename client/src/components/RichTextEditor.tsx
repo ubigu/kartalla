@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Box, FormLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';

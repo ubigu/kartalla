@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FileAnswer } from '@interfaces/survey';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';

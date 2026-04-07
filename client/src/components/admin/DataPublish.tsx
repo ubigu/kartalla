@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { CredentialsEntry } from '@interfaces/submission';
 import {
   Box,

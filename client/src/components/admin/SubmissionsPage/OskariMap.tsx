@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useOskari } from '@src/utils/useOskari';
 import { Feature, Geometry } from 'geojson';

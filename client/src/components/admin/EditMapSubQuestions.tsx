@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
 

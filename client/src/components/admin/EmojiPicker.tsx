@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Box, IconButton, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { EmojiPicker as Frimousse } from 'frimousse';

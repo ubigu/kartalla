@@ -70,16 +70,18 @@ function answerEntryToItems(
 
 export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
-  const [error, setError] = useState(null);
-  const [submissions, setSubmissions] = useState<Submission[]>(null);
+  const [error, setError] = useState<{ status: number } | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[] | null>(null);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [surveyLoading, setSurveyLoading] = useState(true);
   const [responsesLoading, setResponsesLoading] = useState(true);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
-  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection | null>(
+    null,
+  );
   const [refreshSurvey, setRefreshSurvey] = useState(false);
   const [selectedQuestion, setSelectedQuestion] =
-    useState<SurveyQuestion>(null);
+    useState<SurveyQuestion | null>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -109,7 +111,7 @@ export default function SurveySubmissionsPage() {
         const survey = await request<Survey>(requestUrl);
         setSurvey(survey);
       } catch (error) {
-        setError(error);
+        setError(error as { status: number });
       }
       setSurveyLoading(false);
     }
@@ -127,7 +129,7 @@ export default function SurveySubmissionsPage() {
 
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = `/api/surveys/${survey.id}/submissions?withPersonalInfo=true`;
+      const submissionUrl = `/api/surveys/${survey?.id}/submissions?withPersonalInfo=true`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(
@@ -137,7 +139,7 @@ export default function SurveySubmissionsPage() {
           })),
         );
       } catch (error) {
-        setError(error);
+        setError(error as { status: number });
       }
       setSubmissionsLoading(false);
     }
@@ -154,7 +156,7 @@ export default function SurveySubmissionsPage() {
       try {
         //await loadResponses(survey.id);
       } catch (error) {
-        setError(error);
+        setError(error as { status: number });
       }
       setResponsesLoading(false);
     }
@@ -163,16 +165,17 @@ export default function SurveySubmissionsPage() {
 
   // TODO: Could surveyQuestions and questions be combined into a single variable?
   const surveyQuestions = useMemo(() => {
-    if (!survey) return;
-    return survey?.pages.reduce((prevValue, currentValue) => {
-      return [...prevValue, ...currentValue.sections];
-    }, []);
+    if (!survey) return [];
+    return (survey.pages ?? []).reduce(
+      (sections, page) => [...sections, ...page.sections] as SurveyQuestion[],
+      [] as SurveyQuestion[],
+    );
   }, [survey]);
 
   // All map type questions across the entire survey
   const questions = useMemo(() => {
-    if (!survey) return;
-    return survey.pages.reduce(
+    if (!survey) return [];
+    return (survey.pages ?? []).reduce(
       (questions, page) => [
         ...questions,
         ...page.sections.filter((section) => isSurveyQuestion(section)),
@@ -194,7 +197,7 @@ export default function SurveySubmissionsPage() {
     return submissions?.reduce(
       (answerEntries, submission) => [
         ...answerEntries,
-        ...submission.answerEntries.reduce(
+        ...(submission.answerEntries ?? []).reduce(
           (items, entry) => [
             ...items,
             ...answerEntryToItems(submission, entry),
@@ -212,7 +215,7 @@ export default function SurveySubmissionsPage() {
   const answers = useMemo(() => {
     return selectedQuestion?.id === 0 || !selectedQuestion
       ? allAnswers
-      : allAnswers.filter(
+      : allAnswers?.filter(
           (answer) =>
             answer.entry.sectionId === selectedQuestion.id &&
             !isAnswerEmpty(selectedQuestion, answer.entry.value),
@@ -220,27 +223,35 @@ export default function SurveySubmissionsPage() {
   }, [allAnswers, selectedQuestion]);
 
   function renderSidePane() {
-    if (CHART_TYPES.includes(selectedQuestion?.type)) {
+    if (
+      selectedQuestion !== null &&
+      CHART_TYPES.includes(selectedQuestion.type)
+    ) {
       return (
-        <Chart submissions={submissions} selectedQuestion={selectedQuestion} />
+        <Chart
+          submissions={submissions ?? []}
+          selectedQuestion={selectedQuestion}
+        />
       );
     }
     if (selectedQuestion?.type === 'free-text') {
       return (
         <AnswerTable
-          submissions={submissions}
+          submissions={submissions ?? []}
           selectedQuestion={selectedQuestion}
         />
       );
     }
     if (
-      MAP_TYPES.includes(selectedQuestion?.type) ||
-      selectedQuestion?.id === DEFAULT_VIEW_SECTION_ID
+      selectedQuestion !== null &&
+      (MAP_TYPES.includes(selectedQuestion.type) ||
+        selectedQuestion.id === DEFAULT_VIEW_SECTION_ID)
     ) {
+      if (!survey) return false as const;
       return (
         <AnswerMap
           survey={survey}
-          submissions={submissions}
+          submissions={submissions ?? []}
           selectedQuestion={selectedQuestion}
           onAnswerClick={(answer) => setSelectedAnswer(answer)}
           onSelectQuestion={(question) => setSelectedQuestion(question)}
@@ -253,29 +264,41 @@ export default function SurveySubmissionsPage() {
     return false as const;
   }
 
-  return loading ? (
-    <Box
-      sx={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <CircularProgress />
-    </Box>
-  ) : error ? (
-    <Box
-      sx={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Typography variant="body1">{errorMessage}</Typography>
-    </Box>
-  ) : (
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography variant="body1">{errorMessage}</Typography>
+      </Box>
+    );
+  }
+
+  if (!survey) {
+    return null;
+  }
+
+  return (
     <>
       <AdminAppBar
         labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
@@ -308,7 +331,7 @@ export default function SurveySubmissionsPage() {
                   setSelectedQuestion(
                     questions.find(
                       (question) => question.id === event.target.value,
-                    ),
+                    ) ?? null,
                   );
                 }}
               >
@@ -330,7 +353,7 @@ export default function SurveySubmissionsPage() {
                   )}
                 </Typography>
                 <DataChart
-                  submissions={submissions}
+                  submissions={submissions ?? []}
                   submissionsLoading={submissionsLoading}
                 />
                 <Stack direction="row" spacing={2}>
@@ -350,9 +373,9 @@ export default function SurveySubmissionsPage() {
                   )}
                 </Typography>
                 <AnswersList
-                  answers={answers}
+                  answers={answers ?? []}
                   modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
-                  submissions={submissions}
+                  submissions={submissions ?? []}
                   selectedQuestion={selectedQuestion}
                   selectedAnswer={selectedAnswer}
                   setSelectedAnswer={setSelectedAnswer}

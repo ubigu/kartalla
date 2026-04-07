@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import {
   MapQuestionSelectionType,

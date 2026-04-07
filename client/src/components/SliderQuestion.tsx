@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveySliderQuestion } from '@interfaces/survey';
 import { FormLabel, Slider } from '@mui/material';
 import { makeStyles } from '@mui/styles';

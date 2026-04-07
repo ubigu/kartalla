@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { User } from '@interfaces/user';
 import { UserGroup } from '@interfaces/userGroup';
 import {

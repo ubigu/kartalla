@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SubmissionInfo } from '@interfaces/survey';
 import {
   Button,

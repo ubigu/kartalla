@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Fab, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SaveIcon from '@src/components/icons/SaveIcon';

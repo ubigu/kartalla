@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
 import { Box, Button, useTheme } from '@mui/material';
 import { Download } from '@mui/icons-material';

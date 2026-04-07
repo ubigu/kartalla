@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyRadioQuestion } from '@interfaces/survey';
 import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Box, Collapse, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 

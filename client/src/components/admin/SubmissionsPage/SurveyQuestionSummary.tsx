@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyQuestion } from '@interfaces/survey';
 import { Box, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
@@ -7,7 +8,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { PageQuestionList } from './PageQuestionList';
 
 interface Props {
-  setSelectedQuestion: Dispatch<SetStateAction<SurveyQuestion>>;
+  setSelectedQuestion: Dispatch<SetStateAction<SurveyQuestion | null>>;
 }
 
 export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {

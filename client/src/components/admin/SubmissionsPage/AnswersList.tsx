@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   AnswerEntry,
   SurveyQuestion as Question,
@@ -20,7 +21,7 @@ import { format } from 'date-fns';
 interface Props {
   answers: AnswerItem[];
   selectedQuestion: Question;
-  selectedAnswer: AnswerSelection;
+  selectedAnswer: AnswerSelection | null;
   setSelectedAnswer: (answer: AnswerSelection) => void;
   submissions: Submission[];
   surveyQuestions: Question[];

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Feature, FeatureCollection, Point } from 'geojson';
 import OskariRPC, {
   Channel,

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Survey } from '@interfaces/survey';
 import {
   FormControlLabel,

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyPageSection } from '@interfaces/survey';
 
 import {

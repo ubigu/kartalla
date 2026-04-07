@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
   Checkbox,

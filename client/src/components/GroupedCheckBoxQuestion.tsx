@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyGroupedCheckboxQuestion } from '@interfaces/survey';
 import { ArrowForwardIosSharp } from '@mui/icons-material';
 import {

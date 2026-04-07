@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Autocomplete, TextField } from '@mui/material';
 import { getOrgTags } from '@src/controllers/SurveyController';
 import { useTranslations } from '@src/stores/TranslationContext';

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { MapMarkerIcon } from '@interfaces/survey';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FileAnswer } from '@interfaces/survey';
 import {
   Box,

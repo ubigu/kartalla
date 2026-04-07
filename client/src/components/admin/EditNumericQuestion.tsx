@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveyNumericQuestion } from '@interfaces/survey';
 import {
   Checkbox,

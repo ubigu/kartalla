@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { SurveySortingQuestion } from '@interfaces/survey';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {

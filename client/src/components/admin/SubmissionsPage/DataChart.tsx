@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Submission } from '@interfaces/survey';
 import {
   Bar,
