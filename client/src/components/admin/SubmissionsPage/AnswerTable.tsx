@@ -1,4 +1,3 @@
-import { Submission, SurveyQuestion } from '@interfaces/survey';
 import {
   Paper,
   Table,
@@ -10,37 +9,16 @@ import {
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { format } from 'date-fns';
-import { useMemo } from 'react';
+import { AnswerItem } from './AnswersList';
 
 interface Props {
-  submissions: Submission[];
-  selectedQuestion: SurveyQuestion;
+  answers: AnswerItem[];
 }
 
-export function AnswerTable({ submissions, selectedQuestion }: Props) {
+export function AnswerTable({ answers }: Props) {
   const { tr } = useTranslations();
 
-  const freeTextAnswers = useMemo(() => {
-    if (!submissions) return [];
-
-    return submissions.flatMap(
-      (submission) =>
-        submission.answerEntries
-          ?.filter(
-            (entry) =>
-              entry.type === 'free-text' &&
-              entry.sectionId === selectedQuestion.id,
-          )
-          .map((entry) => ({
-            submissionId: submission.id,
-            timestamp: submission.timestamp,
-            sectionId: entry.sectionId,
-            value: entry.value,
-          })) || [],
-    );
-  }, [submissions, selectedQuestion]);
-
-  if (!freeTextAnswers.length) {
+  if (!answers.length) {
     return null;
   }
 
@@ -61,18 +39,18 @@ export function AnswerTable({ submissions, selectedQuestion }: Props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {freeTextAnswers.map((answer, index) => (
+          {answers.map((answer, index) => (
             <TableRow
-              key={`${answer.submissionId}-${answer.sectionId}-${index}`}
+              key={`${answer.submission.id}-${answer.entry.sectionId}-${index}`}
             >
               <TableCell sx={{ fontWeight: 400 }}>
-                {answer.submissionId}
+                {answer.submission.id}
               </TableCell>
               <TableCell sx={{ fontWeight: 400, color: '#797979' }}>
-                {format(answer.timestamp, 'd.MM.yyyy')}
+                {format(answer.submission.timestamp, 'd.MM.yyyy')}
               </TableCell>
               <TableCell sx={{ fontWeight: 400 }}>
-                {String(answer.value)}
+                {String(answer.entry.value)}
               </TableCell>
             </TableRow>
           ))}

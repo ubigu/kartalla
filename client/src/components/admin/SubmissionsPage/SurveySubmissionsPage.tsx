@@ -235,12 +235,7 @@ export default function SurveySubmissionsPage() {
       );
     }
     if (selectedQuestion?.type === 'free-text') {
-      return (
-        <AnswerTable
-          submissions={submissions ?? []}
-          selectedQuestion={selectedQuestion}
-        />
-      );
+      return <AnswerTable answers={answers ?? []} />;
     }
     if (
       selectedQuestion !== null &&
