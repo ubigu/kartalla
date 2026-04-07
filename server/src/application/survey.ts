@@ -2398,7 +2398,7 @@ export async function storeFile({
 }) {
   const isImage = mimetype.startsWith('image/');
   const compressedFileString = isImage
-    ? getCompressedFileString(buffer, 20)
+    ? await getCompressedFileString(buffer, 20)
     : null;
 
   const fileString = `\\x${buffer.toString('hex')}`;
