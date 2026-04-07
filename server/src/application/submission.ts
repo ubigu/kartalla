@@ -254,7 +254,7 @@ async function validateBudgetingEntries(answerEntries: AnswerEntry[]) {
   // Get all budgeting questions and their constraints from db
   const budgetingQuestions = await getDb().manyOrNone<{
     id: number;
-    totalBudget: number;
+    totalBudget: string; // pg returns numeric as string
     requireFullAllocation: boolean;
     inputMode?: 'absolute' | 'percentage';
     type: 'budgeting' | 'geo-budgeting';
@@ -334,7 +334,7 @@ async function validateBudgetingEntries(answerEntries: AnswerEntry[]) {
     // For percentage mode, the effective limit is always 100
     // For absolute mode, use the totalBudget value
     const isPercentageMode = question.inputMode === 'percentage';
-    const budgetLimit = isPercentageMode ? 100 : question.totalBudget;
+    const budgetLimit = isPercentageMode ? 100 : Number(question.totalBudget);
 
     // Validate total doesn't exceed budget
     if (totalUsed > budgetLimit) {
