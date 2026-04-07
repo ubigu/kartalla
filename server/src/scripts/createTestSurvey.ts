@@ -677,7 +677,6 @@ const pages = [
 /** Extracts the `details` JSON that goes in the DB column for a section. */
 function sectionDetails(section: SurveyPageSection): object {
   // Mirror surveySectionsToRows: everything except these common fields goes into details
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {
     id,
     type,

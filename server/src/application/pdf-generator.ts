@@ -16,8 +16,7 @@ import {
 import logger from '@src/logger';
 import useTranslations from '@src/translations/useTranslations';
 import moment from 'moment';
-import PDFDocument from 'pdfkit';
-import PdfPrinter from 'pdfmake';
+import pdfmake from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
 
 import { formatPhoneNumber } from '@src/utils';
@@ -59,44 +58,20 @@ const fonts = {
   },
 };
 
-/**
- * Converts a PDFDocument to a Buffer
- * @param pdf The PDFDocument to convert
- * @returns The Buffer containing the PDF
- */
-async function convertPdfToBuffer(pdf: typeof PDFDocument) {
-  return new Promise<Buffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    pdf.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-    pdf.on('end', () => {
-      resolve(Buffer.concat(chunks));
-    });
-    pdf.on('error', reject);
-    pdf.end();
-  });
-}
+pdfmake.setFonts(fonts);
 
 function findFollowUpMapQuestion(
   sections: SurveyPageSection[],
   entryId: number,
 ): SurveyMapQuestion {
-  let followUpSectionIndex: number;
-  const sectionIndex = sections.findIndex((section) =>
-    section.followUpSections?.some((followUpSection, followUpIndex) => {
-      if (followUpSection.id === entryId) {
-        followUpSectionIndex = followUpIndex;
-        return true;
-      }
-      return false;
-    }),
-  );
-
-  // Entry id is already only for map questions
-  return sections[sectionIndex].followUpSections[
-    followUpSectionIndex
-  ] as SurveyMapQuestion;
+  for (const section of sections) {
+    const followUpIndex =
+      section.followUpSections?.findIndex((fs) => fs.id === entryId) ?? -1;
+    if (followUpIndex !== -1) {
+      return section.followUpSections![followUpIndex] as SurveyMapQuestion;
+    }
+  }
+  throw new Error(`Follow-up map question not found for entry id ${entryId}`);
 }
 
 function prepareMapAndGeoBudgetingAnswers(
@@ -111,7 +86,7 @@ function prepareMapAndGeoBudgetingAnswers(
     )
     .reduce(
       (jobData, entry) => {
-        const page = survey.pages.find((page) =>
+        const page = survey.pages?.find((page) =>
           page.sections.some(
             (section) =>
               section.id === entry.sectionId ||
@@ -120,10 +95,11 @@ function prepareMapAndGeoBudgetingAnswers(
               ),
           ),
         );
+        if (!page) return jobData;
         return {
           ...jobData,
           answers: [
-            ...jobData.answers,
+            ...(jobData?.answers ?? []),
             ...entry.value.map((answer, index) => {
               const question =
                 entry.type === 'map'
@@ -135,7 +111,7 @@ function prepareMapAndGeoBudgetingAnswers(
                   : page.sections.find(
                       (section): section is SurveyGeoBudgetingQuestion =>
                         section.id === entry.sectionId,
-                    );
+                    )!;
 
               // Get marker icon for geobudgeting questions
               let markerIcon: string | undefined;
@@ -157,10 +133,10 @@ function prepareMapAndGeoBudgetingAnswers(
                 sectionId: entry.sectionId,
                 index,
                 feature: answer.geometry,
-                visibleLayerIds:
-                  entry.type === 'map' && (answer as any).mapLayers
-                    ? (answer as any).mapLayers
-                    : page.sidebar.mapLayers,
+                visibleLayerIds: (entry.type === 'map' &&
+                (answer as any).mapLayers
+                  ? (answer as any).mapLayers
+                  : page.sidebar.mapLayers) as (string | number)[],
                 question,
                 markerIcon,
               };
@@ -185,7 +161,7 @@ async function getFrontPage(
 ): Promise<Content> {
   const tr = useTranslations(language);
 
-  const personalInfoQuestion = survey.pages
+  const personalInfoQuestion = (survey.pages ?? [])
     .map((page) =>
       page.sections.find((section) => section.type === 'personal-info'),
     )
@@ -198,7 +174,7 @@ async function getFrontPage(
   );
 
   function getPersonalInfoLabels(
-    personalInfoQuestion: SurveyPersonalInfoQuestion,
+    personalInfoQuestion: SurveyPersonalInfoQuestion | undefined,
   ) {
     if (!personalInfoQuestion || !personalInfoAnswer) {
       return [];
@@ -216,7 +192,7 @@ async function getFrontPage(
       askName: (personalInfoAnswer.value as PersonalInfoAnswer).name,
       askEmail: (personalInfoAnswer.value as PersonalInfoAnswer).email,
       askPhone: formatPhoneNumber(
-        (personalInfoAnswer.value as PersonalInfoAnswer).phone,
+        (personalInfoAnswer.value as PersonalInfoAnswer).phone ?? '',
       ),
       askAddress: (personalInfoAnswer.value as PersonalInfoAnswer).address,
       askCustom: (personalInfoAnswer.value as PersonalInfoAnswer).custom,
@@ -233,9 +209,10 @@ async function getFrontPage(
 
     Object.entries(personalInfoQuestion).forEach(
       ([personalInfoProperty, isIncluded]) => {
-        if (personalInfoProperty in labelMap && isIncluded) {
+        const key = personalInfoProperty as keyof typeof labelMap;
+        if (key in labelMap && isIncluded) {
           labels.push({
-            text: `${labelMap[personalInfoProperty]}: ${answerValuesForLabelsMap[personalInfoProperty]}`,
+            text: `${labelMap[key]}: ${answerValuesForLabelsMap[key]}`,
             fontSize: 12,
             margin: [0, 0, 0, 8],
           });
@@ -265,16 +242,24 @@ async function getFrontPage(
     .map((entry) => entry.value[0]?.fileName)
     .filter(Boolean);
   return [
-    logo && {
-      svg: logo,
-      fit: [220, 150],
-      absolutePosition: { x: 360, y: 20 },
-    },
-    banner && {
-      svg: banner,
-      fit: [250, 100],
-      absolutePosition: { x: 40, y: 700 },
-    },
+    ...(logo
+      ? [
+          {
+            svg: logo,
+            fit: [220, 150] as [number, number],
+            absolutePosition: { x: 360, y: 20 },
+          },
+        ]
+      : []),
+    ...(banner
+      ? [
+          {
+            svg: banner,
+            fit: [250, 100] as [number, number],
+            absolutePosition: { x: 40, y: 700 },
+          },
+        ]
+      : []),
     {
       text: '',
       margin: [0, 300, 0, 0],
@@ -300,15 +285,14 @@ async function getFrontPage(
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
-      attachmentFileNames.length > 0 &&
-        `${tr.attachments}: ${attachmentFileNames.join(', ')}`,
-    ]
-      .filter(Boolean)
-      .map((text) => ({
-        text,
-        fontSize: 12,
-        margin: [0, 0, 0, 10],
-      })),
+      ...(attachmentFileNames.length > 0
+        ? [`${tr.attachments}: ${attachmentFileNames.join(', ')}`]
+        : []),
+    ].map((text) => ({
+      text,
+      fontSize: 12,
+      margin: [0, 0, 0, 10] as [number, number, number, number],
+    })),
     getPersonalInfoLabels(personalInfoQuestion),
     { text: '', pageBreak: 'after' },
   ];
@@ -337,7 +321,7 @@ function getOptionSelectionImage(
 }
 
 function getContent(
-  answerEntry: AnswerEntry,
+  answerEntry: AnswerEntry | undefined,
   sections: SurveyPageSection[],
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
@@ -354,6 +338,7 @@ function getContent(
     (section) => answerEntry.sectionId === section.id,
   );
   const section = sections[sectionIndex];
+  if (!section) return [];
 
   const heading: Content = {
     text: section.title?.[language],
@@ -524,7 +509,7 @@ function getContent(
               {
                 image:
                   'data:image/png;base64,' +
-                  screenshot.image.toString('base64'),
+                  screenshot!.image.toString('base64'),
                 width: 200,
                 style,
               },
@@ -542,9 +527,9 @@ function getContent(
                   style: 'subQuestionTitle',
                 },
                 {
-                  text: !screenshot.layerNames.length
+                  text: !screenshot!.layerNames.length
                     ? '-'
-                    : screenshot.layerNames.join(', '),
+                    : screenshot!.layerNames.join(', '),
                   style: 'subQuestionAnswer',
                 },
                 ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
@@ -726,7 +711,7 @@ function getContent(
               {
                 image:
                   'data:image/png;base64,' +
-                  screenshot.image.toString('base64'),
+                  screenshot!.image.toString('base64'),
                 width: 200,
                 style,
               },
@@ -744,9 +729,9 @@ function getContent(
                   style: 'subQuestionTitle',
                 } as Content,
                 {
-                  text: !screenshot.layerNames.length
+                  text: !screenshot!.layerNames.length
                     ? '-'
-                    : screenshot.layerNames.join(', '),
+                    : screenshot!.layerNames.join(', '),
                   style: 'subQuestionAnswer',
                   margin: [0, 0, 0, 10] as [number, number, number, number],
                 } as Content,
@@ -783,7 +768,7 @@ export async function generatePdf(
   const imageOptions = await getImageOptionsForSurvey(survey.id);
   const options = await getOptionsForSurvey(survey.id);
 
-  const sections = survey.pages.reduce(
+  const sections = (survey.pages ?? []).reduce(
     (sections, page) => [...sections, ...page.sections],
     [] as SurveyPageSection[],
   );
@@ -805,7 +790,7 @@ export async function generatePdf(
   const optionsWithImages = await Promise.all(
     imageOptions.map(async (option) => {
       if (!option.imageUrl) {
-        return { ...option, image: null };
+        return { ...option, image: undefined };
       }
       const file = await getFile(option.imageUrl);
       return {
@@ -854,14 +839,56 @@ export async function generatePdf(
   const personalInfo = answerEntries.find(
     (entry) => entry.type === 'personal-info',
   );
-  const document = new PdfPrinter(fonts).createPdfKitDocument({
-    content,
-    pageMargins: [40, 20, 40, 60],
-    footer: (currentPage, pageCount): Content => {
-      if (currentPage === 1) {
+  return pdfmake
+    .createPdf({
+      content,
+      pageMargins: [40, 20, 40, 60],
+      footer: (currentPage, pageCount): Content => {
+        if (currentPage === 1) {
+          return {
+            margin: [40, 0, 40, 0],
+            columns: [
+              {
+                alignment: 'right',
+                text: `${currentPage}/${pageCount}`,
+                color: '#5e5e5e',
+                fontSize: 10,
+              },
+            ],
+          } as Content;
+        }
         return {
           margin: [40, 0, 40, 0],
           columns: [
+            {
+              width: '90%',
+              stack: [
+                {
+                  alignment: 'left',
+                  text: `${survey.title?.[language]}`,
+                  color: '#5e5e5e',
+                  fontSize: 10,
+                  marginBottom: 2,
+                },
+                ...(personalInfo?.value
+                  ? [
+                      {
+                        alignment: 'left',
+                        text: `${(personalInfo.value as PersonalInfoAnswer)?.name}`,
+                        color: '#5e5e5e',
+                        fontSize: 10,
+                        marginBottom: 2,
+                      },
+                    ]
+                  : []),
+                {
+                  alignment: 'left',
+                  text: submission.id,
+                  color: '#5e5e5e',
+                  fontSize: 10,
+                },
+              ],
+            },
             {
               alignment: 'right',
               text: `${currentPage}/${pageCount}`,
@@ -870,81 +897,40 @@ export async function generatePdf(
             },
           ],
         } as Content;
-      }
-      return {
-        margin: [40, 0, 40, 0],
-        columns: [
-          {
-            width: '90%',
-            stack: [
-              {
-                alignment: 'left',
-                text: `${survey.title?.[language]}`,
-                color: '#5e5e5e',
-                fontSize: 10,
-                marginBottom: 2,
-              },
-              ...(personalInfo?.value
-                ? [
-                    {
-                      alignment: 'left',
-                      text: `${(personalInfo.value as PersonalInfoAnswer)?.name}`,
-                      color: '#5e5e5e',
-                      fontSize: 10,
-                      marginBottom: 2,
-                    },
-                  ]
-                : []),
-              {
-                alignment: 'left',
-                text: submission.id,
-                color: '#5e5e5e',
-                fontSize: 10,
-              },
-            ],
-          },
-          {
-            alignment: 'right',
-            text: `${currentPage}/${pageCount}`,
-            color: '#5e5e5e',
-            fontSize: 10,
-          },
-        ],
-      } as Content;
-    },
-    defaultStyle: {
-      font: 'Helvetica',
-    },
-    styles: {
-      questionTitle: {
-        fontSize: 18,
-        bold: true,
-        margin: [0, 0, 0, 10],
       },
-      answer: {
-        fontSize: 12,
-        margin: [0, 0, 0, 20],
+      defaultStyle: {
+        font: 'Helvetica',
       },
-      subQuestionTitle: {
-        fontSize: 12,
-        bold: true,
-        margin: [5, 0, 0, 5],
+      styles: {
+        questionTitle: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+        answer: {
+          fontSize: 12,
+          margin: [0, 0, 0, 20],
+        },
+        subQuestionTitle: {
+          fontSize: 12,
+          bold: true,
+          margin: [5, 0, 0, 5],
+        },
+        subQuestionAnswer: {
+          margin: [5, 0, 0, 5],
+          fontSize: 12,
+        },
+        followUpSectionTitle: {
+          fontSize: 15,
+          color: '#696969',
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+        followUpSectionAnswer: {
+          margin: [0, 0, 0, 15],
+          fontSize: 12,
+        },
       },
-      subQuestionAnswer: {
-        margin: [5, 0, 0, 5],
-        fontSize: 12,
-      },
-      followUpSectionTitle: {
-        fontSize: 15,
-        color: '#696969',
-        bold: true,
-        margin: [0, 0, 0, 10],
-      },
-      followUpSectionAnswer: {
-        margin: [0, 0, 0, 15],
-        fontSize: 12,
-      },
-    },
-  });
-  return convertPdfToBuffer(document);
+    })
+    .getBuffer();
 }
