@@ -20,7 +20,6 @@ import {
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import { SyntheticEvent } from 'react';
 
 interface FormElements extends HTMLFormControlsCollection {
   groupNameInput: HTMLInputElement;
@@ -141,9 +140,9 @@ export function UserGroupManagement(props: Props) {
       }}
     >
       <FormControl
-        onSubmit={async (e: SyntheticEvent<UserGroupFormElement>) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          const form = e.currentTarget;
+          const form = e.currentTarget as UserGroupFormElement;
           const groupName = form.elements.groupNameInput.value.trim();
 
           if (!groupName) {
