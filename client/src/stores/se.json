@@ -9,7 +9,9 @@
     "attachments": "Bilagor",
     "alphanumericSubmissions": "Alfanumeriska svar",
     "geospatialSubmissions": "Rumsliga svar",
-    "personalInfo": "Personuppgifter"
+    "personalInfo": "Personuppgifter",
+    "fileFormat": "Filformat",
+    "submissions": "svar"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Alfanumeriska svar",

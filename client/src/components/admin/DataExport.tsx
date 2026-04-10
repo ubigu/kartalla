@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import { FileAnswer } from '@interfaces/survey';
+import { FileAnswer, LocalizedText } from '@interfaces/survey';
 import {
   Box,
   Button,
@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import DownloadIcon from '@src/components/icons/DownloadIcon';
 import { useToasts } from '@src/stores/ToastContext';
@@ -26,19 +28,30 @@ interface AnswerCounts {
 }
 interface Props {
   surveyId: number;
+  surveyTitle: LocalizedText;
 }
 
-export default function DataExport({ surveyId }: Props) {
+export default function DataExport({ surveyId, surveyTitle }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [withPersonalInfo, setWithPersonalInfo] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
   const [selectedFileFormats, setSelectedFileFormats] = useState({
     csv: false,
     geopackage: false,
     attachments: false,
   });
   const [answerCounts, setAnswerCounts] = useState<AnswerCounts | null>();
-  const { tr } = useTranslations();
+  const { tr, language, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
+
+  function getExportFilename(ext: string) {
+    const title = (surveyTitle?.[language] ?? surveyTitle?.fi ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_\u00C0-\u024F]/g, '');
+    return `${title}_${tr.DataExport.submissions}.${ext}`;
+  }
 
   useEffect(() => {
     async function getAnswerCounts() {
@@ -67,7 +80,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportCSV() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export/csv?withPersonalInfo=${withPersonalInfo}`,
+        `/api/answers/${surveyId}/file-export?fileType=csv&withPersonalInfo=${withPersonalInfo}&lang=${surveyLanguage}`,
         {
           method: 'GET',
         },
@@ -79,7 +92,27 @@ export default function DataExport({ surveyId }: Props) {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(textBlob);
       link.target = '_blank';
-      link.download = 'data.csv';
+      link.download = getExportFilename('csv');
+      link.click();
+    } catch (err) {
+      showToast({
+        severity: 'error',
+        message: err.message,
+      });
+    }
+  }
+
+  async function exportExcel() {
+    try {
+      const res = await fetch(
+        `/api/answers/${surveyId}/file-export?fileType=excel&withPersonalInfo=${withPersonalInfo}&lang=${surveyLanguage}`,
+        { method: 'GET' },
+      );
+
+      const blob = await res.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = getExportFilename('xlsx');
       link.click();
     } catch (err) {
       showToast({
@@ -179,25 +212,50 @@ export default function DataExport({ surveyId }: Props) {
               }
             />
             {selectedFileFormats.csv && (
-              <FormControlLabel
+              <Box
                 sx={{
                   marginLeft: '8px',
-                  height: '26px',
-                  '& .MuiFormControlLabel-label': {
-                    fontSize: '14px',
-                  },
-                  paddingBottom: '6px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
                 }}
-                label={tr.DataExport.personalInfo}
-                control={
-                  <Checkbox
-                    disabled={answerCounts?.personalInfoAnswers === 0}
-                    size="small"
-                    checked={withPersonalInfo}
-                    onChange={() => setWithPersonalInfo((prev) => !prev)}
-                  />
-                }
-              />
+              >
+                <FormControlLabel
+                  sx={{
+                    height: '26px',
+                    '& .MuiFormControlLabel-label': { fontSize: '14px' },
+                    paddingBottom: '6px',
+                  }}
+                  label={tr.DataExport.personalInfo}
+                  control={
+                    <Checkbox
+                      disabled={answerCounts?.personalInfoAnswers === 0}
+                      size="small"
+                      checked={withPersonalInfo}
+                      onChange={() => setWithPersonalInfo((prev) => !prev)}
+                    />
+                  }
+                />
+                <RadioGroup
+                  value={exportFormat}
+                  onChange={(e) =>
+                    setExportFormat(e.target.value as 'xlsx' | 'csv')
+                  }
+                >
+                  {(['xlsx', 'csv'] as const).map((fmt) => (
+                    <FormControlLabel
+                      key={fmt}
+                      value={fmt}
+                      sx={{
+                        height: '26px',
+                        '& .MuiFormControlLabel-label': { fontSize: '14px' },
+                      }}
+                      label={fmt}
+                      control={<Radio size="small" />}
+                    />
+                  ))}
+                </RadioGroup>
+              </Box>
             )}
           </Box>
           <FormControlLabel
@@ -243,7 +301,9 @@ export default function DataExport({ surveyId }: Props) {
             }
             onClick={() => {
               setDisplayDialog(false);
-              selectedFileFormats.csv && exportCSV();
+              if (selectedFileFormats.csv) {
+                exportFormat === 'xlsx' ? exportExcel() : exportCSV();
+              }
               selectedFileFormats.geopackage && exportGeoPackage();
               selectedFileFormats.attachments && exportAttachments();
             }}
