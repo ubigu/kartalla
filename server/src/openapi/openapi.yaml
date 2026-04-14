@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.2.0
+  version: 1.3.0
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -110,7 +110,7 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '500':
           description: Internal server error if invalid survey id is provided.
-  /surveys/{surveyId}/publication/map:
+  /surveys/{surveyId}/publication/geojson:
     get:
       description: Get all published submissions for the map questions as GeoJSON FeatureCollections. Requires authentication as well as access to geospatial submissions that can be set by the administrator on the answers page.
       tags:
@@ -232,8 +232,6 @@ components:
           startDate,
           endDate,
           allowTestSurvey,
-          createdAt,
-          updatedAt,
           thanksPage,
           theme,
           sectionTitleColor,
@@ -277,9 +275,17 @@ components:
           description: Array of editor user IDs.
           items:
             type: string
+        viewers:
+          type: array
+          description: Array of viewer user IDs.
+          items:
+            type: string
         mapUrl:
           type: string
           description: URL of the embedded map component.
+        localizedMapUrls:
+          $ref: '#/components/schemas/LocalizedText'
+          description: Localized map URLs for the survey.
         startDate:
           type: string
           description: Date when the survey is planned to start and go publick.
@@ -292,12 +298,6 @@ components:
         isPublished:
           type: boolean
           description: Is the survey currently published? Computed server-side from startDate and endDate timestamp values - cannot be updated.
-        createdAt:
-          type: string
-          description: Date when the survey was initially created.
-        updatedAt:
-          type: string
-          description: Date when the survey was modified last time.
         pages:
           type: array
           description: Survey page objects. This array contains pages only if a single survey is fetched with an ID.
@@ -312,9 +312,9 @@ components:
           required: [title, text]
           properties:
             title:
-              type: string
+              $ref: '#/components/schemas/LocalizedText'
             text:
-              type: string
+              $ref: '#/components/schemas/LocalizedText'
             imageUrl:
               type: string
         theme:
@@ -343,9 +343,15 @@ components:
                 type: string
               description: Fixed recipient addresses for the automatic sending.
             subject:
-              type: string
+              $ref: '#/components/schemas/LocalizedText'
             body:
-              type: string
+              $ref: '#/components/schemas/LocalizedText'
+            includePersonalInfo:
+              type: boolean
+              description: Should personal info be included in the email.
+            required:
+              type: boolean
+              description: Does the survey respondent need to provide an email address in order to submit answers?
             info:
               type: array
               items:
@@ -354,7 +360,7 @@ components:
             includeMarginImages:
               type: boolean
               description: Include margin images in the pdf report front pages sent by email.
-        allowSavingsUnfinished:
+        allowSavingUnfinished:
           type: boolean
           description: Should the survey be able to be saved as unfinished?
         localisationEnabled:
@@ -390,7 +396,7 @@ components:
       required: [id, timestamp]
       properties:
         id:
-          type: string
+          type: number
         timestamp:
           type: string
         answerEntries:
@@ -418,9 +424,9 @@ components:
       required: [id, title, sidebar, sections]
       properties:
         id:
-          type: string
+          type: number
         title:
-          type: string
+          $ref: '#/components/schemas/LocalizedText'
         sidebar:
           type: object
           description: Side bar definition for the survey page.
@@ -430,9 +436,7 @@ components:
             type: object
           description: Page sections which includes all questions and other content like attachments.
         conditions:
-          type: array
-          items:
-            type: object
+          type: object
           description: Conditions to display the page in the survey.
         isVisible:
           type: boolean

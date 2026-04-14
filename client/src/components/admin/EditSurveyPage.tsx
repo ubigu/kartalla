@@ -546,7 +546,7 @@ export default function EditSurveyPage(props: Props) {
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={() => history.push(`kyselyt/${surveyId}/perustiedot`)}
+            onClick={() => history.push(`kyselyt/${surveyId}/perusasetukset`)}
             color="primary"
           >
             {tr.commands.cancel}

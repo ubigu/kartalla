@@ -13,11 +13,14 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
+import EditSurveyAppearance from './EditSurveyAppearance';
+import EditSurveyBasicSettings from './EditSurveyBasicSettings';
 import EditSurveyControls from './EditSurveyControls';
 import EditSurveyEmail from './EditSurveyEmail';
 import EditSurveyHeader from './EditSurveyHeader';
-import EditSurveyInfo from './EditSurveyInfo';
+import EditSurveyMapData from './EditSurveyMapData';
 import EditSurveyPage from './EditSurveyPage';
+import EditSurveyPermissions from './EditSurveyPermissions';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslations from './EditSurveyTranslations';
@@ -109,14 +112,22 @@ export default function EditSurvey() {
           flexGrow: 1,
           p: 3,
           maxWidth: 'min(55em, 60%)',
-          margin: '0 auto',
           boxSizing: 'border-box',
         }}
       >
         <Toolbar />
         <Switch>
-          <Route path={`${path}/perustiedot`}>
-            <EditSurveyInfo canEdit={allowEditing} />
+          <Route path={`${path}/perusasetukset`}>
+            <EditSurveyBasicSettings canEdit={allowEditing} />
+          </Route>
+          <Route path={`${path}/käyttäjäoikeudet`}>
+            <EditSurveyPermissions canEdit={allowEditing} />
+          </Route>
+          <Route path={`${path}/ulkoasu`}>
+            <EditSurveyAppearance canEdit={allowEditing} />
+          </Route>
+          <Route path={`${path}/kartta-aineistot`}>
+            <EditSurveyMapData />
           </Route>
           <Route path={`${path}/sähköpostit`}>
             <EditSurveyEmail />
@@ -131,8 +142,8 @@ export default function EditSurvey() {
             <EditSurveyTranslations />
           </Route>
           <Route path="*">
-            {/* By default redirect to info page */}
-            <Redirect to={`${url}/perustiedot`} />
+            {/* By default redirect to basic settings */}
+            <Redirect to={`${url}/perusasetukset`} />
           </Route>
         </Switch>
         {allowEditing && <EditSurveyControls />}

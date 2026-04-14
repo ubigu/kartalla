@@ -12,16 +12,13 @@ import {
 
 import AddIcon from '@src/components/icons/AddIcon';
 import BranchIcon from '@src/components/icons/BranchIcon';
-import ChevronLeftIcon from '@src/components/icons/ChevronLeftIcon';
 import ClipboardIcon from '@src/components/icons/ClipboardIcon';
 import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
 import FavoriteIcon from '@src/components/icons/FavoriteIcon';
-import InfoIcon from '@src/components/icons/InfoIcon';
-import LanguageIcon from '@src/components/icons/LanguageIcon';
 import MailIcon from '@src/components/icons/MailIcon';
+import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
-import VisibleIcon from '@src/components/icons/VisibleIcon';
 
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -40,6 +37,11 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
+import ArrowLeftIcon from '../icons/ArrowLeftIcon';
+import MapGridIcon from '../icons/MapGridIcon';
+import PadlockIcon from '../icons/PadlockIcon';
+import PaintPaletteIcon from '../icons/PaintPaletteIcon';
+import ShareExternalLinkIcon from '../icons/ShareExternalLinkIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -102,27 +104,55 @@ export default function EditSurveySideBar(props: Props) {
       <List>
         <ListItemLink to={`/admin?lang=${language}`}>
           <ListItemIcon>
-            <ChevronLeftIcon />
+            <ArrowLeftIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.toFrontPage} />
         </ListItemLink>
-        <ListItemLink to={`${url}/perustiedot?lang=${language}`}>
+        <ListItemLink to={`${url}/perusasetukset?lang=${language}`}>
           <ListItemIcon>
-            <InfoIcon />
+            <SettingsIcon />
           </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.info} />
+          <ListItemText primary={tr.EditSurvey.basicSettings} />
         </ListItemLink>
-        <ListItemLink to={`${url}/käännökset?lang=${language}`}>
+        <ListItemLink to={`${url}/käyttäjäoikeudet?lang=${language}`}>
           <ListItemIcon>
-            <LanguageIcon />
+            <PadlockIcon />
           </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.translations}></ListItemText>
+          <ListItemText primary={tr.EditSurvey.permissions} />
+        </ListItemLink>
+        <ListItemLink to={`${url}/ulkoasu?lang=${language}`}>
+          <ListItemIcon>
+            <PaintPaletteIcon />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.appearance} />
+        </ListItemLink>
+        <ListItemLink to={`${url}/kartta-aineistot?lang=${language}`}>
+          <ListItemIcon>
+            <MapGridIcon />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.mapData} />
         </ListItemLink>
         <ListItemLink to={`${url}/sähköpostit?lang=${language}`}>
           <ListItemIcon>
             <MailIcon />
           </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.email} />
+          <ListItemText primary={tr.EditSurvey.emailReports} />
+        </ListItemLink>
+        <ListItemLink
+          external
+          newTab
+          to={`/${originalActiveSurvey.organization.name}/${
+            originalActiveSurvey.name
+          }${
+            originalActiveSurvey?.localisationEnabled
+              ? '?lang=' + surveyLanguage
+              : ''
+          }`}
+        >
+          <ListItemIcon>
+            <ShareExternalLinkIcon />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.openSurveyPage} />
         </ListItemLink>
       </List>
       <Divider />
@@ -337,22 +367,6 @@ export default function EditSurveySideBar(props: Props) {
             <FavoriteIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.thanksPage} />
-        </ListItemLink>
-        <ListItemLink
-          external
-          newTab
-          to={`/${originalActiveSurvey.organization.name}/${
-            originalActiveSurvey.name
-          }${
-            originalActiveSurvey?.localisationEnabled
-              ? '?lang=' + surveyLanguage
-              : ''
-          }`}
-        >
-          <ListItemIcon>
-            <VisibleIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.toSurveyPage} />
         </ListItemLink>
       </List>
     </SideBar>
