@@ -79,14 +79,6 @@ export default function AppBarUserMenu() {
             {tr.AppBarUserMenu.updateInstructions}
           </MenuItem>
         )}
-        <MenuItem
-          onClick={() => {
-            setMenuOpen(false);
-            window.location.pathname = '/logout';
-          }}
-        >
-          {tr.AppBarUserMenu.logout}
-        </MenuItem>
       </Menu>
       <InstructionsDialog
         isOpen={instructionsDialogOpen}

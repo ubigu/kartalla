@@ -5,11 +5,14 @@ import {
   ListItem,
   Theme,
   Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
 import KartallaLogo from '@src/components/icons/KartallaLogoDense';
+import LogoutIcon from '@src/components/icons/LogoutIcon';
 import { useHistory } from 'react-router-dom';
+import { useTranslations } from '@src/stores/TranslationContext';
 import LanguageMenu from '../LanguageMenu';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
@@ -28,6 +31,7 @@ export function AdminAppBar({
   style = {},
 }: Props) {
   const history = useHistory();
+  const { tr } = useTranslations();
 
   return (
     <>
@@ -99,6 +103,17 @@ export function AdminAppBar({
             <GeneralNotificationNavigationButton />
             <AppBarInstructionsMenu />
             <AppBarUserMenu />
+            <Tooltip arrow title={tr.AppBarUserMenu.logout}>
+              <IconButton
+                aria-label={tr.AppBarUserMenu.logout}
+                color="inherit"
+                onClick={() => {
+                  window.location.pathname = '/logout';
+                }}
+              >
+                <LogoutIcon />
+              </IconButton>
+            </Tooltip>
           </div>
         </Toolbar>
       </AppBar>
