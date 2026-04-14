@@ -112,7 +112,6 @@ export default function EditSurvey() {
           flexGrow: 1,
           p: 3,
           maxWidth: 'min(55em, 60%)',
-          margin: '0 auto',
           boxSizing: 'border-box',
         }}
       >
