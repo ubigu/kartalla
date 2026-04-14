@@ -3,3 +3,4 @@ dist
 .env
 .vscode
 .db-data
+.claude/worktrees
