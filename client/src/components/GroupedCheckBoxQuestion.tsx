@@ -183,6 +183,9 @@ export default function GroupedCheckBoxQuestion({
             </AccordionSummary>
             <AccordionDetails className={classes.accordionDetails}>
               <FormGroup
+                sx={{
+                  maxWidth: 'fit-content',
+                }}
                 // Indicate the amount of selections inside the group for screen readers
                 aria-label={`${
                   group.name?.[surveyLanguage]
@@ -198,7 +201,12 @@ export default function GroupedCheckBoxQuestion({
                 {group.options.map((option) => (
                   <div
                     key={option.id}
-                    style={{ display: 'flex', flexDirection: 'row' }}
+                    style={{
+                      alignItems: 'center',
+                      display: 'flex',
+
+                      justifyContent: 'space-between',
+                    }}
                   >
                     <FormControlLabel
                       label={option.text?.[surveyLanguage] ?? ''}
