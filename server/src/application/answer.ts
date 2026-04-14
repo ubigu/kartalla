@@ -1,7 +1,9 @@
 import { FileAnswer } from '@interfaces/survey';
 import { getDb } from '@src/database';
 
-export { getCSVFile, getPersonalInfosForSurvey } from './answerExports';
+export { getCSVFile } from './csvExport';
+export { getExcelFile } from './excelExport';
+export { getPersonalInfosForSurvey } from './exportUtils';
 export {
   getGeometryDBEntriesAsGeoJSON,
   getGeoPackageFile,

@@ -1,12 +1,17 @@
+import { LanguageCode } from '@interfaces/survey';
 import {
   getAnswerCounts,
   getAttachments,
   getCSVFile,
+  getExcelFile,
   getGeoPackageFile,
 } from '@src/application/answer';
 import { userCanViewSurvey } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
+import useTranslations, {
+  isLanguageCode,
+} from '@src/translations/useTranslations';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param, query } from 'express-validator';
@@ -45,14 +50,21 @@ router.get(
 );
 
 /**
- * Endpoint for getting answer entry files for the given survey
+ * Endpoint for downloading survey answers as CSV or Excel
  */
 router.get(
-  '/:id/file-export/csv',
+  '/:id/file-export',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('fileType')
+      .isIn(['csv', 'excel'])
+      .withMessage('fileType must be csv or excel'),
+    query('lang')
+      .optional()
+      .custom(isLanguageCode)
+      .withMessage('lang must be a valid language code'),
     query('withPersonalInfo')
       .optional()
       .isBoolean()
@@ -67,17 +79,37 @@ router.get(
       );
     }
 
-    const exportFiles = await getCSVFile(
-      surveyId,
-      req.query.withPersonalInfo === 'true',
-    );
+    const lang = req.query.lang as LanguageCode;
+    const withPersonalInfo = req.query.withPersonalInfo === 'true';
 
-    if (!exportFiles) {
-      res.status(404).json({ message: 'No attachments found' });
+    const fileName = `${useTranslations(lang).sheetName}.xlsx`;
+    if (req.query.fileType === 'csv') {
+      const csv = await getCSVFile(surveyId, withPersonalInfo, lang);
+      if (!csv) {
+        res.status(404).json({ message: 'No answers found' });
+      } else {
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${fileName}"`,
+        );
+        res.status(200).send(csv);
+      }
     } else {
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="data.csv"');
-      res.status(200).send(exportFiles);
+      const buffer = await getExcelFile(surveyId, withPersonalInfo, lang);
+      if (!buffer) {
+        res.status(404).json({ message: 'No answers found' });
+      } else {
+        res.setHeader(
+          'Content-Type',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        );
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${fileName}"`,
+        );
+        res.status(200).send(buffer);
+      }
     }
   }),
 );

@@ -9,7 +9,9 @@
     "attachments": "Vastausliitteet",
     "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",
     "geospatialSubmissions": "Paikkatietovastaukset",
-    "personalInfo": "Sisällytä henkilötiedot"
+    "personalInfo": "Sisällytä henkilötiedot",
+    "fileFormat": "Tiedostomuoto",
+    "submissions": "vastaukset"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",

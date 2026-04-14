@@ -9,7 +9,9 @@
     "attachments": "Survey response data attachments",
     "alphanumericSubmissions": "Alphanumeric submissions",
     "geospatialSubmissions": "Geospatial submissions",
-    "personalInfo": "Personal information"
+    "personalInfo": "Personal information",
+    "fileFormat": "File format",
+    "submissions": "submissions"
   },
   "DataPublish": {
     "alphanumericSubmissions": "Alphanumeric submissions",

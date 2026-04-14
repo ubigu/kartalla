@@ -21,7 +21,7 @@ export interface DBAnswerEntry {
   geometry_srid?: number;
   value_geometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
   value_text: string;
-  value_json: JSON[];
+  value_json: unknown[];
   value_option_id: number;
   value_numeric: number;
   created_at: Date;
@@ -46,15 +46,15 @@ export interface AnswerEntry {
   submissionLanguage: LanguageCode;
   title: LocalizedText;
   type: string;
-  geometrySRID: number;
-  valueGeometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
-  valueText: string;
-  valueJson: JSON[];
-  valueOptionId: number;
-  valueNumeric: number;
+  geometrySRID: number | null;
+  valueGeometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon | null;
+  valueText: string | null;
+  valueJson: unknown[] | null;
+  valueOptionId: number | null;
+  valueNumeric: number | null;
   createdAt: Date;
-  groupIndex: number;
-  optionIndex: number;
+  groupIndex: number | null;
+  optionIndex: number | null;
   optionText?: string;
   mapLayers: (number | string)[];
 }
