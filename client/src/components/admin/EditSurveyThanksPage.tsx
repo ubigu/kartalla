@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import Fieldset from '../Fieldset';
@@ -15,6 +15,9 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
 
   return (
     <Fieldset loading={activeSurveyLoading}>
+      <Typography variant="h4" component={'h1'}>
+        {tr.EditSurvey.thanksPage}
+      </Typography>
       <TextField
         label={tr.EditSurveyThanksPage.title}
         value={activeSurvey.thanksPage?.title?.[surveyLanguage] ?? ''}

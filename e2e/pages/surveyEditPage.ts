@@ -119,7 +119,7 @@ export class SurveyEditPage {
       await this._page.goto('http://localhost:8080/admin');
       await this._page.getByRole('button', { name: 'Uusi kysely' }).click();
       await this._page.waitForURL(
-        'http://localhost:8080/admin/kyselyt/*/perustiedot',
+        'http://localhost:8080/admin/kyselyt/*/perusasetukset',
       );
       const urlParts = this._page.url().split('/');
       this._surveyId = urlParts[urlParts.length - 2];
@@ -127,7 +127,9 @@ export class SurveyEditPage {
   }
 
   async fillBasicInfo(params: SurveyParams) {
-    await this._page.getByRole('link', { name: 'Kyselyn perustiedot' }).click();
+    await this._page
+      .getByRole('link', { name: 'Kyselyn perusasetukset' })
+      .click();
     await this._page.getByLabel('Kyselyn otsikko *').fill(params.title);
     await this._page.getByLabel('Kyselyn aliotsikko').fill(params.subtitle);
     await this._page.getByLabel('Kyselyn nimi *').fill(params.urlName);

@@ -5,6 +5,7 @@ import {
   FormControlLabel,
   FormHelperText,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -40,6 +41,9 @@ export default function EditSurveyEmail() {
   return (
     <>
       <Fieldset loading={activeSurveyLoading}>
+        <Typography variant="h4" component={'h1'}>
+          {tr.EditSurvey.emailReports}
+        </Typography>
         <div>
           <FormControlLabel
             control={
