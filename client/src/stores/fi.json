@@ -719,7 +719,10 @@
     "logout": "Kirjaudu ulos",
     "updateInstructions": "Päivitä käyttöohjeet",
     "userManagement": "Käyttäjähallinta",
-    "editMapPublications": "Muokkaa karttajulkaisuja"
+    "editMapPublications": "Muokkaa karttajulkaisuja",
+    "selectDefaultLanguage": "Valitse sovelluksen oletuskieli",
+    "defaultLanguageSaved": "Oletuskieli tallennettu",
+    "defaultLanguageSaveFailed": "Oletuskielen tallentaminen epäonnistui"
   },
   "AppBarInstructionsMenu": {
     "label": "Ohjeet",

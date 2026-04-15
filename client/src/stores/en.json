@@ -718,7 +718,10 @@
     "logout": "Logout",
     "updateInstructions": "Update user instructions",
     "userManagement": "User management",
-    "editMapPublications": "Edit map publications"
+    "editMapPublications": "Edit map publications",
+    "selectDefaultLanguage": "Select application default language",
+    "defaultLanguageSaved": "Default language saved",
+    "defaultLanguageSaveFailed": "Failed to save default language"
   },
   "AppBarInstructionsMenu": {
     "label": "Instructions",

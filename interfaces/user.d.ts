@@ -1,3 +1,5 @@
+import type { LanguageCode } from './survey';
+
 interface Organization {
   id: string;
   name: string;
@@ -35,4 +37,8 @@ export interface User {
    * User's group ids
    */
   groups?: string[];
+  /**
+   * User's preferred default UI language
+   */
+  defaultLanguage?: LanguageCode;
 }

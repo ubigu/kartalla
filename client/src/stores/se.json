@@ -717,7 +717,10 @@
     "logout": "Logga ut",
     "updateInstructions": "Uppdatera instruktioner",
     "userManagement": "Användarhantering",
-    "editMapPublications": "Redigera kartpublikationer"
+    "editMapPublications": "Redigera kartpublikationer",
+    "selectDefaultLanguage": "Välj applikationens standardspråk",
+    "defaultLanguageSaved": "Standardspråk sparat",
+    "defaultLanguageSaveFailed": "Det gick inte att spara standardspråket"
   },
   "AppBarInstructionsMenu": {
     "label": "Instruktioner",

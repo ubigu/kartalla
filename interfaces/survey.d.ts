@@ -677,7 +677,7 @@ export interface SectionOptionGroup {
 /**
  * Supported language codes
  */
-type LanguageCode = 'fi' | 'en' | 'se';
+export type LanguageCode = 'fi' | 'en' | 'se';
 
 /**
  * Type for localization typing

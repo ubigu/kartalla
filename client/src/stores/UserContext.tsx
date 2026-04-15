@@ -10,14 +10,14 @@ import {
   useReducer,
 } from 'react';
 import { useToasts } from './ToastContext';
-import { useTranslations } from './TranslationContext';
+import { Language, useTranslations } from './TranslationContext';
 
 /**
  * Context state type
  */
 type State = {
   isInitialized: boolean;
-  activeUser: User;
+  activeUser: User | null;
   otherUsers: User[];
   allUsers: User[];
 };
@@ -118,7 +118,7 @@ function reducer(state: State, action: Action): State {
 export default function UserProvider({ children }: Props) {
   const [state, dispatch] = useReducer(reducer, stateDefaults);
   const { showToast } = useToasts();
-  const { tr } = useTranslations();
+  const { tr, setLanguage } = useTranslations();
 
   /**
    * Use useMemo here to avoid unnecessary rerenders
@@ -139,6 +139,12 @@ export default function UserProvider({ children }: Props) {
           (response) => response.json() as Promise<User[]>,
         );
 
+        if (
+          currentUser.defaultLanguage &&
+          !new URLSearchParams(window.location.search).has('lang')
+        ) {
+          setLanguage(currentUser.defaultLanguage as Language);
+        }
         dispatch({ type: 'SET_ACTIVE_USER', user: currentUser });
         dispatch({ type: 'SET_OTHER_USERS', users: otherUsers });
         dispatch({

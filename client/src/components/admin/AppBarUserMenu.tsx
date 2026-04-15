@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SettingsIcon from '@src/components/icons/SettingsIcon';
@@ -6,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { DefaultLanguageDialog } from './DefaultLanguageDialog';
 import { InstructionsDialog } from './InstructionsDialog';
 
 const useStyles = makeStyles({
@@ -17,8 +17,10 @@ const useStyles = makeStyles({
 
 export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
+  const [defaultLanguageDialogOpen, setDefaultLanguageDialogOpen] =
+    useState(false);
   const { activeUserIsSuperUser, activeUserIsAdmin } = useUser();
   const classes = useStyles();
   const { tr } = useTranslations();
@@ -74,12 +76,25 @@ export default function AppBarUserMenu() {
             {tr.AppBarUserMenu.userManagement}
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            setMenuOpen(false);
+            setDefaultLanguageDialogOpen(true);
+          }}
+        >
+          {tr.AppBarUserMenu.selectDefaultLanguage}
+        </MenuItem>
         {activeUserIsSuperUser && (
           <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
             {tr.AppBarUserMenu.updateInstructions}
           </MenuItem>
         )}
       </Menu>
+      <DefaultLanguageDialog
+        isOpen={defaultLanguageDialogOpen}
+        setIsOpen={setDefaultLanguageDialogOpen}
+        setMenuOpen={setMenuOpen}
+      />
       <InstructionsDialog
         isOpen={instructionsDialogOpen}
         setIsOpen={setInstructionsDialogOpen}

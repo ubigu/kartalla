@@ -3,8 +3,10 @@ import en from './en.json';
 import fi from './fi.json';
 import se from './se.json';
 
+export const LANGUAGE_CODES: LanguageCode[] = ['fi', 'en', 'se'];
+
 export function isLanguageCode(value: unknown): value is LanguageCode {
-  return value === 'fi' || value === 'en' || value === 'se';
+  return LANGUAGE_CODES.includes(value as LanguageCode);
 }
 
 export default function useTranslations(lang: LanguageCode) {

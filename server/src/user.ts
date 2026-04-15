@@ -8,7 +8,9 @@ import {
 import { BadRequestError, InternalServerError } from './error';
 import { sendMail } from './email/email';
 import logger from './logger';
-import useTranslations from './translations/useTranslations';
+import useTranslations, {
+  isLanguageCode,
+} from './translations/useTranslations';
 import { UserGroup } from '@interfaces/userGroup';
 import { secrets } from './keyVaultSecrets';
 
@@ -29,6 +31,7 @@ interface DbUser {
   roles: string[];
   isPending?: boolean;
   groups?: string[];
+  default_language?: string;
 }
 
 interface DBUserGroupMember {
@@ -119,6 +122,9 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         roles: dbUser.roles,
         ...(dbUser.isPending && { isPending: dbUser.isPending }),
         ...(dbUser.groups && { groups: dbUser.groups }),
+        ...(isLanguageCode(dbUser.default_language) && {
+          defaultLanguage: dbUser.default_language,
+        }),
       };
 }
 
@@ -279,6 +285,7 @@ export async function getUser(id: string) {
       pgp_sym_decrypt(email, $2) as email,
       organizations,
       roles,
+      default_language,
       COALESCE(array_agg(ugm.group_id) FILTER (WHERE ugm.group_id IS NOT NULL), '{}') as groups
     FROM application.user usr
     LEFT JOIN application.user_group_member ugm ON usr.id = ugm.user_id
@@ -387,6 +394,16 @@ export async function updatePendingUserGroupMembership(
       {},
     );
   });
+}
+
+export async function updateUserDefaultLanguage(
+  userId: string,
+  language: string,
+) {
+  await getDb().none(
+    `UPDATE application.user SET default_language = $1 WHERE id = $2`,
+    [language, userId],
+  );
 }
 
 export async function getUserGroupsForUser(userId: string) {
