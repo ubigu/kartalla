@@ -18,7 +18,7 @@ export default function EditSurveyAppearance(props: Props) {
 
   return (
     <Fieldset loading={activeSurveyLoading}>
-      <Typography variant="h4" component={'h1'}>
+      <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.appearance}
       </Typography>
       <SurveyImageList imageType={'backgroundImage'} canEdit={props.canEdit} />

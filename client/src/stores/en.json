@@ -37,6 +37,7 @@
     "newSurvey": "New survey",
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
     "untitledPage": "Untitled page",
+    "page": "Page",
     "fetchFailed": "Unable to access the survey. Please try again later.",
     "saveSuccessful": "Survey saved successfully!",
     "saveFailed": "Failed to save the survey. Please try again later.",
@@ -57,7 +58,7 @@
     "emailReports": "Email reports",
     "openSurveyPage": "Open survey page",
     "email": "Email",
-    "newPage": "Create page",
+    "newPage": "Create a new page...",
     "newPageFailed": "Error while creating a new page. Please try again later.",
     "thanksPage": "Thanks page",
     "translations": "Translations",
@@ -74,7 +75,12 @@
     "attachNewPage": "Attach page",
     "pageAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
     "pageCopied": "Page copied to clipboard. Use can now attach the page to any survey.",
-    "checkConditionalSections": "Please note that conditions for follow up questions are not copied."
+    "checkConditionalSections": "Please note that conditions for follow up questions are not copied.",
+    "settings": "Settings",
+    "content": "Content",
+    "multilingualism": "Multilingualism",
+    "manageTranslations": "Manage translations",
+    "developedBy": "Kartalla survey service developed by Ubigu Oy"
   },
   "EditSurveyInfo": {
     "title": "Survey title",
@@ -708,6 +714,7 @@
     "showOldResponses": "Display {x} older comments"
   },
   "AppBar": {
+    "survey": "Survey",
     "generalNotifications": "Notifications",
     "generalNotificationsNew": "New notifications",
     "generalNotificationsError": "Error while fetching general notifications",
@@ -775,7 +782,8 @@
     "optionInfo": "Option info",
     "emailInfo": "Email",
     "thanksPage": "Thank you -page",
-    "errorAtleastOnelanguage": "Atleast one language must be selected."
+    "errorAtleastOnelanguage": "Atleast one language must be selected.",
+    "addLanguage": "Add language"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",

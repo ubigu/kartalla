@@ -35,6 +35,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
+import DeleteBinIcon from '../icons/DeleteBinIcon';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
@@ -174,8 +175,14 @@ export default function EditSurveyPage(props: Props) {
     );
   }
 
+  const pageNumber = activeSurvey.pages.findIndex((p) => p.id === page?.id) + 1;
+  const pageTitle = page?.title?.[surveyLanguage] || tr.EditSurvey.untitledPage;
+
   return !page ? null : (
     <Fieldset loading={loading}>
+      <Typography variant="mainHeader" component="h1">
+        {`${tr.EditSurvey.page} ${pageNumber}: ${pageTitle}`}
+      </Typography>
       <TextField
         label={tr.EditSurveyPage.name}
         required
@@ -189,7 +196,7 @@ export default function EditSurveyPage(props: Props) {
       />
       {props.canEdit && (
         <Button
-          style={{
+          sx={{
             display: 'flex',
             position: 'fixed',
             right: '2rem',
@@ -199,6 +206,7 @@ export default function EditSurveyPage(props: Props) {
           color="error"
           variant="contained"
           className={classes.button}
+          startIcon={<DeleteBinIcon stroke={'currentColor'} />}
           onClick={() => {
             setDeleteConfirmDialogOpen(true);
           }}

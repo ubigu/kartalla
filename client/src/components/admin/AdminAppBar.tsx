@@ -11,8 +11,8 @@ import {
 import { SystemStyleObject } from '@mui/system';
 import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import LogoutIcon from '@src/components/icons/LogoutIcon';
-import { useHistory } from 'react-router-dom';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useHistory } from 'react-router-dom';
 import LanguageMenu from '../LanguageMenu';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
@@ -43,14 +43,14 @@ export function AdminAppBar({
               display: 'flex',
               flexWrap: 'nowrap',
               color: 'white',
+              height: '50px',
               '& li': {
                 padding: '0',
               },
-              'li+li::before': {
-                content: '" • "',
-                padding: '0px 10px',
-                lineHeight: 1.6,
-                fontSize: '1.25rem',
+              'li+li': {
+                borderLeft: '1px solid #FFFFFF',
+                marginLeft: '10px',
+                paddingLeft: '10px',
               },
             }}
           >
@@ -61,7 +61,6 @@ export function AdminAppBar({
                   sx={{
                     padding: 0,
                     width: '140px',
-                    transform: 'translateY(-2px)',
                     '&:hover': {
                       backgroundColor: 'transparent',
                       opacity: 0.6,
@@ -79,9 +78,13 @@ export function AdminAppBar({
               >
                 <Typography
                   noWrap
-                  variant="subtitle1"
                   component="p"
-                  sx={{ textOverflow: 'ellipsis', color: 'white' }}
+                  variant="mainHeader"
+                  sx={{
+                    textOverflow: 'ellipsis',
+                    color: 'white',
+                    fontSize: '24px',
+                  }}
                   title={item}
                 >
                   {item}

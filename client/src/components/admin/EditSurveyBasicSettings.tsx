@@ -76,7 +76,7 @@ export default function EditSurveyBasicSettings(props: Props) {
   return (
     <>
       <Fieldset loading={activeSurveyLoading}>
-        <Typography variant="h4" component={'h1'}>
+        <Typography variant="mainHeader" component={'h1'}>
           {tr.EditSurvey.basicSettings}
         </Typography>
         <TextField

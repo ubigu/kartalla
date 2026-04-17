@@ -1,3 +1,4 @@
+import '@fontsource-variable/comfortaa';
 import '@fontsource/nunito/300.css';
 import '@fontsource/nunito/400.css';
 import '@fontsource/nunito/500.css';

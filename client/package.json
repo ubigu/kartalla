@@ -37,6 +37,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@fontsource-variable/comfortaa": "^5.2.8",
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/nunito": "^5.2.7",
     "@fontsource/open-sans": "^4.5.14",

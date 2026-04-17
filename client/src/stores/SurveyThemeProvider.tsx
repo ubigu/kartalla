@@ -5,12 +5,8 @@ import { fiFI } from '@mui/material/locale';
 import { ThemeProvider } from '@mui/material/styles';
 import { ubiTheme } from '@src/themes/common';
 
-import {
-  buttonOverrides,
-  defaultSurveyTheme,
-  inputOverrides,
-  stepperOverrides,
-} from '@src/themes/survey';
+import { defaultSurveyTheme } from '@src/themes/survey';
+import { surveyOverrides } from '@src/themes/overrides';
 import {
   createContext,
   Dispatch,
@@ -76,11 +72,7 @@ export function useSurveyTheme() {
             ubiTheme,
             {
               ...survey.theme?.data,
-              components: {
-                ...buttonOverrides,
-                ...inputOverrides,
-                ...stepperOverrides,
-              },
+              components: surveyOverrides,
             },
             fiFI,
           )

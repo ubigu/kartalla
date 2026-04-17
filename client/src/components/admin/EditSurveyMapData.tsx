@@ -44,7 +44,7 @@ export default function EditSurveyMapData() {
 
   return (
     <Fieldset loading={activeSurveyLoading}>
-      <Typography variant="h4" component={'h1'}>
+      <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.mapData}
       </Typography>
       {mapPublicationsLoading ? (

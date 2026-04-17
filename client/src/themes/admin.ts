@@ -1,8 +1,8 @@
 import { fiFI } from '@mui/material/locale';
 import { createTheme } from '@mui/material/styles';
 import { CSSProperties } from 'react';
-import { surveyCardOverrides, ubiElevated, ubiTheme } from './common';
-import { buttonOverrides } from './survey';
+import { ubiTheme } from './common';
+import { adminOverrides } from './overrides';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -13,43 +13,17 @@ declare module '@mui/material/styles' {
     published?: CSSProperties;
   }
 }
-declare module '@mui/material/Typography' {
-  interface TypographyPropsVariantOverrides {
-    published: true;
-  }
-}
-
 export const theme = createTheme(
   ubiTheme,
   {
+    // TODO: should be checked if this extra augmentation is really needed.
     palette: {
       disabled: ubiTheme.palette.augmentColor({
-        color: {
-          main: '#858585',
-        },
+        color: { main: '#858585' },
         name: 'disabled',
       }),
     },
-    components: {
-      ...surveyCardOverrides,
-      ...buttonOverrides,
-      MuiAppBar: {
-        styleOverrides: {
-          root: {
-            boxShadow: ubiElevated,
-          },
-        },
-      },
-      MuiChip: {
-        styleOverrides: {
-          root: {
-            '&.Mui-disabled': {
-              opacity: 0.8,
-            },
-          },
-        },
-      },
-    },
+    components: adminOverrides,
   },
   fiFI,
 );

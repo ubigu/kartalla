@@ -26,7 +26,7 @@ export default function TextSection({ section, isFollowUp = false }: Props) {
         {section.title?.[surveyLanguage] && (
           <Typography
             variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
-            sx={{ color: survey.sectionTitleColor ?? '#000000', margin: 0 }}
+            sx={{ color: survey?.sectionTitleColor, margin: 0 }}
           >
             {section.title?.[surveyLanguage]}
           </Typography>
@@ -38,7 +38,7 @@ export default function TextSection({ section, isFollowUp = false }: Props) {
           />
         )}
       </div>
-      <div style={{ color: section.bodyColor ?? '#000000' }}>
+      <div style={{ color: section.bodyColor }}>
         <MarkdownView>{section.body?.[surveyLanguage]}</MarkdownView>
       </div>
     </>
