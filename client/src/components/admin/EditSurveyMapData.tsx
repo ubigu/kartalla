@@ -2,6 +2,7 @@
 import { MapPublication } from '@interfaces/mapPublications';
 import {
   Autocomplete,
+  Box,
   FormLabel,
   Skeleton,
   TextField,
@@ -12,7 +13,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getLayerName } from '@src/utils/oskariHelpers';
 import { useEffect, useState } from 'react';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 
 export default function EditSurveyMapData() {
   const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
@@ -43,7 +44,15 @@ export default function EditSurveyMapData() {
   }, []);
 
   return (
-    <Fieldset loading={activeSurveyLoading}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '36px',
+        maxWidth: 'min(55em, 70%)',
+        ...(activeSurveyLoading && loadingPulse),
+      }}
+    >
       <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.mapData}
       </Typography>
@@ -107,6 +116,6 @@ export default function EditSurveyMapData() {
           </ul>
         </div>
       )}
-    </Fieldset>
+    </Box>
   );
 }

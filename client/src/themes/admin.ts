@@ -23,6 +23,10 @@ export const theme = createTheme(
         name: 'disabled',
       }),
     },
+    typography: {
+      fontSize: 14,
+      htmlFontSize: 14,
+    },
     components: adminOverrides,
   },
   fiFI,

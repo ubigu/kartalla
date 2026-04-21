@@ -1,14 +1,14 @@
 // @ts-strict-ignore
 import { User } from '@interfaces/user';
 import { UserGroup } from '@interfaces/userGroup';
-import { Autocomplete, Chip, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Chip, TextField, Typography } from '@mui/material';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useEffect, useState } from 'react';
 import { useUser } from '../../stores/UserContext';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 
 interface Props {
   canEdit: boolean;
@@ -56,7 +56,15 @@ export default function EditSurveyPermissions(props: Props) {
   }
 
   return (
-    <Fieldset loading={activeSurveyLoading}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '36px',
+        maxWidth: 'min(55em, 70%)',
+        ...(activeSurveyLoading && loadingPulse),
+      }}
+    >
       <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.permissions}
       </Typography>
@@ -178,6 +186,6 @@ export default function EditSurveyPermissions(props: Props) {
           });
         }}
       />
-    </Fieldset>
+    </Box>
   );
 }

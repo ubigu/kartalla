@@ -74,7 +74,9 @@ export default function EditSurveyControls() {
               discardChanges();
             }}
           >
-            <UndoIcon htmlColor={!undoDisabled && theme.palette.primary.main} />
+            <UndoIcon
+              htmlColor={!undoDisabled ? theme.palette.primary.main : undefined}
+            />
           </Fab>
         </span>
       </Tooltip>

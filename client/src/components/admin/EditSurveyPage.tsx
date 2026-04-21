@@ -34,7 +34,7 @@ import { getLayerName } from '@src/utils/oskariHelpers';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 import DeleteBinIcon from '../icons/DeleteBinIcon';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
@@ -179,7 +179,15 @@ export default function EditSurveyPage(props: Props) {
   const pageTitle = page?.title?.[surveyLanguage] || tr.EditSurvey.untitledPage;
 
   return !page ? null : (
-    <Fieldset loading={loading}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '36px',
+        maxWidth: 'min(55em, 70%)',
+        ...(loading && loadingPulse),
+      }}
+    >
       <Typography variant="mainHeader" component="h1">
         {`${tr.EditSurvey.page} ${pageNumber}: ${pageTitle}`}
       </Typography>
@@ -569,6 +577,6 @@ export default function EditSurveyPage(props: Props) {
           </Button>
         </DialogActions>
       </Dialog>
-    </Fieldset>
+    </Box>
   );
 }

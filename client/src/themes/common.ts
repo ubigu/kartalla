@@ -29,6 +29,7 @@ declare module '@mui/material/styles' {
     surfaceSuccess: Palette['primary'];
     surfaceWarning: Palette['primary'];
     textError: Palette['primary'];
+    textWarning: Palette['primary'];
     textlink: Palette['primary'];
     textSecondary: Palette['primary'];
     textSubtle: Palette['primary'];
@@ -50,6 +51,7 @@ declare module '@mui/material/styles' {
     surfaceSuccess?: PaletteOptions['primary'];
     surfaceWarning?: PaletteOptions['primary'];
     textError?: PaletteOptions['primary'];
+    textWarning?: PaletteOptions['primary'];
     textlink?: PaletteOptions['primary'];
     textSecondary?: PaletteOptions['primary'];
     textSubtle?: PaletteOptions['primary'];
@@ -79,13 +81,17 @@ export const ubiTheme = createTheme({
     textSecondary: augment('textSecondary'),
     textSubtle: augment('textSubtle'),
     surfacePrimary: augment('surfacePrimary'),
-    surfaceSubtle: augment('surfaceSubtle'),
+    surfaceSubtle: baseTheme.palette.augmentColor({
+      color: { main: colors.surfaceSubtle, dark: colors.surfaceSubtleDark },
+      name: 'surfaceSubtle',
+    }),
     surfaceError: augment('surfaceError'),
     surfaceInfo: augment('surfaceInfo'),
     surfaceInput: augment('surfaceInput'),
     surfaceSuccess: augment('surfaceSuccess'),
     surfaceWarning: augment('surfaceWarning'),
     textError: augment('textError'),
+    textWarning: augment('textWarning'),
   },
   typography: { fontFamily: 'Nunito' },
   components: commonOverrides,

@@ -1,6 +1,7 @@
 // @ts-strict-ignore
 import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
+  Box,
   Checkbox,
   FormControlLabel,
   FormHelperText,
@@ -12,7 +13,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 
 import { useToasts } from '@src/stores/ToastContext';
 import CopyToClipboard from '../CopyToClipboard';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
@@ -130,7 +131,15 @@ export default function EditSurveyTranslations() {
 
   return (
     <>
-      <Fieldset loading={activeSurveyLoading}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '36px',
+          maxWidth: 'min(55em, 70%)',
+          ...(activeSurveyLoading && loadingPulse),
+        }}
+      >
         <div>
           <FormControlLabel
             control={
@@ -531,7 +540,7 @@ export default function EditSurveyTranslations() {
             </div>
           </>
         )}
-      </Fieldset>
+      </Box>
     </>
   );
 }

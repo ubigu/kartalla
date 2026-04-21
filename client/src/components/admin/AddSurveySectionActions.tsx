@@ -2,33 +2,16 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { isFeatureSupported } from '@src/utils/enabledFeatures';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import BudgetingIcon from '../icons/BudgetingIcon';
-import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';
 import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
-import DownloadFileIcon from '../icons/DownloadFileIcon';
-import { ImageCheckIcon } from '../icons/ImageCheckIcon';
-import ImageSmallIcon from '../icons/ImageSmallIcon';
-import LikertGroupIcon from '../icons/LikertGroupIcon';
-import MapIcon from '../icons/MapIcon';
-import MatrixIcon from '../icons/MatrixIcon';
-import MultiCheckmarkIcon from '../icons/MultiCheckmarkIcon';
-import NumericFieldIcon from '../icons/NumericFieldIcon';
-import OrderedIcon from '../icons/OrderedIcon';
-import PaperclipIcon from '../icons/PaperclipIcon';
-import PersonIcon from '../icons/PersonIcon';
-import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
-import SliderIcon from '../icons/SliderIcon';
-import TextFieldIcon from '../icons/TextFieldIcon';
-import TextSectionIcon from '../icons/TextSectionIcon';
+import { sectionTypeIcons } from './surveySectionIcons';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -266,85 +249,71 @@ export default function AddSurveySectionActions(props: Props) {
     type: SurveyPageSection['type'];
     label: string;
     ariaLabel: string;
-    icon: ReactNode;
   }[] = [
     {
       type: 'personal-info',
       label: tr.AddSurveySectionActions.personalInfoQuestion,
       ariaLabel: 'add-personal-info-section',
-      icon: <PersonIcon />,
     },
     {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
       ariaLabel: 'add-radio-question',
-      icon: <RadioButtonCheckedIcon />,
     },
     {
       type: 'radio-image',
       label: tr.AddSurveySectionActions.radioImageQuestion,
       ariaLabel: 'add-radio-image-question',
-      icon: <ImageCheckIcon />,
     },
     {
       type: 'checkbox',
       label: tr.AddSurveySectionActions.checkBoxQuestion,
       ariaLabel: 'add-checkbox-question',
-      icon: <CheckboxCheckedIcon />,
     },
     {
       type: 'free-text',
       label: tr.AddSurveySectionActions.freeTextQuestion,
       ariaLabel: 'add-free-text-question',
-      icon: <TextFieldIcon />,
     },
     {
       type: 'numeric',
       label: tr.AddSurveySectionActions.numericQuestion,
       ariaLabel: 'add-numeric-question',
-      icon: <NumericFieldIcon />,
     },
     {
       type: 'map',
       label: tr.AddSurveySectionActions.mapQuestion,
       ariaLabel: 'add-map-question',
-      icon: <MapIcon />,
     },
     {
       type: 'sorting',
       label: tr.AddSurveySectionActions.sortingQuestion,
       ariaLabel: 'add-sorting-question',
-      icon: <OrderedIcon />,
     },
     {
       type: 'slider',
       label: tr.AddSurveySectionActions.sliderQuestion,
       ariaLabel: 'add-slider-question',
-      icon: <SliderIcon />,
     },
     {
       type: 'matrix',
       label: tr.AddSurveySectionActions.matrixQuestion,
       ariaLabel: 'add-matrix-question',
-      icon: <MatrixIcon />,
     },
     {
       type: 'multi-matrix',
       label: tr.AddSurveySectionActions.multiMatrixQuestion,
       ariaLabel: 'add-multiple-choice-matrix-question',
-      icon: <LikertGroupIcon />,
     },
     {
       type: 'grouped-checkbox',
       label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
       ariaLabel: 'add-grouped-checkbox-question',
-      icon: <MultiCheckmarkIcon />,
     },
     {
       type: 'attachment',
       label: tr.AddSurveySectionActions.attachmentSection,
       ariaLabel: 'add-attachment-section',
-      icon: <PaperclipIcon />,
     },
     ...(isFeatureSupported('budgetingQuestion')
       ? [
@@ -352,13 +321,11 @@ export default function AddSurveySectionActions(props: Props) {
             type: 'budgeting',
             label: tr.AddSurveySectionActions.budgetingQuestion,
             ariaLabel: 'add-budgeting-section',
-            icon: <BudgetingIcon />,
           } as const,
           {
             type: 'geo-budgeting',
             label: tr.AddSurveySectionActions.geoBudgetingQuestion,
             ariaLabel: 'add-geo-budgeting-section',
-            icon: <GeoBudgetingIcon />,
           } as const,
         ]
       : []),
@@ -368,25 +335,21 @@ export default function AddSurveySectionActions(props: Props) {
     type: SurveyPageSection['type'];
     label: string;
     ariaLabel: string;
-    icon: ReactNode;
   }[] = [
     {
       type: 'text',
       label: tr.AddSurveySectionActions.textSection,
       ariaLabel: 'add-text-section',
-      icon: <TextSectionIcon />,
     },
     {
       type: 'image',
       label: tr.AddSurveySectionActions.imageSection,
       ariaLabel: 'add-image-section',
-      icon: <ImageSmallIcon />,
     },
     {
       type: 'document',
       label: tr.AddSurveySectionActions.documentSection,
       ariaLabel: 'add-document-section',
-      icon: <DownloadFileIcon />,
     },
   ];
 
@@ -423,7 +386,7 @@ export default function AddSurveySectionActions(props: Props) {
                         style={{ minWidth: '40px' }}
                         sx={{ boxShadow: 'none' }}
                       >
-                        {button.icon}
+                        {sectionTypeIcons[button.type]}
                       </Fab>
                     </span>
                   </Tooltip>
@@ -449,7 +412,7 @@ export default function AddSurveySectionActions(props: Props) {
                     disabled={props.disabled}
                     sx={{ boxShadow: 'none' }}
                   >
-                    {button.icon}
+                    {sectionTypeIcons[button.type]}
                   </Fab>
                   <Typography>{button.label}</Typography>
                 </div>

@@ -20,6 +20,7 @@ import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
 import ThanksPageIcon from '@src/components/icons/ThanksPageIcon';
 
+import { CoreSelect } from '@src/components/core/Select';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -28,7 +29,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import SideBarItem, { SIDEBAR_PAGE_ICON_CLASS } from '../SideBarItem';
 
-import { Conditions, SurveyPage } from '@interfaces/survey';
+import { Conditions, LanguageCode, SurveyPage } from '@interfaces/survey';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import {
@@ -41,6 +42,7 @@ import PadlockIcon from '../icons/PadlockIcon';
 import PaintPaletteIcon from '../icons/PaintPaletteIcon';
 import ShareExternalLinkIcon from '../icons/ShareExternalLinkIcon';
 import TranslateTextIcon from '../icons/TranslateTextIcon';
+import { collectPageFields } from './EditSurveyTranslationsV2';
 
 const pulse = keyframes`
   0% { opacity: 0.4; }
@@ -65,27 +67,35 @@ const styles = {
   loading: (theme: Theme) => ({
     animation: `${pulse} 1s ${theme.transitions.easing.easeIn} infinite`,
   }),
-  languagesBox: () => ({
+  languagesBox: {
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: '4px',
-    width: '100%',
-  }),
-  langBadge: (isActive: boolean) => (theme: Theme) => ({
-    width: 22,
-    height: 22,
-    borderRadius: '50%',
-    border: `1px solid ${isActive ? theme.palette.havu.main : theme.palette.borderSecondary.main}`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '11px',
-    fontWeight: isActive ? 600 : 400,
-    color: isActive
-      ? theme.palette.havu.main
-      : theme.palette.borderSecondary.main,
-    flexShrink: 0,
-  }),
+    flex: 0,
+    height: 'fit-content',
+  },
+  langBadge: (status: 'default' | 'warning' | 'error') => (theme: Theme) => {
+    const colorByStatus = {
+      default: theme.palette.borderSecondary.main,
+      warning: theme.palette.textWarning.main,
+      error: theme.palette.textError.main,
+    };
+    const color = colorByStatus[status];
+    return {
+      width: 22,
+      height: 22,
+      borderRadius: '50%',
+      border: `1px solid ${color}`,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '11px',
+      fontWeight: status !== 'default' ? 600 : 400,
+      color,
+      flexShrink: 0,
+    };
+  },
   sectionHeader: {
     marginTop: '16px',
     paddingX: '16px',
@@ -93,7 +103,32 @@ const styles = {
     borderBottom: 'solid 2px #C4CEDA',
   },
   list: { padding: 0, alignSelf: 'stretch' },
+  footer: (theme: Theme) => ({
+    position: 'sticky',
+    bottom: 0,
+    zIndex: 1,
+    background: theme.palette.surfaceSubtle.main,
+    marginTop: 'auto',
+    padding: '8px',
+    fontSize: '12px',
+    textAlign: 'center',
+    alignSelf: 'stretch',
+  }),
 };
+
+function getLangBadgeStatus(
+  pages: SurveyPage[],
+  lang: LanguageCode,
+): 'default' | 'warning' | 'error' {
+  let anyMissing = false;
+  for (const page of pages) {
+    const fields = collectPageFields(page, lang);
+    const filledCount = fields.filter((f) => f.trim()).length;
+    if (filledCount === 0) return 'error';
+    if (filledCount < fields.length) anyMissing = true;
+  }
+  return anyMissing ? 'warning' : 'default';
+}
 
 interface Props {
   allowEditing: boolean;
@@ -113,7 +148,8 @@ export default function EditSurveySideBar(props: Props) {
     activeSurveyLoading,
     movePage,
   } = useSurvey();
-  const { tr, surveyLanguage, language, languages } = useTranslations();
+  const { tr, surveyLanguage, setSurveyLanguage, language, languages } =
+    useTranslations();
   const { showToast } = useToasts();
   const { clipboardSection, setClipboardPage, clipboardPage } = useClipboard();
   const theme = useTheme();
@@ -139,6 +175,30 @@ export default function EditSurveySideBar(props: Props) {
         />
         <ListItemText primary={tr.EditSurvey.toFrontPage} />
       </SideBarItem>
+      {activeSurvey.localisationEnabled && (
+        <Box
+          sx={{
+            padding: '8px 12px',
+            borderBottom: `solid 1px ${theme.palette.borderSecondary.main}`,
+          }}
+        >
+          <CoreSelect
+            sx={(theme) => ({ background: theme.palette.surfacePrimary.main })}
+            id="sidebar-survey-language"
+            label={tr.SurveyLanguageMenu.workingLanguage}
+            value={surveyLanguage}
+            onChange={(e) =>
+              setSurveyLanguage(e.target.value as typeof surveyLanguage)
+            }
+            options={languages
+              .filter((lang) => activeSurvey.enabledLanguages[lang])
+              .map((lang) => ({
+                value: lang,
+                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+              }))}
+          />
+        </Box>
+      )}
       <Typography
         mt={1}
         sx={styles.sectionHeader}
@@ -456,45 +516,44 @@ export default function EditSurveySideBar(props: Props) {
           )}
         </Droppable>
       </DragDropContext>
-
-      <Typography
-        component={'h2'}
-        sx={styles.sectionHeader}
-        variant="secondaryHeader"
-      >
-        {tr.EditSurvey.multilingualism}
-      </Typography>
-      <Box sx={styles.languagesBox}>
-        <SideBarItem to={`${url}/käännökset?lang=${language}`}>
-          <TranslateTextIcon />
-          <Typography>{tr.EditSurvey.manageTranslations}</Typography>
-
-          <Box sx={{ display: 'flex', gap: '2px' }}>
-            {languages
-              .filter((lang) => activeSurvey.enabledLanguages[lang])
-              .map((lang) => (
-                <Box key={lang} sx={styles.langBadge(lang === surveyLanguage)}>
-                  {lang}
-                </Box>
-              ))}
-          </Box>
-        </SideBarItem>
-      </Box>
-      <Typography
-        sx={{
-          position: 'sticky',
-          bottom: 0,
-          zIndex: 1,
-          background: theme.palette.surfaceSubtle.main,
-          marginTop: 'auto',
-          padding: '8px',
-          fontSize: '12px',
-          textAlign: 'center',
-          alignSelf: 'stretch',
-        }}
-      >
-        {tr.EditSurvey.developedBy}
-      </Typography>
+      {activeSurvey.localisationEnabled && (
+        <>
+          <Typography
+            component={'h2'}
+            sx={styles.sectionHeader}
+            variant="secondaryHeader"
+          >
+            {tr.EditSurvey.multilingualism}
+          </Typography>
+          <SideBarItem
+            sxProps={styles.languagesBox}
+            to={`${url}/käännökset?lang=${language}`}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <TranslateTextIcon />
+              <Typography>{tr.EditSurvey.manageTranslations}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: '4px', marginLeft: '16px' }}>
+              {languages
+                .filter((lang) => activeSurvey.enabledLanguages[lang])
+                .map((lang) => (
+                  <Box
+                    key={lang}
+                    sx={styles.langBadge(
+                      getLangBadgeStatus(
+                        activeSurvey.pages,
+                        lang as LanguageCode,
+                      ),
+                    )}
+                  >
+                    {lang}
+                  </Box>
+                ))}
+            </Box>
+          </SideBarItem>
+        </>
+      )}
+      <Typography sx={styles.footer}>{tr.EditSurvey.developedBy}</Typography>
     </Box>
   );
 }

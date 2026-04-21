@@ -34,7 +34,7 @@ export default function EditSurvey() {
     activeSurvey,
     hasActiveSurveyChanged,
   } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, setSurveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
@@ -70,6 +70,12 @@ export default function EditSurvey() {
     fetchSurvey();
   }, [surveyId]);
 
+  useEffect(() => {
+    if (activeSurvey?.primaryLanguage) {
+      setSurveyLanguage(activeSurvey.primaryLanguage);
+    }
+  }, [activeSurvey?.id]);
+
   return !activeSurvey || String(activeSurvey.id) !== surveyId ? (
     <Box
       sx={{
@@ -93,7 +99,6 @@ export default function EditSurvey() {
       <Box
         sx={{
           display: 'flex',
-          overflow: 'hidden',
           height: 'calc(min(100svh, 100vh) - 64px)',
           flexDirection: 'row-reverse', // So that h1 header comes before subheaders at dom
         }}
@@ -102,48 +107,43 @@ export default function EditSurvey() {
           component="main"
           sx={{
             position: 'relative',
-            overflowY: 'auto',
+            overflow: 'auto',
             flex: 1,
-            p: 3,
-            boxSizing: 'border-box',
+            p: '24px',
           }}
         >
-          <Box
-            sx={{
-              maxWidth: 'min(55em, 70%)',
-            }}
-          >
-            <Switch>
-              <Route path={`${path}/perusasetukset`}>
-                <EditSurveyBasicSettings canEdit={allowEditing} />
-              </Route>
-              <Route path={`${path}/käyttäjäoikeudet`}>
-                <EditSurveyPermissions canEdit={allowEditing} />
-              </Route>
-              <Route path={`${path}/ulkoasu`}>
-                <EditSurveyAppearance canEdit={allowEditing} />
-              </Route>
-              <Route path={`${path}/kartta-aineistot`}>
-                <EditSurveyMapData />
-              </Route>
-              <Route path={`${path}/sähköpostit`}>
-                <EditSurveyEmail />
-              </Route>
-              <Route path={`${path}/sivut/:pageId`}>
-                <EditSurveyPage canEdit={allowEditing} />
-              </Route>
-              <Route path={`${path}/kiitos-sivu`}>
-                <EditSurveyThanksPage canEdit={allowEditing} />
-              </Route>
+          <Switch>
+            <Route path={`${path}/perusasetukset`}>
+              <EditSurveyBasicSettings canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/käyttäjäoikeudet`}>
+              <EditSurveyPermissions canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/ulkoasu`}>
+              <EditSurveyAppearance canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/kartta-aineistot`}>
+              <EditSurveyMapData />
+            </Route>
+            <Route path={`${path}/sähköpostit`}>
+              <EditSurveyEmail />
+            </Route>
+            <Route path={`${path}/sivut/:pageId`}>
+              <EditSurveyPage canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/kiitos-sivu`}>
+              <EditSurveyThanksPage canEdit={allowEditing} />
+            </Route>
+            {activeSurvey.localisationEnabled && (
               <Route path={`${path}/käännökset`}>
                 <EditSurveyTranslationsV2 />
               </Route>
-              <Route path="*">
-                {/* By default redirect to basic settings */}
-                <Redirect to={`${url}/perusasetukset`} />
-              </Route>
-            </Switch>
-          </Box>
+            )}
+            <Route path="*">
+              {/* By default redirect to basic settings */}
+              <Redirect to={`${url}/perusasetukset`} />
+            </Route>
+          </Switch>
           {allowEditing && <EditSurveyControls />}
         </Box>
         <EditSurveySideBar allowEditing={allowEditing} />

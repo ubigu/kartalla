@@ -763,7 +763,11 @@
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Vaihda kyselyn kieltä",
-    "surveyLanguage": "Kyselyn kieli"
+    "surveyLanguage": "Kyselyn kieli",
+    "workingLanguage": "Työstökieli",
+    "answerLanguage": "Vastauskieli",
+    "multilingual": "Monikielinen",
+    "workingLanguageHelperText": "Millä kielellä rakennat kyselyn? Jos kysely on monikielinen, voit vaihtaa työstökieltä ja syöttää kyselyn tiedot ja sisällön eri kielillä."
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
@@ -784,7 +788,27 @@
     "emailInfo": "Sähköposti",
     "thanksPage": "Kiitos-sivu",
     "errorAtleastOnelanguage": "Valitse vähintään yksi kieli.",
-    "addLanguage": "Lisää kieli"
+    "addLanguage": "Lisää kieli",
+    "multilingualism": "Monikielisyys",
+    "pageTitle": "Sivun nimi",
+    "questionText": "Kysymysteksti",
+    "bodyText": "Teksti",
+    "imageCaption": "Kuvateksti",
+    "option": "vaihtoehto",
+    "optionAltText": "Kuvateksti",
+    "sliderMinLabel": "Min-teksti",
+    "sliderMaxLabel": "Max-teksti",
+    "matrixClass": "Luokka",
+    "matrixSubject": "Aihe",
+    "budgetTarget": "Kohde",
+    "helperText": "Avustusteksti",
+    "group": "Ryhmä",
+    "customLabel": "Mukautettu otsikko",
+    "additionalInfo": "Lisätiedot",
+    "column": "sarake",
+    "columns": "saraketta",
+    "thanksPageTitle": "Kiitos-sivun otsikko",
+    "thanksPageText": "Kiitos-sivun teksti"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

@@ -1,9 +1,9 @@
+import { Components, CSSInterpolation, Theme } from '@mui/material/styles';
 import React from 'react';
 import AlertErrorIcon from '../components/icons/AlertErrorIcon';
 import AlertInfoIcon from '../components/icons/AlertInfoIcon';
 import AlertSuccessIcon from '../components/icons/AlertSuccessIcon';
 import AlertWarningIcon from '../components/icons/AlertWarningIcon';
-import { Components, CSSInterpolation, Theme } from '@mui/material/styles';
 import { colors } from './colors';
 
 const ubiElevated =
@@ -336,6 +336,11 @@ export const surveyOverrides: Components<Omit<Theme, 'components'>> = {
 export const adminOverrides: Components<Omit<Theme, 'components'>> = {
   ...surveyCardOverrides,
   ...buttonOverrides,
+  MuiCssBaseline: {
+    styleOverrides: {
+      html: { fontSize: '14px' },
+    },
+  },
   MuiAppBar: {
     styleOverrides: {
       root: {

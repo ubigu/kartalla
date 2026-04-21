@@ -33,45 +33,47 @@ export default function AdminApplication() {
           { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
         ],
         [ThemeProvider, { theme }],
-        SurveyProvider,
         TranslationProvider,
+        SurveyProvider,
         ToastProvider,
         ClipboardProvider,
         SurveyAnswerProvider,
         SurveyMapProvider,
-        UserProvider,
-        GeneralNotificationProvider,
       ]}
     >
       <CssBaseline />
       <BrowserRouter basename="/admin">
-        <LanguageRouter />
-        <Switch>
-          <Route path="/kyselyt/:surveyId">
-            <EditSurvey />
-          </Route>
-          <Route path="/vastaukset/:surveyId">
-            <SurveySubmissionsPage />
-          </Route>
-          <Route path="/rajapintakuvaus">
-            <ApiInstructions />
-          </Route>
-          <ProtectedRoute path="/kayttajahallinta">
-            <UserManagement />
-          </ProtectedRoute>
-          <Route path="/tiedotteet">
-            <GeneralNotifications />
-          </Route>
-          <Route path="/karttajulkaisut">
-            <AdminMapPublications />
-          </Route>
-          <Route path="/" exact>
-            <AdminFrontPage />
-          </Route>
-          <Route path="*">
-            <Redirect to="/" />
-          </Route>
-        </Switch>
+        <UserProvider>
+          <GeneralNotificationProvider>
+            <LanguageRouter />
+            <Switch>
+              <Route path="/kyselyt/:surveyId">
+                <EditSurvey />
+              </Route>
+              <Route path="/vastaukset/:surveyId">
+                <SurveySubmissionsPage />
+              </Route>
+              <Route path="/rajapintakuvaus">
+                <ApiInstructions />
+              </Route>
+              <ProtectedRoute path="/kayttajahallinta">
+                <UserManagement />
+              </ProtectedRoute>
+              <Route path="/tiedotteet">
+                <GeneralNotifications />
+              </Route>
+              <Route path="/karttajulkaisut">
+                <AdminMapPublications />
+              </Route>
+              <Route path="/" exact>
+                <AdminFrontPage />
+              </Route>
+              <Route path="*">
+                <Redirect to="/" />
+              </Route>
+            </Switch>
+          </GeneralNotificationProvider>
+        </UserProvider>
       </BrowserRouter>
     </Compose>
   );

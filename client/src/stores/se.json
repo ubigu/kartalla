@@ -761,7 +761,11 @@
   "SurveyLanguageMenu": {
     "languageControl": "Language / Språk",
     "changeSurveyLanguage": "Byt språk för enkäten",
-    "surveyLanguage": "Enkätens språk"
+    "surveyLanguage": "Enkätens språk",
+    "workingLanguage": "Arbetsspråk",
+    "answerLanguage": "Svarsspråk",
+    "multilingual": "Flerspråkig",
+    "workingLanguageHelperText": "På vilket språk bygger du enkäten? Om enkäten är flerspråkig kan du byta arbetsspråk och ange enkätens information och innehåll på olika språk."
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
@@ -782,7 +786,27 @@
     "emailInfo": "E-post",
     "thanksPage": "Tack-sida",
     "errorAtleastOnelanguage": "Minst ett språk måste väljas.",
-    "addLanguage": "Lägg till språk"
+    "addLanguage": "Lägg till språk",
+    "multilingualism": "Flerspråkighet",
+    "pageTitle": "Sidans namn",
+    "questionText": "Frågetext",
+    "bodyText": "Text",
+    "imageCaption": "Bildtext",
+    "option": "alternativ",
+    "optionAltText": "Bildtext",
+    "sliderMinLabel": "Min-text",
+    "sliderMaxLabel": "Max-text",
+    "matrixClass": "Klass",
+    "matrixSubject": "Ämne",
+    "budgetTarget": "Mål",
+    "helperText": "Hjälptext",
+    "group": "Grupp",
+    "customLabel": "Anpassad etikett",
+    "additionalInfo": "Ytterligare information",
+    "column": "kolumn",
+    "columns": "kolumner",
+    "thanksPageTitle": "Tacksidans rubrik",
+    "thanksPageText": "Tacksidans text"
   },
   "SurveySubmissionsPage": {
     "attachments": "Bilagor",

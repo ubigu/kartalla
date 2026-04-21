@@ -1,5 +1,6 @@
 // @ts-strict-ignore
 import { Box, FormLabel } from '@mui/material';
+import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromHTML } from 'draft-convert';
@@ -15,7 +16,9 @@ import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import { remark } from 'remark';
 
-const useStyles = makeStyles({
+type StyleProps = { editorHeight?: string; resizable?: boolean };
+
+const useStyles = makeStyles((theme: Theme) => ({
   disabled: {
     opacity: 0.4,
     pointerEvents: 'none',
@@ -37,10 +40,12 @@ const useStyles = makeStyles({
     border: '1px solid red',
   },
   editor: {
-    height: (props: { editorHeight?: string }) => props.editorHeight,
-    background: '#fff',
+    height: (props: StyleProps) => props.editorHeight,
+    overflow: (props: StyleProps) => (props.resizable ? 'auto' : undefined),
+    resize: (props: StyleProps) => (props.resizable ? 'vertical' : undefined),
+    background: theme.palette.surfacePrimary.main,
     padding: '0 1rem',
-    border: '1px solid #ccc',
+    border: `1px solid ${theme.palette.borderSubtle.main}`,
     borderTop: 'none',
     borderRadius: 0,
     borderBottomLeftRadius: 4,
@@ -50,50 +55,66 @@ const useStyles = makeStyles({
     },
   },
   toolbar: {
+    display: 'flex',
+    alignItems: 'center',
+    height: 'fit-content',
     padding: 0,
-    background: '#f4f4f4',
+    background: theme.palette.surfacePrimary.main,
     marginBottom: 0,
     borderRadius: 0,
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
-    border: '1px solid #ccc',
+    overflow: 'hidden',
+    border: `1px solid ${theme.palette.borderSecondary.main}`,
     '& > *': {
       marginBottom: 0,
     },
+    '& .rdw-inline-wrapper': {
+      borderTopLeftRadius: 4,
+      borderTopRightRadius: 4,
+    },
     '& .rdw-option-wrapper': {
-      border: 'none',
       boxShadow: 'none',
       margin: 0,
-      padding: 8,
+      padding: 4,
+      border: 'none',
       borderRadius: 0,
       '&:hover': {
-        background: '#aaa',
+        background: theme.palette.borderSecondary.main,
       },
     },
     '& .rdw-option-active': {
-      background: '#bbb',
+      background: theme.palette.borderSecondary.main,
       boxShadow: 'none',
     },
     '& .rdw-option-disabled': {
       pointerEvents: 'none',
     },
     '& .rdw-fontsize-wrapper': {
-      background: 'white',
+      background: theme.palette.surfacePrimary.main,
       margin: 0,
       border: 'none',
+      maxHeight: '26x',
+
       '&:hover': {
-        background: '#aaa',
+        background: theme.palette.borderSubtle.main,
       },
-      '& .rdw-dropdown-wrapper:hover': {
-        boxShadow: 'none',
-        background: '#aaa',
+      '& .rdw-dropdown-wrapper': {
+        maxHeight: '24px',
+        border: 'none',
+        margin: 0,
+        '&:hover': {
+          boxShadow: 'none',
+          background: theme.palette.borderSubtle.main,
+        },
       },
+
       '& .rdw-dropdown-selectedtext': {
         width: '35px',
       },
     },
   },
-});
+}));
 
 const DEFAULT_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60];
 
@@ -103,6 +124,7 @@ interface Props {
   label?: string;
   onChange: (value: string) => void;
   editorHeight?: string;
+  resizable?: boolean;
   missingValue?: boolean;
   toolbarOptions?: Record<string, any>;
 }
@@ -219,7 +241,10 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
     };
   }, [language, surveyLanguage]);
 
-  const classes = useStyles(props);
+  const classes = useStyles({
+    editorHeight: props.editorHeight,
+    resizable: props.resizable,
+  });
   const { tr } = useTranslations();
 
   function handleEditorStateChange(editorState: EditorState) {

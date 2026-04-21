@@ -762,7 +762,11 @@
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Change language of the survey",
-    "surveyLanguage": "Survey language"
+    "surveyLanguage": "Survey language",
+    "workingLanguage": "Working language",
+    "answerLanguage": "Answer language",
+    "multilingual": "Multilingual",
+    "workingLanguageHelperText": "In which language are you building the survey? If the survey is multilingual, you can change the working language and enter the survey content in different languages."
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Allow publishing the survey with multiple languages",
@@ -782,8 +786,28 @@
     "optionInfo": "Option info",
     "emailInfo": "Email",
     "thanksPage": "Thank you -page",
-    "errorAtleastOnelanguage": "Atleast one language must be selected.",
-    "addLanguage": "Add language"
+    "errorAtleastOnelanguage": "At least one language must be selected.",
+    "addLanguage": "Add language",
+    "multilingualism": "Multilingualism",
+    "pageTitle": "Page name",
+    "questionText": "Question text",
+    "bodyText": "Text",
+    "imageCaption": "Image caption",
+    "option": "option",
+    "optionAltText": "Image caption",
+    "sliderMinLabel": "Min label",
+    "sliderMaxLabel": "Max label",
+    "matrixClass": "Class",
+    "matrixSubject": "Subject",
+    "budgetTarget": "Target",
+    "helperText": "Helper text",
+    "group": "Group",
+    "customLabel": "Custom label",
+    "additionalInfo": "Additional info",
+    "column": "column",
+    "columns": "columns",
+    "thanksPageTitle": "Thanks page title",
+    "thanksPageText": "Thanks page text"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",

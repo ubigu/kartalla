@@ -11,10 +11,12 @@ export const colors = {
   borderSubtle: '#E9ECEF',
   surfacePrimary: '#FFFFFF',
   surfaceSubtle: '#F6F8FA',
+  surfaceSubtleDark: '#E9ECEF',
   surfaceInput: '#F6F8FA',
   surfaceInfo: '#E1F6FF',
   surfaceSuccess: '#00A393',
   surfaceWarning: '#FFD25E',
   surfaceError: '#DF304A',
+  textWarning: 'rgba(212, 159, 84, 1)',
   textError: '#922233',
 };

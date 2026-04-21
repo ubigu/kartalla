@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import {
   EnabledLanguages,
   LanguageCode,
@@ -79,7 +78,7 @@ const stateDefaults: State = {
   languages: ['fi', 'en', 'se'],
 };
 
-export const TranslationContext = createContext<Context>(null);
+export const TranslationContext = createContext<Context | null>(null);
 
 /** Custom hook for accessing the workspace context */
 export function useTranslations() {

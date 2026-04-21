@@ -117,7 +117,8 @@ export default function SurveyListItem(props: Props) {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const surveyLanguage = survey.primaryLanguage;
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();

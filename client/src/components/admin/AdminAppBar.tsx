@@ -13,8 +13,6 @@ import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import LogoutIcon from '@src/components/icons/LogoutIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useHistory } from 'react-router-dom';
-import LanguageMenu from '../LanguageMenu';
-import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
@@ -72,10 +70,7 @@ export function AdminAppBar({
               </ListItem>
             )}
             {labels.map((item, index) => (
-              <ListItem
-                key={`${item}-${index}`}
-                sx={{ maxWidth: index === 0 ? '300px' : 'auto' }}
-              >
+              <ListItem key={`${item}-${index}`}>
                 <Typography
                   noWrap
                   component="p"
@@ -101,8 +96,6 @@ export function AdminAppBar({
               gap: '0.25rem',
             }}
           >
-            <SurveyLanguageMenu />
-            <LanguageMenu />
             <GeneralNotificationNavigationButton />
             <AppBarInstructionsMenu />
             <AppBarUserMenu />

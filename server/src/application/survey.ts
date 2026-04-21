@@ -37,6 +37,8 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import logger from '@src/logger';
+import { isLanguageCode } from '@src/translations/useTranslations';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -50,6 +52,8 @@ import {
 } from '@src/utils';
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
+
+const DEFAULT_LANGUAGE: LanguageCode = 'fi';
 
 const surveySectionCountLimitations: Partial<
   Record<SurveyPageSection['type'], number>
@@ -105,6 +109,7 @@ interface DBSurvey {
   organization: string;
   tags: string[];
   languages: LanguageCode[];
+  primary_language: string;
   is_archived: boolean;
   user_groups?: string[];
 }
@@ -370,6 +375,7 @@ export async function getPublishedSurvey(
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
           survey.languages,
+          survey.primary_language,
           ${params.organizationName ? '$3 as organization,' : ''} -- To prevent organization id public exposure
           theme_name,
           theme_data,
@@ -975,12 +981,18 @@ export async function getPublicationAccesses(
  * @param user Author
  */
 export async function createSurvey(user: User) {
+  logger.info(JSON.stringify(user));
   const { surveyRow, groupRow } = await getDb().tx(async (t) => {
     const row = await t.one<DBSurvey>(
-      `INSERT INTO data.survey (author_id, organization)
-      VALUES ($1, $2)
+      `INSERT INTO data.survey (author_id, organization, languages, primary_language)
+      VALUES ($1, $2, $3, $4)
       RETURNING *`,
-      [user.id, user.organizations[0].id], // For now, use the first organization
+      [
+        user.id,
+        user.organizations[0].id,
+        [user.defaultLanguage ?? DEFAULT_LANGUAGE],
+        user.defaultLanguage ?? DEFAULT_LANGUAGE,
+      ], // For now, use the first organization
     );
     if (user.groups.length === 1) {
       const groupRow = await t.one(
@@ -992,6 +1004,7 @@ export async function createSurvey(user: User) {
       return { surveyRow: row, groupRow };
     }
 
+    logger.info(JSON.stringify(row), 0, null);
     return { surveyRow: row };
   });
 
@@ -1686,7 +1699,8 @@ export async function updateSurvey(survey: Survey) {
           tags = $32,
           languages = $33,
           email_include_personal_info = $34,
-          email_include_margin_images = $35
+          email_include_margin_images = $35,
+          primary_language = $36
         WHERE id = $1 RETURNING *`,
         [
           survey.id,
@@ -1726,6 +1740,7 @@ export async function updateSurvey(survey: Survey) {
             .map(([lang]) => lang),
           survey.email.includePersonalInfo,
           survey.email.includeMarginImages,
+          survey.primaryLanguage,
         ],
       )
       .catch((error) => {
@@ -1817,8 +1832,8 @@ function isPublished(survey: Pick<Survey, 'startDate' | 'endDate'>) {
   const now = new Date();
   return Boolean(
     survey.startDate &&
-      now > survey.startDate &&
-      (!survey.endDate || now < survey.endDate),
+    now > survey.startDate &&
+    (!survey.endDate || now < survey.endDate),
   );
 }
 
@@ -1876,6 +1891,9 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     organization: dbOrganizationIdToOrganization(dbSurvey.organization),
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
+    primaryLanguage: isLanguageCode(dbSurvey.primary_language)
+      ? dbSurvey.primary_language
+      : DEFAULT_LANGUAGE,
     isArchived: dbSurvey.is_archived,
     userGroups: dbSurvey.user_groups ?? [],
   };
@@ -2100,7 +2118,7 @@ export async function createSurveyPage(
      SELECT
        $1 as survey_id,
        COALESCE(MAX(idx) + 1, 0) as idx,
-       '{"fi": ""}'::json,
+       json_build_object((SELECT primary_language FROM data.survey WHERE id = $1), ''),
        $2::json
      FROM data.survey_page WHERE survey_id = $1
      RETURNING *;`,
