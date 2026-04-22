@@ -174,7 +174,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       >
         <Footer>
           <Link
-            color="primary"
+            sx={(theme) => ({ color: theme.palette.textInteractive.main })}
             underline="hover"
             href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
             target="_blank"
@@ -183,7 +183,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           </Link>
           {survey.displayPrivacyStatement && (
             <Link
-              color="primary"
+              sx={(theme) => ({ color: theme.palette.textInteractive.main })}
               underline="hover"
               href={`/tietosuojaseloste?lang=${surveyLanguage}`}
               target="_blank"

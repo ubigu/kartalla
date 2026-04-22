@@ -1,36 +1,35 @@
 // @ts-strict-ignore
+import { keyframes } from '@emotion/react';
 import {
-  Divider,
+  Box,
   IconButton,
   List,
   ListItem,
-  ListItemButton,
-  ListItemIcon,
   ListItemText,
   Theme,
+  Typography,
+  useTheme,
 } from '@mui/material';
 
-import AddIcon from '@src/components/icons/AddIcon';
 import BranchIcon from '@src/components/icons/BranchIcon';
 import ClipboardIcon from '@src/components/icons/ClipboardIcon';
 import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
-import DraggableIcon from '@src/components/icons/DraggableIcon';
-import FavoriteIcon from '@src/components/icons/FavoriteIcon';
+import DragHandleIcon from '@src/components/icons/DragHandleIcon';
 import MailIcon from '@src/components/icons/MailIcon';
 import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
+import ThanksPageIcon from '@src/components/icons/ThanksPageIcon';
 
-import { makeStyles } from '@mui/styles';
+import { CoreSelect } from '@src/components/core/Select';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import ListItemLink from '../ListItemLink';
-import SideBar from '../SideBar';
+import SideBarItem, { SIDEBAR_PAGE_ICON_CLASS } from '../SideBarItem';
 
-import { Conditions, SurveyPage } from '@interfaces/survey';
+import { Conditions, LanguageCode, SurveyPage } from '@interfaces/survey';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import {
@@ -42,44 +41,102 @@ import MapGridIcon from '../icons/MapGridIcon';
 import PadlockIcon from '../icons/PadlockIcon';
 import PaintPaletteIcon from '../icons/PaintPaletteIcon';
 import ShareExternalLinkIcon from '../icons/ShareExternalLinkIcon';
+import TranslateTextIcon from '../icons/TranslateTextIcon';
+import { collectPageFields } from './EditSurveyTranslationsV2';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  '@keyframes pulse': {
-    '0%': {
-      opacity: 0.4,
+const pulse = keyframes`
+  0% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.4; }
+`;
+
+const styles = {
+  navBox: (theme: Theme) => ({
+    overflowY: 'auto',
+    borderRight: `solid 1px ${theme.palette.borderSecondary.main}`,
+    backgroundColor: theme.palette.surfaceSubtle.main,
+    width: '270px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0,
+    '& .MuiListItemText-root > *': {
+      fontSize: '14px',
+      fontWeight: 600,
     },
-    '50%': {
-      opacity: 0.7,
-    },
-    '100%': {
-      opacity: 0.4,
-    },
+  }),
+  loading: (theme: Theme) => ({
+    animation: `${pulse} 1s ${theme.transitions.easing.easeIn} infinite`,
+  }),
+  languagesBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '4px',
+    flex: 0,
+    height: 'fit-content',
   },
-  loading: {
-    animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
+  langBadge: (status: 'default' | 'warning' | 'error') => (theme: Theme) => {
+    const colorByStatus = {
+      default: theme.palette.borderSecondary.main,
+      warning: theme.palette.textWarning.main,
+      error: theme.palette.textError.main,
+    };
+    const color = colorByStatus[status];
+    return {
+      width: 22,
+      height: 22,
+      borderRadius: '50%',
+      border: `1px solid ${color}`,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '11px',
+      fontWeight: status !== 'default' ? 600 : 400,
+      color,
+      flexShrink: 0,
+    };
   },
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.4,
+  sectionHeader: {
+    marginTop: '16px',
+    paddingX: '16px',
+    paddingBottom: '6px',
+    borderBottom: 'solid 2px #C4CEDA',
   },
-  listItemButton: {
-    '&:hover': {
-      backgroundColor: '#747474',
-    },
-  },
-}));
+  list: { padding: 0, alignSelf: 'stretch' },
+  footer: (theme: Theme) => ({
+    position: 'sticky',
+    bottom: 0,
+    zIndex: 1,
+    background: theme.palette.surfaceSubtle.main,
+    marginTop: 'auto',
+    padding: '8px',
+    fontSize: '12px',
+    textAlign: 'center',
+    alignSelf: 'stretch',
+  }),
+};
+
+function getLangBadgeStatus(
+  pages: SurveyPage[],
+  lang: LanguageCode,
+): 'default' | 'warning' | 'error' {
+  let anyMissing = false;
+  for (const page of pages) {
+    const fields = collectPageFields(page, lang);
+    const filledCount = fields.filter((f) => f.trim()).length;
+    if (filledCount === 0) return 'error';
+    if (filledCount < fields.length) anyMissing = true;
+  }
+  return anyMissing ? 'warning' : 'default';
+}
 
 interface Props {
-  width: number;
-  mobileOpen: boolean;
-  onDrawerToggle: () => void;
   allowEditing: boolean;
 }
 
 export default function EditSurveySideBar(props: Props) {
   const [newPageDisabled, setNewPageDisabled] = useState(false);
 
-  const classes = useStyles();
   const history = useHistory();
   const { url } = useRouteMatch();
   const {
@@ -91,284 +148,416 @@ export default function EditSurveySideBar(props: Props) {
     activeSurveyLoading,
     movePage,
   } = useSurvey();
-  const { tr, surveyLanguage, language } = useTranslations();
+  const { tr, surveyLanguage, setSurveyLanguage, language, languages } =
+    useTranslations();
   const { showToast } = useToasts();
   const { clipboardSection, setClipboardPage, clipboardPage } = useClipboard();
+  const theme = useTheme();
 
   return (
-    <SideBar
-      width={props.width}
-      mobileOpen={props.mobileOpen}
-      onDrawerToggle={props.onDrawerToggle}
+    <Box
+      component={'nav'}
+      aria-label={tr.EditSurveyPage.sidebarLabel}
+      sx={styles.navBox}
     >
-      <List>
-        <ListItemLink to={`/admin?lang=${language}`}>
-          <ListItemIcon>
-            <ArrowLeftIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.toFrontPage} />
-        </ListItemLink>
-        <ListItemLink to={`${url}/perusasetukset?lang=${language}`}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.basicSettings} />
-        </ListItemLink>
-        <ListItemLink to={`${url}/käyttäjäoikeudet?lang=${language}`}>
-          <ListItemIcon>
-            <PadlockIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.permissions} />
-        </ListItemLink>
-        <ListItemLink to={`${url}/ulkoasu?lang=${language}`}>
-          <ListItemIcon>
-            <PaintPaletteIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.appearance} />
-        </ListItemLink>
-        <ListItemLink to={`${url}/kartta-aineistot?lang=${language}`}>
-          <ListItemIcon>
-            <MapGridIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.mapData} />
-        </ListItemLink>
-        <ListItemLink to={`${url}/sähköpostit?lang=${language}`}>
-          <ListItemIcon>
-            <MailIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.emailReports} />
-        </ListItemLink>
-        <ListItemLink
-          external
-          newTab
-          to={`/${originalActiveSurvey.organization.name}/${
-            originalActiveSurvey.name
-          }${
-            originalActiveSurvey?.localisationEnabled
-              ? '?lang=' + surveyLanguage
-              : ''
-          }`}
-        >
-          <ListItemIcon>
-            <ShareExternalLinkIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.openSurveyPage} />
-        </ListItemLink>
-      </List>
-      <Divider />
-      <List>
-        <DragDropContext
-          onDragEnd={(event) => {
-            if (!event.destination) {
-              return;
-            }
-            movePage(Number(event.draggableId), event.destination.index);
+      <SideBarItem
+        sxProps={{
+          display: 'flex',
+          gap: '8px',
+          flex: 0,
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+        }}
+        backgroundColor={theme.palette.surfaceSubtle.main}
+        to={`/admin?lang=${language}`}
+      >
+        <ArrowLeftIcon
+          className={SIDEBAR_PAGE_ICON_CLASS}
+          fontSize="small"
+          htmlColor={theme.palette.primary.main}
+        />
+        <ListItemText primary={tr.EditSurvey.toFrontPage} />
+      </SideBarItem>
+      {activeSurvey.localisationEnabled && (
+        <Box
+          sx={{
+            padding: '8px 12px',
+            borderBottom: `solid 1px ${theme.palette.borderSecondary.main}`,
           }}
         >
-          <Droppable droppableId="pages">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {activeSurvey.pages.map((page, index) => (
-                  <Draggable
-                    key={page.id}
-                    draggableId={String(page.id)}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps}>
-                        <ListItemLink
-                          to={`${url}/sivut/${page.id}?lang=${language}`}
-                        >
-                          <ListItemIcon>
-                            {Object.keys(page?.conditions)?.length > 0 && (
-                              <BranchIcon />
-                            )}
-                            <SurveyPageIcon />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              page.title?.[surveyLanguage] || (
-                                <em>{tr.EditSurvey.untitledPage}</em>
-                              )
-                            }
-                          />
-                          <IconButton
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              event.preventDefault();
-                              // Deep copy page to avoid changes to current context
-                              const deepCopy = replaceTranslationsWithNull(
-                                replaceIdsWithNull({
-                                  ...structuredClone(page),
-                                  id: -1,
-                                  sidebar: {
-                                    ...structuredClone(page.sidebar),
-                                    mapLayers: [],
-                                  },
-                                }),
-                              ) as SurveyPage;
-                              // Remove conditions from Follow up question
-                              const copiedSurveyPage: SurveyPage = {
-                                ...deepCopy,
-                                sections: deepCopy.sections.map((section) => {
-                                  return {
-                                    ...section,
-                                    followUpSections:
-                                      section.followUpSections?.map((fus) => {
-                                        return {
-                                          ...fus,
-                                          conditions: {
-                                            equals: [],
-                                            lessThan: [],
-                                            greaterThan: [],
-                                          } as Conditions,
-                                        };
-                                      }),
-                                  };
-                                }),
-                              };
-                              // Store section to locale storage for other browser tabs to get access to it
-                              localStorage.setItem(
-                                'clipboard-content',
-                                JSON.stringify({
-                                  clipboardPage: {
-                                    ...copiedSurveyPage,
-                                    conditions: {},
-                                  },
-                                  clipboardSection,
-                                }),
-                              );
-                              // Store page to context for the currently active browser tab to get access to it
-                              setClipboardPage({
-                                ...copiedSurveyPage,
-                                conditions: {},
-                              });
-                              showToast({
-                                message: tr.EditSurvey.pageCopied,
-                                severity: 'success',
-                              });
-                            }}
-                          >
-                            <DocumentCopyIcon />
-                          </IconButton>
+          <CoreSelect
+            sx={(theme) => ({ background: theme.palette.surfacePrimary.main })}
+            id="sidebar-survey-language"
+            label={tr.SurveyLanguageMenu.workingLanguage}
+            value={surveyLanguage}
+            onChange={(e) =>
+              setSurveyLanguage(e.target.value as typeof surveyLanguage)
+            }
+            options={languages
+              .filter((lang) => activeSurvey.enabledLanguages[lang])
+              .map((lang) => ({
+                value: lang,
+                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+              }))}
+          />
+        </Box>
+      )}
+      <Typography
+        mt={1}
+        sx={styles.sectionHeader}
+        component="h2"
+        variant="secondaryHeader"
+      >
+        {tr.EditSurvey.settings}
+      </Typography>
+      <List sx={styles.list}>
+        <ListItem disablePadding>
+          <SideBarItem to={`${url}/perusasetukset?lang=${language}`}>
+            <SettingsIcon stroke="currentColor" />
+            <ListItemText primary={tr.EditSurvey.basicSettings} />
+          </SideBarItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <SideBarItem to={`${url}/käyttäjäoikeudet?lang=${language}`}>
+            <PadlockIcon />
 
-                          <div {...provided.dragHandleProps}>
-                            <IconButton>
-                              <DraggableIcon />
-                            </IconButton>
-                          </div>
-                        </ListItemLink>
+            <ListItemText primary={tr.EditSurvey.permissions} />
+          </SideBarItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <SideBarItem to={`${url}/ulkoasu?lang=${language}`}>
+            <PaintPaletteIcon />
+
+            <ListItemText primary={tr.EditSurvey.appearance} />
+          </SideBarItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <SideBarItem to={`${url}/kartta-aineistot?lang=${language}`}>
+            <MapGridIcon />
+
+            <ListItemText primary={tr.EditSurvey.mapData} />
+          </SideBarItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <SideBarItem to={`${url}/sähköpostit?lang=${language}`}>
+            <MailIcon />
+
+            <ListItemText primary={tr.EditSurvey.emailReports} />
+          </SideBarItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <SideBarItem
+            backgroundColor="transparent"
+            external
+            newTab
+            to={`/${originalActiveSurvey.organization.name}/${
+              originalActiveSurvey.name
+            }${
+              originalActiveSurvey?.localisationEnabled
+                ? '?lang=' + surveyLanguage
+                : ''
+            }`}
+          >
+            <ShareExternalLinkIcon />
+
+            <ListItemText primary={tr.EditSurvey.openSurveyPage} />
+          </SideBarItem>
+        </ListItem>
+      </List>
+
+      <Typography
+        sx={styles.sectionHeader}
+        component="h2"
+        variant="secondaryHeader"
+      >
+        {tr.EditSurvey.content}
+      </Typography>
+
+      <DragDropContext
+        onDragEnd={(event) => {
+          if (!event.destination) {
+            return;
+          }
+          movePage(Number(event.draggableId), event.destination.index);
+        }}
+      >
+        <Droppable droppableId="pages">
+          {(provided) => (
+            <List
+              sx={styles.list}
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {activeSurvey.pages.map((page, index) => (
+                <Draggable
+                  key={page.id}
+                  draggableId={String(page.id)}
+                  index={index}
+                >
+                  {(provided) => (
+                    <Box
+                      component={'li'}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      sx={{ position: 'relative' }}
+                    >
+                      <div
+                        {...provided.dragHandleProps}
+                        style={{
+                          position: 'absolute',
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '0 4px',
+                          cursor: 'grab',
+                          zIndex: 1,
+                        }}
+                      >
+                        <DragHandleIcon sx={{ fontSize: 14 }} />
                       </div>
+                      <SideBarItem
+                        to={`${url}/sivut/${page.id}?lang=${language}`}
+                        sxProps={{
+                          '&:not(:hover) .page-copy-btn': {
+                            visibility: 'hidden',
+                          },
+                        }}
+                      >
+                        <>
+                          {Object.keys(page?.conditions)?.length > 0 && (
+                            <BranchIcon />
+                          )}
+                          <SurveyPageIcon
+                            className={SIDEBAR_PAGE_ICON_CLASS}
+                            stroke={'currentColor'}
+                            innerTextColor="currentColor"
+                            innerText={index + 1}
+                          />
+                        </>
+                        <ListItemText
+                          primary={
+                            page.title?.[surveyLanguage] || (
+                              <em>{tr.EditSurvey.untitledPage}</em>
+                            )
+                          }
+                        />
+                        <IconButton
+                          className="page-copy-btn"
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            event.preventDefault();
+                            // Deep copy page to avoid changes to current context
+                            const deepCopy = replaceTranslationsWithNull(
+                              replaceIdsWithNull({
+                                ...structuredClone(page),
+                                id: -1,
+                                sidebar: {
+                                  ...structuredClone(page.sidebar),
+                                  mapLayers: [],
+                                },
+                              }),
+                            ) as SurveyPage;
+                            // Remove conditions from Follow up question
+                            const copiedSurveyPage: SurveyPage = {
+                              ...deepCopy,
+                              sections: deepCopy.sections.map((section) => {
+                                return {
+                                  ...section,
+                                  followUpSections:
+                                    section.followUpSections?.map((fus) => {
+                                      return {
+                                        ...fus,
+                                        conditions: {
+                                          equals: [],
+                                          lessThan: [],
+                                          greaterThan: [],
+                                        } as Conditions,
+                                      };
+                                    }),
+                                };
+                              }),
+                            };
+                            // Store section to locale storage for other browser tabs to get access to it
+                            localStorage.setItem(
+                              'clipboard-content',
+                              JSON.stringify({
+                                clipboardPage: {
+                                  ...copiedSurveyPage,
+                                  conditions: {},
+                                },
+                                clipboardSection,
+                              }),
+                            );
+                            // Store page to context for the currently active browser tab to get access to it
+                            setClipboardPage({
+                              ...copiedSurveyPage,
+                              conditions: {},
+                            });
+                            showToast({
+                              message: tr.EditSurvey.pageCopied,
+                              severity: 'success',
+                            });
+                          }}
+                        >
+                          <DocumentCopyIcon />
+                        </IconButton>
+                      </SideBarItem>
+                    </Box>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+              <ListItem disablePadding>
+                <SideBarItem to={`${url}/kiitos-sivu?lang=${language}`}>
+                  <ThanksPageIcon
+                    className={SIDEBAR_PAGE_ICON_CLASS}
+                    stroke="currentColor"
+                  />
+                  <ListItemText primary={tr.EditSurvey.thanksPage} />
+                </SideBarItem>
+              </ListItem>
+              {props.allowEditing && (
+                <>
+                  <ListItem disablePadding>
+                    <SideBarItem
+                      disabled={newPageDisabled || activeSurveyLoading}
+                      sxProps={
+                        newPageLoading ? styles.loading(theme) : undefined
+                      }
+                      onClick={async () => {
+                        setNewPageDisabled(true);
+                        try {
+                          const page = await createPage();
+                          history.push(
+                            `${url}/sivut/${page.id}?lang=${language}`,
+                          );
+                          setNewPageDisabled(false);
+                        } catch (error) {
+                          showToast({
+                            severity: 'error',
+                            message: tr.EditSurvey.newPageFailed,
+                          });
+                          setNewPageDisabled(false);
+                          throw error;
+                        }
+                      }}
+                    >
+                      <SurveyPageIcon
+                        className={SIDEBAR_PAGE_ICON_CLASS}
+                        stroke="currentColor"
+                        innerText="+"
+                        {...(!(newPageDisabled || activeSurveyLoading) && {
+                          innerTextColor: theme.palette.primary.main,
+                        })}
+                      />
+                      <ListItemText
+                        sx={{
+                          fontStyle: 'italic',
+                          '& > *': {
+                            color: theme.palette.textSubtle.main,
+                          },
+                        }}
+                        primary={tr.EditSurvey.newPage}
+                      />
+                    </SideBarItem>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <SideBarItem
+                      disabled={!clipboardPage}
+                      onClick={async () => {
+                        setNewPageDisabled(true);
+                        try {
+                          // Create new blank page and set its contents from Clipboard -context
+                          const blankPage = await createPage();
+                          history.push(
+                            `${url}/sivut/${blankPage.id}?lang=${language}`,
+                          );
+                          setNewPageDisabled(false);
+
+                          // Duplicate any and all files in image and attachment
+                          // sections before creating new page
+                          const duplicatedFiles: SurveyPage =
+                            await duplicateFiles(
+                              structuredClone(clipboardPage),
+                              activeSurvey,
+                            );
+
+                          editPage({
+                            ...duplicatedFiles,
+                            id: blankPage.id,
+                          });
+                          showToast({
+                            severity: 'warning',
+                            message: tr.EditSurvey.pageAttached,
+                            autoHideDuration: 30000,
+                          });
+                          showToast({
+                            severity: 'warning',
+                            message: tr.EditSurvey.checkConditionalSections,
+                            autoHideDuration: 30000,
+                          });
+                        } catch (error) {
+                          showToast({
+                            severity: 'error',
+                            message: tr.EditSurvey.newPageFailed,
+                          });
+                          setNewPageDisabled(false);
+                          throw error;
+                        }
+                      }}
+                    >
+                      <ClipboardIcon className={SIDEBAR_PAGE_ICON_CLASS} />
+                      <ListItemText primary={tr.EditSurvey.attachNewPage} />
+                    </SideBarItem>
+                  </ListItem>
+                </>
+              )}
+            </List>
+          )}
+        </Droppable>
+      </DragDropContext>
+      {activeSurvey.localisationEnabled && (
+        <>
+          <Typography
+            component={'h2'}
+            sx={styles.sectionHeader}
+            variant="secondaryHeader"
+          >
+            {tr.EditSurvey.multilingualism}
+          </Typography>
+          <SideBarItem
+            sxProps={styles.languagesBox}
+            to={`${url}/käännökset?lang=${language}`}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <TranslateTextIcon />
+              <Typography>{tr.EditSurvey.manageTranslations}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: '4px', marginLeft: '16px' }}>
+              {languages
+                .filter((lang) => activeSurvey.enabledLanguages[lang])
+                .map((lang) => (
+                  <Box
+                    key={lang}
+                    sx={styles.langBadge(
+                      getLangBadgeStatus(
+                        activeSurvey.pages,
+                        lang as LanguageCode,
+                      ),
                     )}
-                  </Draggable>
+                  >
+                    {lang}
+                  </Box>
                 ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-        {props.allowEditing && (
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <ListItem
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-              }}
-              className={`${
-                newPageDisabled || activeSurveyLoading ? classes.disabled : ''
-              } ${newPageLoading ? classes.loading : ''}`}
-              onClick={async () => {
-                setNewPageDisabled(true);
-                try {
-                  const page = await createPage();
-                  history.push(`${url}/sivut/${page.id}?lang=${language}`);
-                  setNewPageDisabled(false);
-                } catch (error) {
-                  showToast({
-                    severity: 'error',
-                    message: tr.EditSurvey.newPageFailed,
-                  });
-                  setNewPageDisabled(false);
-                  throw error;
-                }
-              }}
-            >
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText primary={tr.EditSurvey.newPage} />
-            </ListItem>
-            <span
-              style={{
-                height: '2rem',
-                borderRight: '1px solid white',
-                alignSelf: 'center',
-              }}
-            />
-            <ListItemButton
-              className={classes.listItemButton}
-              disabled={!clipboardPage}
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                width: '100%',
-              }}
-              onClick={async () => {
-                setNewPageDisabled(true);
-                try {
-                  // Create new blank page and set its contents from Clipboard -context
-                  const blankPage = await createPage();
-                  history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
-                  setNewPageDisabled(false);
-
-                  // Duplicate any and all files in image and attachment
-                  // sections before creating new page
-                  const duplicatedFiles: SurveyPage = await duplicateFiles(
-                    structuredClone(clipboardPage),
-                    activeSurvey,
-                  );
-
-                  editPage({
-                    ...duplicatedFiles,
-                    id: blankPage.id,
-                  });
-                  showToast({
-                    severity: 'warning',
-                    message: tr.EditSurvey.pageAttached,
-                    autoHideDuration: 30000,
-                  });
-                  showToast({
-                    severity: 'warning',
-                    message: tr.EditSurvey.checkConditionalSections,
-                    autoHideDuration: 30000,
-                  });
-                } catch (error) {
-                  showToast({
-                    severity: 'error',
-                    message: tr.EditSurvey.newPageFailed,
-                  });
-                  setNewPageDisabled(false);
-                  throw error;
-                }
-              }}
-            >
-              <ClipboardIcon />
-              {tr.EditSurvey.attachNewPage}
-            </ListItemButton>
-          </div>
-        )}
-      </List>
-      <Divider />
-      <List>
-        <ListItemLink to={`${url}/kiitos-sivu?lang=${language}`}>
-          <ListItemIcon>
-            <FavoriteIcon />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.thanksPage} />
-        </ListItemLink>
-      </List>
-    </SideBar>
+            </Box>
+          </SideBarItem>
+        </>
+      )}
+      <Typography sx={styles.footer}>{tr.EditSurvey.developedBy}</Typography>
+    </Box>
   );
 }

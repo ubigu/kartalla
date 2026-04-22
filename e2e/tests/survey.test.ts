@@ -1,5 +1,4 @@
-import { test } from '../utils/fixtures';
-import { clearData } from '../utils/db';
+import { expect } from '@playwright/test';
 import {
   getCheckBoxQuestionData,
   getFreeTextQuestionData,
@@ -15,7 +14,8 @@ import {
   getSortingQuestionData,
   testSurveyData,
 } from '../utils/data';
-import { expect } from '@playwright/test';
+import { clearData } from '../utils/db';
+import { test } from '../utils/fixtures';
 
 const personalInfoQuestion = getPersonalInfoQuestionData(
   testSurveyData.pageNames[0],

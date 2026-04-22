@@ -7,8 +7,13 @@ import {
   addPendingUserRequest,
   getUsers,
   updatePendingUserGroupMembership,
+  updateUserDefaultLanguage,
   updateUserGroupMembership,
 } from '@src/user';
+import {
+  isLanguageCode,
+  LANGUAGE_CODES,
+} from '@src/translations/useTranslations';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -61,6 +66,22 @@ router.get(
 router.get('/me', ensureAuthenticated(), (req, res) => {
   res.json(req.user);
 });
+
+/** Update the current user's default language */
+router.patch(
+  '/me/default-language',
+  ensureAuthenticated(),
+  validateRequest([
+    body('language')
+      .isString()
+      .custom(isLanguageCode)
+      .withMessage(`Language must be one of: ${LANGUAGE_CODES.join(', ')}`),
+  ]),
+  asyncHandler(async (req, res) => {
+    await updateUserDefaultLanguage(req.user.id, req.body.language);
+    res.status(204).end();
+  }),
+);
 
 /**
  * Get all other users than the currently logged in user

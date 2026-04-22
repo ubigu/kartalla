@@ -37,6 +37,7 @@
     "newSurvey": "Ny undersökning",
     "errorFetchingSurvey": "Fel vid hämtning av enkät. Kontrollera adressen eller försök igen senare.",
     "untitledPage": "Namnlös sida",
+    "page": "Sida",
     "fetchFailed": "Fel vid hämtning av enkät. Försök igen senare.",
     "saveSuccessful": "Enkäten sparades framgångsrikt!",
     "saveFailed": "Det gick inte att spara enkäten. Försök igen senare.",
@@ -57,7 +58,7 @@
     "emailReports": "E-postrapporter",
     "openSurveyPage": "Öppna enkätsida",
     "email": "E-post",
-    "newPage": "Skapa sida",
+    "newPage": "Skapa ny sida...",
     "newPageFailed": "Det uppstod ett fel när en ny sida skulle skapas. Försök igen senare.",
     "thanksPage": "Tack-sida",
     "translations": "Översättningar",
@@ -74,7 +75,12 @@
     "attachNewPage": "Bifoga sida",
     "pageAttached": "Observera att kartlagval inte kopieras. Kontrollera kartlagvalen och korrigera kartpubliceringsadressen vid behov.",
     "pageCopied": "Sidkopiering lyckades. Du kan nu klistra in den kopierade sidan i din undersökning.",
-    "checkConditionalSections": "Observera att villkor för uppföljningsfrågor inte kopieras."
+    "checkConditionalSections": "Observera att villkor för uppföljningsfrågor inte kopieras.",
+    "settings": "Inställningar",
+    "content": "Innehåll",
+    "multilingualism": "Flerspråkighet",
+    "manageTranslations": "Hantera översättningar",
+    "developedBy": "Kartalla-enkättjänsten utvecklas av Ubigu Oy"
   },
   "EditSurveyInfo": {
     "title": "Undersökningens titel",
@@ -707,6 +713,7 @@
     "showOldResponses": "Visa {x} äldre kommentarer..."
   },
   "AppBar": {
+    "survey": "Enkät",
     "generalNotifications": "Meddelanden",
     "generalNotificationsNew": "Nya meddelanden",
     "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden",
@@ -717,7 +724,10 @@
     "logout": "Logga ut",
     "updateInstructions": "Uppdatera instruktioner",
     "userManagement": "Användarhantering",
-    "editMapPublications": "Redigera kartpublikationer"
+    "editMapPublications": "Redigera kartpublikationer",
+    "selectDefaultLanguage": "Välj applikationens standardspråk",
+    "defaultLanguageSaved": "Standardspråk sparat",
+    "defaultLanguageSaveFailed": "Det gick inte att spara standardspråket"
   },
   "AppBarInstructionsMenu": {
     "label": "Instruktioner",
@@ -751,7 +761,11 @@
   "SurveyLanguageMenu": {
     "languageControl": "Language / Språk",
     "changeSurveyLanguage": "Byt språk för enkäten",
-    "surveyLanguage": "Enkätens språk"
+    "surveyLanguage": "Enkätens språk",
+    "workingLanguage": "Arbetsspråk",
+    "answerLanguage": "Svarsspråk",
+    "multilingual": "Flerspråkig",
+    "workingLanguageHelperText": "På vilket språk bygger du enkäten? Om enkäten är flerspråkig kan du byta arbetsspråk och ange enkätens information och innehåll på olika språk."
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
@@ -771,7 +785,28 @@
     "optionInfo": "Ytterligare information om alternativet",
     "emailInfo": "E-post",
     "thanksPage": "Tack-sida",
-    "errorAtleastOnelanguage": "Minst ett språk måste väljas."
+    "errorAtleastOnelanguage": "Minst ett språk måste väljas.",
+    "addLanguage": "Lägg till språk",
+    "multilingualism": "Flerspråkighet",
+    "pageTitle": "Sidans namn",
+    "questionText": "Frågetext",
+    "bodyText": "Text",
+    "imageCaption": "Bildtext",
+    "option": "alternativ",
+    "optionAltText": "Bildtext",
+    "sliderMinLabel": "Min-text",
+    "sliderMaxLabel": "Max-text",
+    "matrixClass": "Klass",
+    "matrixSubject": "Ämne",
+    "budgetTarget": "Mål",
+    "helperText": "Hjälptext",
+    "group": "Grupp",
+    "customLabel": "Anpassad etikett",
+    "additionalInfo": "Ytterligare information",
+    "column": "kolumn",
+    "columns": "kolumner",
+    "thanksPageTitle": "Tacksidans rubrik",
+    "thanksPageText": "Tacksidans text"
   },
   "SurveySubmissionsPage": {
     "attachments": "Bilagor",

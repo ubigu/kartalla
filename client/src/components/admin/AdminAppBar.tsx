@@ -11,10 +11,8 @@ import {
 import { SystemStyleObject } from '@mui/system';
 import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import LogoutIcon from '@src/components/icons/LogoutIcon';
-import { useHistory } from 'react-router-dom';
 import { useTranslations } from '@src/stores/TranslationContext';
-import LanguageMenu from '../LanguageMenu';
-import SurveyLanguageMenu from '../SurveyLanguageMenu';
+import { useHistory } from 'react-router-dom';
 import AppBarUserMenu from './AppBarUserMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
@@ -43,14 +41,14 @@ export function AdminAppBar({
               display: 'flex',
               flexWrap: 'nowrap',
               color: 'white',
+              height: '50px',
               '& li': {
                 padding: '0',
               },
-              'li+li::before': {
-                content: '" • "',
-                padding: '0px 10px',
-                lineHeight: 1.6,
-                fontSize: '1.25rem',
+              'li+li': {
+                borderLeft: '1px solid #FFFFFF',
+                marginLeft: '10px',
+                paddingLeft: '10px',
               },
             }}
           >
@@ -61,7 +59,6 @@ export function AdminAppBar({
                   sx={{
                     padding: 0,
                     width: '140px',
-                    transform: 'translateY(-2px)',
                     '&:hover': {
                       backgroundColor: 'transparent',
                       opacity: 0.6,
@@ -73,15 +70,16 @@ export function AdminAppBar({
               </ListItem>
             )}
             {labels.map((item, index) => (
-              <ListItem
-                key={`${item}-${index}`}
-                sx={{ maxWidth: index === 0 ? '300px' : 'auto' }}
-              >
+              <ListItem key={`${item}-${index}`}>
                 <Typography
                   noWrap
-                  variant="subtitle1"
                   component="p"
-                  sx={{ textOverflow: 'ellipsis', color: 'white' }}
+                  variant="mainHeader"
+                  sx={{
+                    textOverflow: 'ellipsis',
+                    color: 'white',
+                    fontSize: '24px',
+                  }}
                   title={item}
                 >
                   {item}
@@ -98,8 +96,6 @@ export function AdminAppBar({
               gap: '0.25rem',
             }}
           >
-            <SurveyLanguageMenu />
-            <LanguageMenu />
             <GeneralNotificationNavigationButton />
             <AppBarInstructionsMenu />
             <AppBarUserMenu />

@@ -117,7 +117,8 @@ export default function SurveyListItem(props: Props) {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const surveyLanguage = survey.primaryLanguage;
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
@@ -189,9 +190,11 @@ export default function SurveyListItem(props: Props) {
                 (survey?.title?.[surveyLanguage] ?? '')
               )}
             </Typography>
-            <Typography color="textSecondary" component="h4" gutterBottom>
-              {survey.subtitle?.[surveyLanguage]}
-            </Typography>
+            {survey.subtitle?.[surveyLanguage] && (
+              <Typography color="textSecondary" component="p" gutterBottom>
+                {survey.subtitle?.[surveyLanguage]}
+              </Typography>
+            )}
             <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
               {survey.tags.map((tag, i) => (
                 <Chip label={tag} key={i} />
@@ -259,12 +262,20 @@ export default function SurveyListItem(props: Props) {
                 sx={{ marginRight: 1 }}
               />
               {survey.startDate && survey.endDate ? (
-                <Typography variant="body1" color="primary" gutterBottom>
+                <Typography
+                  variant="body1"
+                  color="textInteractive"
+                  gutterBottom
+                >
                   {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
                   {format(survey.endDate, 'd.M.yyyy')}
                 </Typography>
               ) : survey.startDate ? (
-                <Typography variant="body1" color="primary" gutterBottom>
+                <Typography
+                  variant="body1"
+                  color="textInteractive"
+                  gutterBottom
+                >
                   {tr.SurveyList.openFrom}{' '}
                   {format(survey.startDate, 'd.M.yyyy')}
                 </Typography>
@@ -273,8 +284,10 @@ export default function SurveyListItem(props: Props) {
               {survey.isPublished ? (
                 <Typography
                   variant="published"
-                  color="primary"
-                  style={{ paddingLeft: '0.5rem' }}
+                  color={'textInteractive'}
+                  sx={{
+                    paddingLeft: '0.5rem',
+                  }}
                 >
                   {' '}
                   - {tr.SurveyList.published}
@@ -282,8 +295,10 @@ export default function SurveyListItem(props: Props) {
               ) : (
                 <Typography
                   variant="published"
-                  color="primary"
-                  style={{ paddingLeft: '0.5rem' }}
+                  color={'textInteractive'}
+                  sx={{
+                    paddingLeft: '0.5rem',
+                  }}
                 >
                   {' '}
                   - {tr.SurveyList.notPublished}

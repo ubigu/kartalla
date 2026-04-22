@@ -1,7 +1,7 @@
-import { TextField, Typography } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
 import SurveyImageList from './SurveyImageList';
 
@@ -14,8 +14,16 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
   const { tr, surveyLanguage } = useTranslations();
 
   return (
-    <Fieldset loading={activeSurveyLoading}>
-      <Typography variant="h4" component={'h1'}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '36px',
+        maxWidth: 'min(55em, 70%)',
+        ...(activeSurveyLoading && loadingPulse),
+      }}
+    >
+      <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.thanksPage}
       </Typography>
       <TextField
@@ -51,6 +59,6 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
         }}
       />
       <SurveyImageList canEdit={canEdit} imageType={'thanksPageImage'} />
-    </Fieldset>
+    </Box>
   );
 }

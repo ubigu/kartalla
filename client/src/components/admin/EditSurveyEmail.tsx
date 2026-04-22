@@ -11,7 +11,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { useEffect, useState } from 'react';
-import Fieldset from '../Fieldset';
+import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
 import KeyValueForm from './KeyValueForm';
 
@@ -40,8 +40,16 @@ export default function EditSurveyEmail() {
 
   return (
     <>
-      <Fieldset loading={activeSurveyLoading}>
-        <Typography variant="h4" component={'h1'}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '36px',
+          maxWidth: 'min(55em, 70%)',
+          ...(activeSurveyLoading && loadingPulse),
+        }}
+      >
+        <Typography variant="mainHeader" component={'h1'}>
           {tr.EditSurvey.emailReports}
         </Typography>
         <div>
@@ -214,7 +222,7 @@ export default function EditSurveyEmail() {
             </div>
           </>
         )}
-      </Fieldset>
+      </Box>
     </>
   );
 }

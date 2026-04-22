@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import { Fab, Tooltip } from '@mui/material';
+import { Fab, Tooltip, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SaveIcon from '@src/components/icons/SaveIcon';
 import UndoIcon from '@src/components/icons/UndoIcon';
@@ -29,6 +29,10 @@ export default function EditSurveyControls() {
   } = useSurvey();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
+  const theme = useTheme();
+
+  const undoDisabled = !hasActiveSurveyChanged || activeSurveyLoading;
+  const invalidFieldsLabel = `${tr.EditSurvey.invalidFields} ${validationErrors.map((e) => tr.EditSurvey.validationError[e]).join(', ')}`;
 
   function getErrorInfoText(info: string) {
     switch (info) {
@@ -56,6 +60,26 @@ export default function EditSurveyControls() {
 
   return (
     <div className={classes.root}>
+      <Tooltip title={tr.commands.discard}>
+        <span>
+          <Fab
+            disabled={undoDisabled}
+            sx={{
+              backgroundColor: theme.palette.surfacePrimary.main,
+              border:
+                !undoDisabled && `solid 1px ${theme.palette.primary.main}`,
+            }}
+            aria-label={tr.commands.discard}
+            onClick={() => {
+              discardChanges();
+            }}
+          >
+            <UndoIcon
+              htmlColor={!undoDisabled ? theme.palette.primary.main : undefined}
+            />
+          </Fab>
+        </span>
+      </Tooltip>
       <Tooltip
         title={
           validationErrors.length > 0
@@ -71,7 +95,11 @@ export default function EditSurveyControls() {
               validationErrors.length > 0
             }
             color="primary"
-            aria-label="save-changes"
+            aria-label={
+              validationErrors.length > 0
+                ? invalidFieldsLabel
+                : tr.commands.save
+            }
             onClick={async () => {
               try {
                 await saveChanges();
@@ -88,20 +116,6 @@ export default function EditSurveyControls() {
             }}
           >
             <SaveIcon />
-          </Fab>
-        </span>
-      </Tooltip>
-      <Tooltip title={tr.commands.discard}>
-        <span>
-          <Fab
-            disabled={!hasActiveSurveyChanged || activeSurveyLoading}
-            color="secondary"
-            aria-label="discard-changes"
-            onClick={() => {
-              discardChanges();
-            }}
-          >
-            <UndoIcon />
           </Fab>
         </span>
       </Tooltip>

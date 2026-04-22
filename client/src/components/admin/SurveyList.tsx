@@ -32,6 +32,7 @@ const useStyles = makeStyles({
   actions: {
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   item: {
     boxShadow: '0px 2px 4px rgba(63, 111, 127, 0.9)',
@@ -88,7 +89,6 @@ export default function SurveyList() {
       <Tabs
         value={tabView}
         indicatorColor="primary"
-        textColor="primary"
         sx={{
           mb: '16px',
           minHeight: 'fit-content',

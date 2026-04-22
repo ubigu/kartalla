@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  LanguageCode,
   Submission,
   Survey,
   SurveyQuestion,
@@ -7,13 +8,12 @@ import {
 import {
   Box,
   CircularProgress,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
   Stack,
   Typography,
 } from '@mui/material';
+import { CoreSelect } from '@src/components/core/Select';
+import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
@@ -84,7 +84,8 @@ export default function SurveySubmissionsPage() {
     useState<SurveyQuestion | null>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage, setSurveyLanguage, languages } =
+    useTranslations();
 
   const loading = useMemo(() => {
     return surveyLoading || submissionsLoading || responsesLoading;
@@ -120,6 +121,12 @@ export default function SurveySubmissionsPage() {
     // cleanup to prevent old survey mixing up with the new one when moving between submission pages
     return () => setSurvey(null);
   }, [name, surveyId]);
+
+  useEffect(() => {
+    if (survey?.primaryLanguage) {
+      setSurveyLanguage(survey.primaryLanguage as LanguageCode);
+    }
+  }, [survey?.id]);
 
   // Fetch submissions from server after the survey has been loaded
   useEffect(() => {
@@ -238,16 +245,16 @@ export default function SurveySubmissionsPage() {
       return <AnswerTable answers={answers ?? []} />;
     }
     if (
-      selectedQuestion !== null &&
-      (MAP_TYPES.includes(selectedQuestion.type) ||
-        selectedQuestion.id === DEFAULT_VIEW_SECTION_ID)
+      selectedQuestion === null ||
+      MAP_TYPES.includes(selectedQuestion.type) ||
+      selectedQuestion.id === DEFAULT_VIEW_SECTION_ID
     ) {
       if (!survey) return false as const;
       return (
         <AnswerMap
           survey={survey}
           submissions={submissions ?? []}
-          selectedQuestion={selectedQuestion}
+          selectedQuestion={selectedQuestion ?? questions[0]}
           onAnswerClick={(answer) => setSelectedAnswer(answer)}
           onSelectQuestion={(question) => setSelectedQuestion(question)}
           selectedAnswer={selectedAnswer}
@@ -311,32 +318,80 @@ export default function SurveySubmissionsPage() {
               padding: '1rem',
             }}
           >
-            <FormControl size="medium" variant="filled" fullWidth>
-              <InputLabel id="select-label">
-                {tr.SurveySection.question}
-              </InputLabel>
+            <CoreSelect
+              id="submissions-question-select"
+              label={tr.SurveySection.question}
+              value={selectedQuestion?.id ?? 0}
+              onChange={(event) => {
+                setSelectedAnswer(null);
+                setSelectedQuestion(
+                  questions.find(
+                    (question) => question.id === event.target.value,
+                  ) ?? null,
+                );
+              }}
+              sx={(theme) => ({
+                height: '44px',
+                fontSize: '16px',
+                fontWeight: 700,
+                color: theme.palette.textSecondary.main,
+                '& .MuiSelect-select': {
+                  padding: '0 8px',
+                  paddingRight: '32px !important',
+                },
+              })}
+            >
+              {questions.map((question) => (
+                <MenuItem key={question.id} value={question.id}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {question.type && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexShrink: 0,
+                          '& svg': { fontSize: '20px' },
+                        }}
+                      >
+                        {sectionTypeIcons[question.type]}
+                      </Box>
+                    )}
+                    <span
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        minWidth: 0,
+                      }}
+                    >
+                      {question.title[surveyLanguage]}
+                    </span>
+                  </Box>
+                </MenuItem>
+              ))}
+            </CoreSelect>
 
-              <Select
-                sx={{ fontWeight: 400, fontSize: '24px' }}
-                value={selectedQuestion?.id ?? 0}
-                label={tr.SurveySection.question}
-                onChange={(event) => {
-                  if (!questions) return;
-                  setSelectedAnswer(null);
-                  setSelectedQuestion(
-                    questions.find(
-                      (question) => question.id === event.target.value,
-                    ) ?? null,
-                  );
-                }}
-              >
-                {questions.map((question) => (
-                  <MenuItem key={question.id} value={question.id}>
-                    {question.title[surveyLanguage]}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <CoreSelect
+              id="submissions-survey-language"
+              label={tr.SurveyLanguageMenu.answerLanguage}
+              value={surveyLanguage}
+              onChange={(e) =>
+                setSurveyLanguage(e.target.value as LanguageCode)
+              }
+              options={languages
+                .filter((lang) => survey.enabledLanguages[lang])
+                .map((lang) => ({
+                  value: lang,
+                  label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+                }))}
+            />
 
             {!selectedQuestion ||
             selectedQuestion.id === DEFAULT_VIEW_SECTION_ID ? (

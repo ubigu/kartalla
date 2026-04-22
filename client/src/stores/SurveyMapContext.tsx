@@ -4,7 +4,7 @@ import {
   MapQuestionSelectionType,
   SurveyMapQuestion,
 } from '@interfaces/survey';
-import { harmaa } from '@src/themes/common';
+import { colors } from '@src/themes/colors';
 import { LineString, Point, Polygon } from 'geojson';
 import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
@@ -114,8 +114,8 @@ const stateDefaults: State = {
   },
   modifying: false,
   mapFeatureColorScheme: {
-    primaryColor: harmaa,
-    primaryFillColor: `${harmaa}d4`,
+    primaryColor: colors.harmaa,
+    primaryFillColor: `${colors.harmaa}d4`,
     secondaryColor: '#3e37bf',
     secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
   },
@@ -142,11 +142,11 @@ const modifyEventId = 'modify';
 // Default feature style
 const defaultFeatureStyle = {
   stroke: {
-    color: harmaa,
+    color: colors.harmaa,
     width: 6,
   },
   fill: {
-    color: `${harmaa}d4`,
+    color: `${colors.harmaa}d4`,
   },
 };
 

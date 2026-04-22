@@ -1,10 +1,10 @@
-import { Box, CircularProgress, Toolbar, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import { usePreventUnload } from '@src/utils/usePreventUnload';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Redirect,
   Route,
@@ -23,13 +23,9 @@ import EditSurveyPage from './EditSurveyPage';
 import EditSurveyPermissions from './EditSurveyPermissions';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
-import EditSurveyTranslations from './EditSurveyTranslations';
-
-const sideBarWidth = 320;
+import EditSurveyTranslationsV2 from './EditSurveyTranslationsV2';
 
 export default function EditSurvey() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
   const { path, url } = useRouteMatch();
   const { surveyId } = useParams<{ surveyId: string }>();
   const {
@@ -38,18 +34,19 @@ export default function EditSurvey() {
     activeSurvey,
     hasActiveSurveyChanged,
   } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, setSurveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
 
-  const allowEditing =
+  const allowEditing = Boolean(
     !activeSurveyLoading &&
     !activeSurvey?.isArchived &&
     (activeUserIsSuperUser ||
       activeUserIsAdmin ||
       activeUser?.id === activeSurvey?.authorId ||
-      activeSurvey.editors.includes(activeUser?.id));
+      (activeUser && activeSurvey.editors.includes(activeUser?.id))),
+  );
 
   // Prevent page unload when there are unsaved changes
   usePreventUnload(
@@ -73,6 +70,12 @@ export default function EditSurvey() {
     fetchSurvey();
   }, [surveyId]);
 
+  useEffect(() => {
+    if (activeSurvey?.primaryLanguage) {
+      setSurveyLanguage(activeSurvey.primaryLanguage);
+    }
+  }, [activeSurvey?.id]);
+
   return !activeSurvey || String(activeSurvey.id) !== surveyId ? (
     <Box
       sx={{
@@ -91,63 +94,60 @@ export default function EditSurvey() {
       )}
     </Box>
   ) : (
-    <Box sx={{ display: 'flex' }}>
-      <EditSurveyHeader
-        sideBarWidth={sideBarWidth}
-        onDrawerToggle={() => {
-          setMobileOpen(!mobileOpen);
-        }}
-      />
-      <EditSurveySideBar
-        width={sideBarWidth}
-        mobileOpen={mobileOpen}
-        onDrawerToggle={() => {
-          setMobileOpen(!mobileOpen);
-        }}
-        allowEditing={allowEditing}
-      />
+    <>
+      <EditSurveyHeader />
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          maxWidth: 'min(55em, 60%)',
-          boxSizing: 'border-box',
+          display: 'flex',
+          height: 'calc(min(100svh, 100vh) - 64px)',
+          flexDirection: 'row-reverse', // So that h1 header comes before subheaders at dom
         }}
       >
-        <Toolbar />
-        <Switch>
-          <Route path={`${path}/perusasetukset`}>
-            <EditSurveyBasicSettings canEdit={allowEditing} />
-          </Route>
-          <Route path={`${path}/käyttäjäoikeudet`}>
-            <EditSurveyPermissions canEdit={allowEditing} />
-          </Route>
-          <Route path={`${path}/ulkoasu`}>
-            <EditSurveyAppearance canEdit={allowEditing} />
-          </Route>
-          <Route path={`${path}/kartta-aineistot`}>
-            <EditSurveyMapData />
-          </Route>
-          <Route path={`${path}/sähköpostit`}>
-            <EditSurveyEmail />
-          </Route>
-          <Route path={`${path}/sivut/:pageId`}>
-            <EditSurveyPage canEdit={allowEditing} />
-          </Route>
-          <Route path={`${path}/kiitos-sivu`}>
-            <EditSurveyThanksPage canEdit={allowEditing} />
-          </Route>
-          <Route path={`${path}/käännökset`}>
-            <EditSurveyTranslations />
-          </Route>
-          <Route path="*">
-            {/* By default redirect to basic settings */}
-            <Redirect to={`${url}/perusasetukset`} />
-          </Route>
-        </Switch>
-        {allowEditing && <EditSurveyControls />}
+        <Box
+          component="main"
+          sx={{
+            position: 'relative',
+            overflow: 'auto',
+            flex: 1,
+            p: '24px',
+          }}
+        >
+          <Switch>
+            <Route path={`${path}/perusasetukset`}>
+              <EditSurveyBasicSettings canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/käyttäjäoikeudet`}>
+              <EditSurveyPermissions canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/ulkoasu`}>
+              <EditSurveyAppearance canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/kartta-aineistot`}>
+              <EditSurveyMapData />
+            </Route>
+            <Route path={`${path}/sähköpostit`}>
+              <EditSurveyEmail />
+            </Route>
+            <Route path={`${path}/sivut/:pageId`}>
+              <EditSurveyPage canEdit={allowEditing} />
+            </Route>
+            <Route path={`${path}/kiitos-sivu`}>
+              <EditSurveyThanksPage canEdit={allowEditing} />
+            </Route>
+            {activeSurvey.localisationEnabled && (
+              <Route path={`${path}/käännökset`}>
+                <EditSurveyTranslationsV2 />
+              </Route>
+            )}
+            <Route path="*">
+              {/* By default redirect to basic settings */}
+              <Redirect to={`${url}/perusasetukset`} />
+            </Route>
+          </Switch>
+          {allowEditing && <EditSurveyControls />}
+        </Box>
+        <EditSurveySideBar allowEditing={allowEditing} />
       </Box>
-    </Box>
+    </>
   );
 }

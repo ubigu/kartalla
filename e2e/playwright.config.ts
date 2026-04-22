@@ -9,6 +9,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Desktop Chrome'],
         contextOptions: { ignoreHTTPSErrors: true },
+        viewport: { width: 1280, height: 3000 }, // Tall viewport to avoid scrollable content
       },
     },
     {
@@ -16,6 +17,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Desktop Firefox'],
         contextOptions: { ignoreHTTPSErrors: true },
+        viewport: { width: 1280, height: 3000 }, // Tall viewport to avoid scrollable content
       },
     },
     {
@@ -24,6 +26,7 @@ const config: PlaywrightTestConfig = {
         ...devices['Desktop Edge'],
         channel: 'msedge',
         contextOptions: { ignoreHTTPSErrors: true },
+        viewport: { width: 1280, height: 3000 }, // Tall viewport to avoid scrollable content
       },
     },
     {

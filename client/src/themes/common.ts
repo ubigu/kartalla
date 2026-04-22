@@ -1,138 +1,113 @@
-import { Components, createTheme, Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
+import { colors } from './colors';
+import { commonOverrides } from './overrides';
 
-const primary = '#008577';
-const havu = '#1a776d';
-export const harmaa = '#515b68';
-const textlink = '#219acd';
-const borderPrimary = '#E9ECF0';
-const baseTheme = createTheme({});
-
-declare module '@mui/material/styles' {
-  interface Palette {
-    borderPrimary: Palette['primary'];
-    brandYellow: Palette['primary'];
-    havu: Palette['primary'];
-    harmaa: Palette['primary'];
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    mainHeader: true;
+    secondaryHeader: true;
+    questionTitle: true;
+    followUpSectionTitle: true;
+    published: true;
   }
 
-  interface PaletteOptions {
-    borderPrimary?: PaletteOptions['primary'];
-    brandYellow?: PaletteOptions['primary'];
-    havu?: PaletteOptions['primary'];
-    harmaa?: PaletteOptions['primary'];
+  interface TypographyPropsColorOverrides {
+    havu: true;
+    brandYellow: true;
+    harmaa: true;
+    textlink: true;
+    textSecondary: true;
+    textSubtle: true;
+    textWarning: true;
+    textError: true;
+    textInteractive: true;
   }
 }
 
-export const ubiElevated =
-  '0px 2px 4px rgba(63, 111, 127, 0.09), 0px 10px 20px rgba(10, 104, 129, 0.15)';
-export const surveyCardOverrides: Components<Omit<Theme, 'components'>> = {
-  MuiCard: {
-    styleOverrides: {
-      root: {
-        boxShadow: ubiElevated,
-        border: `0.5px solid ${borderPrimary};`,
-      },
-    },
-  },
-  MuiLink: {
-    styleOverrides: {
-      root: {
-        color: textlink,
-      },
-    },
-  },
-};
+declare module '@mui/material/styles' {
+  interface Palette {
+    disabled: Palette['primary'];
+    borderPrimary: Palette['primary'];
+    borderSecondary: Palette['primary'];
+    borderSubtle: Palette['primary'];
+    brandYellow: Palette['primary'];
+    havu: Palette['primary'];
+    harmaa: Palette['primary'];
+    surfaceError: Palette['primary'];
+    surfaceInfo: Palette['primary'];
+    surfaceInput: Palette['primary'];
+    surfacePrimary: Palette['primary'];
+    surfaceSubtle: Palette['primary'];
+    surfaceSuccess: Palette['primary'];
+    surfaceWarning: Palette['primary'];
+    textError: Palette['primary'];
+    textWarning: Palette['primary'];
+    textInteractive: Palette['primary'];
+    textlink: Palette['primary'];
+    textSecondary: Palette['primary'];
+    textSubtle: Palette['primary'];
+  }
 
-const overridableComponents = [
-  'MuiAccordion',
-  'MuiInputBase',
-  'MuiList',
-  'MuiTypography',
-  'MuiFormLabel',
-  'MuiTableCell',
-];
+  interface PaletteOptions {
+    disabled?: PaletteOptions['primary'];
+    borderPrimary?: PaletteOptions['primary'];
+    borderSecondary?: PaletteOptions['primary'];
+    borderSubtle?: PaletteOptions['primary'];
+    brandYellow?: PaletteOptions['primary'];
+    havu?: PaletteOptions['primary'];
+    harmaa?: PaletteOptions['primary'];
+    surfaceError?: PaletteOptions['primary'];
+    surfaceInfo?: PaletteOptions['primary'];
+    surfaceInput?: PaletteOptions['primary'];
+    surfacePrimary?: PaletteOptions['primary'];
+    surfaceSubtle?: PaletteOptions['primary'];
+    surfaceSuccess?: PaletteOptions['primary'];
+    surfaceWarning?: PaletteOptions['primary'];
+    textError?: PaletteOptions['primary'];
+    textWarning?: PaletteOptions['primary'];
+    textInteractive?: PaletteOptions['primary'];
+    textlink?: PaletteOptions['primary'];
+    textSecondary?: PaletteOptions['primary'];
+    textSubtle?: PaletteOptions['primary'];
+  }
+}
 
-const MuiTypographyOverrides = {
-  variants: [
-    {
-      props: { variant: 'questionTitle' },
-      style: {
-        fontWeight: 700,
-        fontSize: '1.2em',
-        margin: '1em 0',
-      },
-    },
-    {
-      props: { variant: 'followUpSectionTitle' },
-      style: {
-        fontWeight: 700,
-        fontSize: '1em',
-        margin: '0.5em 0',
-      },
-    },
-    {
-      props: { variant: 'published' },
-      style: {
-        fontStyle: 'italic',
-      },
-    },
-  ],
-  styleOverrides: {
-    root: {
-      color: harmaa,
-      textTransform: 'none',
-    },
-  },
-};
+const baseTheme = createTheme({});
 
-const commonComponentOverrides: Components<Omit<Theme, 'components'>> = {
-  MuiCssBaseline: {
-    styleOverrides: {
-      color: harmaa,
-      body: {
-        color: harmaa,
-      },
-      input: {
-        color: harmaa,
-      },
-    },
-  },
-  ...overridableComponents.reduce((object, component) => {
-    if (component === 'MuiTypography') {
-      return {
-        ...object,
-        [component]: MuiTypographyOverrides,
-      };
-    }
-    return {
-      ...object,
-      [component]: { styleOverrides: { root: { color: harmaa } } },
-    };
-  }, {}),
-};
+function augment(name: keyof typeof colors) {
+  return baseTheme.palette.augmentColor({
+    color: { main: colors[name] },
+    name,
+  });
+}
 
-/**  Use this common theme as baseline for all themes */
+/** Use this common theme as baseline for all themes */
 export const ubiTheme = createTheme({
   palette: {
-    primary: {
-      main: primary,
-    },
-    brandYellow: {
-      main: '#FFECAB',
-    },
-    havu: {
-      main: havu,
-    },
-    harmaa: {
-      main: harmaa,
-    },
-    borderPrimary: baseTheme.palette.augmentColor({
-      color: {
-        main: borderPrimary,
-      },
-      name: 'border',
+    primary: { main: colors.primary },
+    brandYellow: augment('brandYellow'),
+    havu: augment('havu'),
+    harmaa: augment('harmaa'),
+    borderPrimary: augment('borderPrimary'),
+    borderSecondary: augment('borderSecondary'),
+    borderSubtle: augment('borderSubtle'),
+    textInteractive: augment('textInteractive'),
+    textlink: augment('textlink'),
+    textSecondary: augment('textSecondary'),
+    textSubtle: augment('textSubtle'),
+    surfacePrimary: augment('surfacePrimary'),
+    surfaceSubtle: baseTheme.palette.augmentColor({
+      color: { main: colors.surfaceSubtle, dark: colors.surfaceSubtleDark },
+      name: 'surfaceSubtle',
     }),
+    surfaceError: augment('surfaceError'),
+    surfaceInfo: augment('surfaceInfo'),
+    surfaceInput: augment('surfaceInput'),
+    surfaceSuccess: augment('surfaceSuccess'),
+    surfaceWarning: augment('surfaceWarning'),
+    textError: augment('textError'),
+    textWarning: augment('textWarning'),
   },
   typography: { fontFamily: 'Nunito' },
-  components: commonComponentOverrides,
+  components: commonOverrides,
 });

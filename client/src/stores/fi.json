@@ -37,6 +37,7 @@
     "newSurvey": "Uusi kysely",
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
     "untitledPage": "Nimetön sivu",
+    "page": "Sivu",
     "fetchFailed": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "saveSuccessful": "Kysely tallennettiin onnistuneesti!",
     "saveFailed": "Kyselyn tallentaminen epäonnistui. Yritä myöhemmin uudestaan.",
@@ -57,7 +58,7 @@
     "emailReports": "Sähköpostiraportit",
     "openSurveyPage": "Avaa kyselysivu",
     "email": "Sähköposti",
-    "newPage": "Luo sivu",
+    "newPage": "Lisää uusi sivu...",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
     "translations": "Käännökset",
@@ -74,7 +75,12 @@
     "attachNewPage": "Liitä sivu",
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
     "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle.",
-    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa."
+    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa.",
+    "settings": "Asetukset",
+    "content": "Sisältö",
+    "multilingualism": "Monikielisyys",
+    "manageTranslations": "Hallitse käännöksiä",
+    "developedBy": "Kartalla-kyselypalvelua kehittää Ubigu Oy"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -709,6 +715,7 @@
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
   "AppBar": {
+    "survey": "Kysely",
     "generalNotifications": "Tiedotteet",
     "generalNotificationsNew": "Uusia tiedotteita",
     "generalNotificationsError": "Virhe haettaessa tiedotteita",
@@ -719,7 +726,10 @@
     "logout": "Kirjaudu ulos",
     "updateInstructions": "Päivitä käyttöohjeet",
     "userManagement": "Käyttäjähallinta",
-    "editMapPublications": "Muokkaa karttajulkaisuja"
+    "editMapPublications": "Muokkaa karttajulkaisuja",
+    "selectDefaultLanguage": "Valitse sovelluksen oletuskieli",
+    "defaultLanguageSaved": "Oletuskieli tallennettu",
+    "defaultLanguageSaveFailed": "Oletuskielen tallentaminen epäonnistui"
   },
   "AppBarInstructionsMenu": {
     "label": "Ohjeet",
@@ -753,7 +763,11 @@
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Vaihda kyselyn kieltä",
-    "surveyLanguage": "Kyselyn kieli"
+    "surveyLanguage": "Kyselyn kieli",
+    "workingLanguage": "Työstökieli",
+    "answerLanguage": "Vastauskieli",
+    "multilingual": "Monikielinen",
+    "workingLanguageHelperText": "Millä kielellä rakennat kyselyn? Jos kysely on monikielinen, voit vaihtaa työstökieltä ja syöttää kyselyn tiedot ja sisällön eri kielillä."
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
@@ -773,7 +787,28 @@
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
     "thanksPage": "Kiitos-sivu",
-    "errorAtleastOnelanguage": "Valitse vähintään yksi kieli."
+    "errorAtleastOnelanguage": "Valitse vähintään yksi kieli.",
+    "addLanguage": "Lisää kieli",
+    "multilingualism": "Monikielisyys",
+    "pageTitle": "Sivun nimi",
+    "questionText": "Kysymysteksti",
+    "bodyText": "Teksti",
+    "imageCaption": "Kuvateksti",
+    "option": "vaihtoehto",
+    "optionAltText": "Kuvateksti",
+    "sliderMinLabel": "Min-teksti",
+    "sliderMaxLabel": "Max-teksti",
+    "matrixClass": "Luokka",
+    "matrixSubject": "Aihe",
+    "budgetTarget": "Kohde",
+    "helperText": "Avustusteksti",
+    "group": "Ryhmä",
+    "customLabel": "Mukautettu otsikko",
+    "additionalInfo": "Lisätiedot",
+    "column": "sarake",
+    "columns": "saraketta",
+    "thanksPageTitle": "Kiitos-sivun otsikko",
+    "thanksPageText": "Kiitos-sivun teksti"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

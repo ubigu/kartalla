@@ -1,4 +1,4 @@
-import { LanguageCode } from '@interfaces/survey';
+import { LanguageCode, Survey } from '@interfaces/survey';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useEffect, useMemo } from 'react';
@@ -8,6 +8,33 @@ function useQuery() {
   const { search } = useLocation();
 
   return useMemo(() => new URLSearchParams(search), [search]);
+}
+
+export function resolveLanguageSettings({
+  survey,
+  queryLang: lang,
+  languages,
+  currentLanguage,
+}: {
+  survey: Pick<Survey, 'localisationEnabled' | 'primaryLanguage'>;
+  queryLang: LanguageCode | null;
+  languages: LanguageCode[];
+  currentLanguage: LanguageCode;
+}): { surveyLanguage: LanguageCode; uiLanguage: LanguageCode | null } {
+  if (
+    !survey.localisationEnabled ||
+    !languages.includes(lang as LanguageCode)
+  ) {
+    return {
+      surveyLanguage: survey.primaryLanguage,
+      uiLanguage: survey.primaryLanguage,
+    };
+  }
+
+  return {
+    surveyLanguage: lang as LanguageCode,
+    uiLanguage: lang !== currentLanguage ? (lang as LanguageCode) : null,
+  };
 }
 
 export default function SurveyLanguageRouter(): null {
@@ -20,15 +47,14 @@ export default function SurveyLanguageRouter(): null {
 
   useEffect(() => {
     if (!survey) return;
-    if (survey?.localisationEnabled && lang) setSurveyLanguage(lang);
-    if (survey?.localisationEnabled && !languages.includes(lang)) {
-      setSurveyLanguage(languages[0] as LanguageCode);
-      setLanguage(languages[0] as LanguageCode);
-    }
-
-    if (!languages.includes(lang) || lang === language) return;
-
-    setLanguage(lang);
+    const { surveyLanguage, uiLanguage } = resolveLanguageSettings({
+      survey,
+      queryLang: lang,
+      languages,
+      currentLanguage: language,
+    });
+    setSurveyLanguage(surveyLanguage);
+    if (uiLanguage) setLanguage(uiLanguage);
   }, [lang, survey, languages]);
 
   return null;

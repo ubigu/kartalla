@@ -1,11 +1,18 @@
-// @ts-strict-ignore
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { DefaultLanguageDialog } from './DefaultLanguageDialog';
 import { InstructionsDialog } from './InstructionsDialog';
 
 const useStyles = makeStyles({
@@ -17,11 +24,13 @@ const useStyles = makeStyles({
 
 export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
+  const [defaultLanguageDialogOpen, setDefaultLanguageDialogOpen] =
+    useState(false);
   const { activeUserIsSuperUser, activeUserIsAdmin } = useUser();
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, language, languages, setLanguage } = useTranslations();
   const history = useHistory();
 
   return (
@@ -74,12 +83,50 @@ export default function AppBarUserMenu() {
             {tr.AppBarUserMenu.userManagement}
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            setMenuOpen(false);
+            setDefaultLanguageDialogOpen(true);
+          }}
+        >
+          {tr.AppBarUserMenu.selectDefaultLanguage}
+        </MenuItem>
         {activeUserIsSuperUser && (
           <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
             {tr.AppBarUserMenu.updateInstructions}
           </MenuItem>
         )}
+        <ListSubheader
+          component={'p'}
+          disableSticky
+          sx={(theme) => ({
+            paddingY: 0,
+            margin: 0,
+            borderTop: `1px solid ${theme.palette.borderSubtle.main}`,
+          })}
+        >
+          {tr.LanguageMenu.changeLanguage}
+        </ListSubheader>
+        <Box component={'ul'} sx={{ padding: 0, margin: 0 }}>
+          {languages.map((lang) => (
+            <MenuItem
+              key={lang}
+              selected={lang === language}
+              onClick={() => {
+                setLanguage(lang);
+                setMenuOpen(false);
+              }}
+            >
+              {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
+            </MenuItem>
+          ))}
+        </Box>
       </Menu>
+      <DefaultLanguageDialog
+        isOpen={defaultLanguageDialogOpen}
+        setIsOpen={setDefaultLanguageDialogOpen}
+        setMenuOpen={setMenuOpen}
+      />
       <InstructionsDialog
         isOpen={instructionsDialogOpen}
         setIsOpen={setInstructionsDialogOpen}

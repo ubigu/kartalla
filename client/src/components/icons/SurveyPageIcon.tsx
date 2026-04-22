@@ -1,19 +1,58 @@
+import { Box } from '@mui/material';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 
-export default function SurveyPageIcon(props: SvgIconProps) {
-  return (
+interface SurveyPageIconProps extends SvgIconProps {
+  innerText?: string | number;
+  innerTextColor?: string;
+}
+
+export default function SurveyPageIcon({
+  innerText,
+  innerTextColor,
+  ...props
+}: SurveyPageIconProps) {
+  const icon = (
     <SvgIcon {...props}>
-      <svg fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        width="20"
+        height="22"
+        viewBox="0 0 20 22"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <path
-          d="M15.0735 1.99997C14.752 1.67848 14.3159 1.49787 13.8613 1.49787L4.21215 1.49786C3.75749 1.49786 3.32146 1.67848 2.99997 1.99997C2.67849 2.32146 2.49787 2.75749 2.49787 3.21215L2.49778 20.7878C2.49778 21.2424 2.6784 21.6785 2.99988 22C3.32138 22.3214 3.7574 22.5021 4.21207 22.5021L19.7877 22.5C20.2424 22.5 20.6785 22.3193 20.9999 21.9979C21.3213 21.6764 21.502 21.2403 21.502 20.7857L21.5021 8.71214C21.5021 8.2575 21.3214 7.82145 20.9999 7.49997M15.0735 1.99997L20.9999 7.49997M15.0735 1.99997C15.4735 2.39997 15.5244 2.8333 15.4999 2.99997V6.49997H18.9999C19.9999 6.49997 20.5999 7.09997 20.9999 7.49997M12.8571 11.5H17.1428M12.8571 17.5H17.1428M6.3281 17.2064L7.76448 18.6428L10.1585 15.2913M6.3281 11.1791L7.76448 12.6155L10.1585 9.26389"
-          stroke="currentColor"
-          fill="none"
-          strokeOpacity="1"
-          strokeWidth="1.5"
+          d="M13.0757 1.00211C12.7542 0.680615 12.3181 0.500003 11.8635 0.500003L2.21435 0.5C1.75969 0.5 1.32366 0.680612 1.00216 1.0021C0.680683 1.32359 0.500066 1.75962 0.500066 2.21429L0.499978 19.7899C0.499978 20.2446 0.680595 20.6807 1.00208 21.0021C1.32357 21.3235 1.7596 21.5042 2.21426 21.5042L17.7899 21.5021C18.2446 21.5021 18.6807 21.3214 19.0021 21C19.3235 20.6786 19.5042 20.2424 19.5042 19.7878L19.5043 7.71428C19.5043 7.25963 19.3236 6.82359 19.0021 6.50211M13.0757 1.00211L19.0021 6.50211M13.0757 1.00211C13.4757 1.40211 13.5266 1.83544 13.5021 2.00211V5.50211H17.0021C18.0021 5.50211 18.6021 6.10211 19.0021 6.50211"
+          stroke={props.stroke ?? '#A7B4C3'}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
     </SvgIcon>
+  );
+
+  if (innerText === undefined) return icon;
+
+  return (
+    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+      {icon}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: '3px 0 0 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize:
+            isNaN(Number(innerText)) && Number(innerText) > 99
+              ? '10px'
+              : '14px',
+          fontWeight: 600,
+          color: innerTextColor ?? '#A7B4C3',
+          pointerEvents: 'none',
+        }}
+      >
+        {innerText}
+      </Box>
+    </Box>
   );
 }

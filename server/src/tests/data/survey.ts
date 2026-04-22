@@ -49,6 +49,7 @@ export const createMockSurvey = (
   organization: { id: '', name: '' },
   tags: [],
   enabledLanguages: { fi: true, en: false, se: false },
+  primaryLanguage: 'fi',
   isArchived: false,
   pages: [
     {

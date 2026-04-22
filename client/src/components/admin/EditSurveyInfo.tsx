@@ -33,9 +33,9 @@ import svLocale from 'date-fns/locale/sv';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from '../../stores/UserContext';
+import { loadingPulse } from '../core/styles';
 import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
-import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
 import RichTextEditor from '../RichTextEditor';
 import ColorSelect from './ColorSelect';
@@ -146,7 +146,15 @@ export default function EditSurveyInfo(props: Props) {
 
   return (
     <>
-      <Fieldset loading={activeSurveyLoading}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '36px',
+          maxWidth: 'min(55em, 70%)',
+          ...(activeSurveyLoading && loadingPulse),
+        }}
+      >
         <TextField
           required
           error={validationErrors.includes('survey.title')}
@@ -576,7 +584,7 @@ export default function EditSurveyInfo(props: Props) {
             </LoadingButton>
           </div>
         )}
-      </Fieldset>
+      </Box>
       <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}
         survey={activeSurvey}
