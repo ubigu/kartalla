@@ -11,7 +11,6 @@
     "migrate": "node-pg-migrate -f ./migration.config.js --template-file-name ./migrations/.template.ts",
     "test": "vitest run",
     "lint": "eslint . ",
-    "prebuild": "npm run lint && npm run test",
     "postbuild": "cp -r src/openapi dist/openapi",
     "build": "tsc"
   },

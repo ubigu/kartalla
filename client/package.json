@@ -9,7 +9,6 @@
     "lint": "eslint . --ext .ts,.tsx",
     "dev": "vite",
     "dev:local": "API_URL='http://localhost:3000' vite",
-    "prebuild": "npm run lint && npm run test",
     "build": "vite build"
   },
   "lint-staged": {

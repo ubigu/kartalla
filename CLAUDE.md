@@ -27,7 +27,7 @@ Individual service logs: `docker-compose logs -f <service-name>`. Restart a serv
 npm run dev          # Start with nodemon + vitest in watch mode
 npm test             # Run all tests once
 npm run lint         # ESLint
-npm run build        # tsc (runs lint + tests first via prebuild)
+npm run build        # tsc (compile TypeScript)
 npm run migrate      # Create a new migration file
 ```
 
@@ -37,7 +37,7 @@ npm run dev          # Vite dev server
 npm run dev:local    # Vite dev server pointing to localhost:3000 API
 npm test             # Run all tests once (vitest)
 npm run lint         # ESLint
-npm run build        # Vite build (runs lint + tests first via prebuild)
+npm run build        # Vite build (no tests/lint, just bundle)
 ```
 
 ### E2E tests (`/e2e`)
