@@ -45,6 +45,7 @@ import {
   isSuperUser,
 } from '@src/user';
 
+import { isFollowUpSectionParentType } from '@src/typeCheck';
 import {
   geometryToGeoJSONFeatureCollection,
   getCompressedFileString,
@@ -1968,23 +1969,30 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
  */
 function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
   const type = dbSurveyJoin.section_type as SurveyPageSection['type'];
-  return dbSurveyJoin.section_id == null
-    ? null
-    : {
-        id: dbSurveyJoin.section_id,
-        title: dbSurveyJoin.section_title,
-        type: dbSurveyJoin.section_type as SurveyPageSection['type'],
-        body: dbSurveyJoin.section_body,
-        info: dbSurveyJoin.section_info,
-        fileUrl: dbSurveyJoin.section_file_url,
-        // Trust that the JSON in the DB fits the rest of the detail fields
-        ...(dbSurveyJoin.section_details as any),
-        // Add an initial empty option array if the type allows options
-        ...((sectionTypesWithOptions.includes(type) ||
-          type === 'radio-image') && { options: [] }),
-        // Add an initial empty group array if the type allows option groups
-        ...(type === 'grouped-checkbox' && { groups: [] }),
-      };
+  const section = {
+    id: dbSurveyJoin.section_id,
+    title: dbSurveyJoin.section_title,
+    type: dbSurveyJoin.section_type as SurveyPageSection['type'],
+    body: dbSurveyJoin.section_body,
+    info: dbSurveyJoin.section_info,
+    fileUrl: dbSurveyJoin.section_file_url,
+    // Trust that the JSON in the DB fits the rest of the detail fields
+    ...(dbSurveyJoin.section_details as any),
+    // Add an initial empty option array if the type allows options
+    ...((sectionTypesWithOptions.includes(type) || type === 'radio-image') && {
+      options: [],
+    }),
+    // Add an initial empty group array if the type allows option groups
+    ...(type === 'grouped-checkbox' && { groups: [] }),
+    // Add an initial empty subQuestions array for map questions
+    ...(type === 'map' && { subQuestions: [] }),
+    // Add an initial empty followUpSections array for types that support follow-ups
+    ...(isFollowUpSectionParentType({ type } as any) && {
+      followUpSections: [],
+    }),
+  };
+
+  return dbSurveyJoin.section_id == null ? null : section;
 }
 
 /**
