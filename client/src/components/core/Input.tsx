@@ -14,7 +14,7 @@ export function CoreInput({ label, id, style, ...props }: CoreInputProps) {
           htmlFor={id}
           style={{
             fontSize: '12px',
-            color: theme.palette.primary.main,
+            color: theme.palette.textInteractive.main,
             lineHeight: 'normal',
           }}
         >

@@ -155,7 +155,11 @@ export default function EditSurveySideBar(props: Props) {
   const theme = useTheme();
 
   return (
-    <Box component={'nav'} sx={styles.navBox}>
+    <Box
+      component={'nav'}
+      aria-label={tr.EditSurveyPage.sidebarLabel}
+      sx={styles.navBox}
+    >
       <SideBarItem
         sxProps={{
           display: 'flex',

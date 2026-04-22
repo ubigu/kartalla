@@ -1,12 +1,36 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
+import { playwright } from '@vitest/browser-playwright';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
-    environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          include: ['src/**/*.test.{ts,tsx}'],
+          exclude: ['src/**/*.a11y.test.tsx'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'a11y',
+          include: ['src/**/*.a11y.test.tsx'],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+            headless: true,
+            screenshotFailures: false,
+          },
+        },
+      },
+    ],
   },
 });

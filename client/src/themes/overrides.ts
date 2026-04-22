@@ -26,6 +26,7 @@ const defaultFocusOutlineStyles: CSSInterpolation = {
 
 const defaultFocusStyles: CSSInterpolation = {
   backgroundColor: focusBackground,
+  color: colors.harmaa,
   ...defaultFocusOutlineStyles,
 };
 
@@ -75,6 +76,19 @@ const buttonOverrides: Components<Omit<Theme, 'components'>> = {
       },
     ],
     styleOverrides: {
+      contained: {
+        backgroundColor: colors.textInteractive,
+        color: colors.surfacePrimary,
+        '&:hover': { backgroundColor: colors.havu },
+      },
+      outlined: {
+        color: colors.textInteractive,
+        borderColor: colors.textInteractive,
+        '&:hover': { borderColor: colors.textInteractive },
+      },
+      text: {
+        color: colors.textInteractive,
+      },
       root: {
         boxShadow: 'none',
         textTransform: 'none',
@@ -111,6 +125,22 @@ const buttonOverrides: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         textTransform: 'none',
+      },
+    },
+  },
+  MuiTabs: {
+    styleOverrides: {
+      indicator: {
+        backgroundColor: colors.textInteractive,
+      },
+    },
+  },
+  MuiTab: {
+    styleOverrides: {
+      root: {
+        '&.Mui-selected': {
+          color: colors.textInteractive,
+        },
       },
     },
   },
@@ -253,6 +283,21 @@ export const commonOverrides: Components<Omit<Theme, 'components'>> = {
         style: {
           fontStyle: 'italic',
         },
+      },
+      { props: { color: 'havu' }, style: { color: colors.havu } },
+      { props: { color: 'brandYellow' }, style: { color: colors.brandYellow } },
+      { props: { color: 'harmaa' }, style: { color: colors.harmaa } },
+      { props: { color: 'textlink' }, style: { color: colors.textlink } },
+      {
+        props: { color: 'textSecondary' },
+        style: { color: colors.textSecondary },
+      },
+      { props: { color: 'textSubtle' }, style: { color: colors.textSubtle } },
+      { props: { color: 'textWarning' }, style: { color: colors.textWarning } },
+      { props: { color: 'textError' }, style: { color: colors.textError } },
+      {
+        props: { color: 'textInteractive' },
+        style: { color: colors.textInteractive },
       },
     ],
     styleOverrides: {

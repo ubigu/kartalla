@@ -10,6 +10,18 @@ declare module '@mui/material/Typography' {
     followUpSectionTitle: true;
     published: true;
   }
+
+  interface TypographyPropsColorOverrides {
+    havu: true;
+    brandYellow: true;
+    harmaa: true;
+    textlink: true;
+    textSecondary: true;
+    textSubtle: true;
+    textWarning: true;
+    textError: true;
+    textInteractive: true;
+  }
 }
 
 declare module '@mui/material/styles' {
@@ -30,6 +42,7 @@ declare module '@mui/material/styles' {
     surfaceWarning: Palette['primary'];
     textError: Palette['primary'];
     textWarning: Palette['primary'];
+    textInteractive: Palette['primary'];
     textlink: Palette['primary'];
     textSecondary: Palette['primary'];
     textSubtle: Palette['primary'];
@@ -52,6 +65,7 @@ declare module '@mui/material/styles' {
     surfaceWarning?: PaletteOptions['primary'];
     textError?: PaletteOptions['primary'];
     textWarning?: PaletteOptions['primary'];
+    textInteractive?: PaletteOptions['primary'];
     textlink?: PaletteOptions['primary'];
     textSecondary?: PaletteOptions['primary'];
     textSubtle?: PaletteOptions['primary'];
@@ -77,6 +91,7 @@ export const ubiTheme = createTheme({
     borderPrimary: augment('borderPrimary'),
     borderSecondary: augment('borderSecondary'),
     borderSubtle: augment('borderSubtle'),
+    textInteractive: augment('textInteractive'),
     textlink: augment('textlink'),
     textSecondary: augment('textSecondary'),
     textSubtle: augment('textSubtle'),

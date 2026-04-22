@@ -54,7 +54,7 @@ export function CoreSelect({
           htmlFor={id as string}
           sx={{
             fontSize: '12px',
-            color: theme.palette.primary.main,
+            color: theme.palette.textInteractive.main,
             lineHeight: 'normal',
           }}
           {...labelProps}

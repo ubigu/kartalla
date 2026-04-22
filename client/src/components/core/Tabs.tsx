@@ -55,7 +55,7 @@ export function CoreTab({ sx, labelColor, ...props }: CoreTabProps) {
         borderTop: `solid 1px ${theme.palette.borderSubtle.main}`,
         borderLeft: `solid 1px ${theme.palette.borderSubtle.main}`,
         borderRight: `solid 1px ${theme.palette.borderSubtle.main}`,
-        color: `${labelColor ?? theme.palette.primary.main}`,
+        color: `${labelColor ?? theme.palette.textInteractive.main}`,
         '&.Mui-selected': {
           zIndex: 1,
           background: theme.palette.surfacePrimary.main,
@@ -65,8 +65,9 @@ export function CoreTab({ sx, labelColor, ...props }: CoreTabProps) {
           boxShadow: 'none',
           marginBottom: '-1px',
           paddingBottom: `${baseTabPaddingY + 1}px`,
-          color: `${labelColor ?? theme.palette.primary.main}`,
+          color: `${labelColor ?? theme.palette.textInteractive.main}`,
         },
+
         ...sx,
       }}
       {...props}

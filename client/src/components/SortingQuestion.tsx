@@ -196,7 +196,9 @@ export default function SortingQuestion(props: Props) {
                         aria-describedby={`drag-instruction-announcement-${props.question.id}`}
                       >
                         <Typography
-                          color={props.readOnly ? 'disabled' : 'primary.main'}
+                          color={
+                            props.readOnly ? 'disabled' : 'textInteractive'
+                          }
                         >
                           {
                             props.question.options.find(

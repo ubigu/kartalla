@@ -89,7 +89,6 @@ export default function SurveyList() {
       <Tabs
         value={tabView}
         indicatorColor="primary"
-        textColor="primary"
         sx={{
           mb: '16px',
           minHeight: 'fit-content',

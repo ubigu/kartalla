@@ -134,7 +134,7 @@ export class SurveyEditPage {
     await this._page.getByLabel('Kyselyn aliotsikko').fill(params.subtitle);
     await this._page.getByLabel('Kyselyn nimi *').fill(params.urlName);
     await this._page
-      .getByLabel('Kyselyn laatija/yhteyshenkil')
+      .getByRole('textbox', { name: 'Kyselyn laatija/yhteyshenkilö' })
       .fill(params.author);
     await this._page.getByLabel('Alkamisaika').fill(params.startDate);
     await this._page.getByLabel('Loppumisaika').fill(params.endDate);
@@ -142,7 +142,7 @@ export class SurveyEditPage {
     for (const pageName of params.pageNames.slice(1)) {
       await this._page
         .getByLabel('Navigointivalikko')
-        .getByText('Luo sivu')
+        .getByText('Lisää uusi sivu...')
         .click();
       await this.renamePage('Nimetön sivu', pageName);
     }
@@ -156,7 +156,7 @@ export class SurveyEditPage {
       .locator('div')
       .nth(2)
       .fill(params.text);
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async goToPage(pageName: string) {
@@ -166,7 +166,7 @@ export class SurveyEditPage {
   async renamePage(oldName: string, newName: string) {
     await this.goToPage(oldName);
     await this._page.getByLabel('Sivun nimi *').fill(newName);
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createPersonalInfoQuestion(
@@ -211,7 +211,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(personalInfoQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createRadioQuestion(radioQuestionParams: RadioQuestionParams) {
@@ -247,7 +247,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(radioQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createCheckBoxQuestion(checkBoxQuestionParams: CheckBoxQuestionParams) {
@@ -296,7 +296,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(checkBoxQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createFreeTextQuestion(freeTextQuestionParams: FreeTextQuestionParams) {
@@ -324,7 +324,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(freeTextQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createNumericQuestion(numericQuestionParams: NumericQuestionParams) {
@@ -358,7 +358,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(numericQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createMapQuestion(mapQuestionParams: MapQuestionParams) {
@@ -388,7 +388,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(mapQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createSortingQuestion(sortingQuestionParams: SortingQuestionParams) {
@@ -420,7 +420,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(sortingQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createSliderQuestion(sliderQuestionParams: SliderQuestionParams) {
@@ -456,7 +456,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(sliderQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createMultiMatrixQuestion(
@@ -511,7 +511,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(multiMatrixQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createMatrixQuestion(matrixQuestionParams: MatrixQuestionParams) {
@@ -550,7 +550,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(matrixQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async createGroupedCheckboxQuestion(
@@ -594,7 +594,7 @@ export class SurveyEditPage {
         .nth(2)
         .fill(groupedCheckboxQuestionParams.additionalInfo);
     }
-    await this._page.getByLabel('save-changes').click();
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
 
   async deleteSurvey() {
