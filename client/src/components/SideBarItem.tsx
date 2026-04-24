@@ -31,9 +31,13 @@ export const SIDEBAR_PAGE_ICON_CLASS = 'sidebar-page-icon';
 
 const itemSx = (backgroundColor?: string) => (theme: Theme) => ({
   display: 'flex',
-  gap: '4px',
+  gap: '6px',
   height: SIDEBAR_ITEM_HEIGHT,
   border: `solid 1px ${theme.palette.borderSubtle.main}`,
+  '& .MuiListItemText-root > *': {
+    fontSize: '14px',
+    fontWeight: 600,
+  },
   '&:not(.Mui-selected)': {
     backgroundColor: backgroundColor ?? theme.palette.surfacePrimary.main,
   },
@@ -44,7 +48,7 @@ const itemSx = (backgroundColor?: string) => (theme: Theme) => ({
     fontSize: '13px',
   },
   '&.Mui-selected': {
-    '& *': { fontWeight: 700 },
+    '& *': { fontWeight: 700, color: 'textSecondary.main' },
     backgroundColor: theme.palette.surfaceInfo.main,
   },
   '&:hover, &.Mui-selected:hover': {

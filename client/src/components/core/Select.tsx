@@ -96,10 +96,11 @@ export function CoreSelect({
             height: '28px',
             fontSize: '14px',
             color: theme.palette.harmaa.main,
-            backgroundColor: `${theme.palette.surfaceSubtle.main} !important`,
+
             border: `0.5px solid ${theme.palette.borderSubtle.main}`,
             borderRadius: '4px',
             boxShadow: '0px 1px 2px 0px #59788626 inset',
+            '&&': { background: `${theme.palette.surfaceSubtle.main}` },
             '& .MuiOutlinedInput-notchedOutline': { borderWidth: 0 },
             '&:hover .MuiOutlinedInput-notchedOutline': { borderWidth: 0 },
             '&.Mui-focused': {
