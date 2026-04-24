@@ -3,6 +3,8 @@ import {
   MenuItem,
   Select as MuiSelect,
   SelectProps,
+  SxProps,
+  Theme,
   useTheme,
 } from '@mui/material';
 import React, { useId } from 'react';
@@ -20,6 +22,7 @@ interface CoreSelectProps extends Omit<SelectProps, 'label' | 'variant'> {
   helperText?: string;
   helperTextProps?: React.ComponentProps<typeof InputHelperText>;
   options?: SelectOption[];
+  wrapperSx?: SxProps<Theme>;
 }
 
 export function CoreSelect({
@@ -31,6 +34,7 @@ export function CoreSelect({
   children,
   helperText,
   helperTextProps,
+  wrapperSx,
   ...props
 }: CoreSelectProps) {
   const theme = useTheme();
@@ -45,6 +49,7 @@ export function CoreSelect({
         flexDirection: 'column',
         gap: '2px',
         position: 'relative',
+        ...wrapperSx,
       }}
     >
       {label && (

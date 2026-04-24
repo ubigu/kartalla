@@ -10,7 +10,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { Language, useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
 import { useState } from 'react';
-import { CoreChip } from '../core/Chip';
+import { CoreCheckbox } from '../core/Checkbox';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
 
@@ -135,24 +135,13 @@ export function LanguageSelector({
       </Typography>
       <Box sx={{ display: 'flex', gap: '4px' }}>
         {allLanguages.map((lang, idx) => {
-          const active = !!enabledLanguages[lang];
+          const isChecked = !!enabledLanguages[lang];
           return (
-            <CoreChip
+            <CoreCheckbox
               key={`${lang}-${idx}`}
               label={getLabel(lang)}
-              onClick={() => onToggle(lang, !active)}
-              variant={active ? 'filled' : 'outlined'}
-              sx={
-                active
-                  ? {
-                      backgroundColor: theme.palette.primary.main,
-                      color: theme.palette.surfacePrimary.main,
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    }
-                  : undefined
-              }
+              onClick={() => onToggle(lang, !isChecked)}
+              checked={isChecked}
             />
           );
         })}

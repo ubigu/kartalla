@@ -53,6 +53,7 @@ export function CoreCheckbox({
   ...props
 }: CoreCheckboxProps) {
   const { palette } = useTheme();
+  console.log(props);
   const checkbox = (
     <Checkbox
       disableFocusRipple

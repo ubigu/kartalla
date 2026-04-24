@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   FormHelperText,
   Link,
+  Stack,
   TextField,
   Typography,
   useTheme,
@@ -29,6 +30,7 @@ import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import LoadingButton from '../LoadingButton';
 import RichTextEditor from '../RichTextEditor';
 import { CoreCheckbox } from '../core/Checkbox';
+import { InputHelperText } from '../core/InputHelperText';
 import { CoreSelect } from '../core/Select';
 import { loadingPulse } from '../core/styles';
 import { LanguageSelector } from './EditSurveyTranslationsV2';
@@ -93,55 +95,64 @@ export default function EditSurveyBasicSettings(props: Props) {
         <Typography variant="mainHeader" component={'h1'}>
           {tr.EditSurvey.basicSettings}
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: '12px',
-            alignItems: 'flex-start',
-          }}
-        >
-          <CoreSelect
-            sx={(theme) => ({
-              background: theme.palette.surfacePrimary.main,
-            })}
-            id="sidebar-survey-language"
-            label={tr.SurveyLanguageMenu.workingLanguage}
-            labelProps={{ style: { position: 'absolute', top: '-18px' } }}
-            value={activeSurvey.primaryLanguage}
-            onChange={(e) => {
-              const lang = e.target.value as LanguageCode;
-              setSurveyLanguage(lang);
-              editSurvey({
-                ...activeSurvey,
-                primaryLanguage: lang,
-                enabledLanguages: {
-                  ...activeSurvey.enabledLanguages,
-                  [lang]: true,
-                },
-              });
+        <Stack sx={{ gap: '4px' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'flex-start',
             }}
-            options={languages.map((lang) => ({
-              value: lang,
-              label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
-            }))}
-            helperText={tr.SurveyLanguageMenu.workingLanguageHelperText}
-          />
-          <CoreCheckbox
-            checkboxBackground={theme.palette.surfaceSubtle.main}
-            label={tr.SurveyLanguageMenu.multilingual}
-            checked={activeSurvey.localisationEnabled ?? false}
-            onChange={(_, checked) => {
-              editSurvey({
-                ...activeSurvey,
-                enabledLanguages: {
-                  ...activeSurvey.enabledLanguages,
-                  [activeSurvey.primaryLanguage]: true,
-                },
-                localisationEnabled: checked,
-              });
-            }}
-          />
-        </Box>
+          >
+            <CoreSelect
+              sx={(theme) => ({
+                background: theme.palette.surfacePrimary.main,
+              })}
+              aria-describedby="common-helper-basic-setting-language-select"
+              id="basic-settings-survey-language"
+              label={tr.SurveyLanguageMenu.workingLanguage}
+              labelProps={{ style: { position: 'absolute', top: '-18px' } }}
+              value={activeSurvey.primaryLanguage}
+              onChange={(e) => {
+                const lang = e.target.value as LanguageCode;
+                setSurveyLanguage(lang);
+                editSurvey({
+                  ...activeSurvey,
+                  primaryLanguage: lang,
+                  enabledLanguages: {
+                    ...activeSurvey.enabledLanguages,
+                    [lang]: true,
+                  },
+                });
+              }}
+              options={languages.map((lang) => ({
+                value: lang,
+                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+              }))}
+            />
+            <CoreCheckbox
+              inputProps={{
+                'aria-describedby':
+                  'common-helper-basic-setting-language-select',
+              }}
+              checkboxBackground={theme.palette.surfaceSubtle.main}
+              label={tr.SurveyLanguageMenu.multilingual}
+              checked={activeSurvey.localisationEnabled ?? false}
+              onChange={(_, checked) => {
+                editSurvey({
+                  ...activeSurvey,
+                  enabledLanguages: {
+                    ...activeSurvey.enabledLanguages,
+                    [activeSurvey.primaryLanguage]: true,
+                  },
+                  localisationEnabled: checked,
+                });
+              }}
+            />
+          </Box>
+          <InputHelperText id={'common-helper-basic-setting-language-select'}>
+            {tr.SurveyLanguageMenu.workingLanguageHelperText}
+          </InputHelperText>
+        </Stack>
         {activeSurvey.localisationEnabled && (
           <LanguageSelector
             allLanguages={languages}
