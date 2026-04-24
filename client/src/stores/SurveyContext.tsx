@@ -128,7 +128,7 @@ type Action =
     }
   | {
       type: 'SET_AVAILABLE_MAP_LAYERS';
-      layers: MapLayer[];
+      layers: MapLayer[] | null;
     }
   | {
       type: 'SET_AVAILABLE_MAP_LAYERS_ERROR';
@@ -803,7 +803,7 @@ function reducer(state: State, action: Action): State {
     case 'SET_AVAILABLE_MAP_LAYERS':
       return {
         ...state,
-        availableMapLayers: action.layers,
+        availableMapLayers: action.layers ?? [],
       };
     case 'START_LOADING_AVAILABLE_MAP_LAYERS':
       return {
