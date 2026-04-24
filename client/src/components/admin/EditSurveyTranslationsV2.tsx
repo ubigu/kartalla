@@ -130,7 +130,9 @@ export function LanguageSelector({
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <Typography sx={{ fontSize: '12px', color: theme.palette.primary.main }}>
+      <Typography
+        sx={{ fontSize: '12px', color: theme.palette.textInteractive.main }}
+      >
         {label}
       </Typography>
       <Box sx={{ display: 'flex', gap: '4px' }}>

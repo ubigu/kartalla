@@ -451,9 +451,6 @@ export default function EditSurveySideBar(props: Props) {
                       <ListItemText
                         sx={{
                           fontStyle: 'italic',
-                          '& > *': {
-                            color: theme.palette.textSubtle.main,
-                          },
                         }}
                         primary={tr.EditSurvey.newPage}
                       />
@@ -511,9 +508,6 @@ export default function EditSurveySideBar(props: Props) {
                       <ListItemText
                         sx={{
                           fontStyle: 'italic',
-                          '& > *': {
-                            color: theme.palette.textSubtle.main,
-                          },
                         }}
                         primary={tr.EditSurvey.attachNewPage}
                       />
