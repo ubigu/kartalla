@@ -12,13 +12,14 @@ import { SystemStyleObject } from '@mui/system';
 import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import LogoutIcon from '@src/components/icons/LogoutIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
 import AppBarUserMenu from './AppBarUserMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
 
 interface Props {
-  labels?: string[];
+  labels?: ReactNode[];
   withHomeLink?: boolean;
   style?: SystemStyleObject<Theme>;
 }
@@ -80,7 +81,6 @@ export function AdminAppBar({
                     color: 'white',
                     fontSize: '24px',
                   }}
-                  title={item}
                 >
                   {item}
                 </Typography>

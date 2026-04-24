@@ -12,9 +12,9 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { CoreSelect } from '@src/components/core/Select';
-import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
+import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
+import { CoreSelect } from '@src/components/core/Select';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
@@ -303,7 +303,10 @@ export default function SurveySubmissionsPage() {
   return (
     <>
       <AdminAppBar
-        labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
+        labels={[
+          survey.title[surveyLanguage],
+          tr.AnswersList.answers.toLocaleLowerCase(),
+        ]}
       />
       <SplitPaneLayout
         height="calc(100vh - 64px)"
