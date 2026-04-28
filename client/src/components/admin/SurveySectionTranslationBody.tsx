@@ -26,6 +26,7 @@ interface Props {
   totalCols: number;
   visibleCols: LanguageCode[];
   activePage: SurveyPage;
+  startIndex: number;
 }
 
 function SubheaderRow({
@@ -84,12 +85,13 @@ export function SurveySectionTranslationBody({
   totalCols,
   visibleCols,
   activePage,
+  startIndex,
 }: Props) {
   const { language, tr } = useTranslations();
   const { editSection, editFollowUpSection } = useSurvey();
 
   const sectionLabel = section.title?.[language] || `${sectionIndex + 1}.`;
-  let rowIndex = 0;
+  let rowIndex = startIndex;
   const nextStripe = () => rowIndex++ % 2 !== 0;
 
   const renderChoiceOptions = () => {
@@ -221,6 +223,7 @@ export function SurveySectionTranslationBody({
             stripe={nextStripe()}
             label={tr.EditSurveyTranslations.helperText}
             cols={visibleCols}
+            headerVerticalAlign="top"
             render={(lang) => (
               <RichTextEditor
                 value={s.helperText?.[lang] ?? ''}
@@ -290,6 +293,7 @@ export function SurveySectionTranslationBody({
           stripe={nextStripe()}
           label={tr.EditSurveyTranslations.bodyText}
           cols={visibleCols}
+          headerVerticalAlign="top"
           render={(lang) => (
             <RichTextEditor
               value={s.body?.[lang] ?? ''}
@@ -474,7 +478,7 @@ export function SurveySectionTranslationBody({
             <Fragment key={`grp-opt-${optionIndex}`}>
               <TranslationRow
                 stripe={nextStripe()}
-                label={`  ${optionIndex + 1}. ${tr.EditSurveyTranslations.option.toLowerCase()}`}
+                label={`└ ${optionIndex + 1}. ${tr.EditSurveyTranslations.option.toLowerCase()}`}
                 cols={visibleCols}
                 render={(lang) => (
                   <CoreInput
@@ -582,6 +586,7 @@ export function SurveySectionTranslationBody({
           stripe={nextStripe()}
           label={tr.EditSurveyTranslations.additionalInfo}
           cols={visibleCols}
+          headerVerticalAlign="top"
           render={(lang) => (
             <RichTextEditor
               value={section.info?.[lang] ?? ''}

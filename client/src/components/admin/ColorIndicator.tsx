@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 
 interface Props {
-  color: string;
+  color?: string;
 }
 
 const useStyles = makeStyles({

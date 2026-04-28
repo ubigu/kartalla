@@ -1,7 +1,7 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useMemo } from 'react';
+import { Select } from '../core/Select';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {
@@ -10,18 +10,8 @@ interface Props {
   onChange: (color: string) => void;
 }
 
-const useStyles = makeStyles({
-  select: {
-    minWidth: '10rem',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-});
-
 export default function ColorSelect({ label, value, onChange }: Props) {
   const { tr } = useTranslations();
-  const classes = useStyles();
 
   const colors = useMemo<{ name: string; value: string }[]>(
     () => [
@@ -37,32 +27,45 @@ export default function ColorSelect({ label, value, onChange }: Props) {
     [tr],
   );
 
+  const options = colors.map((color) => ({
+    value: color.value,
+    label: color.name,
+  }));
+
   return (
-    <FormControl>
-      <InputLabel id="color-select-label">
-        {label ?? tr.ColorSelect.color}
-      </InputLabel>
-      <Select
-        labelId="color-select-label"
-        id="color"
-        label={label ?? tr.ColorSelect.color}
-        className={classes.select}
-        classes={{
-          select: classes.select,
-        }}
-        value={value ?? ''}
-        onChange={(event) => {
-          onChange(event.target.value);
-        }}
-      >
-        {colors.map((color) => (
-          <MenuItem key={color.value} value={color.value}>
-            {color.name}
-            <div style={{ flexGrow: 1 }} />
-            <ColorIndicator color={color.value} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Select<string>
+      id="color"
+      label={label ?? tr.ColorSelect.color}
+      value={value ?? ''}
+      onChange={onChange}
+      renderLabel={(opt) => (
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            justifyContent: 'space-between',
+          }}
+        >
+          {opt.label}
+          <ColorIndicator color={opt.value} />
+        </Box>
+      )}
+      renderDisplayLabel={(opt) => (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            justifyContent: 'space-between',
+          }}
+        >
+          {opt?.label}
+          <ColorIndicator color={opt?.value} />
+        </Box>
+      )}
+      options={options}
+    />
   );
 }

@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import { Box, FormLabel } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -266,7 +266,11 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
         position: 'relative',
       }}
     >
-      {props.label && <FormLabel>{props.label}</FormLabel>}
+      {props.label && (
+        <Typography sx={{ color: 'textInteractive.main', fontSize: '12px' }}>
+          {props.label}
+        </Typography>
+      )}
       <Editor
         {...(props.label && { ariaLabel: props.label })}
         readOnly={props.disabled}

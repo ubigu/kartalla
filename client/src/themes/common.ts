@@ -31,6 +31,8 @@ declare module '@mui/material/styles' {
     borderSecondary: Palette['primary'];
     borderSubtle: Palette['primary'];
     brandYellow: Palette['primary'];
+    brandRed: Palette['primary'];
+    brandBlue: Palette['primary'];
     havu: Palette['primary'];
     harmaa: Palette['primary'];
     surfaceError: Palette['primary'];
@@ -40,6 +42,7 @@ declare module '@mui/material/styles' {
     surfaceSubtle: Palette['primary'];
     surfaceSuccess: Palette['primary'];
     surfaceWarning: Palette['primary'];
+    surfaceHover: Palette['primary'];
     textError: Palette['primary'];
     textWarning: Palette['primary'];
     textInteractive: Palette['primary'];
@@ -54,6 +57,8 @@ declare module '@mui/material/styles' {
     borderSecondary?: PaletteOptions['primary'];
     borderSubtle?: PaletteOptions['primary'];
     brandYellow?: PaletteOptions['primary'];
+    brandRed?: PaletteOptions['primary'];
+    brandBlue?: PaletteOptions['primary'];
     havu?: PaletteOptions['primary'];
     harmaa?: PaletteOptions['primary'];
     surfaceError?: PaletteOptions['primary'];
@@ -63,6 +68,7 @@ declare module '@mui/material/styles' {
     surfaceSubtle?: PaletteOptions['primary'];
     surfaceSuccess?: PaletteOptions['primary'];
     surfaceWarning?: PaletteOptions['primary'];
+    surfaceHover?: PaletteOptions['primary'];
     textError?: PaletteOptions['primary'];
     textWarning?: PaletteOptions['primary'];
     textInteractive?: PaletteOptions['primary'];
@@ -86,6 +92,8 @@ export const ubiTheme = createTheme({
   palette: {
     primary: { main: colors.primary },
     brandYellow: augment('brandYellow'),
+    brandRed: augment('brandRed'),
+    brandBlue: augment('brandBlue'),
     havu: augment('havu'),
     harmaa: augment('harmaa'),
     borderPrimary: augment('borderPrimary'),
@@ -100,11 +108,14 @@ export const ubiTheme = createTheme({
       color: { main: colors.surfaceSubtle, dark: colors.surfaceSubtleDark },
       name: 'surfaceSubtle',
     }),
-    surfaceError: augment('surfaceError'),
+    surfaceError: baseTheme.palette.augmentColor({
+      color: { main: colors.surfaceError, light: colors.surfaceErrorLight },
+    }),
     surfaceInfo: augment('surfaceInfo'),
     surfaceInput: augment('surfaceInput'),
     surfaceSuccess: augment('surfaceSuccess'),
     surfaceWarning: augment('surfaceWarning'),
+    surfaceHover: augment('surfaceHover'),
     textError: augment('textError'),
     textWarning: augment('textWarning'),
   },

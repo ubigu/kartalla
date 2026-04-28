@@ -1,7 +1,11 @@
-import { LanguageCode, SurveyPage } from '@interfaces/survey';
+import {
+  LanguageCode,
+  SurveyPage,
+  SurveyPageSection,
+} from '@interfaces/survey';
 import { Box, Theme, Typography, useTheme } from '@mui/material';
+import { Combobox_WIP } from '@src/components/core/Combobox';
 import { CoreInput } from '@src/components/core/Input';
-import { CoreSelect } from '@src/components/core/Select';
 import { loadingPulse } from '@src/components/core/styles';
 import { CoreTab, CoreTabs } from '@src/components/core/Tabs';
 import RichTextEditor from '@src/components/RichTextEditor';
@@ -109,6 +113,70 @@ function getPageTabColor(
   return anyMissing ? theme.palette.textWarning.main : undefined;
 }
 
+export function countSectionRows(section: SurveyPageSection): number {
+  let count = 1; // questionText title row
+  switch (section.type) {
+    case 'text':
+      count += 1;
+      break;
+    case 'image':
+      count += 1;
+      break;
+    case 'radio':
+    case 'checkbox':
+    case 'sorting':
+      section.options?.forEach((opt) => {
+        count += 1;
+        if (opt.info) count += 1;
+      });
+      break;
+    case 'radio-image':
+      section.options?.forEach((opt) => {
+        count += 2;
+        if (opt.info) count += 1;
+      });
+      break;
+    case 'slider':
+      if (section.minLabel) count += 1;
+      if (section.maxLabel) count += 1;
+      break;
+    case 'matrix':
+    case 'multi-matrix':
+      count += (section.classes?.length ?? 0) + (section.subjects?.length ?? 0);
+      break;
+    case 'budgeting':
+    case 'geo-budgeting':
+      count += section.targets?.length ?? 0;
+      if (section.helperText) count += 1;
+      break;
+    case 'grouped-checkbox':
+      section.groups?.forEach((group) => {
+        count += 1;
+        group.options?.forEach((opt) => {
+          count += 1;
+          if (opt.info) count += 1;
+        });
+      });
+      break;
+    case 'personal-info':
+      if (section.customLabel) count += 1;
+      break;
+    case 'map':
+      count += section.subQuestions?.length ?? 0;
+      break;
+    case 'free-text':
+    case 'numeric':
+    case 'attachment':
+    case 'document':
+      break;
+    default:
+      assertNever(section);
+  }
+  if (section.info) count += 1;
+  count += section.followUpSections?.length ?? 0;
+  return count;
+}
+
 export const inlineToolbarOptions = {
   options: ['inline'],
   inline: { options: ['bold', 'italic'] },
@@ -170,6 +238,18 @@ export default function EditSurveyTranslationsV2() {
   const pages = activeSurvey.pages ?? [];
   const activePage = pages[activeTab];
   const totalCols = visibleCols.length + 1;
+
+  // Compute cumulative start indices so stripe alternation is continuous across all tbodies
+  const SURVEY_ROW_COUNT = 3; // title, subtitle, description
+  const PAGE_TITLE_START = SURVEY_ROW_COUNT;
+  const sections = activePage?.sections ?? [];
+  const sectionStarts: number[] = [];
+  let nextIdx = PAGE_TITLE_START + 1;
+  for (const section of sections) {
+    sectionStarts.push(nextIdx);
+    nextIdx += countSectionRows(section);
+  }
+  const thanksStart = nextIdx;
 
   return (
     <Box
@@ -235,8 +315,9 @@ export default function EditSurveyTranslationsV2() {
       <Box
         component="table"
         sx={{
-          width: '100%',
-          borderCollapse: 'collapse',
+          width: `min(100%, ${visibleColCount * 600}px)`,
+          borderCollapse: 'separate',
+          borderSpacing: '0px 4px',
           tableLayout: 'fixed',
           marginTop: '12px',
         }}
@@ -252,13 +333,13 @@ export default function EditSurveyTranslationsV2() {
               component="th"
               sx={{ width: TRANSLATION_ROW_LABEL_WIDTH, padding: '4px 0' }}
             >
-              <CoreSelect
+              <Combobox_WIP
                 value={String(visibleColCount)}
                 options={languages.map((_, colIndex) => ({
                   value: String(colIndex + 1),
                   label: `${colIndex + 1} ${colIndex === 0 ? tr.EditSurveyTranslations.column : tr.EditSurveyTranslations.columns}`,
                 }))}
-                onChange={(e) => setVisibleColCount(Number(e.target.value))}
+                onChange={(value) => setVisibleColCount(Number(value))}
                 sx={{ width: '100%' }}
               />
             </Box>
@@ -266,18 +347,18 @@ export default function EditSurveyTranslationsV2() {
               <Box
                 component="th"
                 scope="col"
-                key={`${lang}-${colIdx}`}
+                key={colIdx}
                 sx={{ padding: '2px 8px' }}
               >
-                <CoreSelect
+                <Combobox_WIP
                   value={lang}
                   options={languages.map((langCode) => ({
                     value: langCode,
                     label: `${tr.EditSurveyTranslations[langCode]} (${langCode})`,
                   }))}
-                  onChange={(e) => {
+                  onChange={(value) => {
                     const next = [...columnLangs];
-                    next[colIdx] = e.target.value as LanguageCode;
+                    next[colIdx] = value as LanguageCode;
                     setColumnLangs(next);
                   }}
                   sx={(theme) => ({
@@ -335,6 +416,7 @@ export default function EditSurveyTranslationsV2() {
             label={tr.EditSurveyTranslations.surveyDescription}
             stripe={false}
             cols={visibleCols}
+            headerVerticalAlign="top"
             render={(lang) => (
               <RichTextEditor
                 value={activeSurvey.description?.[lang] ?? ''}
@@ -359,7 +441,7 @@ export default function EditSurveyTranslationsV2() {
             <Box component="tbody">
               <TranslationRow
                 label={tr.EditSurveyTranslations.pageTitle}
-                stripe={false}
+                stripe={PAGE_TITLE_START % 2 !== 0}
                 cols={visibleCols}
                 render={(lang) => (
                   <CoreInput
@@ -384,60 +466,64 @@ export default function EditSurveyTranslationsV2() {
                 sectionIndex={sectionIndex}
                 totalCols={totalCols}
                 visibleCols={visibleCols}
+                startIndex={sectionStarts[sectionIndex]}
               />
             ))}
 
-            {/* Thanks page */}
-            <Box component="tbody">
-              <TranslationRow
-                label={tr.EditSurveyTranslations.thanksPageTitle}
-                stripe={false}
-                cols={visibleCols}
-                render={(lang) => (
-                  <CoreInput
-                    value={activeSurvey.thanksPage.title?.[lang] ?? ''}
-                    onChange={(e) =>
-                      editSurvey({
-                        ...activeSurvey,
-                        thanksPage: {
-                          ...activeSurvey.thanksPage,
-                          title: {
-                            ...activeSurvey.thanksPage.title,
-                            [lang]: e.target.value,
+            {/* Thanks page — only on the last page tab */}
+            {activeTab === pages.length - 1 && (
+              <Box component="tbody">
+                <TranslationRow
+                  label={tr.EditSurveyTranslations.thanksPageTitle}
+                  stripe={thanksStart % 2 !== 0}
+                  cols={visibleCols}
+                  render={(lang) => (
+                    <CoreInput
+                      value={activeSurvey.thanksPage.title?.[lang] ?? ''}
+                      onChange={(e) =>
+                        editSurvey({
+                          ...activeSurvey,
+                          thanksPage: {
+                            ...activeSurvey.thanksPage,
+                            title: {
+                              ...activeSurvey.thanksPage.title,
+                              [lang]: e.target.value,
+                            },
                           },
-                        },
-                      })
-                    }
-                  />
-                )}
-              />
-              <TranslationRow
-                label={tr.EditSurveyTranslations.thanksPageText}
-                stripe={true}
-                cols={visibleCols}
-                render={(lang) => (
-                  <RichTextEditor
-                    value={activeSurvey.thanksPage.text?.[lang] ?? ''}
-                    missingValue={false}
-                    onChange={(val) =>
-                      editSurvey({
-                        ...activeSurvey,
-                        thanksPage: {
-                          ...activeSurvey.thanksPage,
-                          text: {
-                            ...activeSurvey.thanksPage.text,
-                            [lang]: val,
+                        })
+                      }
+                    />
+                  )}
+                />
+                <TranslationRow
+                  label={tr.EditSurveyTranslations.thanksPageText}
+                  stripe={(thanksStart + 1) % 2 !== 0}
+                  cols={visibleCols}
+                  headerVerticalAlign="top"
+                  render={(lang) => (
+                    <RichTextEditor
+                      value={activeSurvey.thanksPage.text?.[lang] ?? ''}
+                      missingValue={false}
+                      onChange={(val) =>
+                        editSurvey({
+                          ...activeSurvey,
+                          thanksPage: {
+                            ...activeSurvey.thanksPage,
+                            text: {
+                              ...activeSurvey.thanksPage.text,
+                              [lang]: val,
+                            },
                           },
-                        },
-                      })
-                    }
-                    resizable
-                    editorHeight="80px"
-                    toolbarOptions={inlineToolbarOptions}
-                  />
-                )}
-              />
-            </Box>
+                        })
+                      }
+                      resizable
+                      editorHeight="80px"
+                      toolbarOptions={inlineToolbarOptions}
+                    />
+                  )}
+                />
+              </Box>
+            )}
           </>
         )}
       </Box>

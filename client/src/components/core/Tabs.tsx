@@ -32,7 +32,7 @@ export function CoreTabs({ onChange, sx, ...props }: CoreTabsProps) {
         marginRight: '-24px',
         paddingLeft: '24px',
         paddingRight: '24px',
-
+        overflow: 'visible',
         ...sx,
       }}
       {...props}

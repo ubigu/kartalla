@@ -5,16 +5,10 @@ import {
   Survey,
   SurveyQuestion,
 } from '@interfaces/survey';
-import {
-  Box,
-  CircularProgress,
-  MenuItem,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
 import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
-import { CoreSelect } from '@src/components/core/Select';
+import { Combobox_WIP } from '@src/components/core/Combobox';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
@@ -321,16 +315,15 @@ export default function SurveySubmissionsPage() {
               padding: '1rem',
             }}
           >
-            <CoreSelect
+            <Combobox_WIP
               id="submissions-question-select"
               label={tr.SurveySection.question}
-              value={selectedQuestion?.id ?? 0}
-              onChange={(event) => {
+              value={String(selectedQuestion?.id ?? 0)}
+              onChange={(value) => {
                 setSelectedAnswer(null);
                 setSelectedQuestion(
-                  questions.find(
-                    (question) => question.id === event.target.value,
-                  ) ?? null,
+                  questions.find((question) => question.id === Number(value)) ??
+                    null,
                 );
               }}
               sx={(theme) => ({
@@ -338,14 +331,17 @@ export default function SurveySubmissionsPage() {
                 fontSize: '16px',
                 fontWeight: 700,
                 color: theme.palette.textSecondary.main,
-                '& .MuiSelect-select': {
-                  padding: '0 8px',
-                  paddingRight: '32px !important',
-                },
               })}
-            >
-              {questions.map((question) => (
-                <MenuItem key={question.id} value={question.id}>
+              options={questions.map((question) => ({
+                value: String(question.id),
+                label: question.title[surveyLanguage],
+              }))}
+              renderValue={(opt) => {
+                const question = questions.find(
+                  (q) => String(q.id) === opt.value,
+                );
+                if (!question) return null;
+                return (
                   <Box
                     sx={{
                       display: 'flex',
@@ -377,17 +373,15 @@ export default function SurveySubmissionsPage() {
                       {question.title[surveyLanguage]}
                     </span>
                   </Box>
-                </MenuItem>
-              ))}
-            </CoreSelect>
+                );
+              }}
+            />
 
-            <CoreSelect
+            <Combobox_WIP
               id="submissions-survey-language"
               label={tr.SurveyLanguageMenu.answerLanguage}
               value={surveyLanguage}
-              onChange={(e) =>
-                setSurveyLanguage(e.target.value as LanguageCode)
-              }
+              onChange={(value) => setSurveyLanguage(value as LanguageCode)}
               options={languages
                 .filter((lang) => survey.enabledLanguages[lang])
                 .map((lang) => ({

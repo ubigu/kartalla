@@ -1,13 +1,12 @@
-// @ts-strict-ignore
-import { User } from '@interfaces/user';
 import { UserGroup } from '@interfaces/userGroup';
-import { Autocomplete, Box, Chip, TextField, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useEffect, useState } from 'react';
 import { useUser } from '../../stores/UserContext';
+import { Combobox_WIP } from '../core/Combobox';
 import { loadingPulse } from '../core/styles';
 
 interface Props {
@@ -51,7 +50,9 @@ export default function EditSurveyPermissions(props: Props) {
 
     return (
       !props.canEdit ||
-      (activeUser.groups?.length === 1 && activeSurvey.userGroups?.length > 0)
+      (activeUser.groups?.length === 1 &&
+        activeSurvey.userGroups &&
+        activeSurvey.userGroups.length > 0)
     );
   }
 
@@ -68,121 +69,60 @@ export default function EditSurveyPermissions(props: Props) {
       <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.permissions}
       </Typography>
-      <Autocomplete
-        multiple
-        filterSelectedOptions
+
+      <Combobox_WIP
+        label={tr.EditSurveyInfo.userGroups}
+        helperText={tr.EditSurveyInfo.userGroupsHelperText}
+        options={availableUserGroups.map((group) => ({
+          value: group.id,
+          label: group.name,
+        }))}
+        multiselect
         disabled={surveyUserGroupEditingDisabled()}
-        options={availableUserGroups}
-        getOptionLabel={(group) => group.name}
-        value={
-          availableUserGroups.filter((group) =>
-            activeSurvey.userGroups?.includes(group.id),
-          ) ?? []
-        }
-        onChange={(_, value) => {
+        value={activeSurvey.userGroups}
+        onMultiChange={(value) => {
           editSurvey({
             ...activeSurvey,
-            userGroups: value.map((group) => group.id),
-          });
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label={tr.EditSurveyInfo.userGroups}
-            helperText={tr.EditSurveyInfo.userGroupsHelperText}
-          />
-        )}
-        renderTags={(value, getTagProps) => {
-          return value.map((option, index) => {
-            const { key, ...tagProps } = getTagProps({ index });
-            return <Chip key={key} label={option.name} {...tagProps} />;
+            userGroups: value.map((val) => String(val)),
           });
         }}
       />
-      <Autocomplete
-        multiple
-        filterSelectedOptions
-        disabled={allUsers == null || !props.canEdit}
-        options={
+
+      <Combobox_WIP
+        label={tr.EditSurveyInfo.editors}
+        helperText={tr.EditSurveyInfo.editorsHelperText}
+        options={(
           allUsers?.filter(
             (user) =>
-              user.id !== activeSurvey.authorId && user.id !== activeUser.id,
+              user.id !== activeSurvey.authorId && user.id !== activeUser?.id,
           ) ?? []
-        }
-        getOptionLabel={(user) => user.fullName}
-        value={
-          allUsers?.filter((user) => activeSurvey.editors?.includes(user.id)) ??
-          []
-        }
-        onChange={(_, value: User[]) => {
+        ).map((user) => ({ value: user.id, label: user.fullName }))}
+        multiselect
+        disabled={allUsers == null || !props.canEdit}
+        value={activeSurvey.editors ?? []}
+        onMultiChange={(value) => {
           editSurvey({
             ...activeSurvey,
-            editors: value.map((user) => user.id),
-          });
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label={tr.EditSurveyInfo.editors}
-            helperText={tr.EditSurveyInfo.editorsHelperText}
-          />
-        )}
-        renderTags={(value: User[], getTagProps) => {
-          return value.map((option, index) => {
-            const { key, ...tagProps } = getTagProps({ index });
-            return (
-              <Chip
-                key={key}
-                label={option.fullName}
-                {...tagProps}
-                disabled={option.id === activeUser.id}
-              />
-            );
+            editors: value.map(String),
           });
         }}
       />
-      <Autocomplete
-        multiple
-        filterSelectedOptions
-        disabled={allUsers == null || !props.canEdit}
-        options={
+      <Combobox_WIP
+        label={tr.EditSurveyInfo.viewers}
+        helperText={tr.EditSurveyInfo.viewersHelperText}
+        options={(
           allUsers?.filter(
             (user) =>
-              user.id !== activeSurvey.authorId && user.id !== activeUser.id,
+              user.id !== activeSurvey.authorId && user.id !== activeUser?.id,
           ) ?? []
-        }
-        getOptionLabel={(user) => user.fullName}
-        value={
-          allUsers?.filter((user) => activeSurvey.viewers?.includes(user.id)) ??
-          []
-        }
-        onChange={(_, value: User[]) => {
+        ).map((user) => ({ value: user.id, label: user.fullName }))}
+        multiselect
+        disabled={allUsers == null || !props.canEdit}
+        value={activeSurvey.viewers ?? []}
+        onMultiChange={(value) => {
           editSurvey({
             ...activeSurvey,
-            viewers: value.map((user) => user.id),
-          });
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label={tr.EditSurveyInfo.viewers}
-            helperText={tr.EditSurveyInfo.viewersHelperText}
-          />
-        )}
-        renderTags={(value: User[], getTagProps) => {
-          return value.map((option, index) => {
-            const { key, ...tagProps } = getTagProps({ index });
-            return (
-              <Chip
-                key={key}
-                label={option.fullName}
-                {...tagProps}
-                disabled={option.id === activeUser.id}
-              />
-            );
+            viewers: value.map(String),
           });
         }}
       />

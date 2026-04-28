@@ -1,16 +1,5 @@
 // @ts-strict-ignore
-import { LanguageCode } from '@interfaces/survey';
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormHelperText,
-  Link,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Box, Link, Stack, Typography, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -30,8 +19,9 @@ import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import LoadingButton from '../LoadingButton';
 import RichTextEditor from '../RichTextEditor';
 import { CoreCheckbox } from '../core/Checkbox';
+import { CoreInput } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
-import { CoreSelect } from '../core/Select';
+import { Select } from '../core/Select';
 import { loadingPulse } from '../core/styles';
 import { LanguageSelector } from './EditSurveyTranslationsV2';
 
@@ -103,7 +93,7 @@ export default function EditSurveyBasicSettings(props: Props) {
               alignItems: 'flex-start',
             }}
           >
-            <CoreSelect
+            <Select
               sx={(theme) => ({
                 background: theme.palette.surfacePrimary.main,
               })}
@@ -112,8 +102,7 @@ export default function EditSurveyBasicSettings(props: Props) {
               label={tr.SurveyLanguageMenu.workingLanguage}
               labelProps={{ style: { position: 'absolute', top: '-18px' } }}
               value={activeSurvey.primaryLanguage}
-              onChange={(e) => {
-                const lang = e.target.value as LanguageCode;
+              onChange={(lang) => {
                 setSurveyLanguage(lang);
                 editSurvey({
                   ...activeSurvey,
@@ -175,7 +164,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             }}
           />
         )}
-        <TextField
+        <CoreInput
           required
           error={validationErrors.includes('survey.title')}
           label={tr.EditSurveyInfo.title}
@@ -190,7 +179,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             });
           }}
         />
-        <TextField
+        <CoreInput
           label={tr.EditSurveyInfo.subtitle}
           value={activeSurvey.subtitle?.[surveyLanguage] ?? ''}
           onChange={(event) =>
@@ -225,12 +214,11 @@ export default function EditSurveyBasicSettings(props: Props) {
             })
           }
         />
-        <TextField
+        <CoreInput
           required
           error={validationErrors.includes('survey.name')}
           label={tr.EditSurveyInfo.name}
           value={activeSurvey.name ?? ''}
-          inputProps={{ maxLength: 100 }}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
@@ -249,7 +237,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             })
           }
         />
-        <TextField
+        <CoreInput
           required
           error={validationErrors.includes('survey.author')}
           label={tr.EditSurveyInfo.author}
@@ -261,7 +249,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             });
           }}
         />
-        <TextField
+        <CoreInput
           label={tr.EditSurveyInfo.authorUnit}
           value={activeSurvey.authorUnit ?? ''}
           onChange={(event) => {
@@ -311,52 +299,41 @@ export default function EditSurveyBasicSettings(props: Props) {
             />
           </LocalizationProvider>
         </Box>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={activeSurvey.allowSavingUnfinished}
-              onChange={(event) =>
-                editSurvey({
-                  ...activeSurvey,
-                  allowSavingUnfinished: event.target.checked,
-                })
-              }
-              inputProps={{ 'aria-label': 'allow-unfinished' }}
-            />
-          }
+        <CoreCheckbox
           label={tr.EditSurvey.allowSavingUnfinished}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={activeSurvey.displayPrivacyStatement}
-              onChange={(event) =>
-                editSurvey({
-                  ...activeSurvey,
-                  displayPrivacyStatement: event.target.checked,
-                })
-              }
-              inputProps={{
-                'aria-label': `${tr.EditSurvey.displayPrivacyStatement}`,
-              }}
-            />
+          checked={activeSurvey.allowSavingUnfinished}
+          onChange={(event) =>
+            editSurvey({
+              ...activeSurvey,
+              allowSavingUnfinished: event.target.checked,
+            })
           }
+          inputProps={{ 'aria-label': 'allow-unfinished' }}
+        />
+        <CoreCheckbox
           label={tr.EditSurvey.displayPrivacyStatement}
+          checked={activeSurvey.displayPrivacyStatement}
+          onChange={(event) =>
+            editSurvey({
+              ...activeSurvey,
+              displayPrivacyStatement: event.target.checked,
+            })
+          }
+          inputProps={{
+            'aria-label': `${tr.EditSurvey.displayPrivacyStatement}`,
+          }}
         />
         <div>
-          <FormControlLabel
+          <CoreCheckbox
             label={tr.EditSurveyInfo.allowTestSurvey}
-            control={
-              <Checkbox
-                checked={activeSurvey.allowTestSurvey}
-                onChange={(event) => {
-                  editSurvey({
-                    ...activeSurvey,
-                    allowTestSurvey: event.target.checked,
-                  });
-                }}
-              />
-            }
+            checked={activeSurvey.allowTestSurvey}
+            aria-describedby={'publish-survey-helper-text'}
+            onChange={(event) => {
+              editSurvey({
+                ...activeSurvey,
+                allowTestSurvey: event.target.checked,
+              });
+            }}
           />
           {activeSurvey.allowTestSurvey && (
             <div
@@ -375,9 +352,12 @@ export default function EditSurveyBasicSettings(props: Props) {
               <CopyToClipboard data={testSurveyUrl} />
             </div>
           )}
-          <FormHelperText>
+          <InputHelperText
+            id={'publish-survey-helper-text'}
+            sx={{ paddingTop: '4px' }}
+          >
             {tr.EditSurveyInfo.allowTestSurveyHelperText}
-          </FormHelperText>
+          </InputHelperText>
         </div>
         {props.canEdit && (
           <div className={classes.actions}>

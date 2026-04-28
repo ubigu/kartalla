@@ -20,7 +20,7 @@ import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
 import ThanksPageIcon from '@src/components/icons/ThanksPageIcon';
 
-import { CoreSelect } from '@src/components/core/Select';
+import { Combobox_WIP } from '@src/components/core/Combobox';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -182,15 +182,15 @@ export default function EditSurveySideBar(props: Props) {
             borderBottom: `solid 1px ${theme.palette.borderSecondary.main}`,
           }}
         >
-          <CoreSelect
+          <Combobox_WIP
             sx={(theme) => ({
               '&&': { background: theme.palette.surfacePrimary.main },
             })}
             id="sidebar-survey-language"
             label={tr.SurveyLanguageMenu.workingLanguage}
             value={surveyLanguage}
-            onChange={(e) =>
-              setSurveyLanguage(e.target.value as typeof surveyLanguage)
+            onChange={(value) =>
+              setSurveyLanguage(value as typeof surveyLanguage)
             }
             options={languages
               .filter((lang) => activeSurvey.enabledLanguages[lang])
@@ -341,6 +341,7 @@ export default function EditSurveySideBar(props: Props) {
                           />
                         </>
                         <ListItemText
+                          primaryTypographyProps={{ noWrap: true }}
                           primary={
                             page.title?.[surveyLanguage] || (
                               <em>{tr.EditSurvey.untitledPage}</em>

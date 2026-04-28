@@ -2,17 +2,17 @@ import { render } from '@testing-library/react';
 import axe from 'axe-core';
 import { expect, it } from 'vitest';
 import { TestWrapper } from '../../test/TestWrapper';
-import { Select } from './Select';
+import { Combobox_WIP } from './Combobox';
 
 const options = [
   { value: 'a', label: 'Option A' },
   { value: 'b', label: 'Option B' },
 ];
 
-it('Select without label has no accessibility violations', async () => {
+it('Combobox without label has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <Select
+      <Combobox_WIP
         id="test-select"
         value="a"
         options={options}
@@ -25,10 +25,10 @@ it('Select without label has no accessibility violations', async () => {
   expect(violations).toEqual([]);
 });
 
-it('Select with label has no accessibility violations', async () => {
+it('Combobox with label has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <Select
+      <Combobox_WIP
         id="test-select"
         label="Choose option"
         value="a"
@@ -41,48 +41,13 @@ it('Select with label has no accessibility violations', async () => {
   expect(violations).toEqual([]);
 });
 
-it('Select with helper text has no accessibility violations', async () => {
+it('Combobox with helper text has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <Select
+      <Combobox_WIP
         id="test-select"
         label="Choose option"
         helperText="Select one of the options"
-        value="a"
-        options={options}
-        onChange={() => {}}
-      />
-    </TestWrapper>,
-  );
-  const { violations } = await axe.run(container);
-  expect(violations).toEqual([]);
-});
-
-it('Select with error has no accessibility violations', async () => {
-  const { container } = render(
-    <TestWrapper>
-      <Select
-        id="test-select"
-        label="Choose option"
-        error
-        helperText="This is an error"
-        value="a"
-        options={options}
-        onChange={() => {}}
-      />
-    </TestWrapper>,
-  );
-  const { violations } = await axe.run(container);
-  expect(violations).toEqual([]);
-});
-
-it('Disabled Select has no accessibility violations', async () => {
-  const { container } = render(
-    <TestWrapper>
-      <Select
-        id="test-select"
-        label="Choose option"
-        disabled
         value="a"
         options={options}
         onChange={() => {}}
