@@ -8,6 +8,7 @@ import { CoreInput } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
+import { editPageContainerSx } from './EditSurvey';
 import { EmailPicker } from './EmailPicker';
 import KeyValueForm from './KeyValueForm';
 
@@ -38,10 +39,7 @@ export default function EditSurveyEmail() {
     <>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '36px',
-          maxWidth: 'min(55em, 70%)',
+          ...editPageContainerSx,
           ...(activeSurveyLoading && loadingPulse),
         }}
       >

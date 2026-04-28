@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Combobox_WIP } from '../core/Combobox';
 import { CoreInput } from '../core/Input';
 import { loadingPulse } from '../core/styles';
+import { editPageContainerSx } from './EditSurvey';
 
 export default function EditSurveyMapData() {
   const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
@@ -41,10 +42,7 @@ export default function EditSurveyMapData() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(activeSurveyLoading && loadingPulse),
       }}
     >

@@ -23,6 +23,7 @@ import { CoreInput } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
 import { Select } from '../core/Select';
 import { loadingPulse } from '../core/styles';
+import { editPageContainerSx } from './EditSurvey';
 import { LanguageSelector } from './EditSurveyTranslationsV2';
 
 const useStyles = makeStyles({
@@ -75,10 +76,7 @@ export default function EditSurveyBasicSettings(props: Props) {
     <>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '36px',
-          maxWidth: 'min(55em, 70%)',
+          ...editPageContainerSx,
           ...(activeSurveyLoading && loadingPulse),
         }}
       >

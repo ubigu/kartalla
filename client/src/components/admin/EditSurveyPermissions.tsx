@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../stores/UserContext';
 import { Combobox_WIP } from '../core/Combobox';
 import { loadingPulse } from '../core/styles';
+import { editPageContainerSx } from './EditSurvey';
 
 interface Props {
   canEdit: boolean;
@@ -59,10 +60,7 @@ export default function EditSurveyPermissions(props: Props) {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(activeSurveyLoading && loadingPulse),
       }}
     >
