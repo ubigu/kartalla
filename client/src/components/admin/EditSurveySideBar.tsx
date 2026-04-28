@@ -11,7 +11,6 @@ import {
   useTheme,
 } from '@mui/material';
 
-import BranchIcon from '@src/components/icons/BranchIcon';
 import ClipboardIcon from '@src/components/icons/ClipboardIcon';
 import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
 import DragHandleIcon from '@src/components/icons/DragHandleIcon';
@@ -37,6 +36,7 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
+import ConditionalPageIcon from '../icons/ConditionalPageIcon';
 import MapGridIcon from '../icons/MapGridIcon';
 import PadlockIcon from '../icons/PadlockIcon';
 import PaintPaletteIcon from '../icons/PaintPaletteIcon';
@@ -331,7 +331,13 @@ export default function EditSurveySideBar(props: Props) {
                       >
                         <>
                           {Object.keys(page?.conditions)?.length > 0 && (
-                            <BranchIcon />
+                            <ConditionalPageIcon
+                              sx={{
+                                marginLeft: '-4px',
+                                transform: 'translateX(6px)',
+                              }}
+                              stroke={theme.palette.borderSecondary.main}
+                            />
                           )}
                           <SurveyPageIcon
                             className={SIDEBAR_PAGE_ICON_CLASS}

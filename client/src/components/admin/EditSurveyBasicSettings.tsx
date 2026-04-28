@@ -90,6 +90,7 @@ export default function EditSurveyBasicSettings(props: Props) {
               display: 'flex',
               gap: '12px',
               alignItems: 'flex-start',
+              position: 'relative',
             }}
           >
             <Select
