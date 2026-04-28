@@ -25,6 +25,7 @@ import { ContentCopy, Person } from '@mui/icons-material';
 import {
   Accordion,
   AccordionSummary,
+  Box,
   IconButton,
   Tooltip,
   Typography,
@@ -384,9 +385,9 @@ export default function SurveySectionAccordion(props: Props) {
           {props.copyingSettings?.copyingDisabled &&
             props.copyingSettings?.disabledTooltip && (
               <Tooltip title={props.copyingSettings.disabledTooltip}>
-                <span>
+                <Box component="span" sx={{ padding: '8px' }}>
                   <ContentCopy color="disabled" />
-                </span>
+                </Box>
               </Tooltip>
             )}
           {!props.copyingSettings?.copyingDisabled && (
