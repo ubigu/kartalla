@@ -5,7 +5,6 @@ import UndoIcon from '@src/components/icons/UndoIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { editPageFixedRight } from './editSurveyStyles';
 import { useMemo } from 'react';
 
 const useStyles = makeStyles({
@@ -14,7 +13,7 @@ const useStyles = makeStyles({
     gap: '1rem',
     position: 'fixed',
     bottom: '1rem',
-    right: editPageFixedRight,
+    right: '1rem',
   },
 });
 
