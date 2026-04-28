@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { loadingPulse } from '../core/styles';
+import { editPageContainerSx } from './EditSurvey';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
@@ -19,10 +20,7 @@ export default function EditSurveyAppearance(props: Props) {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(activeSurveyLoading && loadingPulse),
       }}
     >

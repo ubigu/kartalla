@@ -3,6 +3,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
+import { editPageContainerSx } from './EditSurvey';
 import SurveyImageList from './SurveyImageList';
 
 interface Props {
@@ -16,10 +17,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(activeSurveyLoading && loadingPulse),
       }}
     >

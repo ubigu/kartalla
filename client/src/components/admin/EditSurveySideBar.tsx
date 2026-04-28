@@ -20,7 +20,7 @@ import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
 import ThanksPageIcon from '@src/components/icons/ThanksPageIcon';
 
-import { CoreSelect } from '@src/components/core/Select';
+import { Combobox_WIP } from '@src/components/core/Combobox';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -59,10 +59,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
-    '& .MuiListItemText-root > *': {
-      fontSize: '14px',
-      fontWeight: 600,
-    },
   }),
   loading: (theme: Theme) => ({
     animation: `${pulse} 1s ${theme.transitions.easing.easeIn} infinite`,
@@ -186,13 +182,15 @@ export default function EditSurveySideBar(props: Props) {
             borderBottom: `solid 1px ${theme.palette.borderSecondary.main}`,
           }}
         >
-          <CoreSelect
-            sx={(theme) => ({ background: theme.palette.surfacePrimary.main })}
+          <Combobox_WIP
+            sx={(theme) => ({
+              '&&': { background: theme.palette.surfacePrimary.main },
+            })}
             id="sidebar-survey-language"
             label={tr.SurveyLanguageMenu.workingLanguage}
             value={surveyLanguage}
-            onChange={(e) =>
-              setSurveyLanguage(e.target.value as typeof surveyLanguage)
+            onChange={(value) =>
+              setSurveyLanguage(value as typeof surveyLanguage)
             }
             options={languages
               .filter((lang) => activeSurvey.enabledLanguages[lang])
@@ -248,6 +246,11 @@ export default function EditSurveySideBar(props: Props) {
         </ListItem>
         <ListItem disablePadding>
           <SideBarItem
+            sxProps={{
+              '& .MuiListItemText-root > *': {
+                color: 'textlink.main',
+              },
+            }}
             backgroundColor="transparent"
             external
             newTab
@@ -332,12 +335,13 @@ export default function EditSurveySideBar(props: Props) {
                           )}
                           <SurveyPageIcon
                             className={SIDEBAR_PAGE_ICON_CLASS}
-                            stroke={'currentColor'}
-                            innerTextColor="currentColor"
+                            stroke={theme.palette.borderSecondary.main}
+                            innerTextColor="primary.main"
                             innerText={index + 1}
                           />
                         </>
                         <ListItemText
+                          primaryTypographyProps={{ noWrap: true }}
                           primary={
                             page.title?.[surveyLanguage] || (
                               <em>{tr.EditSurvey.untitledPage}</em>
@@ -411,15 +415,6 @@ export default function EditSurveySideBar(props: Props) {
                 </Draggable>
               ))}
               {provided.placeholder}
-              <ListItem disablePadding>
-                <SideBarItem to={`${url}/kiitos-sivu?lang=${language}`}>
-                  <ThanksPageIcon
-                    className={SIDEBAR_PAGE_ICON_CLASS}
-                    stroke="currentColor"
-                  />
-                  <ListItemText primary={tr.EditSurvey.thanksPage} />
-                </SideBarItem>
-              </ListItem>
               {props.allowEditing && (
                 <>
                   <ListItem disablePadding>
@@ -448,7 +443,7 @@ export default function EditSurveySideBar(props: Props) {
                     >
                       <SurveyPageIcon
                         className={SIDEBAR_PAGE_ICON_CLASS}
-                        stroke="currentColor"
+                        stroke={theme.palette.borderSecondary.main}
                         innerText="+"
                         {...(!(newPageDisabled || activeSurveyLoading) && {
                           innerTextColor: theme.palette.primary.main,
@@ -457,9 +452,6 @@ export default function EditSurveySideBar(props: Props) {
                       <ListItemText
                         sx={{
                           fontStyle: 'italic',
-                          '& > *': {
-                            color: theme.palette.textSubtle.main,
-                          },
                         }}
                         primary={tr.EditSurvey.newPage}
                       />
@@ -510,12 +502,29 @@ export default function EditSurveySideBar(props: Props) {
                         }
                       }}
                     >
-                      <ClipboardIcon className={SIDEBAR_PAGE_ICON_CLASS} />
-                      <ListItemText primary={tr.EditSurvey.attachNewPage} />
+                      <ClipboardIcon
+                        stroke={theme.palette.borderSecondary.main}
+                        className={SIDEBAR_PAGE_ICON_CLASS}
+                      />
+                      <ListItemText
+                        sx={{
+                          fontStyle: 'italic',
+                        }}
+                        primary={tr.EditSurvey.attachNewPage}
+                      />
                     </SideBarItem>
                   </ListItem>
                 </>
               )}
+              <ListItem disablePadding>
+                <SideBarItem to={`${url}/kiitos-sivu?lang=${language}`}>
+                  <ThanksPageIcon
+                    className={SIDEBAR_PAGE_ICON_CLASS}
+                    stroke={theme.palette.borderSecondary.main}
+                  />
+                  <ListItemText primary={tr.EditSurvey.thanksPage} />
+                </SideBarItem>
+              </ListItem>
             </List>
           )}
         </Droppable>

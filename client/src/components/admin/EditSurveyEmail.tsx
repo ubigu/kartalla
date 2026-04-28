@@ -1,18 +1,15 @@
-import {
-  Autocomplete,
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormHelperText,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, FormHelperText, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { useEffect, useState } from 'react';
+import { CoreCheckbox } from '../core/Checkbox';
+import { CoreInput } from '../core/Input';
+import { InputHelperText } from '../core/InputHelperText';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
+import { editPageContainerSx } from './EditSurvey';
+import { EmailPicker } from './EmailPicker';
 import KeyValueForm from './KeyValueForm';
 
 export default function EditSurveyEmail() {
@@ -42,10 +39,7 @@ export default function EditSurveyEmail() {
     <>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '36px',
-          maxWidth: 'min(55em, 70%)',
+          ...editPageContainerSx,
           ...(activeSurveyLoading && loadingPulse),
         }}
       >
@@ -53,124 +47,111 @@ export default function EditSurveyEmail() {
           {tr.EditSurvey.emailReports}
         </Typography>
         <div>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="email-enabled"
+          <CoreCheckbox
+            aria-describedby={'enable-email-helper'}
+            label={tr.EditSurveyEmail.enable}
+            disabled={activeSurveyLoading}
+            checked={activeSurvey.email.enabled ?? false}
+            onChange={(event) => {
+              editSurvey({
+                ...activeSurvey,
+                email: {
+                  ...activeSurvey.email,
+                  enabled: event.target.checked,
+                },
+              });
+            }}
+          />
+          <InputHelperText
+            id={'enable-email-helper'}
+            sx={{ paddingTop: '4px' }}
+          >
+            {tr.EditSurveyEmail.enableHelperText}
+          </InputHelperText>
+        </div>
+        {activeSurvey.email.enabled && (
+          <>
+            <Box display={'flex'} flexDirection="column" gap={'1rem'}>
+              <CoreCheckbox
+                label={tr.EditSurveyEmail.includeMarginImages}
                 disabled={activeSurveyLoading}
-                checked={activeSurvey.email.enabled ?? false}
+                checked={activeSurvey.email.includeMarginImages}
                 onChange={(event) => {
                   editSurvey({
                     ...activeSurvey,
                     email: {
                       ...activeSurvey.email,
-                      enabled: event.target.checked,
+                      includeMarginImages: event.target.checked,
                     },
                   });
                 }}
               />
-            }
-            label={tr.EditSurveyEmail.enable}
-          />
-          <FormHelperText>{tr.EditSurveyEmail.enableHelperText}</FormHelperText>
-        </div>
-        {activeSurvey.email.enabled && (
-          <>
-            <Box display={'flex'} flexDirection="column" gap={'1rem'}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="margin-images-enabled"
-                    disabled={activeSurveyLoading}
-                    checked={activeSurvey.email.includeMarginImages}
-                    onChange={(event) => {
-                      editSurvey({
-                        ...activeSurvey,
-                        email: {
-                          ...activeSurvey.email,
-                          includeMarginImages: event.target.checked,
-                        },
-                      });
-                    }}
-                  />
-                }
-                label={tr.EditSurveyEmail.includeMarginImages}
-              />
               <div>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="personal-info-enabled"
-                      disabled={activeSurveyLoading}
-                      checked={activeSurvey.email.includePersonalInfo}
-                      onChange={(event) => {
-                        editSurvey({
-                          ...activeSurvey,
-                          email: {
-                            ...activeSurvey.email,
-                            includePersonalInfo: event.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
+                <CoreCheckbox
+                  aria-describedby={'include-personal-info-helper'}
                   label={tr.EditSurveyEmail.includePersonalInfo}
+                  disabled={activeSurveyLoading}
+                  checked={activeSurvey.email.includePersonalInfo}
+                  onChange={(event) => {
+                    editSurvey({
+                      ...activeSurvey,
+                      email: {
+                        ...activeSurvey.email,
+                        includePersonalInfo: event.target.checked,
+                      },
+                    });
+                  }}
                 />
-                <FormHelperText>
+                <InputHelperText
+                  id={'include-personal-info-helper'}
+                  sx={{ paddingTop: '4px' }}
+                >
                   {tr.EditSurveyEmail.includePersonalInfoHelperText}
-                </FormHelperText>
+                </InputHelperText>
               </div>
               <div>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="email-required"
-                      disabled={activeSurveyLoading}
-                      checked={activeSurvey.email.required}
-                      onChange={(event) => {
-                        editSurvey({
-                          ...activeSurvey,
-                          email: {
-                            ...activeSurvey.email,
-                            required: event.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
+                <CoreCheckbox
+                  aria-describedby={'email-required-helper'}
                   label={tr.EditSurveyEmail.required}
+                  disabled={activeSurveyLoading}
+                  checked={activeSurvey.email.required}
+                  onChange={(event) => {
+                    editSurvey({
+                      ...activeSurvey,
+                      email: {
+                        ...activeSurvey.email,
+                        required: event.target.checked,
+                      },
+                    });
+                  }}
                 />
-                <FormHelperText>
+                <InputHelperText
+                  id={'email-required-helper'}
+                  sx={{ paddingTop: '4px' }}
+                >
                   {tr.EditSurveyEmail.requiredHelperText}
-                </FormHelperText>
+                </InputHelperText>
               </div>
             </Box>
-            <Autocomplete
-              multiple
-              freeSolo
-              filterSelectedOptions
-              loading={autocompleteEmailsLoading}
-              options={autocompleteEmails}
-              value={activeSurvey.email.autoSendTo ?? []}
-              onChange={(_, value: string[]) => {
-                editSurvey({
-                  ...activeSurvey,
-                  email: {
-                    ...activeSurvey.email,
-                    autoSendTo: value,
-                  },
-                });
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="standard"
-                  label={tr.EditSurveyEmail.autoSendTo}
-                  helperText={tr.EditSurveyEmail.autoSendToHelperText}
-                />
-              )}
-            />
-            <TextField
+            <div>
+              <EmailPicker
+                label={tr.EditSurveyEmail.autoSendTo}
+                value={activeSurvey.email.autoSendTo ?? []}
+                options={autocompleteEmails}
+                onChange={(emails) => {
+                  setAutocompleteEmails(emails);
+                  editSurvey({
+                    ...activeSurvey,
+                    email: {
+                      ...activeSurvey.email,
+                      autoSendTo: emails,
+                    },
+                  });
+                }}
+                disabled={autocompleteEmailsLoading || activeSurveyLoading}
+              />
+            </div>
+            <CoreInput
               label={tr.EditSurveyEmail.emailSubject}
               value={activeSurvey.email.subject?.[surveyLanguage] ?? ''}
               onChange={(event) => {

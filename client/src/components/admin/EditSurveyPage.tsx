@@ -36,6 +36,8 @@ import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import { loadingPulse } from '../core/styles';
 import DeleteBinIcon from '../icons/DeleteBinIcon';
+import { editPageContainerSx } from './EditSurvey';
+import { editPageFixedRight } from './editSurveyStyles';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
@@ -181,10 +183,7 @@ export default function EditSurveyPage(props: Props) {
   return !page ? null : (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(loading && loadingPulse),
       }}
     >
@@ -207,7 +206,7 @@ export default function EditSurveyPage(props: Props) {
           sx={{
             display: 'flex',
             position: 'fixed',
-            right: '2rem',
+            right: editPageFixedRight,
             zIndex: 10,
           }}
           disabled={loading}

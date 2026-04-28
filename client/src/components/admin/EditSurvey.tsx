@@ -25,6 +25,14 @@ import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslationsV2 from './EditSurveyTranslationsV2';
 
+export const editPageContainerSx = {
+  display: 'flex',
+  flexDirection: 'column' as const,
+  gap: '36px',
+  minWidth: 'fit-content',
+  maxWidth: 'min(55em, 70%)',
+};
+
 export default function EditSurvey() {
   const { path, url } = useRouteMatch();
   const { surveyId } = useParams<{ surveyId: string }>();

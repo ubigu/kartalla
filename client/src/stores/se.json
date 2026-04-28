@@ -58,7 +58,7 @@
     "emailReports": "E-postrapporter",
     "openSurveyPage": "Öppna enkätsida",
     "email": "E-post",
-    "newPage": "Skapa ny sida...",
+    "newPage": "Skapa ny sida",
     "newPageFailed": "Det uppstod ett fel när en ny sida skulle skapas. Försök igen senare.",
     "thanksPage": "Tack-sida",
     "translations": "Översättningar",
@@ -896,8 +896,13 @@
     "privacyStatement": "Integritetspolicy"
   },
   "TagPicker": {
-    "addTags": "Lägg till taggar",
-    "filterWithTags": "Filtrera med taggar"
+    "selectTags": "Välja taggar",
+    "filterWithTags": "Filtrera med taggar",
+    "newTag": "Ny tagg",
+    "add": "Lägg till"
+  },
+  "EmailPicker": {
+    "addEmail": "Lägg till e-postadress"
   },
   "adminInstructions": "Öppna användarmanual",
   "GeneralNotification": {
@@ -922,6 +927,9 @@
   },
   "LoadingBackdrop": {
     "copying": "Kopierar enkät"
+  },
+  "Combobox": {
+    "removeSelection": "Ta bort"
   },
   "AdminMapPublications": {
     "name": "Namn",

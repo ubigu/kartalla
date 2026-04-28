@@ -58,7 +58,7 @@
     "emailReports": "Sähköpostiraportit",
     "openSurveyPage": "Avaa kyselysivu",
     "email": "Sähköposti",
-    "newPage": "Lisää uusi sivu...",
+    "newPage": "Lisää uusi sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
     "translations": "Käännökset",
@@ -899,8 +899,13 @@
     "privacyStatement": "Tietosuojaseloste"
   },
   "TagPicker": {
-    "addTags": "Lisää tunnisteita",
-    "filterWithTags": "Suodata tunnisteilla"
+    "selectTags": "Valitse tunnisteita",
+    "filterWithTags": "Suodata tunnisteilla",
+    "newTag": "Uusi tunniste",
+    "add": "Lisää"
+  },
+  "EmailPicker": {
+    "addEmail": "Lisää sähköpostiosoite"
   },
   "GeneralNotification": {
     "addNew": "Lisää tiedote",
@@ -924,6 +929,9 @@
   },
   "LoadingBackdrop": {
     "copying": "Kopioidaan kyselyä"
+  },
+  "Combobox": {
+    "removeSelection": "Poista"
   },
   "AdminMapPublications": {
     "name": "Nimi",

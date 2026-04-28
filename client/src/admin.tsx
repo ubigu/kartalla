@@ -2,6 +2,7 @@ import '@fontsource-variable/comfortaa';
 import '@fontsource/nunito/300.css';
 import '@fontsource/nunito/400.css';
 import '@fontsource/nunito/500.css';
+import '@fontsource/nunito/600.css';
 import '@fontsource/nunito/700.css';
 import AdminApplication from '@src/components/admin/AdminApplication';
 import { createRoot } from 'react-dom/client';

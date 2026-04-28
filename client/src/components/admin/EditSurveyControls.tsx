@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { Fab, Tooltip, useTheme } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SaveIcon from '@src/components/icons/SaveIcon';
@@ -6,6 +5,7 @@ import UndoIcon from '@src/components/icons/UndoIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { editPageFixedRight } from './editSurveyStyles';
 import { useMemo } from 'react';
 
 const useStyles = makeStyles({
@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     gap: '1rem',
     position: 'fixed',
     bottom: '1rem',
-    right: '1rem',
+    right: editPageFixedRight,
   },
 });
 
@@ -32,7 +32,10 @@ export default function EditSurveyControls() {
   const theme = useTheme();
 
   const undoDisabled = !hasActiveSurveyChanged || activeSurveyLoading;
-  const invalidFieldsLabel = `${tr.EditSurvey.invalidFields} ${validationErrors.map((e) => tr.EditSurvey.validationError[e]).join(', ')}`;
+  const invalidFieldsLabel = `${tr.EditSurvey.invalidFields} ${validationErrors
+    ?.filter((e) => e !== null)
+    .map((e) => tr.EditSurvey.validationError[e])
+    .join(', ')}`;
 
   function getErrorInfoText(info: string) {
     switch (info) {
@@ -50,9 +53,12 @@ export default function EditSurveyControls() {
       <>
         {tr.EditSurvey.invalidFields}
         <ul>
-          {validationErrors.map((error) => (
-            <li key={error}>{tr.EditSurvey.validationError[error]}</li>
-          ))}
+          {validationErrors?.map(
+            (error) =>
+              error && (
+                <li key={error}>{tr.EditSurvey.validationError[error]}</li>
+              ),
+          )}
         </ul>
       </>
     );
@@ -66,8 +72,9 @@ export default function EditSurveyControls() {
             disabled={undoDisabled}
             sx={{
               backgroundColor: theme.palette.surfacePrimary.main,
-              border:
-                !undoDisabled && `solid 1px ${theme.palette.primary.main}`,
+              border: !undoDisabled
+                ? `solid 1px ${theme.palette.primary.main}`
+                : undefined,
             }}
             aria-label={tr.commands.discard}
             onClick={() => {
@@ -82,7 +89,7 @@ export default function EditSurveyControls() {
       </Tooltip>
       <Tooltip
         title={
-          validationErrors.length > 0
+          validationErrors?.length && validationErrors.length > 0
             ? validationErrorTooltip
             : tr.commands.save
         }
@@ -92,11 +99,11 @@ export default function EditSurveyControls() {
             disabled={
               !hasActiveSurveyChanged ||
               activeSurveyLoading ||
-              validationErrors.length > 0
+              Boolean(validationErrors?.length && validationErrors.length > 0)
             }
             color="primary"
             aria-label={
-              validationErrors.length > 0
+              validationErrors?.length && validationErrors.length > 0
                 ? invalidFieldsLabel
                 : tr.commands.save
             }
@@ -107,7 +114,7 @@ export default function EditSurveyControls() {
                   severity: 'success',
                   message: tr.EditSurvey.saveSuccessful,
                 });
-              } catch (error) {
+              } catch (error: any) {
                 showToast({
                   severity: 'error',
                   message: getErrorInfoText(error.info),

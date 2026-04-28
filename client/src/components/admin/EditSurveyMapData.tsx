@@ -1,19 +1,15 @@
 // @ts-strict-ignore
 import { MapPublication } from '@interfaces/mapPublications';
-import {
-  Autocomplete,
-  Box,
-  FormLabel,
-  Skeleton,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Skeleton, Typography } from '@mui/material';
 import { getMapPublications } from '@src/controllers/MapPublicationsController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getLayerName } from '@src/utils/oskariHelpers';
 import { useEffect, useState } from 'react';
+import { Combobox_WIP } from '../core/Combobox';
+import { CoreInput } from '../core/Input';
 import { loadingPulse } from '../core/styles';
+import { editPageContainerSx } from './EditSurvey';
 
 export default function EditSurveyMapData() {
   const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
@@ -46,10 +42,7 @@ export default function EditSurveyMapData() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '36px',
-        maxWidth: 'min(55em, 70%)',
+        ...editPageContainerSx,
         ...(activeSurveyLoading && loadingPulse),
       }}
     >
@@ -59,30 +52,23 @@ export default function EditSurveyMapData() {
       {mapPublicationsLoading ? (
         <Skeleton variant="rectangular" height={40} />
       ) : (
-        <Autocomplete
-          options={mapPublications}
-          getOptionLabel={(pub) => pub.name}
-          value={
-            mapPublications.find((pub) => pub.url === activeSurvey.mapUrl) ??
-            null
-          }
-          onChange={(_, value) => {
+        <Combobox_WIP
+          options={mapPublications.map((pub) => ({
+            value: pub.url,
+            label: pub.name,
+          }))}
+          value={activeSurvey.mapUrl}
+          onChange={(value) => {
             editSurvey({
               ...activeSurvey,
-              mapUrl: value?.url ?? '',
+              mapUrl: value,
             });
           }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="standard"
-              label={tr.EditSurveyInfo.mapPublicationSelect}
-              helperText={tr.EditSurveyInfo.mapPublicationSelectHelperText}
-            />
-          )}
+          label={tr.EditSurveyInfo.mapPublicationSelect}
+          helperText={tr.EditSurveyInfo.mapPublicationSelectHelperText}
         />
       )}
-      <TextField
+      <CoreInput
         error={validationErrors.includes('survey.mapUrl')}
         label={tr.EditSurveyInfo.mapUrl}
         value={activeSurvey.mapUrl ?? ''}
@@ -102,7 +88,7 @@ export default function EditSurveyMapData() {
       )}
       {!availableMapLayersLoading && availableMapLayers?.length > 0 && (
         <div>
-          <FormLabel>{tr.EditSurveyInfo.availableMapLayers}</FormLabel>
+          <Typography>{tr.EditSurveyInfo.availableMapLayers}</Typography>
           <ul>
             {availableMapLayers.map((layer) => (
               <li key={layer.id}>

@@ -142,7 +142,7 @@ export class SurveyEditPage {
     for (const pageName of params.pageNames.slice(1)) {
       await this._page
         .getByLabel('Navigointivalikko')
-        .getByText('Lisää uusi sivu...')
+        .getByText('Lisää uusi sivu')
         .click();
       await this.renamePage('Nimetön sivu', pageName);
     }
