@@ -33,10 +33,13 @@ export function CoreInput({
   style,
   error,
   helperText,
+  required,
   ...props
 }: CoreInputProps) {
   const theme = useTheme();
   const helperId = useId();
+  const internalId = useId();
+  const inputId = id ?? internalId;
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -44,7 +47,7 @@ export function CoreInput({
       {label && (
         <Box
           component={'label'}
-          htmlFor={id}
+          htmlFor={inputId}
           sx={{
             fontSize: '12px',
             color: getLabelColor({ isFocused, isError: !!error }),
@@ -52,11 +55,12 @@ export function CoreInput({
           }}
         >
           {label}
+          {required && <span aria-hidden="true"> *</span>}
         </Box>
       )}
       <Box
         component={'input'}
-        id={id}
+        id={inputId}
         aria-invalid={!!error}
         aria-describedby={helperText ? helperId : undefined}
         onFocus={(e) => {

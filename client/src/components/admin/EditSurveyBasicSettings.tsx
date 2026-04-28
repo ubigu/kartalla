@@ -49,6 +49,7 @@ export default function EditSurveyBasicSettings(props: Props) {
     validationErrors,
     deleteActiveSurvey,
   } = useSurvey();
+
   const { languages, tr, language, surveyLanguage, setSurveyLanguage } =
     useTranslations();
   const { showToast } = useToasts();

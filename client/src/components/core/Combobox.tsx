@@ -18,7 +18,7 @@ const chevronWidth = 22;
 
 interface ComboboxListboxBaseProps<T extends string> {
   listBoxRef: React.RefObject<HTMLElement | null>;
-  listboxId: string;
+  id: string;
   label?: string;
   multiselect?: boolean;
   filteredOptions: ComboboxOption<T>[];
@@ -41,7 +41,7 @@ interface ComboboxListboxProps<
 function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
   const {
     listBoxRef,
-    listboxId,
+    id,
     label,
     multiselect,
     filteredOptions,
@@ -59,7 +59,7 @@ function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
       ref={listBoxRef}
       tabIndex={-1}
       component="ul"
-      id={listboxId}
+      id={id}
       role="listbox"
       aria-label={label}
       aria-multiselectable={multiselect}
@@ -100,7 +100,7 @@ function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
           <Box
             component="li"
             key={opt.value}
-            id={`${listboxId}-${i}`}
+            id={`${id}-${i}`}
             ref={i === activeIndex ? activeItemRef : undefined}
             role="option"
             aria-selected={isSelected}
@@ -169,6 +169,7 @@ interface ComboboxBaseProps<T extends String> {
   options: ComboboxOption<T>[];
   disabled?: boolean;
   placeholder?: string;
+  required?: boolean;
   renderValue?: (option: ComboboxOption<T>) => React.ReactNode;
   wrapperSx?: SxProps<Theme>;
   sx?: SxProps<Theme>;
@@ -231,6 +232,7 @@ export function Combobox_WIP<T extends string = string>(
     disabled,
     multiselect,
     onMultiChange,
+    required,
     wrapperSx,
     sx,
     'aria-describedby': ariaDescribedBy,
@@ -239,6 +241,8 @@ export function Combobox_WIP<T extends string = string>(
   const theme = useTheme();
   const { tr } = useTranslations();
   const helperId = useId();
+  const internalId = useId();
+  const inputId = id ?? internalId;
   const listboxId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -361,6 +365,7 @@ export function Combobox_WIP<T extends string = string>(
           {...labelProps}
         >
           {label}
+          {required && <span aria-hidden="true"> *</span>}
         </Box>
       )}
 
@@ -455,7 +460,7 @@ export function Combobox_WIP<T extends string = string>(
           ref={inputRef}
           component="input"
           type="text"
-          id={id}
+          id={inputId}
           role="combobox"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -465,6 +470,7 @@ export function Combobox_WIP<T extends string = string>(
             isOpen ? `${listboxId}-${activeIndex}` : undefined
           }
           aria-invalid={!!error}
+          aria-required={required}
           aria-describedby={describedBy}
           aria-label={ariaLabel}
           disabled={disabled}
@@ -583,7 +589,7 @@ export function Combobox_WIP<T extends string = string>(
 
         <ComboboxListbox
           listBoxRef={listboxRef}
-          listboxId={listboxId}
+          id={listboxId}
           label={label}
           multiselect={multiselect}
           filteredOptions={filteredOptions}

@@ -22,7 +22,7 @@ export interface SelectOption<T extends string | number = string> {
 interface SelectProps<T extends string | number = string> {
   id?: string;
   label?: string;
-  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
+  labelProps?: React.HTMLAttributes<HTMLSpanElement>;
   error?: boolean;
   helperText?: string;
   helperTextProps?: React.ComponentProps<typeof InputHelperText>;
@@ -33,6 +33,7 @@ interface SelectProps<T extends string | number = string> {
   placeholder?: string;
   renderLabel?: (option: SelectOption<T>, index: number) => React.ReactNode;
   renderDisplayLabel?: (option: SelectOption<T> | undefined) => React.ReactNode;
+  required?: boolean;
   wrapperSx?: SxProps<Theme>;
   sx?: SxProps<Theme>;
   'aria-describedby'?: string;
@@ -51,6 +52,7 @@ export function Select<T extends string | number = string>({
   onChange,
   disabled,
   placeholder,
+  required,
   renderLabel,
   renderDisplayLabel,
   wrapperSx,
@@ -60,6 +62,7 @@ export function Select<T extends string | number = string>({
 }: SelectProps<T>) {
   const theme = useTheme();
   const helperId = useId();
+  const labelId = useId();
   const listboxId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -131,8 +134,8 @@ export function Select<T extends string | number = string>({
     >
       {label && (
         <Box
-          component="label"
-          htmlFor={id}
+          component="span"
+          id={labelId}
           sx={{
             fontSize: '12px',
             width: 'fit-content',
@@ -144,6 +147,7 @@ export function Select<T extends string | number = string>({
           {...labelProps}
         >
           {label}
+          {required && <span aria-hidden="true"> *</span>}
         </Box>
       )}
 
@@ -159,8 +163,10 @@ export function Select<T extends string | number = string>({
           aria-controls={listboxId}
           aria-activedescendant={activeOptionId}
           aria-invalid={!!error}
+          aria-required={required}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={label ? undefined : ariaLabel}
           aria-describedby={describedBy}
-          aria-label={ariaLabel}
           disabled={disabled}
           onClick={() => {
             if (!disabled) isOpen ? close() : open();
