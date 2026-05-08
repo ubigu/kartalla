@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import { describe, expect, it } from 'vitest';
 import { TestWrapper } from '../../test/TestWrapper';
-import { CoreTab, CoreTabs } from './Tabs';
+import { CoreTab } from './Tabs';
 
 describe('MUI Tabs', () => {
   it('has no accessibility violations', async () => {
@@ -55,11 +55,11 @@ describe('CoreTabs', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TestWrapper>
-        <CoreTabs value={0} onChange={() => {}}>
+        <Tabs value={0} onChange={() => {}}>
           <CoreTab label="First" />
           <CoreTab label="Second" />
           <CoreTab label="Third" />
-        </CoreTabs>
+        </Tabs>
       </TestWrapper>,
     );
     const { violations } = await axe.run(container);
@@ -71,7 +71,7 @@ describe('CoreTabs', () => {
     let value = 0;
     const { container, rerender } = render(
       <TestWrapper>
-        <CoreTabs
+        <Tabs
           value={value}
           onChange={(v) => {
             value = v;
@@ -79,16 +79,16 @@ describe('CoreTabs', () => {
         >
           <CoreTab label="First" />
           <CoreTab label="Second" />
-        </CoreTabs>
+        </Tabs>
       </TestWrapper>,
     );
     await user.click(container.querySelectorAll('[role="tab"]')[1]);
     rerender(
       <TestWrapper>
-        <CoreTabs value={value} onChange={() => {}}>
+        <Tabs value={value} onChange={() => {}}>
           <CoreTab label="First" />
           <CoreTab label="Second" />
-        </CoreTabs>
+        </Tabs>
       </TestWrapper>,
     );
     const { violations } = await axe.run(container);

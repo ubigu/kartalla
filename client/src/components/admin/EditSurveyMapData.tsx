@@ -7,7 +7,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { getLayerName } from '@src/utils/oskariHelpers';
 import { useEffect, useState } from 'react';
 import { Combobox_WIP } from '../core/Combobox';
-import { CoreInput } from '../core/Input';
+import { Input } from '../core/Input';
 import { loadingPulse } from '../core/styles';
 import { editPageContainerSx } from './EditSurvey';
 
@@ -68,7 +68,7 @@ export default function EditSurveyMapData() {
           helperText={tr.EditSurveyInfo.mapPublicationSelectHelperText}
         />
       )}
-      <CoreInput
+      <Input
         error={validationErrors.includes('survey.mapUrl')}
         label={tr.EditSurveyInfo.mapUrl}
         value={activeSurvey.mapUrl ?? ''}

@@ -3,8 +3,8 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { useEffect, useState } from 'react';
-import { CoreCheckbox } from '../core/Checkbox';
-import { CoreInput } from '../core/Input';
+import { Checkbox } from '../core/Checkbox';
+import { Input } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
@@ -46,7 +46,7 @@ export default function EditSurveyEmail() {
         {tr.EditSurvey.emailReports}
       </Typography>
       <div>
-        <CoreCheckbox
+        <Checkbox
           aria-describedby={'enable-email-helper'}
           label={tr.EditSurveyEmail.enable}
           disabled={activeSurveyLoading}
@@ -68,7 +68,7 @@ export default function EditSurveyEmail() {
       {activeSurvey.email.enabled && (
         <>
           <Box display={'flex'} flexDirection="column" gap={'1rem'}>
-            <CoreCheckbox
+            <Checkbox
               label={tr.EditSurveyEmail.includeMarginImages}
               disabled={activeSurveyLoading}
               checked={activeSurvey.email.includeMarginImages}
@@ -83,7 +83,7 @@ export default function EditSurveyEmail() {
               }}
             />
             <div>
-              <CoreCheckbox
+              <Checkbox
                 aria-describedby={'include-personal-info-helper'}
                 label={tr.EditSurveyEmail.includePersonalInfo}
                 disabled={activeSurveyLoading}
@@ -106,7 +106,7 @@ export default function EditSurveyEmail() {
               </InputHelperText>
             </div>
             <div>
-              <CoreCheckbox
+              <Checkbox
                 aria-describedby={'email-required-helper'}
                 label={tr.EditSurveyEmail.required}
                 disabled={activeSurveyLoading}
@@ -147,7 +147,7 @@ export default function EditSurveyEmail() {
               disabled={autocompleteEmailsLoading || activeSurveyLoading}
             />
           </div>
-          <CoreInput
+          <Input
             label={tr.EditSurveyEmail.emailSubject}
             value={activeSurvey.email.subject?.[surveyLanguage] ?? ''}
             onChange={(event) => {

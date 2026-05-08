@@ -3,7 +3,7 @@ import { getOrgTags } from '@src/controllers/SurveyController';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useEffect, useState } from 'react';
 import { Combobox_WIP } from '../core/Combobox';
-import { CoreInput } from '../core/Input';
+import { Input } from '../core/Input';
 
 interface Props {
   selectedTags: string[];
@@ -59,7 +59,7 @@ export function TagPicker({
           />
         </Box>
         <Box sx={{ display: 'flex', gap: '8px' }}>
-          <CoreInput
+          <Input
             placeholder={tr.TagPicker.newTag}
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}

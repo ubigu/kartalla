@@ -8,7 +8,7 @@ import { Box, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Fragment, ReactNode } from 'react';
-import { CoreInput } from '../core/Input';
+import { Input } from '../core/Input';
 import RichTextEditor from '../RichTextEditor';
 import { inlineToolbarOptions } from './EditSurveyTranslationsV2';
 import { sectionTypeIcons } from './surveySectionIcons';
@@ -103,7 +103,7 @@ export function SurveySectionTranslationBody({
           label={`${optionIndex + 1}. ${tr.EditSurveyTranslations.option.toLowerCase()}`}
           cols={visibleCols}
           render={(lang) => (
-            <CoreInput
+            <Input
               value={option.text?.[lang] ?? ''}
               onChange={(e) =>
                 editSection(activePage.id, sectionIndex, {
@@ -122,7 +122,7 @@ export function SurveySectionTranslationBody({
             label={`${optionIndex + 1}. ${tr.EditSurveyTranslations.optionInfo.toLowerCase()}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={option.info?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -154,7 +154,7 @@ export function SurveySectionTranslationBody({
             label={`${tr.EditSurveyTranslations.matrixClass} ${classIndex + 1}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={matrixClass?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -175,7 +175,7 @@ export function SurveySectionTranslationBody({
             label={`${tr.EditSurveyTranslations.matrixSubject} ${subjectIndex + 1}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={subject?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -204,7 +204,7 @@ export function SurveySectionTranslationBody({
             label={`${tr.EditSurveyTranslations.budgetTarget} ${targetIndex + 1}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={target.name?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -271,7 +271,7 @@ export function SurveySectionTranslationBody({
               label={tr.EditSurveyTranslations.questionText}
               cols={visibleCols}
               render={(lang) => (
-                <CoreInput
+                <Input
                   value={question.title?.[lang] ?? ''}
                   onChange={(e) =>
                     editSection(activePage.id, section.id!, {
@@ -320,7 +320,7 @@ export function SurveySectionTranslationBody({
           label={tr.EditSurveyTranslations.imageCaption}
           cols={visibleCols}
           render={(lang) => (
-            <CoreInput
+            <Input
               value={s.altText?.[lang] ?? ''}
               onChange={(e) =>
                 editSection(activePage.id, sectionIndex, {
@@ -345,7 +345,7 @@ export function SurveySectionTranslationBody({
             label={`${optionIndex + 1}. ${tr.EditSurveyTranslations.option.toLowerCase()}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={option.text?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -363,7 +363,7 @@ export function SurveySectionTranslationBody({
             label={`${optionIndex + 1}. ${tr.EditSurveyTranslations.optionAltText.toLowerCase()}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={option.altText?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -382,7 +382,7 @@ export function SurveySectionTranslationBody({
               label={`${optionIndex + 1}. ${tr.EditSurveyTranslations.optionInfo.toLowerCase()}`}
               cols={visibleCols}
               render={(lang) => (
-                <CoreInput
+                <Input
                   value={option.info?.[lang] ?? ''}
                   onChange={(e) =>
                     editSection(activePage.id, sectionIndex, {
@@ -412,7 +412,7 @@ export function SurveySectionTranslationBody({
               label={tr.EditSurveyTranslations.sliderMinLabel}
               cols={visibleCols}
               render={(lang) => (
-                <CoreInput
+                <Input
                   value={s.minLabel?.[lang] ?? ''}
                   onChange={(e) =>
                     editSection(activePage.id, sectionIndex, {
@@ -430,7 +430,7 @@ export function SurveySectionTranslationBody({
               label={tr.EditSurveyTranslations.sliderMaxLabel}
               cols={visibleCols}
               render={(lang) => (
-                <CoreInput
+                <Input
                   value={s.maxLabel?.[lang] ?? ''}
                   onChange={(e) =>
                     editSection(activePage.id, sectionIndex, {
@@ -461,7 +461,7 @@ export function SurveySectionTranslationBody({
             label={`${tr.EditSurveyTranslations.group} ${groupIndex + 1}`}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={group.name?.[lang] ?? ''}
                 onChange={(e) =>
                   editSection(activePage.id, sectionIndex, {
@@ -481,7 +481,7 @@ export function SurveySectionTranslationBody({
                 label={`└ ${optionIndex + 1}. ${tr.EditSurveyTranslations.option.toLowerCase()}`}
                 cols={visibleCols}
                 render={(lang) => (
-                  <CoreInput
+                  <Input
                     value={option.text?.[lang] ?? ''}
                     onChange={(e) =>
                       editSection(activePage.id, sectionIndex, {
@@ -502,7 +502,7 @@ export function SurveySectionTranslationBody({
                   label={`  ${optionIndex + 1}. ${tr.EditSurveyTranslations.optionInfo.toLowerCase()}`}
                   cols={visibleCols}
                   render={(lang) => (
-                    <CoreInput
+                    <Input
                       value={option.info?.[lang] ?? ''}
                       onChange={(e) =>
                         editSection(activePage.id, sectionIndex, {
@@ -538,7 +538,7 @@ export function SurveySectionTranslationBody({
           label={tr.EditSurveyTranslations.customLabel}
           cols={visibleCols}
           render={(lang) => (
-            <CoreInput
+            <Input
               value={s.customLabel?.[lang] ?? ''}
               onChange={(e) =>
                 editSection(activePage.id, sectionIndex, {
@@ -569,7 +569,7 @@ export function SurveySectionTranslationBody({
         label={tr.EditSurveyTranslations.questionText}
         cols={visibleCols}
         render={(lang) => (
-          <CoreInput
+          <Input
             value={section.title?.[lang] ?? ''}
             onChange={(e) =>
               editSection(activePage.id, sectionIndex, {
@@ -622,7 +622,7 @@ export function SurveySectionTranslationBody({
               label={tr.EditSurveyTranslations.questionText}
               cols={visibleCols}
               render={(lang) => (
-                <CoreInput
+                <Input
                   value={followUp.title?.[lang] ?? ''}
                   onChange={(e) =>
                     editFollowUpSection(activePage.id, section.id!, {

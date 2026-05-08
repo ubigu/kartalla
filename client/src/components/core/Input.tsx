@@ -21,13 +21,13 @@ const hoverStyle = {
   backgroundColor: getBackgroundColor('hover'),
 };
 
-interface CoreInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: boolean;
   helperText?: string;
 }
 
-export function CoreInput({
+export function Input({
   label,
   id,
   style,
@@ -35,7 +35,7 @@ export function CoreInput({
   helperText,
   required,
   ...props
-}: CoreInputProps) {
+}: Props) {
   const theme = useTheme();
   const helperId = useId();
   const internalId = useId();

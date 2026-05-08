@@ -1,5 +1,9 @@
 import { Check } from '@mui/icons-material';
-import { Checkbox, CheckboxProps, FormControlLabel } from '@mui/material';
+import {
+  CheckboxProps,
+  FormControlLabel,
+  Checkbox as MuiCheckbox,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
@@ -41,21 +45,16 @@ const UncheckedIcon = ({ backgroundColor }: IconProps) => {
   );
 };
 
-interface CoreCheckboxProps extends Omit<CheckboxProps, 'size'> {
+interface Props extends Omit<CheckboxProps, 'size'> {
   label?: React.ReactNode;
   checkboxBackground?: string;
 }
 
-export function CoreCheckbox({
-  label,
-  sx,
-  checkboxBackground,
-  ...props
-}: CoreCheckboxProps) {
+export function Checkbox({ label, sx, checkboxBackground, ...props }: Props) {
   const { palette } = useTheme();
 
   const checkbox = (
-    <Checkbox
+    <MuiCheckbox
       disableFocusRipple
       disableRipple
       sx={{
