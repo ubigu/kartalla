@@ -35,6 +35,12 @@ it('Combobox with label has no accessibility violations', async () => {
         options={options}
         onChange={() => {}}
       />
+      <Combobox_WIP
+        label="Choose option"
+        value="a"
+        options={options}
+        onChange={() => {}}
+      />
     </TestWrapper>,
   );
   const { violations } = await axe.run(container);

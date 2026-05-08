@@ -717,7 +717,8 @@
     "generalNotifications": "Meddelanden",
     "generalNotificationsNew": "Nya meddelanden",
     "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden",
-    "mapPublications": "Kartpublikationer"
+    "mapPublications": "Kartpublikationer",
+    "navigateToFrontPage": "Navigera till startsidan"
   },
   "AppBarUserMenu": {
     "label": "Användarmeny",

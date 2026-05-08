@@ -719,7 +719,8 @@
     "generalNotifications": "Tiedotteet",
     "generalNotificationsNew": "Uusia tiedotteita",
     "generalNotificationsError": "Virhe haettaessa tiedotteita",
-    "mapPublications": "Karttajulkaisut"
+    "mapPublications": "Karttajulkaisut",
+    "navigateToFrontPage": "Navigoi aloitussivulle"
   },
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",

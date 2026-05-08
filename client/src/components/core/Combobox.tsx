@@ -353,7 +353,7 @@ export function Combobox_WIP<T extends string = string>(
       {label && (
         <Box
           component="label"
-          htmlFor={id}
+          htmlFor={inputId}
           sx={{
             fontSize: '12px',
             width: 'fit-content',

@@ -9,7 +9,7 @@ import { draftToMarkdown } from 'markdown-draft-js';
 import remarkRehype from 'remark-rehype';
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { Editor } from 'react-draft-wysiwyg';
+import { Editor, EditorProps } from 'react-draft-wysiwyg';
 import rehypeFormat from 'rehype-format';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -118,7 +118,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const DEFAULT_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60];
 
-interface Props {
+interface Props extends Omit<EditorProps, 'onChange'> {
   value: string;
   disabled?: boolean;
   label?: string;
@@ -215,7 +215,9 @@ function editorStateToMarkdown(
 }
 
 const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
-  const [editorState, setEditorState] = useState(null);
+  const [editorState, setEditorState] = useState<EditorState | null>(null);
+
+  const { onChange, ...restProps } = props;
 
   useImperativeHandle(
     ref,
@@ -272,6 +274,7 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
         </Typography>
       )}
       <Editor
+        {...restProps}
         {...(props.label && { ariaLabel: props.label })}
         readOnly={props.disabled}
         toolbar={
@@ -294,7 +297,7 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
         editorClassName={classes.editor}
         toolbarClassName={classes.toolbar}
         localization={{ translations: tr.RichTextEditor }}
-        editorState={editorState}
+        editorState={editorState ?? undefined}
         onEditorStateChange={handleEditorStateChange}
         customStyleMap={{
           'fontsize-24': {

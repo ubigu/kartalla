@@ -202,6 +202,7 @@ export default function EditSurveyBasicSettings(props: Props) {
               options: ['bold', 'italic'],
             },
           }}
+          editorStyle={{ background: theme.palette.surfaceInput.main }}
           label={tr.EditSurveyInfo.description}
           value={activeSurvey.description?.[surveyLanguage] ?? ''}
           onChange={(value) =>

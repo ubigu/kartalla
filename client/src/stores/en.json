@@ -718,7 +718,8 @@
     "generalNotifications": "Notifications",
     "generalNotificationsNew": "New notifications",
     "generalNotificationsError": "Error while fetching general notifications",
-    "mapPublications": "Map publications"
+    "mapPublications": "Map publications",
+    "navigateToFrontPage": "Navigate to the front page"
   },
   "AppBarUserMenu": {
     "label": "User menu",

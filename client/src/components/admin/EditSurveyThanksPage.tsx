@@ -1,6 +1,7 @@
-import { Box, TextField, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { Input } from '../core/Input';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
 import { editPageContainerSx } from './EditSurvey';
@@ -13,6 +14,7 @@ interface Props {
 export default function EditSurveyThanksPage({ canEdit = true }: Props) {
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
   const { tr, surveyLanguage } = useTranslations();
+  const theme = useTheme();
 
   return (
     <Box
@@ -24,7 +26,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
       <Typography variant="mainHeader" component={'h1'}>
         {tr.EditSurvey.thanksPage}
       </Typography>
-      <TextField
+      <Input
         label={tr.EditSurveyThanksPage.title}
         value={activeSurvey.thanksPage?.title?.[surveyLanguage] ?? ''}
         onChange={(event) => {
@@ -43,6 +45,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
       <RichTextEditor
         label={tr.EditSurveyThanksPage.text}
         value={activeSurvey.thanksPage.text?.[surveyLanguage] ?? ''}
+        editorStyle={{ background: theme.palette.surfaceInput.main }}
         onChange={(value) => {
           editSurvey({
             ...activeSurvey,
