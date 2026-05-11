@@ -107,6 +107,7 @@
     "selectDateAndTime": "Select date and time",
     "theme": "Theme",
     "selectTheme": "Choose a theme",
+    "selectTitleColor": "Select color",
     "themeFetchFailed": "Failed to access survey themes. Please try again later.",
     "titleColor": "Color for the section titles",
     "allowTestSurvey": "Publish test survey",
@@ -718,7 +719,8 @@
     "generalNotifications": "Notifications",
     "generalNotificationsNew": "New notifications",
     "generalNotificationsError": "Error while fetching general notifications",
-    "mapPublications": "Map publications"
+    "mapPublications": "Map publications",
+    "navigateToFrontPage": "Navigate to the front page"
   },
   "AppBarUserMenu": {
     "label": "User menu",
@@ -727,6 +729,7 @@
     "userManagement": "User management",
     "editMapPublications": "Edit map publications",
     "selectDefaultLanguage": "Select application default language",
+    "defaultLanguage": "Default language",
     "defaultLanguageSaved": "Default language saved",
     "defaultLanguageSaveFailed": "Failed to save default language"
   },

@@ -48,8 +48,9 @@ test.describe('Survey test', () => {
     await clearData();
   });
 
-  test('create questions', async ({ workerSurveyEditPage }) => {
+  test('create questions', async ({ workerSurveyEditPage, makeAxeBuilder }) => {
     await workerSurveyEditPage.goto();
+    expect((await makeAxeBuilder('body').analyze()).violations).toHaveLength(0);
     await workerSurveyEditPage.createPersonalInfoQuestion(personalInfoQuestion);
     await workerSurveyEditPage.createRadioQuestion({
       ...radioQuestion,

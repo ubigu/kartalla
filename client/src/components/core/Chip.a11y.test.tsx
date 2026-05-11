@@ -2,12 +2,12 @@ import { render } from '@testing-library/react';
 import axe from 'axe-core';
 import { expect, it } from 'vitest';
 import { TestWrapper } from '../../test/TestWrapper';
-import { CoreChip } from './Chip';
+import { Chip } from './Chip';
 
 it('CoreChip filled has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <CoreChip label="Status" />
+      <Chip label="Status" />
     </TestWrapper>,
   );
   const { violations } = await axe.run(container);
@@ -17,7 +17,7 @@ it('CoreChip filled has no accessibility violations', async () => {
 it('CoreChip outlined has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <CoreChip label="Status" variant="outlined" />
+      <Chip label="Status" variant="outlined" />
     </TestWrapper>,
   );
   const { violations } = await axe.run(container);
@@ -27,7 +27,7 @@ it('CoreChip outlined has no accessibility violations', async () => {
 it('CoreChip clickable has no accessibility violations', async () => {
   const { container } = render(
     <TestWrapper>
-      <CoreChip label="Clickable" onClick={() => {}} />
+      <Chip label="Clickable" onClick={() => {}} />
     </TestWrapper>,
   );
   const { violations } = await axe.run(container);

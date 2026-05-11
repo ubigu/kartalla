@@ -1,10 +1,9 @@
-import { Tab, Tabs } from '@mui/material';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import { describe, expect, it } from 'vitest';
 import { TestWrapper } from '../../test/TestWrapper';
-import { CoreTab, CoreTabs } from './Tabs';
+import { Tab, Tabs } from './Tabs';
 
 describe('MUI Tabs', () => {
   it('has no accessibility violations', async () => {
@@ -28,7 +27,7 @@ describe('MUI Tabs', () => {
       <TestWrapper>
         <Tabs
           value={value}
-          onChange={(_, v) => {
+          onChange={(v) => {
             value = v;
           }}
         >
@@ -55,11 +54,11 @@ describe('CoreTabs', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TestWrapper>
-        <CoreTabs value={0} onChange={() => {}}>
-          <CoreTab label="First" />
-          <CoreTab label="Second" />
-          <CoreTab label="Third" />
-        </CoreTabs>
+        <Tabs value={0} onChange={() => {}}>
+          <Tab label="First" />
+          <Tab label="Second" />
+          <Tab label="Third" />
+        </Tabs>
       </TestWrapper>,
     );
     const { violations } = await axe.run(container);
@@ -71,24 +70,24 @@ describe('CoreTabs', () => {
     let value = 0;
     const { container, rerender } = render(
       <TestWrapper>
-        <CoreTabs
+        <Tabs
           value={value}
           onChange={(v) => {
             value = v;
           }}
         >
-          <CoreTab label="First" />
-          <CoreTab label="Second" />
-        </CoreTabs>
+          <Tab label="First" />
+          <Tab label="Second" />
+        </Tabs>
       </TestWrapper>,
     );
     await user.click(container.querySelectorAll('[role="tab"]')[1]);
     rerender(
       <TestWrapper>
-        <CoreTabs value={value} onChange={() => {}}>
-          <CoreTab label="First" />
-          <CoreTab label="Second" />
-        </CoreTabs>
+        <Tabs value={value} onChange={() => {}}>
+          <Tab label="First" />
+          <Tab label="Second" />
+        </Tabs>
       </TestWrapper>,
     );
     const { violations } = await axe.run(container);

@@ -1,20 +1,25 @@
-import { Tab, TabProps, Tabs, TabsProps } from '@mui/material';
+import {
+  Tab as MuiTab,
+  TabProps as MuiTabProps,
+  Tabs as MuiTabs,
+  TabsProps as MuiTabsProps,
+} from '@mui/material';
 import { theme } from '@src/themes/admin';
 
-interface CoreTabsProps extends Omit<TabsProps, 'onChange'> {
+interface TabsProps extends Omit<MuiTabsProps, 'onChange'> {
   onChange?: (value: number) => void;
 }
 
-interface CoreTabProps extends TabProps {
+interface TabProps extends MuiTabProps {
   labelColor?: string;
 }
 
 const TAB_HEIGHT = 'min-content';
 const baseTabPaddingY = 4;
 
-export function CoreTabs({ onChange, sx, ...props }: CoreTabsProps) {
+export function Tabs({ onChange, sx, ...props }: TabsProps) {
   return (
-    <Tabs
+    <MuiTabs
       onChange={(_, value) => onChange?.(value)}
       TabIndicatorProps={{ style: { display: 'none' } }}
       sx={{
@@ -40,9 +45,9 @@ export function CoreTabs({ onChange, sx, ...props }: CoreTabsProps) {
   );
 }
 
-export function CoreTab({ sx, labelColor, ...props }: CoreTabProps) {
+export function Tab({ sx, labelColor, ...props }: TabProps) {
   return (
-    <Tab
+    <MuiTab
       sx={{
         minHeight: TAB_HEIGHT,
         fontSize: '14px',

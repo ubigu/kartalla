@@ -18,8 +18,8 @@ import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import LoadingButton from '../LoadingButton';
 import RichTextEditor from '../RichTextEditor';
-import { CoreCheckbox } from '../core/Checkbox';
-import { CoreInput } from '../core/Input';
+import { Checkbox } from '../core/Checkbox';
+import { Input } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
 import { Select } from '../core/Select';
 import { loadingPulse } from '../core/styles';
@@ -118,7 +118,7 @@ export default function EditSurveyBasicSettings(props: Props) {
                 label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
               }))}
             />
-            <CoreCheckbox
+            <Checkbox
               inputProps={{
                 'aria-describedby':
                   'common-helper-basic-setting-language-select',
@@ -164,7 +164,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             }}
           />
         )}
-        <CoreInput
+        <Input
           required
           error={validationErrors.includes('survey.title')}
           label={tr.EditSurveyInfo.title}
@@ -179,7 +179,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             });
           }}
         />
-        <CoreInput
+        <Input
           label={tr.EditSurveyInfo.subtitle}
           value={activeSurvey.subtitle?.[surveyLanguage] ?? ''}
           onChange={(event) =>
@@ -202,6 +202,7 @@ export default function EditSurveyBasicSettings(props: Props) {
               options: ['bold', 'italic'],
             },
           }}
+          editorStyle={{ background: theme.palette.surfaceInput.main }}
           label={tr.EditSurveyInfo.description}
           value={activeSurvey.description?.[surveyLanguage] ?? ''}
           onChange={(value) =>
@@ -214,7 +215,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             })
           }
         />
-        <CoreInput
+        <Input
           required
           error={validationErrors.includes('survey.name')}
           label={tr.EditSurveyInfo.name}
@@ -237,7 +238,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             })
           }
         />
-        <CoreInput
+        <Input
           required
           error={validationErrors.includes('survey.author')}
           label={tr.EditSurveyInfo.author}
@@ -249,7 +250,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             });
           }}
         />
-        <CoreInput
+        <Input
           label={tr.EditSurveyInfo.authorUnit}
           value={activeSurvey.authorUnit ?? ''}
           onChange={(event) => {
@@ -299,7 +300,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             />
           </LocalizationProvider>
         </Box>
-        <CoreCheckbox
+        <Checkbox
           label={tr.EditSurvey.allowSavingUnfinished}
           checked={activeSurvey.allowSavingUnfinished}
           onChange={(event) =>
@@ -310,7 +311,7 @@ export default function EditSurveyBasicSettings(props: Props) {
           }
           inputProps={{ 'aria-label': 'allow-unfinished' }}
         />
-        <CoreCheckbox
+        <Checkbox
           label={tr.EditSurvey.displayPrivacyStatement}
           checked={activeSurvey.displayPrivacyStatement}
           onChange={(event) =>
@@ -324,7 +325,7 @@ export default function EditSurveyBasicSettings(props: Props) {
           }}
         />
         <div>
-          <CoreCheckbox
+          <Checkbox
             label={tr.EditSurveyInfo.allowTestSurvey}
             checked={activeSurvey.allowTestSurvey}
             aria-describedby={'publish-survey-helper-text'}

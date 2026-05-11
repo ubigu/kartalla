@@ -2,7 +2,7 @@ import { Box, Button } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useId, useRef, useState } from 'react';
 import { Combobox_WIP } from '../core/Combobox';
-import { CoreInput } from '../core/Input';
+import { Input } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
 
 interface Props {
@@ -76,7 +76,7 @@ export function EmailPicker({
           </InputHelperText>
         </Box>
         <Box sx={{ display: 'flex', gap: '8px' }}>
-          <CoreInput
+          <Input
             placeholder={tr.EmailPicker.addEmail}
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}

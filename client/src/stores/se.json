@@ -107,6 +107,7 @@
     "selectDateAndTime": "Välj datum och tid",
     "theme": "Tema",
     "selectTheme": "Välj tema",
+    "selectTitleColor": "Välj färg",
     "themeFetchFailed": "Misslyckades att hämta teman. Försök igen senare.",
     "titleColor": "Färg på avsnittstitlar",
     "allowTestSurvey": "Publicera testundersökning",
@@ -717,7 +718,8 @@
     "generalNotifications": "Meddelanden",
     "generalNotificationsNew": "Nya meddelanden",
     "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden",
-    "mapPublications": "Kartpublikationer"
+    "mapPublications": "Kartpublikationer",
+    "navigateToFrontPage": "Navigera till startsidan"
   },
   "AppBarUserMenu": {
     "label": "Användarmeny",
@@ -726,6 +728,7 @@
     "userManagement": "Användarhantering",
     "editMapPublications": "Redigera kartpublikationer",
     "selectDefaultLanguage": "Välj applikationens standardspråk",
+    "defaultLanguage": "Standardspråk",
     "defaultLanguageSaved": "Standardspråk sparat",
     "defaultLanguageSaveFailed": "Det gick inte att spara standardspråket"
   },

@@ -5,16 +5,16 @@ import {
 } from '@interfaces/survey';
 import { Box, Theme, Typography, useTheme } from '@mui/material';
 import { Combobox_WIP } from '@src/components/core/Combobox';
-import { CoreInput } from '@src/components/core/Input';
+import { Input } from '@src/components/core/Input';
 import { loadingPulse } from '@src/components/core/styles';
-import { CoreTab, CoreTabs } from '@src/components/core/Tabs';
+import { Tab, Tabs } from '@src/components/core/Tabs';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { Language, useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
 import { useState } from 'react';
-import { CoreCheckbox } from '../core/Checkbox';
+import { Checkbox } from '../core/Checkbox';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
 
@@ -207,7 +207,7 @@ export function LanguageSelector({
         {allLanguages.map((lang, idx) => {
           const isChecked = !!enabledLanguages[lang];
           return (
-            <CoreCheckbox
+            <Checkbox
               key={`${lang}-${idx}`}
               label={getLabel(lang)}
               onClick={() => onToggle(lang, !isChecked)}
@@ -295,21 +295,21 @@ export default function EditSurveyTranslationsV2() {
           {tr.EditSurvey.translations}
         </Typography>
 
-        <CoreTabs value={activeTab} onChange={setActiveTab}>
+        <Tabs value={activeTab} onChange={setActiveTab}>
           {pages.map((page, pageIndex) => {
             const pageTitle =
               page.title?.[language] ||
               `${tr.EditSurvey.page} ${pageIndex + 1}`;
             const tabColor = getPageTabColor(page, enabledLanguages, theme);
             return (
-              <CoreTab
+              <Tab
                 key={page.id}
                 label={`${pageIndex + 1}. ${pageTitle}`}
                 labelColor={tabColor}
               />
             );
           })}
-        </CoreTabs>
+        </Tabs>
       </Box>
 
       <Box
@@ -379,7 +379,7 @@ export default function EditSurveyTranslationsV2() {
             stripe={false}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={activeSurvey.title?.[lang] ?? ''}
                 onChange={(e) =>
                   editSurvey({
@@ -398,7 +398,7 @@ export default function EditSurveyTranslationsV2() {
             stripe={true}
             cols={visibleCols}
             render={(lang) => (
-              <CoreInput
+              <Input
                 value={activeSurvey.subtitle?.[lang] ?? ''}
                 onChange={(e) =>
                   editSurvey({
@@ -444,7 +444,7 @@ export default function EditSurveyTranslationsV2() {
                 stripe={PAGE_TITLE_START % 2 !== 0}
                 cols={visibleCols}
                 render={(lang) => (
-                  <CoreInput
+                  <Input
                     value={activePage.title?.[lang] ?? ''}
                     onChange={(e) =>
                       editPage({
@@ -478,7 +478,7 @@ export default function EditSurveyTranslationsV2() {
                   stripe={thanksStart % 2 !== 0}
                   cols={visibleCols}
                   render={(lang) => (
-                    <CoreInput
+                    <Input
                       value={activeSurvey.thanksPage.title?.[lang] ?? ''}
                       onChange={(e) =>
                         editSurvey({

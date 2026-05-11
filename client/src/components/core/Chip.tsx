@@ -1,6 +1,6 @@
 import { ChipProps, Chip as MuiChip } from '@mui/material';
 
-export function CoreChip({ sx, ...props }: ChipProps) {
+export function Chip({ sx, ...props }: ChipProps) {
   return (
     <MuiChip
       size="small"

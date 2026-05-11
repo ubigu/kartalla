@@ -27,13 +27,16 @@ export default function ColorSelect({ label, value, onChange }: Props) {
     [tr],
   );
 
-  const options = colors.map((color) => ({
-    value: color.value,
-    label: color.name,
-  }));
+  const options = [
+    { value: '', label: tr.EditSurveyInfo.selectTitleColor },
+    ...colors.map((color) => ({
+      value: color.value,
+      label: color.name,
+    })),
+  ];
 
   return (
-    <Select<string>
+    <Select
       id="color"
       label={label ?? tr.ColorSelect.color}
       value={value ?? ''}

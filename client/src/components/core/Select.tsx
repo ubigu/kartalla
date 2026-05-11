@@ -1,4 +1,12 @@
-import { Box, SxProps, Theme, useTheme } from '@mui/material';
+import {
+  Box,
+  MenuItem,
+  Select as MuiSelect,
+  SelectChangeEvent,
+  SxProps,
+  Theme,
+  useTheme,
+} from '@mui/material';
 import {
   getBackgroundColor,
   getBorderColor,
@@ -7,19 +15,19 @@ import {
   getDisabledLabelColor,
   getLabelColor,
 } from '@src/themes/colorHelpers';
-import React, { useId, useRef, useState } from 'react';
+import React, { useId, useState } from 'react';
 import ChevronDownSmallIcon from '../icons/ChevronDownSmallIcon';
 import { InputHelperText } from './InputHelperText';
 
 const paddingX = 6;
 const chevronWidth = 22;
 
-export interface SelectOption<T extends string | number = string> {
+export interface SelectOption<T extends string = string> {
   value: T;
   label: string;
 }
 
-interface SelectProps<T extends string | number = string> {
+interface SelectProps<T extends string = string> {
   id?: string;
   label?: string;
   labelProps?: React.HTMLAttributes<HTMLSpanElement>;
@@ -40,7 +48,7 @@ interface SelectProps<T extends string | number = string> {
   'aria-label'?: string;
 }
 
-export function Select<T extends string | number = string>({
+export function Select<T extends string = string>({
   id,
   label,
   labelProps,
@@ -57,65 +65,15 @@ export function Select<T extends string | number = string>({
   renderDisplayLabel,
   wrapperSx,
   sx,
-  'aria-describedby': ariaDescribedBy,
   'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy,
 }: SelectProps<T>) {
   const theme = useTheme();
   const helperId = useId();
   const labelId = useId();
-  const listboxId = useId();
-  const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const listboxRef = useRef<HTMLElement>(null);
 
   const selectedOption = options.find((o) => o.value === value);
-  const displayLabel = selectedOption?.label ?? placeholder ?? '';
-  const optionCount = options.length;
-
-  function open() {
-    const currentIndex = options.findIndex((o) => o.value === value);
-    setActiveIndex(currentIndex >= 0 ? currentIndex : 0);
-    setIsOpen(true);
-  }
-
-  function close() {
-    setIsOpen(false);
-    setActiveIndex(-1);
-  }
-
-  function handleSelect(opt: SelectOption<T>) {
-    onChange?.(opt.value);
-    close();
-    buttonRef.current?.focus();
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (!isOpen) {
-        open();
-        return;
-      }
-      setActiveIndex((i) => Math.min(i + 1, optionCount - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (!isOpen) {
-        open();
-        return;
-      }
-      if (activeIndex >= 0) handleSelect(options[activeIndex]);
-    } else if (e.key === 'Escape' || e.key === 'Tab') {
-      close();
-    }
-  }
-
-  const activeOptionId =
-    isOpen && activeIndex >= 0 ? `${listboxId}-${activeIndex}` : undefined;
 
   const describedBy =
     [ariaDescribedBy, helperText ? helperId : undefined]
@@ -151,142 +109,33 @@ export function Select<T extends string | number = string>({
         </Box>
       )}
 
-      <Box sx={{ position: 'relative', display: 'flex', flex: 1 }}>
-        <Box
-          ref={buttonRef}
-          component="button"
-          type="button"
-          id={id}
-          role="combobox"
-          aria-haspopup="listbox"
-          aria-expanded={isOpen}
-          aria-controls={listboxId}
-          aria-activedescendant={activeOptionId}
-          aria-invalid={!!error}
-          aria-required={required}
-          aria-labelledby={label ? labelId : undefined}
-          aria-label={label ? undefined : ariaLabel}
-          aria-describedby={describedBy}
-          disabled={disabled}
-          onClick={() => {
-            if (!disabled) isOpen ? close() : open();
-          }}
-          onFocus={() => setIsFocused(true)}
-          onBlur={(e: React.FocusEvent<HTMLButtonElement>) => {
-            if (e.relatedTarget === listboxRef.current) return;
-            setIsFocused(false);
-            close();
-          }}
-          onKeyDown={handleKeyDown}
-          sx={[
-            {
-              height: '28px',
-              fontSize: '14px',
-              fontFamily: theme.typography.fontFamily,
-              color: disabled
-                ? 'textSubtle.main'
-                : value
-                  ? theme.palette.harmaa.main
-                  : 'textPlaceholder.main',
-              '&&': {
-                backgroundColor: disabled
-                  ? 'surfaceSubtle.main'
-                  : getBackgroundColor('default', !!error),
-              },
-              border: '1px solid',
-              borderColor: getBorderColor('default', !!error),
-              borderRadius: '3px',
-              padding: `0 ${paddingX + chevronWidth}px 0 ${paddingX}px`,
-              boxShadow: getBoxShadow('default', !!error),
-              outline: 'none',
-              width: '100%',
-              boxSizing: 'border-box',
-              textAlign: 'left',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              transition: 'border-color 0.2s, background-color 0.2s',
-              ...(disabled ? getDisabledInputStyles() : {}),
-              '&:hover:not(:focus)':
-                !error && !disabled
-                  ? {
-                      borderColor: getBorderColor('hover'),
-                      backgroundColor: getBackgroundColor('hover'),
-                    }
-                  : {},
-              '&:focus-visible': !error
-                ? {
-                    paddingLeft: `${paddingX - 1}px`,
-                    border: '2px solid',
-                    borderColor: getBorderColor('focus'),
-                    backgroundColor: getBackgroundColor('focus'),
-                    boxShadow: getBoxShadow('focus'),
-                  }
-                : {},
-            },
-            ...(Array.isArray(sx) ? sx : [sx ?? {}]),
-          ]}
-        >
-          {renderDisplayLabel
-            ? renderDisplayLabel(selectedOption)
-            : displayLabel}
-        </Box>
-
-        <Box
-          sx={{
-            position: 'absolute',
-            right: `${paddingX}px`,
-            top: '50%',
-            transform: `translateY(-50%) rotate(${isOpen ? 180 : 0}deg)`,
-            transition: 'transform 0.15s',
-            pointerEvents: 'none',
-            display: 'flex',
-            color: 'primary.main',
-          }}
-        >
-          <ChevronDownSmallIcon
-            stroke={disabled ? theme.palette.textSubtle.main : 'currentColor'}
-          />
-        </Box>
-
-        {
-          <Box
-            ref={listboxRef}
-            tabIndex={-1}
-            component="ul"
-            id={listboxId}
-            role="listbox"
-            aria-label={label}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, optionCount - 1));
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
-              } else if (e.key === 'Enter') {
-                e.preventDefault();
-                if (activeIndex >= 0) handleSelect(options[activeIndex]);
-              } else if (e.key === 'Escape' || e.key === 'Tab') {
-                close();
-                buttonRef.current?.focus();
-              } else {
-                buttonRef.current?.focus();
-              }
-            }}
-            onBlur={(e: React.FocusEvent) => {
-              if (e.relatedTarget === buttonRef.current) return;
-              setIsFocused(false);
-              close();
-            }}
-            sx={{
-              display: isOpen ? 'default' : 'none',
-              position: 'absolute',
-              top: 'calc(100%)',
-              left: 0,
-              right: 0,
-              zIndex: 1300,
-              margin: 0,
+      <MuiSelect
+        id={id}
+        value={value}
+        onChange={(e: SelectChangeEvent) => onChange?.(e.target.value as T)}
+        disabled={disabled}
+        required={required}
+        error={!!error}
+        displayEmpty
+        renderValue={(val) => {
+          if (renderDisplayLabel) return renderDisplayLabel(selectedOption);
+          if (val === '' || val === undefined || val === null) {
+            return (
+              <Box component="span" sx={{ color: 'textPlaceholder.main' }}>
+                {placeholder ?? ''}
+              </Box>
+            );
+          }
+          return selectedOption?.label ?? '';
+        }}
+        IconComponent={ChevronDownSmallIcon}
+        labelId={label ? labelId : undefined}
+        aria-describedby={describedBy}
+        SelectDisplayProps={{ 'aria-label': label ? undefined : ariaLabel }}
+        MenuProps={{
+          PaperProps: {
+            sx: {
               padding: '4px 0',
-              listStyle: 'none',
               backgroundColor: 'surfacePrimary.main',
               border: '1px solid',
               borderColor: 'borderSubtle.main',
@@ -295,50 +144,113 @@ export function Select<T extends string | number = string>({
               borderTopLeftRadius: 0,
               borderTop: 'none',
               boxShadow: '0px 4px 16px 0px #59788626',
-              outline: 'none',
-              '&:focus': {
-                borderColor: getBorderColor('focus'),
-                boxShadow: getBoxShadow('focus'),
+              '& .MuiList-root': { padding: 0 },
+            },
+          },
+        }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        sx={[
+          {
+            height: '28px',
+            fontSize: '14px',
+            fontFamily: theme.typography.fontFamily,
+            color: disabled
+              ? 'textSubtle.main'
+              : value
+                ? theme.palette.harmaa.main
+                : 'textPlaceholder.main',
+            '&&': {
+              backgroundColor: disabled
+                ? 'surfaceSubtle.main'
+                : getBackgroundColor('default', !!error),
+            },
+            border: '1px solid',
+            borderColor: getBorderColor('default', !!error),
+            borderRadius: '3px',
+            boxShadow: getBoxShadow('default', !!error),
+            transition: 'border-color 0.2s, background-color 0.2s',
+            width: '100%',
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            '& .MuiSelect-select': {
+              padding: `0 ${paddingX + chevronWidth}px 0 ${paddingX}px `,
+              height: '28px !important',
+              display: 'flex',
+              alignItems: 'center',
+            },
+            '& .MuiSelect-icon': {
+              top: '50%',
+              transform: 'translateY(-50%)',
+              transition: 'transform 0.15s',
+              color: disabled
+                ? 'textSubtle.main'
+                : error
+                  ? 'textError.main'
+                  : 'primary.main',
+            },
+            '& .MuiSelect-iconOpen': {
+              transform: 'translateY(-50%) rotate(180deg)',
+            },
+            '&:hover:not(.Mui-focused):not(.Mui-disabled)': !error
+              ? {
+                  borderColor: getBorderColor('hover'),
+                  backgroundColor: getBackgroundColor('hover'),
+                }
+              : {},
+            '&.Mui-focused': {
+              '& .MuiSelect-icon': {
+                marginRight: '-1px',
               },
-              overflowY: 'auto',
-              maxHeight: '240px',
-            }}
-          >
-            {options.map((opt, i) => {
-              const isSelected = opt.value === value;
-              return (
-                <Box
-                  component="li"
-                  key={opt.value}
-                  id={`${listboxId}-${i}`}
-                  role="option"
-                  aria-selected={isSelected}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => handleSelect(opt)}
-                  onMouseEnter={() => setActiveIndex(i)}
-                  sx={{
-                    px: `${paddingX}px`,
-                    py: '4px',
-                    fontSize: '14px',
-                    fontFamily: theme.typography.fontFamily,
-                    color: isSelected
-                      ? 'textSecondary.main'
-                      : theme.palette.harmaa.main,
-                    fontWeight: isSelected ? 700 : 400,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    backgroundColor:
-                      i === activeIndex ? 'surfaceHover.main' : 'transparent',
-                  }}
-                >
-                  {renderLabel ? renderLabel(opt, i) : opt.label}
-                </Box>
-              );
-            })}
-          </Box>
-        }
-      </Box>
+              border: '2px solid',
+              borderColor: getBorderColor(error ? 'error' : 'focus'),
+              backgroundColor: getBackgroundColor(error ? 'error' : 'focus'),
+              boxShadow: getBoxShadow(error ? 'error' : 'focus'),
+              '& .MuiSelect-select': {
+                padding: `0 ${paddingX + chevronWidth - 1}px 0 ${paddingX - 1}px `,
+              },
+            },
+            '&.Mui-disabled': {
+              ...getDisabledInputStyles(),
+            },
+          },
+          ...(Array.isArray(sx) ? sx : [sx ?? {}]),
+        ]}
+      >
+        {options.map((opt, i) => {
+          const isSelected = opt.value === value;
+          return (
+            <MenuItem
+              key={opt.value}
+              value={opt.value as string | number}
+              sx={{
+                px: `${paddingX}px`,
+                py: '4px',
+                fontSize: '14px',
+                fontFamily: theme.typography.fontFamily,
+                color: isSelected
+                  ? 'textSecondary.main'
+                  : theme.palette.harmaa.main,
+                fontWeight: isSelected ? 700 : 400,
+                '&.MuiMenuItem-root': {
+                  backgroundColor: 'transparent',
+                },
+                '&:hover, &.Mui-focusVisible': {
+                  backgroundColor: 'surfaceHover.main',
+                },
+                '&.Mui-selected, &.Mui-selected:hover, &.Mui-selected.Mui-focusVisible':
+                  {
+                    backgroundColor: 'transparent',
+                  },
+                '&.Mui-selected:hover, &.Mui-selected.Mui-focusVisible': {
+                  backgroundColor: 'surfaceHover.main',
+                },
+              }}
+            >
+              {renderLabel ? renderLabel(opt, i) : opt.label}
+            </MenuItem>
+          );
+        })}
+      </MuiSelect>
 
       {error ? (
         helperText && (

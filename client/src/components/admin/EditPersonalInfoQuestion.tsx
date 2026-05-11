@@ -1,8 +1,8 @@
 // @ts-strict-ignore
 import { SurveyPersonalInfoQuestion } from '@interfaces/survey';
-import { CoreCheckbox } from '@src/components/core/Checkbox';
 import { FormGroup, FormLabel, Input } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { Checkbox } from '@src/components/core/Checkbox';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
@@ -24,7 +24,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
   return (
     <>
       <FormGroup>
-        <CoreCheckbox
+        <Checkbox
           name="is-required"
           checked={section.isRequired}
           onChange={(event) => {
@@ -47,7 +47,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
         >
           {tr.PersonalInfoQuestion.label}
         </FormLabel>
-        <CoreCheckbox
+        <Checkbox
           checkboxBackground={palette.surfacePrimary.main}
           name="name"
           checked={section.askName}
@@ -59,7 +59,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           }}
           label={tr.PersonalInfoQuestion.nameLabel}
         />
-        <CoreCheckbox
+        <Checkbox
           checkboxBackground={palette.surfacePrimary.main}
           name="email"
           checked={section.askEmail}
@@ -71,7 +71,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           }}
           label={tr.PersonalInfoQuestion.emailLabel}
         />
-        <CoreCheckbox
+        <Checkbox
           checkboxBackground={palette.surfacePrimary.main}
           name="phone"
           checked={section.askPhone}
@@ -83,7 +83,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           }}
           label={tr.PersonalInfoQuestion.phoneLabel}
         />
-        <CoreCheckbox
+        <Checkbox
           checkboxBackground={palette.surfacePrimary.main}
           name="address"
           checked={section.askAddress}
@@ -95,7 +95,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           }}
           label={tr.PersonalInfoQuestion.addressLabel}
         />
-        <CoreCheckbox
+        <Checkbox
           checkboxBackground={palette.surfacePrimary.main}
           data-testid="custom-checkbox"
           name="customText"

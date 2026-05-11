@@ -65,6 +65,7 @@ export function AdminAppBar({
                       opacity: 0.6,
                     },
                   }}
+                  aria-label={tr.AppBar.navigateToFrontPage}
                 >
                   <KartallaLogo />
                 </IconButton>
