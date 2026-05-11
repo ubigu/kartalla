@@ -1,8 +1,8 @@
 import {
+  Tab as MuiTab,
   TabProps as MuiTabProps,
   Tabs as MuiTabs,
   TabsProps as MuiTabsProps,
-  Tab,
 } from '@mui/material';
 import { theme } from '@src/themes/admin';
 
@@ -45,9 +45,9 @@ export function Tabs({ onChange, sx, ...props }: TabsProps) {
   );
 }
 
-export function CoreTab({ sx, labelColor, ...props }: TabProps) {
+export function Tab({ sx, labelColor, ...props }: TabProps) {
   return (
-    <Tab
+    <MuiTab
       sx={{
         minHeight: TAB_HEIGHT,
         fontSize: '14px',
