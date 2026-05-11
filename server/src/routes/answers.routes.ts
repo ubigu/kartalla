@@ -1,11 +1,8 @@
 import { LanguageCode } from '@interfaces/survey';
-import {
-  getAnswerCounts,
-  getAttachments,
-  getCSVFile,
-  getExcelFile,
-  getGeoPackageFile,
-} from '@src/application/answer';
+import { getAnswerCounts, getAttachments } from '@src/application/answer';
+import { getGeoPackageFile } from '@src/application/answerGeometry';
+import { getCSVFile } from '@src/application/csvExport';
+import { getExcelFile } from '@src/application/excelExport';
 import { userCanViewSurvey } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';

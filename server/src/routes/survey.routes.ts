@@ -1,5 +1,5 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
-import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answer';
+import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answerGeometry';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   deletePublicationCredentials,

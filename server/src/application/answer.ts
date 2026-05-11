@@ -1,14 +1,6 @@
 import { FileAnswer } from '@interfaces/survey';
 import { getDb } from '@src/database';
 
-export { getCSVFile } from './csvExport';
-export { getExcelFile } from './excelExport';
-export { getPersonalInfosForSurvey } from './exportUtils';
-export {
-  getGeometryDBEntriesAsGeoJSON,
-  getGeoPackageFile,
-} from './answerGeometry';
-
 interface FileEntry {
   valueFile: string;
   valueFileName: string;
