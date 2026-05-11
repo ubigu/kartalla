@@ -107,6 +107,7 @@
     "selectDateAndTime": "Valitse päivämäärä ja aika",
     "theme": "Teema",
     "selectTheme": "Valitse teema",
+    "selectTitleColor": "Valitse väri",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "titleColor": "Osioiden otsikoiden väri",
     "allowTestSurvey": "Julkaise testikysely",
@@ -729,6 +730,7 @@
     "userManagement": "Käyttäjähallinta",
     "editMapPublications": "Muokkaa karttajulkaisuja",
     "selectDefaultLanguage": "Valitse sovelluksen oletuskieli",
+    "defaultLanguage": "Oletuskieli",
     "defaultLanguageSaved": "Oletuskieli tallennettu",
     "defaultLanguageSaveFailed": "Oletuskielen tallentaminen epäonnistui"
   },

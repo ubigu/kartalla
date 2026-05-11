@@ -37,28 +37,30 @@ export default function ThemeSelect({ value, onChange }: Props) {
   }, []);
 
   const themeOptions = themes.map((theme) => ({
-    value: theme.id,
+    value: String(theme.id),
     label: theme.name ?? '',
   }));
 
   const options = [
-    { value: -1, label: tr.EditSurveyInfo.selectTheme },
+    { value: '-1', label: tr.EditSurveyInfo.selectTheme },
     ...themeOptions,
   ];
 
   return (
-    <Select<number>
+    <Select
       id="theme"
       label={tr.EditSurveyInfo.theme}
       disabled={loading}
       placeholder={tr.EditSurveyInfo.selectTheme}
-      value={loading || value == null ? -1 : value}
+      value={loading || value == null ? '-1' : String(value)}
       onChange={(selectedValue) => {
         const selectedId = selectedValue ? selectedValue : null;
-        onChange(themes.find((theme) => theme.id === selectedId) ?? null);
+        onChange(
+          themes.find((theme) => theme.id === Number(selectedId)) ?? null,
+        );
       }}
       renderLabel={(opt) => {
-        const theme = themes.find((t) => t.id === opt.value);
+        const theme = themes.find((t) => t.id === Number(opt.value));
         return (
           <Box
             sx={{
@@ -82,7 +84,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
         );
       }}
       renderDisplayLabel={(opt) => {
-        const theme = themes.find((t) => t?.id === opt?.value);
+        const theme = themes.find((t) => t?.id === Number(opt?.value));
         return (
           <Box
             sx={{

@@ -7,7 +7,7 @@ import { Box, Theme, Typography, useTheme } from '@mui/material';
 import { Combobox_WIP } from '@src/components/core/Combobox';
 import { Input } from '@src/components/core/Input';
 import { loadingPulse } from '@src/components/core/styles';
-import { CoreTab, Tabs } from '@src/components/core/Tabs';
+import { Tab, Tabs } from '@src/components/core/Tabs';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -302,7 +302,7 @@ export default function EditSurveyTranslationsV2() {
               `${tr.EditSurvey.page} ${pageIndex + 1}`;
             const tabColor = getPageTabColor(page, enabledLanguages, theme);
             return (
-              <CoreTab
+              <Tab
                 key={page.id}
                 label={`${pageIndex + 1}. ${pageTitle}`}
                 labelColor={tabColor}

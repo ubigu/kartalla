@@ -5,14 +5,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem,
-  Select,
 } from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';
 import { Language, useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import { request } from '@src/utils/request';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { Select } from '../core/Select';
 
 interface Props {
   isOpen: boolean;
@@ -66,17 +65,15 @@ export function DefaultLanguageDialog({
     >
       <DialogTitle>{tr.AppBarUserMenu.selectDefaultLanguage}</DialogTitle>
       <DialogContent sx={{ minWidth: '320px' }}>
-        <Select
+        <Select<Language>
+          aria-label={tr.AppBarUserMenu.defaultLanguage}
           value={selected}
-          onChange={(e) => setSelected(e.target.value as Language)}
-          fullWidth
-        >
-          {languages.map((lang) => (
-            <MenuItem key={lang} value={lang}>
-              {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
-            </MenuItem>
-          ))}
-        </Select>
+          onChange={(val) => setSelected(val)}
+          options={languages.map((lang) => ({
+            label: `${tr.LanguageMenu[lang]} (${lang.toLocaleUpperCase()}`,
+            value: lang,
+          }))}
+        />
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={() => setIsOpen(false)}>
