@@ -78,7 +78,7 @@
     "remark-breaks": "^4.0.0",
     "remark-rehype": "^11.1.2",
     "remarkable": "^2.0.1",
-    "styled-components": "^6.3.12"
+    "styled-components": "^6.4.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
