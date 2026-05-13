@@ -4,3 +4,5 @@ dist
 .vscode
 .db-data
 .claude/worktrees
+*storybook.log
+storybook-static
