@@ -17,7 +17,7 @@ Kuva 1: ohjelmiston arkkitehtuuri ajoympäristössään
 
 - Käynnistä Docker -ekosysteemi projektin juuresssa komennoilla `docker-compose build && docker-compose up -d`. Esiehto: lokaalisti tulee olla asennettuna [Docker -konttien hallintajärjestelmä](https://www.docker.com/products/docker-desktop)).
 - Luo ympäristömuuttujille tiedosto polkuun `/server/.env` ja täytä se tarvittavilla muuttujilla ohjeen `/server/.template.env` mukaan.
-- Toteuta uudet toiminnallisuudet omaan Git -haaraansa, esim. `feature/new-feature-name`. Valmistuessaan yhdistä tämä haara `develop` -haaraan, josta sovellusta ajetaan testiympäristössä. Kun on aika tehdä tuotantopäivitys, vie `develop` -haaran muutokset `main` -haaraan, josta sovellusta ajetaan tuotantoympäristössä.
+- Toteuta uudet toiminnallisuudet omaan Git -haaraansa, esim. `feature/new-feature-name`. Valmistuessaan yhdistä tämä haara pull requestin kautta suoraan `main` -haaraan. CI/CD ajaa testit automaattisesti ja julkaisee hyväksytyn koodin testiympäristöön. Tuotantopäivitys tehdään luomalla release.
 
 <br>
 
@@ -29,7 +29,23 @@ Serveri ja tietokanta juttelevat keskenään yhteydellä, joka on määritetty y
 
 Lokaalissa kehityksessä React käyttöliittymä ohjaa rajapintapyynnöt automaattisesti omaan porttiinsa. Toisin sanoen, mikäli käyttöliittymästä (portti 8080) tehdään HTTP pyyntö serverille (portti 3000), tätä ei tarvitse erikseen määrittää, vaan käyttöliittymä osaa ohjata liikenteen suoraan omasta portistaan serverin porttiin (8080 -> 3000).
 
-Sovelluskehitys noudattaa perinteistä [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow#:~:text=The%20overall%20flow%20of%20Gitflow,branch%20is%20created%20from%20main&text=When%20a%20feature%20is%20complete%20it%20is%20merged%20into%20the,branch%20is%20created%20from%20main) -mallia, jossa uudet toiminnallisuudet toteutetaan omaan Git -haaraansa, esim. `feature/new-feature-name`. Valmistuessaan tämä haara yhdistetään `main` -haaraan. Kun `main` -haaraan kohdistuu muutoksia Githubissa, automaattinen integraatio käynnistyy, joka julkistaa haaraan viedyn uuden lähdekoodin Azureen testiympäristöön. `main`-haaraan yhdistäminen täydentää automaattisesti `release`-luonnoksen, jonka julkaisun yhteydessä `main` haaran sisältö viedään automaattisen integraation kautta Azuren tuotantoympäristöön.
+Sovelluskehitys noudattaa trunk-pohjaista kehitysmallia. Uudet toiminnallisuudet toteutetaan omaan lyhytikäiseen Git -haaraansa, esim. `feature/new-feature-name`, ja yhdistetään pull requestin kautta suoraan `main` -haaraan. Kun `main` -haaraan kohdistuu muutoksia Githubissa, automaattinen CI/CD-integraatio käynnistyy: ensin ajetaan testit, ja niiden läpäisyn jälkeen uusi lähdekoodi julkaistaan Azuren testiympäristöön. Tuotantopäivitys tehdään luomalla uusi release, jonka julkaiseminen käynnistää automaattisen viennin Azuren tuotantoympäristöön.
+
+## Storybook – komponenttien kehitys ja testaus
+
+Ydinkäyttöliittymäkomponenttien (`client/src/components/core`) kehitystä ja visuaalista testausta varten on käytettävissä [Storybook](https://storybook.js.org/). Storybook käynnistetään `client`-kansiosta:
+
+```bash
+npm run storybook   # Käynnistää Storybookin osoitteeseen localhost:6006
+```
+
+Storyt sijaitsevat polulla `client/src/components/core/stories/`. Kukin komponentti saa oman `.stories.tsx`-tiedostonsa. Storybook sisältää myös saavutettavuustarkistuksen (`@storybook/addon-a11y`), joka raportoi WCAG-rikkomukset suoraan selaimessa.
+
+Tuotantoversio Storybookista voidaan rakentaa komennolla:
+
+```bash
+npm run build-storybook
+```
 
 ## E2E-testaus
 
