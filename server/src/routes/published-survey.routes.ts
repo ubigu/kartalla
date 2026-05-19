@@ -13,7 +13,7 @@ import { getOrganizationIdWithName } from '@src/user';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, query, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 const router = Router();
 

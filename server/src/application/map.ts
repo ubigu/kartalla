@@ -1,11 +1,19 @@
-import { LanguageCode, MapLayer } from '@interfaces/survey';
+import { LanguageCode, LocalizedSurveyMapLayer } from '@interfaces/survey';
 import fetch, { Response } from 'node-fetch';
+import { getDb } from '../database';
 import { NotFoundError } from '../error';
+
+export async function getOlMapLayers() {
+  const rows = await getDb().manyOrNone<{ id: number; name: string }>(
+    'SELECT id, name FROM application.map_layers ORDER BY id',
+  );
+  return rows;
+}
 
 export async function getAvailableMapLayers(
   mapUrl: string,
   language: LanguageCode = 'fi',
-): Promise<MapLayer[]> {
+): Promise<LocalizedSurveyMapLayer[]> {
   if (!mapUrl) {
     return [];
   }

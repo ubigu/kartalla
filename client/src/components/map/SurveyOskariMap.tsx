@@ -2,6 +2,10 @@
 import { Check, Edit } from '@mui/icons-material';
 import { Box, CircularProgress, Fab, Tooltip } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+import {
+  SurveyOskariMapProvider,
+  useSurveyOskariMap,
+} from '@src/stores/SurveyOskariMapContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import OskariRPC from 'oskari-rpc';
@@ -22,13 +26,25 @@ interface MapPosition {
   options?: object;
 }
 
-export default function SurveyMap(props: Props) {
+export default function SurveyOskariMap(props: Props) {
+  return (
+    <SurveyOskariMapProvider>
+      <SurveyOskariMapContent {...props} />
+    </SurveyOskariMapProvider>
+  );
+}
+
+function SurveyOskariMapContent(props: Props) {
   const [mapInitialized, setMapInitialized] = useState(false);
   const [mapInitialPos, setMapiInitialPos] = useState<MapPosition | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const {
-    rpcChannel,
     setRpcChannel,
+    provider,
+    isReady: oskariIsReady,
+  } = useSurveyOskariMap();
+  const {
+    setMapProvider,
     isMapReady,
     initializeMap,
     modifying,
@@ -37,6 +53,8 @@ export default function SurveyMap(props: Props) {
     stopModifying,
     drawing,
     centerToDefaultView,
+    getMapPosition,
+    moveMapTo,
   } = useSurveyMap();
 
   const { tr } = useTranslations();
@@ -62,20 +80,24 @@ export default function SurveyMap(props: Props) {
     if (!iframeRef?.current) {
       return;
     }
-    // Reset RPC channel (i.e. make map "not ready")
     setRpcChannel(null);
     const channel = OskariRPC.connect(iframeRef.current, getOrigin(props.url));
     channel.onReady(() => {
-      // Set the RPC channel to context state when ready
       setRpcChannel(channel);
     });
   }, [iframeRef, props.url]);
 
   /**
+   * Set the map provider in the shared context when Oskari becomes ready
+   */
+  useEffect(() => {
+    setMapProvider(oskariIsReady ? provider : null);
+  }, [oskariIsReady]);
+
+  /**
    * Initialize map only once when it becomes ready
    */
   useEffect(() => {
-    // Initialize map whenever it gets ready
     if (isMapReady) {
       initializeMap();
       setMapInitialized(true);
@@ -88,7 +110,7 @@ export default function SurveyMap(props: Props) {
   useEffect(() => {
     if (!mapInitialized || !isMapReady) return;
     if (!mapInitialPos) {
-      rpcChannel.getMapPosition((pos) => {
+      getMapPosition().then((pos) => {
         setMapiInitialPos(pos);
       });
     }
@@ -99,11 +121,11 @@ export default function SurveyMap(props: Props) {
         stroke: { color: '#00000000' },
       });
     } else if (mapInitialPos) {
-      rpcChannel.postRequest('MapMoveRequest', [
+      moveMapTo(
         mapInitialPos.centerX,
         mapInitialPos.centerY,
         mapInitialPos.zoom,
-      ]);
+      );
     }
   }, [props.defaultMapView, mapInitialized, props.pageId]);
 

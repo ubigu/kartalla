@@ -13,7 +13,14 @@ declare module 'oskari-rpc' {
       name: 'DrawTools.StartDrawingRequest',
       params: [
         id: string,
-        shape: 'Point' | 'Circle' | 'Polygon' | 'Box' | 'Square' | 'LineString',
+        shape:
+          | 'Point'
+          | 'Circle'
+          | 'Polygon'
+          | 'Box'
+          | 'Square'
+          | 'LineString'
+          | null,
         options: {
           buffer?: number;
           style?: object;
@@ -87,8 +94,8 @@ declare module 'oskari-rpc' {
     export type RemoveFeaturesFromMapRequest = (
       name: 'MapModulePlugin.RemoveFeaturesFromMapRequest',
       params: [
-        featureFilterKey: string,
-        featureFilterValue: string | number,
+        featureFilterKey: string | null,
+        featureFilterValue: string | number | null,
         layerId: string,
       ],
     ) => void;

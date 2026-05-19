@@ -3,9 +3,17 @@ import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { query } from 'express-validator';
-import { getAvailableMapLayers } from '../application/map';
+import { getAvailableMapLayers, getOlMapLayers } from '../application/map';
 
 const router = Router();
+
+router.get(
+  '/ol-layers',
+  asyncHandler(async (_req, res) => {
+    const layers = await getOlMapLayers();
+    res.json(layers);
+  }),
+);
 
 router.get(
   '/available-layers',

@@ -69,6 +69,8 @@ export default function GeoBudgetingQuestion({
 
   const valueRef = useRef<GeoBudgetingAnswer[]>(value);
   valueRef.current = value;
+  const visibleLayersRef = useRef(visibleLayers);
+  visibleLayersRef.current = visibleLayers;
 
   // Calculate count per target
   const countPerTarget = useMemo(() => {
@@ -118,14 +120,22 @@ export default function GeoBudgetingQuestion({
     if (!isMapReady || question.id == null) {
       return;
     }
-    const unregisterEventHandler = onModify(question.id, (features) => {
-      onChange(
-        valueRef.current.map((answer, index) => ({
-          ...answer,
-          geometry: features[index] as any,
-        })),
-      );
-    });
+    const unregisterEventHandler = onModify<GeoJSON.Point>(
+      question.id,
+      (features) => {
+        const newValue = [...valueRef.current];
+        features.forEach((feature) => {
+          const answerIndex = feature.properties?.index;
+          if (answerIndex != null && answerIndex < newValue.length) {
+            newValue[answerIndex] = {
+              ...newValue[answerIndex],
+              geometry: feature,
+            };
+          }
+        });
+        onChange(newValue);
+      },
+    );
     // On unmount unregister the event handler
     return () => {
       unregisterEventHandler();
@@ -175,7 +185,10 @@ export default function GeoBudgetingQuestion({
 
       // Stop drawing to clear visual features from the map
       // (GeoBudgetingQuestion has no subquestions, so we clear immediately)
-      stopDrawing();
+      // Timeout is set so that ol singleClick doesn't trigger extra select event
+      setTimeout(() => {
+        stopDrawing();
+      }, 500);
 
       // Add new answer (geometry is already a Feature<Point> with CRS)
       onChange([
@@ -183,7 +196,7 @@ export default function GeoBudgetingQuestion({
         {
           targetIndex,
           geometry: geometry as any,
-          mapLayers: visibleLayers,
+          mapLayers: visibleLayersRef.current,
         },
       ]);
 

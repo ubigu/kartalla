@@ -38,7 +38,7 @@ const CHART_TYPES: SurveyQuestion['type'][] = [
   'budgeting',
 ];
 
-const MAP_TYPES: SurveyQuestion['type'][] = ['map'];
+const MAP_TYPES: SurveyQuestion['type'][] = ['map', 'geo-budgeting'];
 
 const DEFAULT_VIEW_SECTION_ID = 0;
 

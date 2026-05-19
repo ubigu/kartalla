@@ -12,9 +12,9 @@ import {
   useReducer,
 } from 'react';
 import { useHistory } from 'react-router-dom';
-import en from './en.json';
-import fi from './fi.json';
-import se from './se.json';
+import en from '../locales/en.json';
+import fi from '../locales/fi.json';
+import se from '../locales/se.json';
 
 // Object containing all translations
 const translations = {

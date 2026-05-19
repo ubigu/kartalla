@@ -128,15 +128,12 @@ function prepareMapAndGeoBudgetingAnswers(
                   markerIcon = target.icon;
                 }
               }
-
               return {
                 sectionId: entry.sectionId,
                 index,
                 feature: answer.geometry,
-                visibleLayerIds: (entry.type === 'map' &&
-                (answer as any).mapLayers
-                  ? (answer as any).mapLayers
-                  : page.sidebar.mapLayers) as (string | number)[],
+                visibleLayerIds: ((answer as any).mapLayers ??
+                  page.sidebar.mapLayers) as (string | number)[],
                 question,
                 markerIcon,
               };
@@ -145,6 +142,7 @@ function prepareMapAndGeoBudgetingAnswers(
         };
       },
       {
+        mapProvider: survey.mapProvider,
         mapUrl: survey.localizedMapUrls[language],
         language,
         answers: [],
@@ -733,10 +731,10 @@ function getContent(
                     ? '-'
                     : screenshot!.layerNames.join(', '),
                   style: 'subQuestionAnswer',
-                  margin: [0, 0, 0, 10] as [number, number, number, number],
                 } as Content,
               ],
             ],
+            columnGap: 10,
             unbreakable: true,
             margin: [0, 0, 0, 15] as [number, number, number, number],
           } as Content;
@@ -786,6 +784,7 @@ export async function generatePdf(
     answerEntries,
     language,
   );
+
   const screenshots = await getScreenshots(screenshotJobData);
   const optionsWithImages = await Promise.all(
     imageOptions.map(async (option) => {

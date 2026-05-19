@@ -97,6 +97,9 @@
     "editorsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
     "viewers": "Survey viewers",
     "viewersHelperText": "Users who can view the survey and its answers.",
+    "mapProvider": "Map provider",
+    "mapProviderOpenlayers": "OpenLayers",
+    "mapProviderOskari": "Oskari",
     "mapPublicationSelect": "Select map publication",
     "mapPublicationSelectHelperText": "Select a pre-defined Oskari map publication, or enter the map publication URL created for your survey in the field below.",
     "mapUrl": "URL for the Oskari map publication",
@@ -950,5 +953,8 @@
     "deleteSuccess": "Map publication deleted.",
     "deleteFailed": "Failed to delete map publication.",
     "fetchFailed": "Failed to load map publications."
+  },
+  "OlMap": {
+    "layerFetchError": "Failed to load map layers. Using default map."
   }
 }

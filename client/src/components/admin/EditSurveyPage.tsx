@@ -30,17 +30,17 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getLayerName } from '@src/utils/oskariHelpers';
+import { getLayerName } from '@src/utils/map/oskariHelpers';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import { loadingPulse } from '../core/styles';
 import DeleteBinIcon from '../icons/DeleteBinIcon';
 import AddSurveySectionActions from './AddSurveySectionActions';
-import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { editPageContainerSx } from './EditSurvey';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
+import { AdminSurveyMapPreview } from './map/AdminSurveyMapPreview';
 import SurveySections from './SurveySections';
 
 const useStyles = makeStyles({
@@ -72,6 +72,7 @@ export default function EditSurveyPage(props: Props) {
     availableMapLayers,
     availableMapLayersLoading,
   } = useSurvey();
+
   const history = useHistory();
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
@@ -251,7 +252,7 @@ export default function EditSurveyPage(props: Props) {
         </ToggleButtonGroup>
       </FormGroup>
       {page.sidebar.type === 'map' &&
-        (!activeSurvey.mapUrl ? (
+        (!activeSurvey.mapUrl && activeSurvey.mapProvider === 'oskari' ? (
           <div>{tr.EditSurveyPage.warningNoMapUrl}</div>
         ) : !availableMapLayers.length ? (
           <div>{tr.EditSurveyPage.warningNoAvailableMapLayers}</div>
@@ -268,6 +269,7 @@ export default function EditSurveyPage(props: Props) {
                     <FormControlLabel
                       sx={{ maxWidth: '500px' }}
                       key={layer.id}
+                      disabled={activeSurvey.mapProvider === 'openlayers'}
                       label={getLayerName(
                         layer,
                         surveyLanguage,
@@ -520,6 +522,7 @@ export default function EditSurveyPage(props: Props) {
         }}
       />
       <AdminSurveyMapPreview
+        provider={activeSurvey.mapProvider}
         url={activeSurvey.localizedMapUrls[surveyLanguage]}
         isOpen={mapPreviewOpen}
         setIsOpen={setMapPreviewOpen}

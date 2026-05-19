@@ -1,9 +1,9 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { usePreventUnload } from '@src/hooks/usePreventUnload';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import { usePreventUnload } from '@src/utils/usePreventUnload';
 import { useEffect } from 'react';
 import {
   Redirect,
@@ -18,12 +18,12 @@ import EditSurveyBasicSettings from './EditSurveyBasicSettings';
 import EditSurveyControls from './EditSurveyControls';
 import EditSurveyEmail from './EditSurveyEmail';
 import EditSurveyHeader from './EditSurveyHeader';
-import EditSurveyMapData from './EditSurveyMapData';
 import EditSurveyPage from './EditSurveyPage';
 import EditSurveyPermissions from './EditSurveyPermissions';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslationsV2 from './EditSurveyTranslationsV2';
+import EditSurveyMapData from './map/EditSurveyMapData';
 
 export const editPageContainerSx = {
   display: 'flex',

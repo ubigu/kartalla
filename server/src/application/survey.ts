@@ -13,11 +13,13 @@ import {
   SurveyEmailInfoItem,
   SurveyFollowUpSection,
   SurveyImage,
+  SurveyMapProvider,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
   SurveyPageConditions,
   SurveyPageSection,
+  SurveyPageSidebar,
   SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
   SurveyRadioQuestion,
@@ -37,7 +39,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 import { isLanguageCode } from '@src/translations/useTranslations';
 import {
   dbOrganizationIdToOrganization,
@@ -55,6 +56,8 @@ import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 
 const DEFAULT_LANGUAGE: LanguageCode = 'fi';
+const DEFAULT_MAP_PROVIDER: SurveyMapProvider = 'openlayers';
+const DEFAULT_MAP_LAYERS: number[] = [0]; // OpenStreetMap base layer
 
 const surveySectionCountLimitations: Partial<
   Record<SurveyPageSection['type'], number>
@@ -82,6 +85,7 @@ interface DBSurvey {
   author_id: string;
   editors: string[];
   viewers: string[];
+  map_provider: 'openlayers' | 'oskari';
   map_url: string;
   start_date: Date;
   end_date: Date;
@@ -363,6 +367,7 @@ export async function getPublishedSurvey(
           survey.thanks_page_title,
           survey.thanks_page_text,
           survey.map_url,
+          survey.map_provider,
           survey.section_title_color,
           survey.background_image_url,
           survey.thanks_page_image_url,
@@ -982,17 +987,17 @@ export async function getPublicationAccesses(
  * @param user Author
  */
 export async function createSurvey(user: User) {
-  logger.info(JSON.stringify(user));
   const { surveyRow, groupRow } = await getDb().tx(async (t) => {
     const row = await t.one<DBSurvey>(
-      `INSERT INTO data.survey (author_id, organization, languages, primary_language)
-      VALUES ($1, $2, $3, $4)
+      `INSERT INTO data.survey (author_id, organization, languages, primary_language, map_provider)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *`,
       [
         user.id,
         user.organizations[0].id,
         [user.defaultLanguage ?? DEFAULT_LANGUAGE],
         user.defaultLanguage ?? DEFAULT_LANGUAGE,
+        DEFAULT_MAP_PROVIDER,
       ], // For now, use the first organization
     );
     if (user.groups.length === 1) {
@@ -1005,7 +1010,6 @@ export async function createSurvey(user: User) {
       return { surveyRow: row, groupRow };
     }
 
-    logger.info(JSON.stringify(row), 0, null);
     return { surveyRow: row };
   });
 
@@ -1014,7 +1018,9 @@ export async function createSurvey(user: User) {
   }
 
   const survey = dbSurveyToSurvey({ ...surveyRow, user_groups: groupRow });
-  const page = await createSurveyPage(survey.id);
+  const page = await createSurveyPage(survey.id, {
+    sidebar: { mapLayers: DEFAULT_MAP_LAYERS },
+  });
 
   return { ...survey, pages: [page] };
 }
@@ -1701,7 +1707,8 @@ export async function updateSurvey(survey: Survey) {
           languages = $33,
           email_include_personal_info = $34,
           email_include_margin_images = $35,
-          primary_language = $36
+          primary_language = $36,
+          map_provider = $37
         WHERE id = $1 RETURNING *`,
         [
           survey.id,
@@ -1742,6 +1749,7 @@ export async function updateSurvey(survey: Survey) {
           survey.email.includePersonalInfo,
           survey.email.includeMarginImages,
           survey.primaryLanguage,
+          survey.mapProvider,
         ],
       )
       .catch((error) => {
@@ -1764,10 +1772,11 @@ export async function updateSurvey(survey: Survey) {
     const pageWithDefaultMapView = survey.pages.find(
       (page) => page.sidebar.defaultMapView,
     );
-    const defaultMapViewSRID = pageWithDefaultMapView
-      ? parseInt(
-          pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1],
-        )
+    const rawCrs = pageWithDefaultMapView?.sidebar.defaultMapView?.crs;
+    const crsString =
+      typeof rawCrs === 'string' ? rawCrs : rawCrs?.properties?.name;
+    const defaultMapViewSRID = crsString
+      ? parseInt(crsString.split(':')[1])
       : null;
 
     // Update the survey pages
@@ -1855,6 +1864,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     authorId: dbSurvey.author_id,
     editors: dbSurvey.editors,
     viewers: dbSurvey.viewers,
+    mapProvider: dbSurvey.map_provider,
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
@@ -2119,7 +2129,7 @@ function getPageWithConditions(
  */
 export async function createSurveyPage(
   surveyId: number,
-  partialPage?: Partial<SurveyPage>,
+  partialPage?: { sidebar?: Partial<SurveyPageSidebar> },
 ) {
   const row = await getDb().one<DBSurveyPage>(
     `INSERT INTO data.survey_page (survey_id, idx, title, sidebar_map_layers)

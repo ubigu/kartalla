@@ -1,10 +1,11 @@
 import { Backdrop, Box, Button, Typography } from '@mui/material';
 
-import { SurveyPage } from '@interfaces/survey';
+import { SurveyMapProvider, SurveyPage } from '@interfaces/survey';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Dispatch, SetStateAction } from 'react';
-import { AdminMap } from './AdminMap';
+import { OlAdminMap } from './OlAdminMap';
+import { OskariAdminMap } from './OskariAdminMap';
 
 interface Props {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface Props {
   page: SurveyPage;
   modifyView: boolean;
   setModifyView: Dispatch<SetStateAction<boolean>>;
+  provider: SurveyMapProvider;
 }
 
 export function AdminSurveyMapPreview({
@@ -24,9 +26,15 @@ export function AdminSurveyMapPreview({
   page,
   modifyView,
   setModifyView,
+  provider,
 }: Props) {
   const { tr } = useTranslations();
-  const { clearView } = useAdminMap();
+  const { clearDefaultView } = useAdminMap();
+
+  const previewMap = {
+    oskari: <OskariAdminMap allowDrawing={modifyView} url={url} page={page} />,
+    openlayers: <OlAdminMap allowDrawing={modifyView} page={page} />,
+  };
 
   return (
     <Backdrop
@@ -64,9 +72,7 @@ export function AdminSurveyMapPreview({
         )}
 
         <Box sx={{ flex: 1, margin: '0.5rem -10px' }}>
-          {isOpen && (
-            <AdminMap allowDrawing={modifyView} url={url} page={page} />
-          )}
+          {isOpen && previewMap[provider]}
         </Box>
 
         <Box
@@ -82,7 +88,7 @@ export function AdminSurveyMapPreview({
           {modifyView ? (
             <>
               <Button
-                onClick={() => clearView()}
+                onClick={() => clearDefaultView()}
                 color="error"
                 sx={{ marginRight: 'auto' }}
               >

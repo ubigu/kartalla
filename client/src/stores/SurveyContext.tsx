@@ -1,14 +1,15 @@
 // @ts-strict-ignore
 import {
-  MapLayer,
+  LocalizedSurveyMapLayer,
   Survey,
   SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
+import { DEFAULT_OL_MAP_LAYER_ID } from '@src/components/map/openlayers/layers';
 import { getSurvey, updateSurvey } from '@src/controllers/SurveyController';
+import { useDebounce } from '@src/hooks/useDebounce';
 import { request } from '@src/utils/request';
-import { useDebounce } from '@src/utils/useDebounce';
 import {
   Dispatch,
   ReactNode,
@@ -28,7 +29,7 @@ interface State {
   activeSurveyLoading: boolean;
   newPageLoading: boolean;
   availableMapLayersLoading: boolean;
-  availableMapLayers: MapLayer[];
+  availableMapLayers: LocalizedSurveyMapLayer[];
   availableMapLayersError: string;
 }
 
@@ -128,7 +129,7 @@ type Action =
     }
   | {
       type: 'SET_AVAILABLE_MAP_LAYERS';
-      layers: MapLayer[] | null;
+      layers: LocalizedSurveyMapLayer[] | null;
     }
   | {
       type: 'SET_AVAILABLE_MAP_LAYERS_ERROR';
@@ -239,8 +240,10 @@ export function useSurvey() {
           {
             method: 'POST',
             body: {
-              // Set all map layers visible by default
-              mapLayers: state.availableMapLayers.map((layer) => layer.id),
+              sidebar: {
+                // Set all map layers visible by default
+                mapLayers: state.availableMapLayers.map((layer) => layer.id),
+              },
             } as Partial<SurveyPage>,
           },
         );
@@ -287,6 +290,21 @@ export function useSurvey() {
      * @param survey Survey
      */
     editSurvey(survey: Survey) {
+      if (
+        survey.mapProvider === 'openlayers' &&
+        state.activeSurvey.mapProvider !== 'openlayers'
+      ) {
+        dispatch({
+          type: 'SET_PAGES',
+          pages: state.activeSurvey.pages.map((page) => ({
+            ...page,
+            sidebar: {
+              ...page.sidebar,
+              mapLayers: [DEFAULT_OL_MAP_LAYER_ID],
+            },
+          })),
+        });
+      }
       dispatch({ type: 'EDIT_SURVEY', survey });
     },
     /**
@@ -857,24 +875,47 @@ export default function SurveyProvider({ children }: { children: ReactNode }) {
   }, [state.activeSurvey?.mapUrl]);
 
   /**
-   * Update available map layers when the debounced value of map URL has changed.
+   * Update available map layers when the debounced value of map URL or map provider has changed.
    */
   useEffect(() => {
+    const isOl = state.activeSurvey?.mapProvider === 'openlayers';
+
+    async function updateAvailableOlLayers() {
+      dispatch({ type: 'START_LOADING_AVAILABLE_MAP_LAYERS' });
+      dispatch({ type: 'SET_AVAILABLE_MAP_LAYERS_ERROR', error: null });
+      try {
+        const layers =
+          await request<LocalizedSurveyMapLayer[]>('/api/map/ol-layers');
+        dispatch({ type: 'SET_AVAILABLE_MAP_LAYERS', layers });
+        dispatch({ type: 'STOP_LOADING_AVAILABLE_MAP_LAYERS' });
+      } catch (error) {
+        dispatch({ type: 'SET_AVAILABLE_MAP_LAYERS', layers: null });
+        dispatch({
+          type: 'SET_AVAILABLE_MAP_LAYERS_ERROR',
+          error: error.message,
+        });
+        dispatch({ type: 'STOP_LOADING_AVAILABLE_MAP_LAYERS' });
+        throw error;
+      }
+    }
+
+    if (isOl) {
+      updateAvailableOlLayers();
+      return;
+    }
+
     if (!debouncedmapUrl) {
       // URL was set to empty - clear all map layer data from context
       dispatch({ type: 'STOP_LOADING_AVAILABLE_MAP_LAYERS' });
       dispatch({ type: 'SET_AVAILABLE_MAP_LAYERS_ERROR', error: null });
-      dispatch({
-        type: 'SET_AVAILABLE_MAP_LAYERS',
-        layers: [],
-      });
+      dispatch({ type: 'SET_AVAILABLE_MAP_LAYERS', layers: [] });
       return;
     }
 
-    async function updateAvailableMapLayers() {
+    async function updateAvailableOskariLayers() {
       dispatch({ type: 'START_LOADING_AVAILABLE_MAP_LAYERS' });
       try {
-        const layers = await request<MapLayer[]>(
+        const layers = await request<LocalizedSurveyMapLayer[]>(
           `/api/map/available-layers?url=${encodeURIComponent(
             debouncedmapUrl,
           )}`,
@@ -899,8 +940,8 @@ export default function SurveyProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    updateAvailableMapLayers();
-  }, [debouncedmapUrl]);
+    updateAvailableOskariLayers();
+  }, [debouncedmapUrl, state.activeSurvey?.mapProvider]);
 
   return (
     <SurveyContext.Provider value={value}>{children}</SurveyContext.Provider>

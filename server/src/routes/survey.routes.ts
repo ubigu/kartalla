@@ -574,6 +574,7 @@ router.get(
       getAnswerEntries(submissionId, req.query.withPersonalInfo === 'true'),
       getTimestamp(submissionId),
     ]);
+
     const pdfBuffer = await generatePdf(
       survey,
       { id: submissionId, timestamp },

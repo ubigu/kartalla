@@ -56,11 +56,14 @@ export default function MapQuestion({
     editingMapAnswer,
     stopEditingMapAnswer,
     onModify,
+    visibleLayers,
   } = useSurveyMap();
   const { tr, surveyLanguage } = useTranslations();
 
   const valueRef = useRef<MapQuestionAnswer[]>(null);
   valueRef.current = value;
+  const visibleLayersRef = useRef(visibleLayers);
+  visibleLayersRef.current = visibleLayers;
 
   useEffect(() => {
     if (!mobileDrawerOpen && readyForSubQuestion) {
@@ -78,10 +81,14 @@ export default function MapQuestion({
     }
     const unregisterEventHandler = onModify(question.id, (features) => {
       onChange(
-        valueRef.current.map((answer, index) => ({
-          ...answer,
-          geometry: features[index],
-        })),
+        valueRef.current.map((answer, index) => {
+          const modifiedFeature = features.find(
+            (f) => f.properties?.index === index,
+          );
+          return modifiedFeature
+            ? { ...answer, geometry: modifiedFeature }
+            : answer;
+        }),
       );
     });
     // On unmount unregister the event handler
@@ -138,7 +145,7 @@ export default function MapQuestion({
           selectionType,
           geometry,
           subQuestionAnswers,
-          mapLayers: [],
+          mapLayers: visibleLayersRef.current,
         },
       ]);
       setSelectionType(null);

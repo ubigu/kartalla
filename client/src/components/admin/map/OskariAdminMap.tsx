@@ -1,9 +1,12 @@
-// @ts-strict-ignore
 import { SurveyPage } from '@interfaces/survey';
+import { Box, CircularProgress } from '@mui/material';
+import {
+  SurveyOskariMapProvider,
+  useSurveyOskariMap,
+} from '@src/stores/SurveyOskariMapContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import OskariRPC from 'oskari-rpc';
 import { useEffect, useRef } from 'react';
-import { CircularProgress, Box } from '@mui/material';
 
 interface Props {
   url: string;
@@ -11,12 +14,25 @@ interface Props {
   allowDrawing?: boolean;
 }
 
-export function AdminMap({ url, page, allowDrawing = false }: Props) {
+export function OskariAdminMap(props: Props) {
+  return (
+    <SurveyOskariMapProvider>
+      <AdminMapContent {...props} />
+    </SurveyOskariMapProvider>
+  );
+}
+
+function AdminMapContent({ url, page, allowDrawing = false }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const {
     setRpcChannel,
+    provider,
+    isReady: oskariIsReady,
+  } = useSurveyOskariMap();
+  const {
+    setMapProvider,
     isMapReady,
-    startDrawingRequest,
+    startDrawingDefaultView,
     drawDefaultView,
     setDefaultView,
     setVisibleLayers,
@@ -43,21 +59,26 @@ export function AdminMap({ url, page, allowDrawing = false }: Props) {
     if (!iframeRef?.current) {
       return;
     }
-    // Reset RPC channel (i.e. make map "not ready")
     setRpcChannel(null);
     const channel = OskariRPC.connect(iframeRef.current, getOrigin(url));
     channel.onReady(() => {
-      // Set the RPC channel to context state when ready
       setRpcChannel(channel);
     });
   }, [iframeRef, url]);
+
+  /**
+   * Set the map provider in the shared context when Oskari becomes ready
+   */
+  useEffect(() => {
+    setMapProvider(oskariIsReady ? provider : null);
+  }, [oskariIsReady]);
 
   useEffect(() => {
     if (isMapReady) {
       setVisibleLayers(page.sidebar.mapLayers);
       setDefaultView(page.sidebar.defaultMapView);
       drawDefaultView();
-      if (allowDrawing) startDrawingRequest();
+      if (allowDrawing) startDrawingDefaultView();
     }
   }, [isMapReady]);
 

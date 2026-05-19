@@ -1,5 +1,5 @@
 import { MapPublication } from '@interfaces/mapPublications';
-import { MapLayer } from '@interfaces/survey';
+import { LocalizedSurveyMapLayer } from '@interfaces/survey';
 import { Cancel, Delete, Save, Warning } from '@mui/icons-material';
 import {
   Box,
@@ -24,12 +24,12 @@ import {
   deleteMapPublication,
   getMapPublications,
 } from '@src/controllers/MapPublicationsController';
+import { useDebounce } from '@src/hooks/useDebounce';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import { useDebounce } from '@src/utils/useDebounce';
 import { useEffect, useState } from 'react';
-import { AdminAppBar } from './AdminAppBar';
+import { AdminAppBar } from '../AdminAppBar';
 
 interface NewPublication {
   tempId: string;
@@ -74,7 +74,7 @@ function NewPublicationRow({
       setLayersAvailable(undefined);
 
       try {
-        const layers = await request<MapLayer[]>(
+        const layers = await request<LocalizedSurveyMapLayer[]>(
           `/api/map/available-layers?url=${encodeURIComponent(debouncedUrl)}`,
         );
         setLayersAvailable(layers.length > 0);

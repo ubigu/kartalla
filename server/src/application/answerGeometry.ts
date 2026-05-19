@@ -1,17 +1,17 @@
-import { MapLayer } from '@interfaces/survey';
+import { LocalizedSurveyMapLayer } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
 import fs, { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import path from 'path';
-import { getAvailableMapLayers } from './map';
-import { getSurvey } from './survey';
 import {
   AnswerEntry,
   DBAnswerEntry,
   dbAnswerEntryRowsToAnswerEntries,
 } from './answerTypes';
+import { getAvailableMapLayers } from './map';
+import { getSurvey } from './survey';
 
 const tr = useTranslations('fi');
 
@@ -67,7 +67,7 @@ interface PageSectionDetails {
  */
 function geometryAnswerToFeature(
   answer: AnswerEntry,
-  mapLayers: MapLayer[],
+  mapLayers: LocalizedSurveyMapLayer[],
   questionDetails?: PageSectionDetails,
   answerType?: string,
 ) {
@@ -133,7 +133,7 @@ function geometryAnswerToFeature(
 function dbEntriesToFeatures(
   entries: AnswerEntry[],
   checkboxOptions: CheckboxOptions[],
-  mapLayers: MapLayer[],
+  mapLayers: LocalizedSurveyMapLayer[],
 ) {
   // Sort entries first by submission, then by sectionId
   // Each sectionId instance (separated by submission) will represent a single Feature
