@@ -16,16 +16,16 @@ import {
   useReducer,
   useRef,
 } from 'react';
-import { useAnswerDraw } from '../hooks/map/ol/useAnswerDraw';
-import { useAnswerGeometries } from '../hooks/map/ol/useAnswerGeometries';
-import { useAnswerModify } from '../hooks/map/ol/useAnswerModify';
-import { useAnswerSelect } from '../hooks/map/ol/useAnswerSelect';
-import { useDefaultViewDraw } from '../hooks/map/ol/useDefaultViewDraw';
+import { useAnswerDraw } from '@src/hooks/map/ol/useAnswerDraw';
+import { useAnswerGeometries } from '@src/hooks/map/ol/useAnswerGeometries';
+import { useAnswerModify } from '@src/hooks/map/ol/useAnswerModify';
+import { useAnswerSelect } from '@src/hooks/map/ol/useAnswerSelect';
+import { useDefaultViewDraw } from '@src/hooks/map/ol/useDefaultViewDraw';
 import {
   MapLayer,
   MapPosition,
   SurveyMapContextProvider,
-} from '../hooks/map/surveyMapProvider';
+} from '@src/hooks/map/surveyMapProvider';
 
 interface OlState {
   map: Map | null;
