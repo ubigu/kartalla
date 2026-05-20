@@ -97,6 +97,9 @@
     "editorsHelperText": "Användare som definieras förutom den ursprungliga skaparen av undersökningen, som kan se undersökningsinformation och redigera undersökningen.",
     "viewers": "Undersökningens tittare",
     "viewersHelperText": "Användare som kan se undersökningsinformation och svaren.",
+    "mapProvider": "Kartleverantör",
+    "mapProviderOpenlayers": "OpenLayers",
+    "mapProviderOskari": "Oskari",
     "mapPublicationSelect": "Välj kartpublikation",
     "mapPublicationSelectHelperText": "Välj en fördefinierad Oskari-kartpublikation eller ange kartpublikationens adress som skapats för din undersökning i fältet nedan.",
     "mapUrl": "Oskari-kartpubliceringens adress",
@@ -949,5 +952,8 @@
     "deleteSuccess": "Kartpublikation borttagen.",
     "deleteFailed": "Det gick inte att ta bort kartpublikationen.",
     "fetchFailed": "Det gick inte att läsa in kartpublikationer."
+  },
+  "OlMap": {
+    "layerFetchError": "Det gick inte att läsa in kartlager. Standardkartan används."
   }
 }

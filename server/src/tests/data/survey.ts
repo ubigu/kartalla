@@ -15,6 +15,7 @@ export const createMockSurvey = (
   authorId,
   editors: [],
   viewers: [],
+  mapProvider: 'openlayers',
   mapUrl: '',
   localizedMapUrls: { fi: '', en: '', se: '' },
   startDate: new Date(),

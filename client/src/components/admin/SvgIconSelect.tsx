@@ -36,7 +36,7 @@ export function emojiToSvg(emoji: string, size: number) {
   // These dimensions are eyeballed to look good both in React UI and Oskari map
   const fontSize = size;
   const padding = 10;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-padding} ${-padding} ${size + padding} ${size + padding}" width="${size}" height="${size}"><text x="${size / 2}" y="${size / 2}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}">${emoji}</text></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-padding / 2} ${-padding / 2} ${size + padding} ${size + padding}" width="${size}" height="${size}"><text x="${size / 2}" y="${size / 2}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}">${emoji}</text></svg>`;
 }
 
 export function SvgIconSelect(props: Props) {

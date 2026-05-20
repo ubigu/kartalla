@@ -1,6 +1,8 @@
 import { GeoJSONWithCRS } from './geojson';
 import { Organization } from './user';
 
+export type SurveyMapProvider = 'openlayers' | 'oskari';
+
 /**
  * Section of a survey page
  */
@@ -173,8 +175,7 @@ export interface SurveyTextSection extends CommonSurveyPageSection {
  * Image section
  */
 export interface SurveyImageSection
-  extends CommonSurveyPageSection,
-    SectionFile {
+  extends CommonSurveyPageSection, SectionFile {
   type: 'image';
   altText: LocalizedText;
   attributions: string;
@@ -185,8 +186,7 @@ export interface SurveyImageSection
  * Document section
  */
 export interface SurveyDocumentSection
-  extends CommonSurveyPageSection,
-    SectionFile {
+  extends CommonSurveyPageSection, SectionFile {
   type: 'document';
 }
 
@@ -287,8 +287,7 @@ export interface SurveyMultiMatrixQuestion extends CommonSurveyPageQuestion {
 /**
  * Grouped checkbox question
  */
-export interface SurveyGroupedCheckboxQuestion
-  extends CommonSurveyPageQuestion {
+export interface SurveyGroupedCheckboxQuestion extends CommonSurveyPageQuestion {
   type: 'grouped-checkbox';
   answerLimits: {
     min?: number;
@@ -462,6 +461,10 @@ export interface Survey {
    * Array of viewer user IDs
    */
   viewers: string[];
+  /**
+   * Map provider used for this survey
+   */
+  mapProvider: SurveyMapProvider;
   /**
    * URL of the embedded map component
    */
@@ -806,9 +809,9 @@ export type AnswerEntry = {
 );
 
 /**
- * Oskari map layer
+ * Map layer
  */
-export interface MapLayer {
+export interface LocalizedSurveyMapLayer {
   /**
    * ID of the map layer
    */

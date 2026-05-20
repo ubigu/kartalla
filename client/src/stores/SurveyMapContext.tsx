@@ -1,13 +1,10 @@
 // @ts-strict-ignore
-import { GeoJSONWithCRS } from '@interfaces/geojson';
 import {
   MapQuestionSelectionType,
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import { colors } from '@src/themes/colors';
 import { LineString, Point, Polygon } from 'geojson';
-import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
-import parseCSSColor from 'parse-css-color';
 import {
   Dispatch,
   ReactNode,
@@ -16,14 +13,17 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
 } from 'react';
+import {
+  MapLayer,
+  SurveyMapContextProvider,
+} from '../hooks/map/surveyMapProvider';
 import { useTranslations } from './TranslationContext';
 
 interface State {
   visibleLayers: (number | string)[];
   allLayers: (number | string)[];
-  rpcChannel: Channel;
+  mapProvider: SurveyMapContextProvider | null;
   helperText: string;
   selectionType: MapQuestionSelectionType;
   questionId: number;
@@ -41,7 +41,6 @@ interface State {
   };
 
   defaultView: GeoJSON.FeatureCollection;
-  oskariVersion: number;
   isInitialized: boolean;
 }
 
@@ -55,8 +54,8 @@ type Action =
       layers: (number | string)[];
     }
   | {
-      type: 'SET_RPC_CHANNEL';
-      rpcChannel: Channel;
+      type: 'SET_MAP_PROVIDER';
+      value: SurveyMapContextProvider | null;
     }
   | {
       type: 'SET_HELPER_TEXT';
@@ -90,10 +89,6 @@ type Action =
       value: GeoJSON.FeatureCollection;
     }
   | {
-      type: 'SET_OSKARI_VERSION';
-      value: number;
-    }
-  | {
       type: 'SET_IS_INITIALIZED';
       value: boolean;
     };
@@ -103,7 +98,7 @@ type Context = [State, Dispatch<Action>];
 const stateDefaults: State = {
   visibleLayers: [],
   allLayers: [],
-  rpcChannel: null,
+  mapProvider: null,
   helperText: null,
   selectionType: null,
   questionId: null,
@@ -121,92 +116,13 @@ const stateDefaults: State = {
   },
 
   defaultView: null,
-  oskariVersion: null,
   isInitialized: false,
 };
 
-/**
- * Context containing the state object and dispatch function.
- */
 export const SurveyMapContext = createContext<Context>(null);
-
-// Default view layer id
-const defaultViewLayer = 'defaultView';
-
-// Layer ID for answer geometries
-const answerGeometryLayer = 'answers';
-
-// Drawing ID for modifying existing geometries
-const modifyEventId = 'modify';
-
-// Default feature style
-const defaultFeatureStyle = {
-  stroke: {
-    color: colors.harmaa,
-    width: 6,
-  },
-  fill: {
-    color: `${colors.harmaa}d4`,
-  },
-};
-
-function getFeatureStyle(
-  selectionType: MapQuestionSelectionType,
-  question: SurveyMapQuestion,
-) {
-  // Use default style for points
-  if (selectionType === 'point') {
-    return defaultFeatureStyle;
-  }
-  // Get feature style from question
-  const style = question.featureStyles?.[selectionType];
-  // If no style is defined, use default
-  if (!style) {
-    return defaultFeatureStyle;
-  }
-  // Parse & calculate fill color with a fixed opacity from the stroke color
-  const parsedStrokeColor = parseCSSColor(style.strokeColor);
-  const fillColor = parsedStrokeColor
-    ? `rgba(${parsedStrokeColor.values.join(',')}, 0.3)`
-    : defaultFeatureStyle.fill.color;
-  return {
-    stroke: {
-      color: style.strokeColor || defaultFeatureStyle.stroke.color,
-      width: 4,
-      lineDash:
-        style.strokeStyle === 'dashed'
-          ? [30, 10]
-          : style.strokeStyle === 'dotted'
-            ? [0, 14]
-            : null,
-      lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
-    },
-    fill: {
-      color: fillColor,
-    },
-  };
-}
-
-/**
- * Generates a unique ID for question and selection type combination.
- * If selection type is not specified, it will be omitted from the ID.
- * @param questionId Question ID
- * @param selectionType Selection type
- * @returns Drawing event ID, e.g. `'map-answer:123:line'`
- */
-function getDrawingEventId(
-  questionId: number,
-  selectionType?: MapQuestionSelectionType,
-) {
-  return `map-answer:${questionId}${selectionType ? `:${selectionType}` : ''}`;
-}
 
 export function useAdminMap() {
   const context = useContext(SurveyMapContext);
-  const featureStyle = {
-    fill: { color: '#00000000' },
-    stroke: { color: '#FF4747', lineDash: 6 },
-  };
 
   if (!context) {
     throw new Error('useSurveyMap must be used within the SurveyMapProvider');
@@ -214,88 +130,34 @@ export function useAdminMap() {
 
   const [state, dispatch] = context;
 
-  function startDrawingRequest() {
-    state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
-      'DefaultViewSelection',
-      'Box',
-      {
-        allowMultipleDrawing: 'single',
-        style: {
-          draw: {
-            fill: { color: '#00000000' },
-            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
-          },
-          modify: {
-            fill: { color: '#00000000' },
-            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
-          },
-        },
-        modifyControl: false,
-      },
-    ]);
-
-    const drawingHandler: DrawingEventHandler = (event) => {
-      if (event.id === 'DefaultViewSelection' && state.defaultView) {
-        state.rpcChannel.postRequest(
-          'MapModulePlugin.RemoveFeaturesFromMapRequest',
-          [null, null, defaultViewLayer],
-        );
-      }
-      if (event.id === 'DefaultViewSelection' && event.isFinished) {
-        dispatch({
-          type: 'SET_DEFAULT_VIEW',
-          value: event.geojson,
-        });
-      }
-    };
-
-    state.rpcChannel.handleEvent('DrawingEvent', drawingHandler);
-  }
-  function drawDefaultView() {
-    if (!state.defaultView) return;
-
-    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
-      state.defaultView,
-      {
-        centerTo: true,
-        clearPrevious: true,
-        layerId: defaultViewLayer,
-        featureStyle: featureStyle,
-      },
-    ] as any);
-  }
-
-  function clearView() {
-    // Clear recent features
-    state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-      'DefaultViewSelection',
-      true,
-      true,
-    ]);
-    // Clear previously drawn features
-    state.rpcChannel.postRequest(
-      'MapModulePlugin.RemoveFeaturesFromMapRequest',
-      [null, null, defaultViewLayer],
+  function startDrawingDefaultView() {
+    state.mapProvider.startDrawingDefaultView(state.defaultView, (geojson) =>
+      dispatch({ type: 'SET_DEFAULT_VIEW', value: geojson }),
     );
-    dispatch({
-      type: 'SET_DEFAULT_VIEW',
-      value: null,
-    });
-    startDrawingRequest();
+  }
+
+  function drawDefaultView(
+    view: GeoJSON.FeatureCollection = state.defaultView,
+  ) {
+    if (!view) return;
+    state.mapProvider.drawDefaultView(view);
+  }
+
+  function clearDefaultView() {
+    dispatch({ type: 'SET_DEFAULT_VIEW', value: null });
+    state.mapProvider.clearDefaultView((geojson) =>
+      dispatch({ type: 'SET_DEFAULT_VIEW', value: geojson }),
+    );
   }
 
   return {
     ...state,
-    isMapReady: state.isInitialized && Boolean(state.rpcChannel),
-    startDrawingRequest,
+    isMapReady: Boolean(state.isInitialized && state.mapProvider),
+    startDrawingDefaultView,
     drawDefaultView,
-    clearView,
-    /**
-     * Set RPC channel for controlling the map
-     * @param rpcChannel
-     */
-    setRpcChannel(rpcChannel: Channel) {
-      dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel });
+    clearDefaultView,
+    setMapProvider(provider: SurveyMapContextProvider | null) {
+      dispatch({ type: 'SET_MAP_PROVIDER', value: provider });
     },
     setDefaultView(viewGeometry: GeoJSON.FeatureCollection) {
       dispatch({ type: 'SET_DEFAULT_VIEW', value: viewGeometry });
@@ -320,107 +182,11 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
-  const drawingRef = useRef<boolean | null>(null);
-  drawingRef.current = state.questionId != null;
-
-  const isMapReady = useMemo(() => {
-    state.rpcChannel?.getInfo((oskariInfo) => {
-      const oskariVersion = Number(oskariInfo.version.split('.').join(''));
-      dispatch({ type: 'SET_OSKARI_VERSION', value: oskariVersion });
-    });
-
-    return Boolean(state.isInitialized && state.rpcChannel);
-  }, [state.rpcChannel, state.isInitialized]);
-
-  /**
-   * Draws given geometries as features onto the map
-   * @param geometries
-   */
-  function drawAnswerGeometries(geometries: GeoJSON.FeatureCollection) {
-    // Clear previous geometries
-    state.rpcChannel.postRequest(
-      'MapModulePlugin.RemoveFeaturesFromMapRequest',
-      [null, null, answerGeometryLayer],
-    );
-    state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
-    // Add current features one by one to get the correct styles
-    // For points: render as markers (for map questions and geo-budgeting)
-    // For lines/polygons: render as features
-    geometries.features.forEach((feature) => {
-      if (['Polygon', 'LineString'].includes(feature.geometry.type)) {
-        state.rpcChannel.postRequest(
-          'MapModulePlugin.AddFeaturesToMapRequest',
-          [
-            {
-              type: 'FeatureCollection',
-              features: [feature],
-            },
-            {
-              layerId: answerGeometryLayer,
-              centerTo: false,
-              clearPrevious: false,
-              cursor: 'pointer',
-              featureStyle: getFeatureStyle(
-                feature.geometry.type === 'Polygon' ? 'area' : 'line',
-                feature.properties.question,
-              ),
-            },
-          ] as any,
-        );
-      } else {
-        // Check for custom icon: geo-budgeting uses targetIcon, map questions use featureStyles
-        const customIcon =
-          feature.properties.targetIcon ||
-          feature.properties.question.featureStyles?.point?.markerIcon;
-        state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
-          {
-            x: (feature.geometry as any).coordinates[0],
-            y: (feature.geometry as any).coordinates[1],
-            shape: customIcon ? customIcon : 0,
-            offsetX: 0,
-            offsetY: 0,
-            size:
-              Boolean(customIcon) &&
-              state.oskariVersion >= 270 &&
-              state.oskariVersion < 290
-                ? 64
-                : 6,
-          },
-          `answer:${feature.properties.question.id}:${
-            feature.properties.index
-          }${
-            feature.properties.submissionId != null
-              ? `:${feature.properties.submissionId}`
-              : ''
-          }`,
-        ]);
-      }
-    });
-  }
-
-  function centerToDefaultView(
-    featureCollection: GeoJSON.FeatureCollection,
-    style: object = {},
-  ) {
-    state.rpcChannel.postRequest(
-      'MapModulePlugin.RemoveFeaturesFromMapRequest',
-      [null, null, defaultViewLayer],
-    );
-    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
-      featureCollection,
-      {
-        centerTo: true,
-        clearPrevious: true,
-        layerId: defaultViewLayer,
-        featureStyle: style,
-      },
-    ] as any);
-  }
+  const isMapReady = Boolean(state.isInitialized && state.mapProvider);
 
   return {
     ...state,
     isMapReady,
-    centerToDefaultView,
     /**
      * Set visible layers
      * @param layers Visible layers
@@ -429,11 +195,10 @@ export function useSurveyMap() {
       dispatch({ type: 'SET_VISIBLE_LAYERS', layers });
     },
     /**
-     * Set RPC channel for controlling the map
-     * @param rpcChannel
+     * Set map provider (called by the map component when a provider connects)
      */
-    setRpcChannel(rpcChannel: Channel) {
-      dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel });
+    setMapProvider(provider: SurveyMapContextProvider | null) {
+      dispatch({ type: 'SET_MAP_PROVIDER', value: provider });
     },
     /**
      * Initializes the map instance:
@@ -441,36 +206,19 @@ export function useSurveyMap() {
      * - Draws current answer geometries on the map (clears any previous)
      */
     initializeMap() {
-      // Set handler for clicking features
-      state.rpcChannel.handleEvent('FeatureEvent', (event) => {
-        if (event.operation !== 'click' || drawingRef.current) {
-          return;
-        }
-        // TODO: tuleeko klikki-eventit läpi jos on drawing-mode päällä? eli voiko pitää muokkaus-moodia jatkuvasti kartalla (pl. uusien piirtomoodi)?
-        // There should only be one feature collection
-        const featureCollection: GeoJSON.FeatureCollection =
-          event.features[0].geojson;
-        // There should only be one feature
-        const feature = featureCollection.features[0];
-        // Pick answer data from feature properties
-        const { question, index } = feature.properties;
-        // Open editing dialog via context
-        dispatch({
-          type: 'SET_EDITING_MAP_ANSWER',
-          value: { questionId: question?.id, index },
-        });
-      });
-
-      state.rpcChannel.handleEvent('MarkerClickEvent', (event) => {
-        const [, questionId, index] = event.id.split(':').map(Number);
-        dispatch({
-          type: 'SET_EDITING_MAP_ANSWER',
-          value: { questionId, index },
-        });
-      });
-
-      // Draw existing answer geometries onto the map
-      drawAnswerGeometries(state.answerGeometries);
+      state.mapProvider.initializeMap(
+        (questionId, index) =>
+          dispatch({
+            type: 'SET_EDITING_MAP_ANSWER',
+            value: { questionId, index },
+          }),
+        (questionId, index) =>
+          dispatch({
+            type: 'SET_EDITING_MAP_ANSWER',
+            value: { questionId, index },
+          }),
+        state.answerGeometries,
+      );
     },
     /**
      * Enters the draw state and returns the geometry when user has finished drawing.
@@ -479,14 +227,10 @@ export function useSurveyMap() {
      * @returns Drawn geometry
      */
     async draw(type: MapQuestionSelectionType, question: SurveyMapQuestion) {
-      // Stop any previous drawing if the map is in a draw state
       if (state.questionId) {
-        state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-          getDrawingEventId(state.questionId, state.selectionType),
-          true,
-        ]);
+        state.mapProvider.stopDrawing();
       }
-      const eventId = getDrawingEventId(question.id, type);
+
       // These events need to be delayed - otherwise there might be an extraneous feature click event from Oskari
       setTimeout(() => {
         dispatch({ type: 'SET_HELPER_TEXT', text: question.title[language] });
@@ -494,69 +238,7 @@ export function useSurveyMap() {
         dispatch({ type: 'SET_SELECTION_TYPE', value: type });
       }, 0);
 
-      const featureStyle =
-        getFeatureStyle(type, question) ?? defaultFeatureStyle;
-      // Start the new drawing
-      state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
-        eventId,
-        type === 'point'
-          ? 'Point'
-          : type === 'line'
-            ? 'LineString'
-            : type === 'area'
-              ? 'Polygon'
-              : null,
-        {
-          allowMultipleDrawing: false,
-          style: {
-            // Due to some buggy changes in https://github.com/mozilla/jschannel/pull/15 the recursive object check fails,
-            // unless we do a deep copy of the style object.
-            draw: JSON.parse(JSON.stringify(featureStyle)),
-            modify: JSON.parse(JSON.stringify(featureStyle)),
-          },
-        },
-      ]);
-
-      // Wait for the matching finished drawing event
-      let handler: DrawingEventHandler = null;
-      const geometry = await new Promise<
-        GeoJSONWithCRS<
-          GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
-        >
-      >((resolve) => {
-        handler = (event) => {
-          const [, eventQuestionId, eventSelectionType] = event.id.split(':');
-          // Skip unfinished events and events for a different question and different selection type (if specified)
-          if (
-            !event.isFinished ||
-            eventQuestionId !== String(question.id) ||
-            (eventSelectionType && eventSelectionType !== type) ||
-            !event.geojson.features.length
-          ) {
-            return;
-          }
-          // Resolve the geometry from the event
-          resolve({
-            ...event.geojson.features[0],
-            crs: {
-              type: 'name',
-              properties: {
-                name: event.geojson.crs,
-              },
-            },
-          });
-        };
-        state.rpcChannel.handleEvent('DrawingEvent', handler);
-      });
-
-      // Drawing is now completed - unregister the event handler
-      state.rpcChannel.unregisterEventHandler('DrawingEvent', handler);
-
-      // Stop the drawing interaction
-      state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-        eventId,
-        false,
-      ]);
+      const geometry = await state.mapProvider.draw(type, question);
 
       dispatch({ type: 'SET_SELECTION_TYPE', value: null });
       dispatch({ type: 'SET_HELPER_TEXT', text: null });
@@ -569,12 +251,7 @@ export function useSurveyMap() {
      * @param questionId Question ID (default: current question ID)
      */
     stopDrawing(questionId: number | null = state.questionId) {
-      state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-        questionId == null
-          ? null
-          : getDrawingEventId(questionId, state.selectionType),
-        true,
-      ]);
+      state.mapProvider.stopDrawing();
       // If stopping the current drawing (or there was none), clear the internal state
       if (!state.questionId || questionId === state.questionId) {
         dispatch({ type: 'SET_SELECTION_TYPE', value: null });
@@ -587,54 +264,14 @@ export function useSurveyMap() {
      */
     startModifying() {
       dispatch({ type: 'SET_MODIFYING', value: true });
-      // Remove all static features from the map
-      state.rpcChannel.postRequest(
-        'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer],
-      );
-      state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
-
-      // TODO in modify mode, all feature styles will be replaced even when adding them one by one - so just use the default style in this case
-      // Start modifying with currently stored answer geometries
-      state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
-        modifyEventId,
-        // This must have some valid value, but shouldnt matter a lot because we aren't drawing new shapes here
-        'LineString',
-        {
-          drawControl: false,
-          modifyControl: true,
-          geojson: {
-            ...state.answerGeometries,
-            features: state.answerGeometries.features.map((feature) => ({
-              ...feature,
-              // Leave properties from modify mode to prevent passing recursive data structures
-              properties: {},
-              // Oskari overwrites GeoJSON properties when entering drawing mode - form an ID to keep the data available in drawing event handler
-              id: `answer:${feature.properties.question.id}:${feature.properties.index}`,
-            })),
-          },
-          style: {
-            // Due to some buggy changes in https://github.com/mozilla/jschannel/pull/15 the recursive object check fails,
-            // unless we do a deep copy of the style object.
-            draw: JSON.parse(JSON.stringify(defaultFeatureStyle)),
-            modify: JSON.parse(JSON.stringify(defaultFeatureStyle)),
-          },
-        },
-      ]);
+      state.mapProvider.startModifying(state.answerGeometries);
     },
     /**
      * Stop modifying geometries.
      */
     stopModifying() {
       dispatch({ type: 'SET_MODIFYING', value: false });
-      // Stop the drawing
-      state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-        modifyEventId,
-        true,
-        false,
-      ]);
-      // Draw stored answer geometries to map as static features
-      drawAnswerGeometries(state.answerGeometries);
+      state.mapProvider.stopModifying(state.answerGeometries);
     },
     /**
      * Register a function listening to changes to geometries during modification.
@@ -642,54 +279,10 @@ export function useSurveyMap() {
      * @param callback Callback when geometries for given question ID have changed
      * @returns Function for unregistering the event handler
      */
-    onModify(
-      questionId: number,
-      callback: (
-        features: GeoJSON.Feature<Point | LineString | Polygon>[],
-      ) => void,
-    ) {
-      // Create a handler for any modification DrawingEvents
-      const handler: DrawingEventHandler = (event) => {
-        if (event.id !== modifyEventId || !event.isFinished) {
-          return;
-        }
-        const changedFeatures = event.geojson.features
-          // Destructure the question ID and index from feature ID and store them in properties
-          .map((feature) => {
-            const [, questionId, index] = String(feature.id)
-              .split(':')
-              .map(Number);
-            return {
-              ...feature,
-              crs: {
-                type: 'name',
-                properties: {
-                  name: event.geojson.crs,
-                },
-              },
-              properties: {
-                ...feature.properties,
-                questionId,
-                index,
-              },
-            };
-          })
-          // Filter out all features of other questions
-          .filter((feature) => feature.properties.questionId === questionId)
-          // Sort the features by index for assigning the changed features to correct slots
-          .sort((a, b) => a.properties.index - b.properties.index);
-
-        // Only invoke the callback if there were changed features for the given question ID
-        if (changedFeatures.length) {
-          callback(changedFeatures);
-        }
-      };
-      state.rpcChannel.handleEvent('DrawingEvent', handler);
-
-      // Return a function for unregistering the event handler after leaving the page
-      return () => {
-        state.rpcChannel.unregisterEventHandler('DrawingEvent', handler);
-      };
+    onModify<
+      G extends Point | LineString | Polygon = Point | LineString | Polygon,
+    >(questionId: number, callback: (features: GeoJSON.Feature<G>[]) => void) {
+      return state.mapProvider.onModify<G>(questionId, callback);
     },
     /**
      * Update geometries shown on the map. If not modifying, the geometries will be redrawn.
@@ -698,24 +291,25 @@ export function useSurveyMap() {
      */
     updateGeometries(geometries: GeoJSON.FeatureCollection) {
       dispatch({ type: 'SET_ANSWER_GEOMETRIES', value: geometries });
-      // Only update geometries to state if still modifying
       if (state.modifying) {
         return;
       }
-      state.rpcChannel.postRequest(
-        'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer],
-      );
-      drawAnswerGeometries(geometries);
+      state.mapProvider.drawAnswerGeometries(geometries);
     },
     /**
      * Zoom to geometries shown on the answer geometry layer.
      */
     zoomToAnswerGeometries() {
-      state.rpcChannel.postRequest('MapModulePlugin.ZoomToFeaturesRequest', [
-        { layer: [answerGeometryLayer] },
-        {},
-      ]);
+      state.mapProvider.zoomToAnswerGeometries();
+    },
+    /**
+     * Center map to default view geometry.
+     */
+    centerToDefaultView(
+      featureCollection: GeoJSON.FeatureCollection,
+      style: object = {},
+    ) {
+      state.mapProvider.centerToDefaultView(featureCollection, style);
     },
     /**
      * Stop editing a map answer in dialog
@@ -733,13 +327,23 @@ export function useSurveyMap() {
      * Get all current layers
      * @returns
      */
-    async getAllLayers() {
-      if (!state.rpcChannel) {
+    async getAllLayers(): Promise<MapLayer[]> {
+      if (!state.mapProvider) {
         return [];
       }
-      return new Promise<Layer[]>((resolve) => {
-        state.rpcChannel.getAllLayers((layers) => resolve(layers));
-      });
+      return state.mapProvider.getAllLayers();
+    },
+    /**
+     * Get current map position
+     */
+    async getMapPosition() {
+      return state.mapProvider.getMapPosition();
+    },
+    /**
+     * Move map to given position
+     */
+    moveMapTo(centerX: number, centerY: number, zoom: number) {
+      state.mapProvider.moveMapTo(centerX, centerY, zoom);
     },
   };
 }
@@ -762,10 +366,10 @@ function reducer(state: State, action: Action): State {
         ...state,
         allLayers: action.layers,
       };
-    case 'SET_RPC_CHANNEL':
+    case 'SET_MAP_PROVIDER':
       return {
         ...state,
-        rpcChannel: action.rpcChannel,
+        mapProvider: action.value,
       };
     case 'SET_HELPER_TEXT':
       return {
@@ -803,11 +407,6 @@ function reducer(state: State, action: Action): State {
         ...state,
         defaultView: action.value,
       };
-    case 'SET_OSKARI_VERSION':
-      return {
-        ...state,
-        oskariVersion: action.value,
-      };
     case 'SET_IS_INITIALIZED':
       return {
         ...state,
@@ -834,54 +433,45 @@ export default function SurveyMapProvider({
   const value = useMemo<Context>(() => [state, dispatch], [state]);
 
   /**
-   * Initialization of the map once RPC channel is created
+   * Initialization of allLayers and isInitialized once a map provider is set.
    */
   useEffect(() => {
-    if (!state.rpcChannel) {
+    if (!state.mapProvider) {
+      if (state.isInitialized) {
+        dispatch({ type: 'SET_IS_INITIALIZED', value: false });
+      }
       return;
     }
 
-    // getAllLayers does work here, but we need to wait until Oskari assigns the layers all the way to the internal map state, thus the polling...
-    // This issue should resolve the problem in some better way: https://github.com/oskariorg/oskari-documentation/issues/58
-    const interval = setInterval(() => {
-      state.rpcChannel.getCurrentState(({ mapfull }) => {
-        const layers = mapfull.state.selectedLayers.map((layer) => layer.id);
-        if (!layers.length) {
-          return;
-        }
-        clearInterval(interval);
-        dispatch({ type: 'SET_ALL_LAYERS', layers });
-        dispatch({ type: 'SET_IS_INITIALIZED', value: true });
-      });
-    }, 100);
-  }, [state.rpcChannel]);
+    let cancelled = false;
+    state.mapProvider.getInitialLayers().then((layers) => {
+      if (cancelled) return;
+      dispatch({ type: 'SET_ALL_LAYERS', layers });
+      dispatch({ type: 'SET_IS_INITIALIZED', value: true });
+    });
 
-  useEffect(() => {
-    if (!state.rpcChannel && state.isInitialized) {
-      dispatch({ type: 'SET_IS_INITIALIZED', value: false });
-    }
-  }, [state.rpcChannel, state.isInitialized]);
+    return () => {
+      cancelled = true;
+    };
+  }, [state.mapProvider]);
 
   /**
    * Whenever changes are made to visible layers, update the visibility to state
    */
   useEffect(() => {
-    if (!state.allLayers || !state.isInitialized || !state.rpcChannel) {
+    if (!state.allLayers || !state.isInitialized || !state.mapProvider) {
       return;
     }
 
-    state.allLayers.forEach((layerId) => {
-      // Update visibility for each layer - only show it if current page has that layer visible
-      state.rpcChannel.postRequest(
-        'MapModulePlugin.MapLayerVisibilityRequest',
-        [layerId, state.visibleLayers?.includes?.(layerId) ?? false],
-      );
-    });
+    state.mapProvider.updateLayerVisibility(
+      state.allLayers,
+      state.visibleLayers,
+    );
   }, [
     state.isInitialized,
     state.allLayers,
     state.visibleLayers,
-    state.rpcChannel,
+    state.mapProvider,
   ]);
 
   return (

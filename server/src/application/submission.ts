@@ -32,6 +32,8 @@ import {
 import logger from '@src/logger';
 import { assertNever } from '@src/utils';
 import { LineString, Point, Polygon } from 'geojson';
+import { getSurveyTargetSrid } from './map';
+import { getSurvey } from './survey';
 
 /**
  * DB row of table data.answer_entry
@@ -1097,14 +1099,21 @@ export async function getSurveyAnswerLanguage(token: string) {
  * @returns Answer entries for the submission
  */
 export async function getUnfinishedAnswerEntries(token: string) {
-  const { id: submissionId } = await getDb().oneOrNone<{ id: number }>(
-    `SELECT id FROM data.submission WHERE unfinished_token = $1`,
+  const row = await getDb().oneOrNone<{
+    id: number;
+    survey_id: number;
+  }>(
+    `SELECT s.id, s.survey_id FROM data.submission s WHERE s.unfinished_token = $1`,
     [token],
   );
 
-  if (!submissionId) {
+  if (!row?.id) {
     throw new NotFoundError(`Token not found`);
   }
+
+  const { id: submissionId, survey_id: surveyId } = row;
+  const survey = await getSurvey({ id: surveyId });
+  const targetSrid = await getSurveyTargetSrid(survey);
 
   const rows = await getDb()
     .manyOrNone<
@@ -1122,7 +1131,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       ae.parent_entry_id,
       ae.value_text,
       ae.value_option_id,
-      public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, $2))::json as value_geometry,
       ae.value_numeric,
       ae.value_json,
       ae.value_file,
@@ -1136,7 +1145,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       INNER JOIN data.page_section ps ON ps.id = ae.section_id
     WHERE s.unfinished_token = $1
   `,
-      [token],
+      [token, targetSrid],
     )
     .catch(() => {
       throw new BadRequestError(`Invalid token`);
@@ -1159,6 +1168,13 @@ export async function getAnswerEntries(
   submissionId: number,
   withPersonalInfo?: boolean,
 ) {
+  const surveyRow = await getDb().oneOrNone<{ survey_id: number }>(
+    `SELECT survey_id FROM data.submission WHERE id = $1`,
+    [submissionId],
+  );
+  const survey = await getSurvey({ id: surveyRow.survey_id });
+  const targetSrid = await getSurveyTargetSrid(survey);
+
   const rows = await getDb().manyOrNone<
     DBAnswerEntry & {
       section_type: SurveyPageSection['type'];
@@ -1174,7 +1190,7 @@ export async function getAnswerEntries(
       ae.parent_entry_id,
       ae.value_text,
       ae.value_option_id,
-      public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, $2))::json as value_geometry,
       ae.value_numeric,
       ae.value_json,
       ae.value_file,
@@ -1190,7 +1206,7 @@ export async function getAnswerEntries(
     WHERE s.id = $1
     ORDER BY sp.idx, ps.idx ASC
   `,
-    [submissionId],
+    [submissionId, targetSrid],
   );
 
   if (rows.length === 0) {
@@ -1234,6 +1250,9 @@ export async function getSubmissionsForSurvey(
   geospatial: boolean = true,
   attachments: boolean = true,
 ) {
+  const survey = await getSurvey({ id: surveyId });
+  const targetSrid = await getSurveyTargetSrid(survey);
+
   const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
       s.updated_at,
@@ -1243,7 +1262,7 @@ export async function getSubmissionsForSurvey(
       ae.parent_entry_id,
       ae.value_text,
       ae.value_option_id,
-      public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, $(targetSrid)))::json as value_geometry,
       ae.value_numeric,
       ae.value_json,
       ae.value_file,
@@ -1277,7 +1296,7 @@ export async function getSubmissionsForSurvey(
     ${!withPersonalInfo ? `AND ps.type != 'personal-info'` : ''}
     ${!attachments ? `AND ps.type != 'attachment'` : ''}
     ORDER BY updated_at, sp.idx, ps.idx;`,
-    { surveyId },
+    { surveyId, targetSrid },
   );
 
   const personalInfoRows = withPersonalInfo

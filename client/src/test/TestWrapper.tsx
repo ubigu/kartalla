@@ -8,6 +8,7 @@ import '@fontsource/nunito/600.css';
 import '@fontsource/nunito/700.css';
 import '@fontsource/open-sans';
 import { ThemeProvider } from '@mui/material/styles';
+import ToastProvider from '@src/stores/ToastContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import { theme } from '@src/themes/admin';
 import React from 'react';
@@ -19,7 +20,9 @@ interface Props {
 export function TestWrapper({ children }: Props) {
   return (
     <TranslationProvider>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ToastProvider>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </ToastProvider>
     </TranslationProvider>
   );
 }

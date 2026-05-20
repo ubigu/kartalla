@@ -3,6 +3,7 @@ import migrate from 'node-pg-migrate';
 import { Client } from 'pg';
 import PgPromise from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
+import { DEFAULT_SRID } from './constants';
 import logger from './logger';
 
 // Default schemas for all queries
@@ -99,7 +100,7 @@ export function getColumnSet<Row>(
  */
 export function getGeoJSONColumn(
   name: string,
-  inputSRID: number = 3857,
+  inputSRID: number = DEFAULT_SRID,
 ): Partial<PgPromise.Column> {
   return {
     name,

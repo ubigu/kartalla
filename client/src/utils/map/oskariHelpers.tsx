@@ -1,4 +1,4 @@
-import { LanguageCode, MapLayer } from '@interfaces/survey';
+import { LanguageCode, LocalizedSurveyMapLayer } from '@interfaces/survey';
 
 /** Helper to transform se to sv */
 function surveyLangToOskariLang(lang: LanguageCode): 'fi' | 'sv' | 'en' {
@@ -15,7 +15,7 @@ function surveyLangToOskariLang(lang: LanguageCode): 'fi' | 'sv' | 'en' {
 }
 
 export function getLayerName(
-  layer: MapLayer,
+  layer: LocalizedSurveyMapLayer,
   surveyLanguage: LanguageCode,
   fallBackText: string,
 ) {

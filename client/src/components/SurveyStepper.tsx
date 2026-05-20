@@ -39,12 +39,13 @@ import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
 import Footer from './Footer';
 import ImageSection from './ImageSection';
+import SurveyOlMap from './map/SurveyOlMap';
+import SurveyOskariMap from './map/SurveyOskariMap';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SubmissionInfoDialog from './SubmissionInfoDialog';
 import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
-import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import { isPageNavigationDisabled } from './SurveyStepperUtils';
 import TextSection from './TextSection';
@@ -271,8 +272,9 @@ export default function SurveyStepper({
         ...fc,
         features: [
           ...fc.features,
-          ...answer.value.reduce(
-            (features, value, index) => [
+          ...answer.value.reduce((features, value, index) => {
+            if (!value.geometry) return features;
+            return [
               ...features,
               {
                 ...value.geometry,
@@ -284,9 +286,8 @@ export default function SurveyStepper({
                   index,
                 },
               },
-            ],
-            [],
-          ),
+            ];
+          }, []),
         ],
       };
     }, featureCollection);
@@ -399,7 +400,7 @@ export default function SurveyStepper({
       // Old Oskari might return drawing or feature layers which are not part of survey layers, filter these out (as well as invisible layers)
       .filter(
         (layer) =>
-          layer.visible && currentPageAcceptedLayers.includes(layer.id),
+          layer?.visible && currentPageAcceptedLayers.includes(layer.id),
       )
       .map((layer) => layer.id);
     updatePageMapLayers(currentPage, mapLayers);
@@ -703,8 +704,15 @@ export default function SurveyStepper({
     // Return some component to be rendered in the side pane if a page has a sidebar
     switch (currentPage.sidebar.type) {
       case 'map':
-        return (
-          <SurveyMap
+        return survey.mapProvider === 'openlayers' ? (
+          <SurveyOlMap
+            key={currentPage.id}
+            pageId={currentPage.id}
+            defaultMapView={currentPage.sidebar?.defaultMapView}
+            layers={currentPage.sidebar.mapLayers}
+          />
+        ) : (
+          <SurveyOskariMap
             key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount if the map URL changes
             pageId={currentPage.id}
             defaultMapView={currentPage.sidebar?.defaultMapView}

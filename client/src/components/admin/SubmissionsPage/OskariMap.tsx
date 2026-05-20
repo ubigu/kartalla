@@ -1,11 +1,12 @@
 // @ts-strict-ignore
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
-import { useOskari } from '@src/utils/useOskari';
+import { useOskari } from '@src/hooks/map/useOskari';
 import { Feature, Geometry } from 'geojson';
 import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import { useEffect, useMemo, useRef } from 'react';
 import { AnswerSelection } from './AnswersList';
+import { isFeatureSelected } from './AnswerMap';
 
 interface Props {
   url: string;
@@ -109,7 +110,7 @@ export default function OskariMap({
         labelProperty: 'submissionId',
         labelText: feature.properties.submissionId,
       },
-      ...(feature.properties.selected && {
+      ...(isFeatureSelected(feature, selectedAnswer) && {
         stroke: {
           ...style.stroke,
           color: '#0076A3',
@@ -149,7 +150,7 @@ export default function OskariMap({
     const style = {
       shape: customIcon?.length > 0 ? customIcon : isPrimaryStyle ? 5 : 2,
       scale: 4,
-      size: feature.properties.selected ? 9 : markerSize, // Not over 10 because it works differently between Oskari versions
+      size: isFeatureSelected(feature, selectedAnswer) ? 9 : markerSize, // Not over 10 because it works differently between Oskari versions
       color: isPrimaryStyle
         ? mapFeatureColorScheme.primaryColor
         : mapFeatureColorScheme.secondaryColor,

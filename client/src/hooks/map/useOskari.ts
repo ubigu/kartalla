@@ -9,8 +9,8 @@ import OskariRPC, {
   MarkerStyle,
 } from 'oskari-rpc';
 import { useEffect, useState } from 'react';
-import { isPointFeature } from './geometry';
-import { useCurrent } from './useCurrent';
+import { isPointFeature } from '@src/utils/geometry';
+import { useCurrent } from '../useCurrent';
 
 // Layer ID for answer geometries
 const featureLayer = 'answers';

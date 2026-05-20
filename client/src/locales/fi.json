@@ -97,6 +97,9 @@
     "editorsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
     "viewers": "Katseluoikeudelliset käyttäjät",
     "viewersHelperText": "Käyttäjät, joilla on katseluoikeudet kyselyn tietoihin sekä vastauksiin.",
+    "mapProvider": "Karttapalveluntarjoaja",
+    "mapProviderOpenlayers": "OpenLayers",
+    "mapProviderOskari": "Oskari",
     "mapPublicationSelect": "Valitse karttajulkaisu",
     "mapPublicationSelectHelperText": "Valitse valmiiksi määritelty Oskari-karttajulkaisu tai syötä alempaan kenttään karttajulkaisun osoite, joka on laadittu kyselyäsi varten.",
     "mapUrl": "Oskari-karttajulkaisun osoite",
@@ -384,7 +387,6 @@
     "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt.",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta."
   },
-
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noBackgroundImage": "Ei taustakuvaa",
@@ -876,7 +878,6 @@
     "updateSuccess": "Käyttäjäryhmä päivitetty onnistuneesti.",
     "updateFailed": "Käyttäjäryhmän päivittäminen epäonnistui."
   },
-
   "navigation": {
     "next": "Seuraava",
     "back": "Takaisin"
@@ -951,5 +952,8 @@
     "deleteSuccess": "Karttajulkaisu poistettu.",
     "deleteFailed": "Karttajulkaisun poistaminen epäonnistui.",
     "fetchFailed": "Karttajulkaisujen lataaminen epäonnistui."
+  },
+  "OlMap": {
+    "layerFetchError": "Karttatasojen lataaminen epäonnistui. Käytetään oletuskarttaa."
   }
 }

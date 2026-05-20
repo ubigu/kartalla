@@ -8,9 +8,10 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { Feature } from 'geojson';
+import { Feature as GeojsonFeature } from 'geojson';
 import { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
+import OlAnswerMap from './OlAnswerMap';
 import OskariMap from './OskariMap';
 
 /**
@@ -20,7 +21,6 @@ interface BaseAnswerFeatureProperties {
   question: SurveyPageSection | undefined;
   submissionId: number;
   index: number;
-  selected: boolean;
 }
 
 /**
@@ -37,6 +37,24 @@ interface GeoBudgetingAnswerFeatureProperties extends BaseAnswerFeaturePropertie
 type AnswerFeatureProperties =
   | BaseAnswerFeatureProperties
   | GeoBudgetingAnswerFeatureProperties;
+
+export type AnswerFeature = GeojsonFeature<
+  GeoJSON.Geometry,
+  AnswerFeatureProperties
+>;
+
+export function isFeatureSelected(
+  feature: GeojsonFeature,
+  selectedAnswer: AnswerSelection | null,
+) {
+  if (!selectedAnswer) return false;
+  const { submissionId, question, index } = feature.properties;
+  return (
+    selectedAnswer.submissionId === submissionId &&
+    selectedAnswer.questionId === question?.id &&
+    (question?.type === 'map' ? selectedAnswer.index === index : true)
+  );
+}
 
 interface Props {
   survey: Survey;
@@ -73,19 +91,6 @@ export default function AnswerMap({
     );
   }
 
-  function isFeatureSelected(
-    submission: Submission,
-    section: SurveyPageSection,
-    index: number,
-  ) {
-    return (
-      selectedAnswer &&
-      selectedAnswer.submissionId === submission.id &&
-      selectedAnswer.questionId === section.id &&
-      (section.type === 'map' ? selectedAnswer.index === index : true)
-    );
-  }
-
   function getAnswerVisibility(answer: AnswerEntry) {
     if (!answer.value) return false;
     // Current question is not selected, filter away answers that are not map/geo-budgeting answers
@@ -106,101 +111,89 @@ export default function AnswerMap({
   }
 
   // All answer geometries that should be shown on the map
-  const features = useMemo<Feature<any, AnswerFeatureProperties>[]>(() => {
-    // If no question containing map question was selected OR if the selected question was not "select all", show nothing on the map
-    if (!(selectedQuestion?.id === 0 || holdsMapQuestions(selectedQuestion))) {
+  const features = useMemo<AnswerFeature[]>(() => {
+    if (selectedQuestion?.id !== 0 && !holdsMapQuestions(selectedQuestion)) {
       return [];
     }
 
     return (
       submissions
         // Reduce all submissions into one array of features
-        .reduce(
-          (features, submission) => {
-            return [
-              ...features,
-              ...submission.answerEntries
+        .reduce((features, submission) => {
+          return [
+            ...features,
+            ...submission.answerEntries
 
-                .filter(
-                  (
-                    answer,
-                  ): answer is AnswerEntry & {
-                    type: 'map' | 'geo-budgeting';
-                  } => getAnswerVisibility(answer),
-                )
+              .filter(
+                (
+                  answer,
+                ): answer is AnswerEntry & {
+                  type: 'map' | 'geo-budgeting';
+                } => getAnswerVisibility(answer),
+              )
 
-                // Reduce answer's values into a single array of features
-                .reduce((features, answer) => {
-                  const question =
-                    selectedQuestion?.id === 0
-                      ? surveyQuestions
-                          .flatMap((question) => [
+              // Reduce answer's values into a single array of features
+              .reduce((features, answer) => {
+                const question =
+                  selectedQuestion?.id === 0
+                    ? surveyQuestions
+                        .flatMap((question) => [
+                          question,
+                          ...(question?.followUpSections ?? []),
+                        ])
+                        .find((question) => question.id === answer.sectionId)
+                    : selectedQuestion;
+
+                return [
+                  ...features,
+                  ...answer.value
+                    .filter((value) => value.geometry?.geometry != null)
+                    .map((value, index) => {
+                      // For geo-budgeting answers, create properties with targetIndex and targetIcon
+                      if (
+                        answer.type === 'geo-budgeting' &&
+                        question?.type === 'geo-budgeting'
+                      ) {
+                        const geoBudgetValue = value as GeoBudgetingAnswer;
+                        const properties: GeoBudgetingAnswerFeatureProperties =
+                          {
                             question,
-                            ...(question?.followUpSections ?? []),
-                          ])
-                          .find((question) => question.id === answer.sectionId)
-                      : selectedQuestion;
-
-                  return [
-                    ...features,
-                    ...answer.value
-                      .filter((value) => value.geometry?.geometry != null)
-                      .map((value, index) => {
-                        const isSelected = isFeatureSelected(
-                          submission,
-                          question,
-                          index,
-                        );
-
-                        // For geo-budgeting answers, create properties with targetIndex and targetIcon
-                        if (
-                          answer.type === 'geo-budgeting' &&
-                          question?.type === 'geo-budgeting'
-                        ) {
-                          const geoBudgetValue = value as GeoBudgetingAnswer;
-                          const properties: GeoBudgetingAnswerFeatureProperties =
-                            {
-                              question,
-                              submissionId: submission.id,
-                              index,
-                              selected: isSelected,
-                              targetIndex: geoBudgetValue.targetIndex,
-                              targetIcon:
-                                question.targets?.[geoBudgetValue.targetIndex]
-                                  ?.icon,
-                            };
-
-                          return {
-                            id: `feature-${question?.id}-${index}-${submission?.id}`,
-                            type: 'Feature',
-                            geometry: geoBudgetValue.geometry.geometry,
-                            properties,
+                            submissionId: submission.id,
+                            index,
+                            targetIndex: geoBudgetValue.targetIndex,
+                            targetIcon:
+                              question.targets?.[geoBudgetValue.targetIndex]
+                                ?.icon,
                           };
-                        }
-
-                        // For map questions, create base properties
-                        const properties: BaseAnswerFeatureProperties = {
-                          question,
-                          submissionId: submission.id,
-                          index,
-                          selected: isSelected,
-                        };
 
                         return {
                           id: `feature-${question?.id}-${index}-${submission?.id}`,
                           type: 'Feature',
-                          geometry: value.geometry.geometry,
+                          geometry: geoBudgetValue.geometry.geometry,
                           properties,
                         };
-                      }),
-                  ];
-                }, []),
-            ];
-          },
-          [] as Feature<any, AnswerFeatureProperties>[],
-        )
+                      }
+
+                      // For map questions, create base properties
+                      const properties: BaseAnswerFeatureProperties = {
+                        question,
+                        submissionId: submission.id,
+                        index,
+                      };
+
+                      return {
+                        id: `feature-${question?.id}-${index}-${submission?.id}`,
+                        type: 'Feature',
+                        geometry: value.geometry.geometry,
+                        properties,
+                      };
+                    }),
+                ];
+              }, []),
+          ];
+        }, [])
     );
-  }, [selectedQuestion, selectedAnswer]);
+  }, [selectedQuestion, submissions, surveyQuestions]);
 
   // Select to show all questions by default
   useEffect(() => {
@@ -218,6 +211,7 @@ export default function AnswerMap({
 
     const firstQuestionWithMap = questions.find(
       (question) =>
+        question.type === 'geo-budgeting' ||
         question.type === 'map' ||
         question.followUpSections?.some((section) => section.type === 'map'),
     );
@@ -237,17 +231,28 @@ export default function AnswerMap({
 
   return (
     <>
-      <OskariMap
-        key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount on URL change
-        url={survey.localizedMapUrls[surveyLanguage]}
-        layers={layers}
-        features={features}
-        onFeatureClick={(feature) => {
-          const { submissionId, question, index } = feature.properties;
-          onAnswerClick({ submissionId, questionId: question.id, index });
-        }}
-        selectedAnswer={selectedAnswer}
-      />
+      {survey.mapProvider === 'oskari' ? (
+        <OskariMap
+          key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount on URL change
+          url={survey.localizedMapUrls[surveyLanguage]}
+          layers={layers}
+          features={features}
+          onFeatureClick={(feature) => {
+            const { submissionId, question, index } = feature.properties;
+            onAnswerClick({ submissionId, questionId: question.id, index });
+          }}
+          selectedAnswer={selectedAnswer}
+        />
+      ) : (
+        <OlAnswerMap
+          features={features}
+          mapIsInteractive={selectedQuestion.id !== 0}
+          onFeatureClick={(feature) => {
+            const { submissionId, question, index } = feature.getProperties();
+            onAnswerClick({ submissionId, questionId: question.id, index });
+          }}
+        />
+      )}
     </>
   );
 }

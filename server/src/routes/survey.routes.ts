@@ -1,5 +1,5 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
-import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answer';
+import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answerGeometry';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   deletePublicationCredentials,
@@ -574,6 +574,7 @@ router.get(
       getAnswerEntries(submissionId, req.query.withPersonalInfo === 'true'),
       getTimestamp(submissionId),
     ]);
+
     const pdfBuffer = await generatePdf(
       survey,
       { id: submissionId, timestamp },
