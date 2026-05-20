@@ -1,6 +1,6 @@
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
-import { getAvailableMapLayers } from './map';
+import { getAvailableOskariMapLayers } from './map';
 import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
@@ -44,7 +44,10 @@ async function generateScreenshots({
   const { mapUrl, answers, language } = data;
   const returnData: ScreenshotJobReturnData[] = [];
 
-  const availableMapLayers = await getAvailableMapLayers(mapUrl, language);
+  const availableMapLayers = await getAvailableOskariMapLayers(
+    mapUrl,
+    language,
+  );
 
   await page.setUserAgent({
     userAgent:

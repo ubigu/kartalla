@@ -28,19 +28,14 @@ vi.mock('@src/user', () => ({
 
 import { getDb } from '@src/database';
 import { createSurvey, updateSurvey } from './survey';
+import { buildMockDb } from '@src/tests/helpers';
 
 describe('updateSurvey', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const mockDb = {
-      one: vi.fn().mockResolvedValue({}),
-      none: vi.fn().mockResolvedValue(undefined),
-      manyOrNone: vi.fn().mockResolvedValue([]),
-      oneOrNone: vi.fn().mockResolvedValue(null),
-      any: vi.fn().mockResolvedValue([]),
-      tx: vi.fn().mockImplementation(async (callback: any) => callback(mockDb)),
-    };
+    const mockDb = buildMockDb();
+    mockDb.one.mockResolvedValue({});
 
     (getDb as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
   });
@@ -180,14 +175,7 @@ describe('createSurvey', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockDb = {
-      one: vi.fn(),
-      none: vi.fn().mockResolvedValue(undefined),
-      manyOrNone: vi.fn().mockResolvedValue([]),
-      oneOrNone: vi.fn().mockResolvedValue(null),
-      any: vi.fn().mockResolvedValue([]),
-      tx: vi.fn().mockImplementation(async (callback: any) => callback(mockDb)),
-    };
+    mockDb = buildMockDb();
 
     (getDb as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
   });

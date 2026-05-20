@@ -3,7 +3,10 @@ import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { query } from 'express-validator';
-import { getAvailableMapLayers, getOlMapLayers } from '../application/map';
+import {
+  getAvailableOskariMapLayers,
+  getOlMapLayers,
+} from '../application/map';
 
 const router = Router();
 
@@ -21,7 +24,7 @@ router.get(
   validateRequest([query('url').isString()]),
   asyncHandler(async (req, res) => {
     const mapUrl = decodeURIComponent(req.query.url.toString());
-    const layers = await getAvailableMapLayers(mapUrl);
+    const layers = await getAvailableOskariMapLayers(mapUrl);
     res.json(layers);
   }),
 );

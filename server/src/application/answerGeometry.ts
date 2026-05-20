@@ -10,7 +10,7 @@ import {
   DBAnswerEntry,
   dbAnswerEntryRowsToAnswerEntries,
 } from './answerTypes';
-import { getAvailableMapLayers } from './map';
+import { getAvailableOskariMapLayers, getSurveyTargetSrid } from './map';
 import { getSurvey } from './survey';
 
 const tr = useTranslations('fi');
@@ -249,7 +249,10 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
  * @param surveyId
  * @returns
  */
-async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
+async function getGeometryDBEntries(
+  surveyId: number,
+  targetSrid: number,
+): Promise<AnswerEntry[]> {
   const rows = (await getDb().manyOrNone(
     `SELECT
       ae.submission_id,
@@ -258,8 +261,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_text,
       ae.value_option_id,
       opt.text as option_text,
-      public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
-      public.ST_SRID(ae.value_geometry) AS geometry_srid,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, $2))::json as value_geometry,
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
@@ -282,7 +284,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
           ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index, opt.idx`,
-    [surveyId],
+    [surveyId, targetSrid],
   )) as DBAnswerEntry[];
 
   if (!rows || rows.length === 0) return null;
@@ -297,12 +299,13 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
 export async function getGeometryDBEntriesAsGeoJSON(
   surveyId: number,
 ): Promise<{ [key: string]: FeatureCollection }> {
-  const rows = await getGeometryDBEntries(surveyId);
-  const srid = rows?.find((row) => row.geometrySRID)?.geometrySRID ?? '3857';
-  const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
-  const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
-    getAvailableMapLayers(survey.mapUrl),
-  );
+  const survey = await getSurvey({ id: surveyId });
+  const [targetSrid, checkboxOptions, mapLayers] = await Promise.all([
+    getSurveyTargetSrid(survey),
+    getCheckboxOptionsFromDB(surveyId),
+    getAvailableOskariMapLayers(survey.mapUrl),
+  ]);
+  const rows = await getGeometryDBEntries(surveyId, targetSrid);
 
   if (!rows) return null;
 
@@ -321,7 +324,7 @@ export async function getGeometryDBEntriesAsGeoJSON(
       features: [],
       crs: {
         type: 'name',
-        properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
+        properties: { name: `urn:ogc:def:crs:EPSG::${targetSrid}` },
       },
     };
     questions[questionTitle].features.push(feature);

@@ -6,6 +6,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import proj4 from 'proj4';
 import StaticMaps from 'staticmaps';
+import { DEFAULT_SRID } from '../constants';
 import { getOlMapLayers } from './map';
 import { svgToPng } from './puppeteer-screenshot';
 import {
@@ -26,7 +27,7 @@ function defaultCircleMarker(): string {
 function parseCrs(feature: GeoJSONWithCRS): string {
   const name = feature.crs?.properties?.name;
   const epsgCode = name?.match(/\d+$/)?.[0];
-  return epsgCode ? `EPSG:${epsgCode}` : 'EPSG:3857';
+  return epsgCode ? `EPSG:${epsgCode}` : `EPSG:${DEFAULT_SRID}`;
 }
 
 function toWgs84(x: number, y: number, crs: string): [number, number] {

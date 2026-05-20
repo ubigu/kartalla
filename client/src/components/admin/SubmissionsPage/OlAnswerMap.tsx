@@ -71,7 +71,7 @@ export default function OlAnswerMap({
     const webglSource = webglSourceRef.current;
     const iconSource = iconSourceRef.current;
     const iconLayer = iconLayerRef.current;
-    console.log(map, webglSource, iconSource, iconLayer);
+
     if (!map || !webglSource || !iconSource || !iconLayer) return;
 
     const webglFeatures: OlFeature<Geometry>[] = [];
