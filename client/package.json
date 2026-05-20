@@ -55,7 +55,7 @@
     "hast-util-sanitize": "^5.0.2",
     "jszip": "^3.10.1",
     "markdown-draft-js": "^2.4.0",
-    "mobx": "^6.15.0",
+    "mobx": "^6.15.3",
     "ol": "10.9.0",
     "oskari-rpc": "^2.1.0",
     "parse-css-color": "^0.2.1",
@@ -82,7 +82,7 @@
     "styled-components": "^6.3.12"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.2",
+    "@axe-core/playwright": "^4.11.3",
     "@babel/preset-env": "^7.29.5",
     "@babel/preset-react": "^7.28.5",
     "@chromatic-com/storybook": "^5.1.2",
@@ -100,17 +100,17 @@
     "@types/file-saver": "^2.0.7",
     "@types/geojson": "^7946.0.16",
     "@types/markdown-draft-js": "^2.2.7",
-    "@types/node": "^20.19.39",
+    "@types/node": "^20.19.41",
     "@types/react": "^19.2.14",
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^19.2.3",
     "@types/react-draft-wysiwyg": "^1.13.9",
     "@types/react-router-dom": "^5.3.3",
     "@types/remarkable": "^2.0.8",
-    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.58.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "@vitest/browser": "^4.1.5",
+    "@vitest/browser": "^4.1.6",
     "@vitest/browser-playwright": "^4.1.5",
     "@vitest/coverage-v8": "^4.1.2",
     "@vitest/ui": "^4.1.5",
@@ -124,8 +124,8 @@
     "eslint-plugin-storybook": "^10.3.6",
     "glob-parent": "^6.0.2",
     "inline-source-map": "^0.6.3",
-    "jsdom": "^29.0.2",
-    "playwright": "^1.59.1",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
     "storybook": "^10.3.6",
     "typescript": "^5.9.3",
     "typescript-strict-plugin": "^2.4.4",
@@ -133,7 +133,7 @@
     "vite": "^6.4.2",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^4.1.2",
-    "yaml": "^2.8.3"
+    "yaml": "^2.9.0"
   },
   "overrides": {
     "react-split-pane": {
