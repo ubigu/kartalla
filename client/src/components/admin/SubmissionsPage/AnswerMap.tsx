@@ -8,7 +8,7 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { Feature, Feature as GeojsonFeature } from 'geojson';
+import { Feature as GeojsonFeature } from 'geojson';
 import { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OlAnswerMap from './OlAnswerMap';
@@ -44,7 +44,7 @@ export type AnswerFeature = GeojsonFeature<
 >;
 
 export function isFeatureSelected(
-  feature: Feature,
+  feature: GeojsonFeature,
   selectedAnswer: AnswerSelection | null,
 ) {
   if (!selectedAnswer) return false;

@@ -23,7 +23,7 @@ import EditSurveyPermissions from './EditSurveyPermissions';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslationsV2 from './EditSurveyTranslationsV2';
-import EditSurveyMapData from './map/EditSurveyMapData';
+import { EditSurveyMapData } from './map/EditSurveyMapData';
 
 export const editPageContainerSx = {
   display: 'flex',

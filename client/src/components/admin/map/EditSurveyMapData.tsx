@@ -12,7 +12,7 @@ import { Select } from '../../core/Select';
 import { loadingPulse } from '../../core/styles';
 import { editPageContainerSx } from '../EditSurvey';
 
-export default function EditSurveyMapData() {
+export function EditSurveyMapData() {
   const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
   const [mapPublicationsLoading, setMapPublicationsLoading] = useState(true);
 
