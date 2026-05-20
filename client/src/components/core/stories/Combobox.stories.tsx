@@ -1,6 +1,5 @@
 import { TestWrapper } from '@src/test/TestWrapper';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router-dom';
 import { Combobox_WIP } from '../Combobox';
 
 const options = [
@@ -15,13 +14,11 @@ const meta: Meta<typeof Combobox_WIP> = {
   component: Combobox_WIP,
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <TestWrapper>
-          <div style={{ padding: '16px', maxWidth: '300px' }}>
-            <Story />
-          </div>
-        </TestWrapper>
-      </MemoryRouter>
+      <TestWrapper>
+        <div style={{ padding: '16px', maxWidth: '300px' }}>
+          <Story />
+        </div>
+      </TestWrapper>
     ),
   ],
 };
