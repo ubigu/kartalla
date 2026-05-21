@@ -56,10 +56,7 @@ import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import {
-  replaceIdsWithNull,
-  replaceTranslationsWithNull,
-} from '@src/utils/schemaValidation';
+import { replaceIdsWithNull } from '@src/utils/schemaValidation';
 import { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
@@ -399,11 +396,9 @@ export default function SurveySectionAccordion(props: Props) {
                 // Remove all IDs from the section JSON to prevent unwanted references
                 // Create deep copy to avoid unwanted side effects on original
 
-                const deepCopy = replaceTranslationsWithNull(
-                  replaceIdsWithNull({
-                    ...structuredClone(props.section),
-                  }),
-                );
+                const deepCopy = replaceIdsWithNull({
+                  ...structuredClone(props.section),
+                });
                 const copiedSurveySection: SurveyPageSection = {
                   ...deepCopy,
                   followUpSections: deepCopy.followUpSections?.map(

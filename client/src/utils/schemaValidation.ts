@@ -19,19 +19,3 @@ export function replaceIdsWithNull(obj: any, depth = -1) {
 
   return obj;
 }
-
-export function replaceTranslationsWithNull(obj: any) {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj;
-  }
-
-  if (obj.hasOwnProperty('en')) {
-    obj = { ...obj, en: null };
-  }
-
-  for (const key in obj) {
-    obj[key] = replaceTranslationsWithNull(obj[key]);
-  }
-
-  return obj;
-}
