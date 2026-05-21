@@ -31,10 +31,7 @@ import SideBarItem, { SIDEBAR_PAGE_ICON_CLASS } from '../SideBarItem';
 import { Conditions, LanguageCode, SurveyPage } from '@interfaces/survey';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
-import {
-  replaceIdsWithNull,
-  replaceTranslationsWithNull,
-} from '@src/utils/schemaValidation';
+import { replaceIdsWithNull } from '@src/utils/schemaValidation';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import ConditionalPageIcon from '../icons/ConditionalPageIcon';
 import MapGridIcon from '../icons/MapGridIcon';
@@ -364,16 +361,14 @@ export default function EditSurveySideBar(props: Props) {
                             event.stopPropagation();
                             event.preventDefault();
                             // Deep copy page to avoid changes to current context
-                            const deepCopy = replaceTranslationsWithNull(
-                              replaceIdsWithNull({
-                                ...structuredClone(page),
-                                id: -1,
-                                sidebar: {
-                                  ...structuredClone(page.sidebar),
-                                  mapLayers: [],
-                                },
-                              }),
-                            ) as SurveyPage;
+                            const deepCopy = replaceIdsWithNull({
+                              ...structuredClone(page),
+                              id: -1,
+                              sidebar: {
+                                ...structuredClone(page.sidebar),
+                                mapLayers: [],
+                              },
+                            }) as SurveyPage;
                             // Remove conditions from Follow up question
                             const copiedSurveyPage: SurveyPage = {
                               ...deepCopy,
