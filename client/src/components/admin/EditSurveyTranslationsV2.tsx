@@ -15,6 +15,7 @@ import { Language, useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
 import { useState } from 'react';
 import { Checkbox } from '../core/Checkbox';
+import { Select } from '../core/Select';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
 
@@ -333,7 +334,7 @@ export default function EditSurveyTranslationsV2() {
               component="th"
               sx={{ width: TRANSLATION_ROW_LABEL_WIDTH, padding: '4px 0' }}
             >
-              <Combobox_WIP
+              <Select
                 value={String(visibleColCount)}
                 options={languages.map((_, colIndex) => ({
                   value: String(colIndex + 1),

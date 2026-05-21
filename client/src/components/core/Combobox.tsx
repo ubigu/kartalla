@@ -74,7 +74,7 @@ function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
         padding: '4px 0',
         listStyle: 'none',
         backgroundColor: 'surfacePrimary.main',
-        border: '1px solid',
+        border: '0.5px solid',
         borderColor: 'borderSubtle.main',
         borderRadius: '8px',
         borderTopRightRadius: 0,
@@ -381,7 +381,7 @@ export function Combobox_WIP<T extends string = string>(
             padding: `4px ${paddingX + chevronWidth}px 4px ${paddingX}px`,
             minHeight: '28px',
             backgroundColor: getBackgroundColor('default', !!error),
-            border: '1px solid',
+            border: '0.5px solid',
             borderColor: isFocused
               ? getBorderColor('focus')
               : getBorderColor('default', !!error),
@@ -532,7 +532,7 @@ export function Combobox_WIP<T extends string = string>(
                   }
                 : {
                     backgroundColor: getBackgroundColor('default', !!error),
-                    border: '1px solid',
+                    border: '0.5px solid',
                     borderColor: getBorderColor('default', !!error),
                     borderRadius: '3px',
                     padding: `0 ${paddingX + chevronWidth}px 0 ${paddingX}px`,

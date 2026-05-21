@@ -34,7 +34,7 @@ const itemSx = (backgroundColor?: string) => (theme: Theme) => ({
   gap: '6px',
   height: SIDEBAR_ITEM_HEIGHT,
   minWidth: 0,
-  border: `solid 1px ${theme.palette.borderSubtle.main}`,
+  borderBottom: `solid 1px ${theme.palette.surfaceSubtle.dark}`,
   '& .MuiListItemText-root > *': {
     fontSize: '14px',
     fontWeight: 600,

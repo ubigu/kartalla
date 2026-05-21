@@ -14,6 +14,8 @@ import { NewUserRequest } from './NewUserRequest';
 import { UserGroupManagement } from './UserGroupManagement';
 import { UserList } from './UserList';
 
+export const userManagementContentPadding = '2rem';
+
 export function UserManagement() {
   const { tr } = useTranslations();
   const { activeUserIsSuperUser } = useUser();
@@ -71,7 +73,7 @@ export function UserManagement() {
       <AdminAppBar labels={[tr.AppBarUserMenu.userManagement]} />
       <Box
         sx={{
-          padding: '2rem 8rem',
+          padding: '2rem 4rem',
           display: 'flex',
           flexDirection: 'column',
           gap: '84px',
@@ -89,6 +91,7 @@ export function UserManagement() {
         />
         <Box
           sx={{
+            paddingX: userManagementContentPadding,
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem',

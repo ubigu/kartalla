@@ -1,13 +1,7 @@
 // @ts-strict-ignore
-import {
-  Box,
-  Button,
-  FormControl,
-  MenuItem,
-  Select,
-  useTheme,
-} from '@mui/material';
-import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
+import { Box, Button, FormControl } from '@mui/material';
+import { Input } from '@src/components/core/Input';
+import { Select } from '@src/components/core/Select';
 import UserAddSmallIcon from '@src/components/icons/UserAddSmallIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -27,7 +21,6 @@ export function NewUserRequest({
 }: {
   onSubmitSuccess: () => Promise<void>;
 }) {
-  const theme = useTheme();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
   const [selectedRole, setSelectedRole] = useState('');
@@ -73,25 +66,6 @@ export function NewUserRequest({
         display: 'flex',
         justifyContent: 'flex-start',
         padding: '1rem 0',
-        '& label': {
-          fontSize: '12px',
-          color: 'primary.main',
-        },
-        '& button, & input, & .MuiInputBase-root': {
-          boxShadow: '0px -1px 2px 0px rgba(89, 120, 134, 0.15)',
-          backgroundColor: '#F6F8FA',
-          border: '0.5px solid #E9ECEF',
-          borderRadius: '4px',
-          height: '28px',
-          fontSize: '14px',
-        },
-        '& input': {
-          padding: '0 0.25rem',
-          '&:focus': {
-            border: `solid 2px ${theme.palette.primary.main}`,
-            outline: 'none',
-          },
-        },
       }}
     >
       <FormControl
@@ -128,8 +102,8 @@ export function NewUserRequest({
             flex: 1,
           }}
         >
-          <label htmlFor="userName">{tr.UserManagement.name}</label>
-          <input
+          <Input
+            label={tr.UserManagement.name}
             id="userName"
             type="text"
             required
@@ -145,8 +119,8 @@ export function NewUserRequest({
             flex: 1,
           }}
         >
-          <label htmlFor="userEmail">{tr.UserManagement.email}</label>
-          <input
+          <Input
+            label={tr.UserManagement.email}
             id="userEmail"
             type="email"
             required
@@ -161,41 +135,22 @@ export function NewUserRequest({
             gap: '0.25rem',
           }}
         >
-          <label htmlFor="userRightsSelect">{tr.UserManagement.role}</label>
           <Select
             required
-            sx={{
-              '& .MuiSvgIcon-root': { color: theme.palette.primary.main },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderWidth: '0',
-              },
-            }}
+            label={tr.UserManagement.role}
             id="userRightsSelect"
-            onChange={(e) => setSelectedRole(e.target.value as string)}
+            onChange={(val) => setSelectedRole(val)}
             value={selectedRole}
-            IconComponent={(props) => <ChevronDownSmallIcon {...props} />}
-          >
-            <MenuItem value={'organization_user'}>
-              {tr.UserManagement.regularUser}
-            </MenuItem>
-            <MenuItem value={'organization_admin'}>
-              {tr.UserManagement.admin}
-            </MenuItem>
-          </Select>
+            options={[
+              {
+                label: tr.UserManagement.regularUser,
+                value: 'organization_user',
+              },
+              { label: tr.UserManagement.admin, value: 'organization_admin' },
+            ]}
+          />
         </FormControl>
-        <Button
-          sx={{
-            width: 'max-content',
-            backgroundColor: 'rgba(246, 248, 250, 1)',
-            borderRadius: '0.25rem',
-            '& .MuiSvgIcon-root.MuiSvgIcon-root': {
-              fontSize: '12px',
-            },
-            '&:active': { backgroundColor: '#e4e4e4' },
-          }}
-          endIcon={<UserAddSmallIcon />}
-          type="submit"
-        >
+        <Button variant="outlined" endIcon={<UserAddSmallIcon />} type="submit">
           {tr.UserManagement.addUser}
         </Button>
       </FormControl>

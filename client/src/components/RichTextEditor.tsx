@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     resize: (props: StyleProps) => (props.resizable ? 'vertical' : undefined),
     background: theme.palette.surfacePrimary.main,
     padding: '0 1rem',
-    border: `1px solid ${theme.palette.borderSubtle.main}`,
+    border: `0.5px solid ${theme.palette.borderSubtle.main}`,
     borderTop: 'none',
     borderRadius: 0,
     borderBottomLeftRadius: 4,

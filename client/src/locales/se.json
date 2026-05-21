@@ -870,6 +870,7 @@
     "groupFetchError": "Fel vid hämtning av användargrupper.",
     "groupCreationComplete": "Användargruppen har lagts till.",
     "groupCreationFailed": "Det gick inte att lägga till användargruppen.",
+    "groupDeletionConfirm": "Är du säker på att du vill ta bort den här användargruppen?",
     "groupDeletionComplete": "Användargruppen har tagits bort.",
     "groupDeletionFailed": "Det gick inte att ta bort användargruppen."
   },

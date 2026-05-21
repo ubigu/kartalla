@@ -77,7 +77,7 @@ export function Input({
           fontFamily: theme.typography.fontFamily,
           color: theme.palette.harmaa.main,
           backgroundColor: getBackgroundColor('default', !!error),
-          border: `1px solid`,
+          border: `0.5px solid`,
           borderColor: getBorderColor('default', !!error),
           borderRadius: '3px',
           padding: `0 ${paddingX}px`,
