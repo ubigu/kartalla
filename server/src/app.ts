@@ -52,6 +52,7 @@ export async function createApp({
               "'self'",
               "'sha256-akiPVdLAnKpbE9p6HKbK57nJ8z55GUgOK58yVmNldeU='",
             ], // login.html inline script
+            'img-src': secrets.allowedImageSources ?? "'self'",
           },
         },
       })(req, res, next);

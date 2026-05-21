@@ -2,7 +2,10 @@ import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import logger from '@src/logger';
 
-type SecretKeys = 'userGroupNameMapping' | 'allowedFrameSources';
+type SecretKeys =
+  | 'userGroupNameMapping'
+  | 'allowedFrameSources'
+  | 'allowedImageSources';
 
 /** Secrets are used to get the value directly from Azure Key vault and they enable application state refresh without restart using the "/keyvault" route. */
 export const secrets: Partial<Record<SecretKeys, string>> = {};
