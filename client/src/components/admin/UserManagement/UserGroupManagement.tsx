@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { UserGroup } from '@interfaces/userGroup';
 import {
   Box,
@@ -13,6 +12,8 @@ import {
   TableRow,
   Theme,
 } from '@mui/material';
+import ConfirmDialog from '@src/components/ConfirmDialog';
+import { Input } from '@src/components/core/Input';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import {
   createUserGroup,
@@ -21,6 +22,8 @@ import {
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
+import { useState } from 'react';
+import { userManagementContentPadding } from '.';
 
 interface FormElements extends HTMLFormControlsCollection {
   groupNameInput: HTMLInputElement;
@@ -30,32 +33,12 @@ interface UserGroupFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-const formStyle = (theme: Theme) => ({
+const formStyle = {
   flexDirection: 'row',
   gap: '1rem',
   alignItems: 'end',
   flex: 1,
-  '& input': {
-    padding: '0 0.25rem',
-    width: '200px',
-    '&:focus': {
-      border: `solid 2px ${theme.palette.primary.main}`,
-      outline: 'none',
-    },
-  },
-  '& button, & input, & .MuiInputBase-root': {
-    boxShadow: '0px -1px 2px 0px rgba(89, 120, 134, 0.15)',
-    backgroundColor: '#F6F8FA',
-    border: '0.5px solid #E9ECEF',
-    borderRadius: '4px',
-    height: '28px',
-    fontSize: '14px',
-  },
-  '& label': {
-    fontSize: '12px',
-    color: 'primary.main',
-  },
-});
+};
 
 const singleColumnBorderRadiusStyle = {
   borderRadius: '16px',
@@ -115,11 +98,12 @@ export function UserGroupManagement(props: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const { activeUserIsSuperUser } = useUser();
+  const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
 
   async function handleDeleteGroup(groupId: string) {
     try {
       await deleteUserGroup(groupId);
-      props.onGroupDelete();
+      props.onGroupDelete?.();
       showToast({
         message: tr.UserGroupManagement.groupDeletionComplete,
         severity: 'success',
@@ -138,8 +122,21 @@ export function UserGroupManagement(props: Props) {
         display: 'flex',
         flexDirection: 'column',
         gap: '1.5rem',
+        paddingX: userManagementContentPadding,
       }}
     >
+      <ConfirmDialog
+        open={groupToDelete !== null}
+        text={tr.UserGroupManagement.groupDeletionConfirm}
+        submitColor="error"
+        onClose={async (confirmed) => {
+          const id = groupToDelete;
+          setGroupToDelete(null);
+          if (confirmed && id) {
+            await handleDeleteGroup(id);
+          }
+        }}
+      />
       <FormControl
         onSubmit={async (e) => {
           e.preventDefault();
@@ -162,7 +159,7 @@ export function UserGroupManagement(props: Props) {
           }
         }}
         component="form"
-        sx={(theme) => formStyle(theme)}
+        sx={formStyle}
       >
         <Box
           sx={{
@@ -171,17 +168,17 @@ export function UserGroupManagement(props: Props) {
             gap: '0.25rem',
           }}
         >
-          <label htmlFor="groupNameInput">
-            {tr.UserGroupManagement.addGroupLabel}
-          </label>
-          <input id="groupNameInput" />
+          <Input
+            label={tr.UserGroupManagement.addGroupLabel}
+            id="groupNameInput"
+          />
         </Box>
 
         <Button
           type="submit"
+          variant="outlined"
           sx={{
             width: 'max-content',
-            '&:active': { backgroundColor: '#e4e4e4' },
           }}
         >
           {tr.UserGroupManagement.addGroup}
@@ -243,10 +240,7 @@ export function UserGroupManagement(props: Props) {
                                 color: 'error.main',
                               },
                             }}
-                            onClick={async () => {
-                              await handleDeleteGroup(group.id);
-                              await props.onGroupDelete();
-                            }}
+                            onClick={() => setGroupToDelete(group.id)}
                           >
                             <DeleteBinIcon fontSize="small" />
                           </IconButton>
@@ -265,10 +259,7 @@ export function UserGroupManagement(props: Props) {
                                 color: 'error.main',
                               },
                             }}
-                            onClick={async () => {
-                              await handleDeleteGroup(group.id);
-                              await props.onGroupDelete();
-                            }}
+                            onClick={() => setGroupToDelete(group.id)}
                           >
                             <DeleteBinIcon fontSize="small" />
                           </IconButton>

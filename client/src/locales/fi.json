@@ -871,6 +871,7 @@
     "groupFetchError": "Virhe haettaessa käyttäjäryhmiä.",
     "groupCreationComplete": "Käyttäjäryhmä lisätty.",
     "groupCreationFailed": "Käyttäjäryhmän lisääminen epäonnistui.",
+    "groupDeletionConfirm": "Haluatko varmasti poistaa tämän käyttäjäryhmän?",
     "groupDeletionComplete": "Käyttäjäryhmä poistettu.",
     "groupDeletionFailed": "Käyttäjäryhmän poistaminen epäonnistui."
   },

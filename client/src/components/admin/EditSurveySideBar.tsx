@@ -96,9 +96,12 @@ const styles = {
     marginTop: '16px',
     paddingX: '16px',
     paddingBottom: '6px',
-    borderBottom: 'solid 2px #C4CEDA',
+    borderBottom: `solid 2px #C4CEDA`,
   },
-  list: { padding: 0, alignSelf: 'stretch' },
+  list: {
+    padding: 0,
+    alignSelf: 'stretch',
+  },
   footer: (theme: Theme) => ({
     position: 'sticky',
     bottom: 0,

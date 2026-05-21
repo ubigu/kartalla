@@ -137,7 +137,7 @@ export function Select<T extends string = string>({
             sx: {
               padding: '4px 0',
               backgroundColor: 'surfacePrimary.main',
-              border: '1px solid',
+              border: '0.5px solid',
               borderColor: 'borderSubtle.main',
               borderRadius: '8px',
               borderTopRightRadius: 0,
@@ -165,7 +165,7 @@ export function Select<T extends string = string>({
                 ? 'surfaceSubtle.main'
                 : getBackgroundColor('default', !!error),
             },
-            border: '1px solid',
+            border: '0.5px solid',
             borderColor: getBorderColor('default', !!error),
             borderRadius: '3px',
             boxShadow: getBoxShadow('default', !!error),
