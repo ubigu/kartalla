@@ -31,12 +31,16 @@ export default function EditBudgetingQuestion({ section, onChange }: Props) {
         control={
           <Switch
             checked={section.budgetingMode === 'pieces'}
-            onChange={(event) =>
+            onChange={(event) => {
+              const budgetingMode = event.target.checked ? 'pieces' : 'direct';
               onChange({
                 ...section,
-                budgetingMode: event.target.checked ? 'pieces' : 'direct',
-              })
-            }
+                budgetingMode,
+                ...(budgetingMode === 'pieces' && {
+                  requireFullAllocation: false,
+                }),
+              });
+            }}
           />
         }
       />
