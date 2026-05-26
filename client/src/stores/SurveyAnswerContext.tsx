@@ -1,9 +1,9 @@
 // @ts-strict-ignore
 import {
-  AnswerEntry,
   Conditions,
   LanguageCode,
   PersonalInfoAnswer,
+  SubmissionAnswerEntry,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -27,7 +27,7 @@ import { getLocalizedMapUrls } from './SurveyContext';
 import { useTranslations } from './TranslationContext';
 
 interface State {
-  answers: AnswerEntry[];
+  answers: SubmissionAnswerEntry[];
   survey: Survey | null;
   unfinishedToken: string | null;
 }
@@ -43,15 +43,15 @@ type Action =
     }
   | {
       type: 'UPDATE_ANSWER';
-      answer: AnswerEntry;
+      answer: SubmissionAnswerEntry;
     }
   | {
       type: 'UPDATE_ANSWERS';
-      answers: AnswerEntry[];
+      answers: SubmissionAnswerEntry[];
     }
   | {
       type: 'SET_ANSWERS';
-      answers: AnswerEntry[];
+      answers: SubmissionAnswerEntry[];
     }
   | {
       type: 'SET_UNFINISHED_TOKEN';
@@ -71,7 +71,9 @@ const stateDefaults: State = {
  */
 export const SurveyAnswerContext = createContext<Context | null>(null);
 
-export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
+export function getEmptyAnswer(
+  section: SurveyPageSection,
+): SubmissionAnswerEntry {
   switch (section.type) {
     case 'personal-info':
       return {
@@ -186,7 +188,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
  */
 export function isAnswerEmpty(
   question: SurveyQuestion,
-  value: AnswerEntry['value'],
+  value: SubmissionAnswerEntry['value'],
 ) {
   // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
   if (question.type === 'matrix') {
@@ -405,7 +407,10 @@ export function useSurveyAnswers() {
         case 'checkbox':
           return conditionForSection.equals.some((answerId) =>
             (
-              answerEntry as Extract<AnswerEntry, { type: 'checkbox' }>
+              answerEntry as Extract<
+                SubmissionAnswerEntry,
+                { type: 'checkbox' }
+              >
             ).value.some((val) => (isString(val) ? -1 : val) === answerId),
           );
 
@@ -467,9 +472,9 @@ export function useSurveyAnswers() {
         return question.followUpSections
           .filter((section) =>
             section.conditions.equals.some((answerId) =>
-              (answer as Extract<AnswerEntry, { type: 'checkbox' }>).value.some(
-                (val) => (isString(val) ? -1 : val) === answerId,
-              ),
+              (
+                answer as Extract<SubmissionAnswerEntry, { type: 'checkbox' }>
+              ).value.some((val) => (isString(val) ? -1 : val) === answerId),
             ),
           )
           .map((s) => s.id);
@@ -478,7 +483,10 @@ export function useSurveyAnswers() {
         return question.followUpSections
           .filter((section) => {
             const value = (
-              answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
+              answer as Extract<
+                SubmissionAnswerEntry,
+                { type: 'numeric' | 'slider' }
+              >
             ).value;
 
             return section.conditions.equals.some(
@@ -527,7 +535,7 @@ export function useSurveyAnswers() {
      * Update survey answer
      * @param answer Survey answer
      */
-    updateAnswer(answer: AnswerEntry) {
+    updateAnswer(answer: SubmissionAnswerEntry) {
       dispatch({ type: 'UPDATE_ANSWER', answer });
     },
     /**
@@ -630,7 +638,7 @@ export function useSurveyAnswers() {
     async loadUnfinishedEntries(token: string) {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
       const response = await request<{
-        answers: AnswerEntry[];
+        answers: SubmissionAnswerEntry[];
         language: LanguageCode;
       }>(
         `/api/published-surveys/${state.survey.organization.name}/${state.survey.name}/unfinished-submission?token=${token}`,

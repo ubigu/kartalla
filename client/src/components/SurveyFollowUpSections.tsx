@@ -3,7 +3,7 @@ import { Box, Collapse, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 
 import {
-  AnswerEntry,
+  SubmissionAnswerEntry,
   SurveyFollowUpQuestion,
   SurveyFollowUpSection,
   SurveyQuestion as SurveyQuestionType,
@@ -22,7 +22,7 @@ function FollowUpSectionAnswers({
   mobileDrawerOpen,
 }: {
   section: SurveyFollowUpQuestion;
-  answerEntries: AnswerEntry[];
+  answerEntries: SubmissionAnswerEntry[];
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
 }) {
@@ -38,19 +38,20 @@ function FollowUpSectionAnswers({
           <Typography variant="followUpSectionTitle">
             {section.title?.[surveyLanguage]}
           </Typography>
-          {(answerEntry as AnswerEntry & { type: 'map' }).value.map((item) =>
-            item.subQuestionAnswers.map((subquestionAnswer, index) => (
-              <SurveyQuestion
-                pageUnfinished={false}
-                mobileDrawerOpen={false}
-                key={index}
-                readOnly
-                question={section.subQuestions.find(
-                  (question) => question.id === subquestionAnswer.sectionId,
-                )}
-                value={subquestionAnswer.value}
-              />
-            )),
+          {(answerEntry as SubmissionAnswerEntry & { type: 'map' }).value.map(
+            (item) =>
+              item.subQuestionAnswers.map((subquestionAnswer, index) => (
+                <SurveyQuestion
+                  pageUnfinished={false}
+                  mobileDrawerOpen={false}
+                  key={index}
+                  readOnly
+                  question={section.subQuestions.find(
+                    (question) => question.id === subquestionAnswer.sectionId,
+                  )}
+                  value={subquestionAnswer.value}
+                />
+              )),
           )}
         </>
       ) : (

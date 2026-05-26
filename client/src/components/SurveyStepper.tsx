@@ -1,6 +1,6 @@
 // @ts-strict-ignore
 import {
-  AnswerEntry,
+  SubmissionAnswerEntry,
   SubmissionInfo,
   Survey,
   SurveyMapQuestion,
@@ -264,7 +264,7 @@ export default function SurveyStepper({
     featureCollection = mapQuestions.reduce((fc, question) => {
       const answer = answers.find(
         (answer) => answer.sectionId === question.id,
-      ) as AnswerEntry & { type: 'map' };
+      ) as SubmissionAnswerEntry & { type: 'map' };
       if (!answer?.value) {
         return fc;
       }
@@ -296,7 +296,7 @@ export default function SurveyStepper({
     featureCollection = geoBudgetingQuestions.reduce((fc, question) => {
       const answer = answers.find(
         (answer) => answer.sectionId === question.id,
-      ) as AnswerEntry & { type: 'geo-budgeting' };
+      ) as SubmissionAnswerEntry & { type: 'geo-budgeting' };
       if (!answer?.value) {
         return fc;
       }
@@ -421,7 +421,7 @@ export default function SurveyStepper({
       });
 
     answers
-      .filter((answer): answer is AnswerEntry & { type: 'map' } =>
+      .filter((answer): answer is SubmissionAnswerEntry & { type: 'map' } =>
         mapQuestionIds.includes(answer.sectionId),
       )
       .forEach((answer) => {

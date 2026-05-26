@@ -40,7 +40,7 @@ import {
   multiLangSubject,
   multiLangTarget,
   multiLangTitle,
-} from './answerExportHelpers';
+} from '../tests/answerExportHelpers';
 import { getCSVFile } from './csvExport';
 import {
   getAnswerDBEntries,

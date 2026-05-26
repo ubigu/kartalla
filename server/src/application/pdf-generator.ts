@@ -1,9 +1,9 @@
 import {
-  AnswerEntry,
   LanguageCode,
   PersonalInfoAnswer,
   SectionImageOption,
   SectionOption,
+  SubmissionAnswerEntry,
   Survey,
   SurveyBudgetingQuestion,
   SurveyFollowUpSection,
@@ -76,12 +76,14 @@ function findFollowUpMapQuestion(
 
 function prepareMapAndGeoBudgetingAnswers(
   survey: Survey,
-  answerEntries: AnswerEntry[],
+  answerEntries: SubmissionAnswerEntry[],
   language: LanguageCode,
 ): ScreenshotJobData {
   return answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'map' | 'geo-budgeting' } =>
+      (
+        entry,
+      ): entry is SubmissionAnswerEntry & { type: 'map' | 'geo-budgeting' } =>
         entry.type === 'map' || entry.type === 'geo-budgeting',
     )
     .reduce(
@@ -154,7 +156,7 @@ async function getFrontPage(
   survey: Survey,
   submissionId: number,
   timestamp: Date,
-  answerEntries: AnswerEntry[],
+  answerEntries: SubmissionAnswerEntry[],
   language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
@@ -234,7 +236,7 @@ async function getFrontPage(
 
   const attachmentFileNames = answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'attachment' } =>
+      (entry): entry is SubmissionAnswerEntry & { type: 'attachment' } =>
         entry.type === 'attachment',
     )
     .map((entry) => entry.value[0]?.fileName)
@@ -319,7 +321,7 @@ function getOptionSelectionImage(
 }
 
 function getContent(
-  answerEntry: AnswerEntry | undefined,
+  answerEntry: SubmissionAnswerEntry | undefined,
   sections: SurveyPageSection[],
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
@@ -759,7 +761,7 @@ function getContent(
 export async function generatePdf(
   survey: Survey,
   submission: { id: number; timestamp: Date },
-  answerEntries: AnswerEntry[],
+  answerEntries: SubmissionAnswerEntry[],
   language: LanguageCode,
 ) {
   const start = Date.now();
