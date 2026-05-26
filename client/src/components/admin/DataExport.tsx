@@ -14,7 +14,10 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@src/components/icons/DownloadIcon';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
@@ -29,6 +32,21 @@ interface AnswerCounts {
 interface Props {
   surveyId: number;
   surveyTitle: LocalizedText;
+}
+
+async function handleFileExportError(res: Response) {
+  if (!res.ok) {
+    let error: string | object = await res.text();
+    try {
+      error = JSON.parse(error as string);
+    } catch {
+      // keep as string if body is not valid JSON
+    }
+    throw {
+      ...(typeof error === 'object' ? error : { text: error }),
+      status: res.status,
+    };
+  }
 }
 
 export default function DataExport({ surveyId, surveyTitle }: Props) {
@@ -86,6 +104,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
         },
       );
 
+      await handleFileExportError(res);
       const csvText = await res.text();
       const textBlob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
 
@@ -97,7 +116,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
     } catch (err) {
       showToast({
         severity: 'error',
-        message: err.message,
+        message: getApiTranslation(err.message_code ?? err.message, tr),
       });
     }
   }
@@ -109,6 +128,8 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
         { method: 'GET' },
       );
 
+      await handleFileExportError(res);
+
       const blob = await res.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -117,7 +138,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
     } catch (err) {
       showToast({
         severity: 'error',
-        message: err.message,
+        message: getApiTranslation(err.message_code ?? err.message, tr),
       });
     }
   }
@@ -131,18 +152,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
         },
       );
 
-      if (!res.ok) {
-        let error: string | object = await res.text();
-        error = JSON.parse(error as string);
-        throw {
-          ...(typeof error === 'object'
-            ? error
-            : {
-                text: error,
-              }),
-          status: res.status,
-        };
-      }
+      await handleFileExportError(res);
 
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -153,7 +163,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
     } catch (err) {
       showToast({
         severity: 'error',
-        message: err.message,
+        message: getApiTranslation(err.message_code ?? err.message, tr),
       });
     }
   }

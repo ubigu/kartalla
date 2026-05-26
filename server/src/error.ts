@@ -30,17 +30,29 @@ function getHttpErrorClass<StatusCode extends number>(
     info: InfoType;
 
     /**
+     * Machine-readable error code for client-side translation lookup.
+     */
+    message_code?: string;
+
+    /**
      * Creates a new error object with a predefined HTTP status code.
      * When Express catches the error, it responds with
      *   - the status code
      *   - error message
+     *   - message_code (if provided)
      *   - additional info (if provided)
      * @param message
      * @param info
+     * @param message_code
      */
-    constructor(message = defaultMessage, info?: InfoType) {
+    constructor(
+      message = defaultMessage,
+      info?: InfoType,
+      message_code?: string,
+    ) {
       super(message);
       this.info = info;
+      this.message_code = message_code;
     }
   };
 }

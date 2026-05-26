@@ -83,7 +83,11 @@ router.post(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId, true);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const id = await changeSurveyArchiveStatus(surveyId, req.body.archive);
 
@@ -267,7 +271,11 @@ router.put(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const survey: Survey = {
       ...req.body,
@@ -306,7 +314,11 @@ router.delete(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const deletedSurvey = await deleteSurvey(surveyId);
     res.status(200).json(deletedSurvey);
@@ -464,7 +476,11 @@ router.post(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
 
     const survey = await publishSurvey(surveyId);
@@ -486,7 +502,11 @@ router.post(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
 
     const survey = await unpublishSurvey(surveyId);
@@ -508,7 +528,11 @@ router.post(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const partialPage = req.body as Partial<SurveyPage>;
     const createdSurveyPage = await createSurveyPage(surveyId, partialPage);
@@ -537,7 +561,11 @@ router.delete(
     const surveyId = Number(req.params.surveyId);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
 
     const deletedSurveyPage = await deleteSurveyPage(pageId);
@@ -681,7 +709,11 @@ router.get(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
 
     const publications = await getPublicationCredentials(surveyId);
@@ -705,7 +737,11 @@ router.put(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const {
       username,
@@ -741,7 +777,11 @@ router.delete(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author nor editor of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_EDIT',
+      );
     }
     const publication = await deletePublicationCredentials(surveyId);
     res.status(200).json(publication);

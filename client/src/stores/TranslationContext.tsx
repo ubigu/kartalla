@@ -128,6 +128,21 @@ export function useTranslations() {
   };
 }
 
+type ApiTranslationKey = keyof typeof fi.ApiResponses;
+
+function isApiTranslationKey(key: unknown): key is ApiTranslationKey {
+  return typeof key === 'string' && key in fi.ApiResponses;
+}
+
+/** Returns the translation for an API response key, falling back to the key itself if no translation exists. */
+export function getApiTranslation(
+  key: unknown,
+  tr: (typeof translations)[Language],
+): string {
+  if (!isApiTranslationKey(key)) return typeof key === 'string' ? key : '';
+  return tr.ApiResponses[key];
+}
+
 /** Reducer function for dispatching actions and changing the state provided by the TranslationContext */
 function reducer(state: State, action: Action): State {
   switch (action.type) {

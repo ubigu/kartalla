@@ -956,5 +956,12 @@
   },
   "OlMap": {
     "layerFetchError": "Det gick inte att läsa in kartlager. Standardkartan används."
+  },
+  "ApiResponses": {
+    "NO_ANSWERS_FOUND": "Inga svar hittades.",
+    "NO_ANSWERS_AVAILABLE": "Inga svar tillgängliga.",
+    "NO_ATTACHMENTS_AVAILABLE": "Inga bilagor tillgängliga.",
+    "USER_NOT_PERMITTED_TO_VIEW": "Användaren är inte skapare, redaktör eller granskare av enkäten.",
+    "USER_NOT_PERMITTED_TO_EDIT": "Användaren är inte skapare eller redaktör av enkäten."
   }
 }
