@@ -1,8 +1,8 @@
 // @ts-strict-ignore
 import {
-  AnswerEntry,
   GeoBudgetingAnswer,
   Submission,
+  SubmissionAnswerEntry,
   Survey,
   SurveyPageSection,
   SurveyQuestion,
@@ -91,7 +91,7 @@ export default function AnswerMap({
     );
   }
 
-  function getAnswerVisibility(answer: AnswerEntry) {
+  function getAnswerVisibility(answer: SubmissionAnswerEntry) {
     if (!answer.value) return false;
     // Current question is not selected, filter away answers that are not map/geo-budgeting answers
     if (selectedQuestion.id === 0)
@@ -127,7 +127,7 @@ export default function AnswerMap({
               .filter(
                 (
                   answer,
-                ): answer is AnswerEntry & {
+                ): answer is SubmissionAnswerEntry & {
                   type: 'map' | 'geo-budgeting';
                 } => getAnswerVisibility(answer),
               )

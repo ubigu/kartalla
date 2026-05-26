@@ -1,6 +1,5 @@
 import { CredentialsEntry } from '@interfaces/submission';
 import {
-  AnswerEntry,
   BudgetTarget,
   GeoBudgetingAnswer,
   LanguageCode,
@@ -8,6 +7,7 @@ import {
   MapQuestionAnswer,
   PersonalInfoAnswer,
   Submission,
+  SubmissionAnswerEntry,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -112,7 +112,9 @@ const answerEntryColumnSet = (inputSRID: number) =>
  * Validates given answer entries. Rejects the request if any of the entries is invalid, i.e. exceeds answer limits.
  * @param answerEntries Answer entries to validate
  */
-async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
+async function validateEntriesByAnswerLimits(
+  answerEntries: SubmissionAnswerEntry[],
+) {
   // Get all questions that have answer limits from db
   const limitedQuestions = await getDb().manyOrNone<{
     id: number;
@@ -168,7 +170,9 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
  * Disregard follow-up questions as they are conditionally answered
  * @param answerEntries Answer entries to validate
  */
-async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
+async function validateEntriesByIsRequired(
+  answerEntries: SubmissionAnswerEntry[],
+) {
   // Get all questions that are required from db
   const requiredQuestions = await getDb().manyOrNone<{
     id: number;
@@ -204,7 +208,7 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
  * Check if given answer entries are valid.
  * @param answerEntries Answer entries to validate
  */
-async function validateEntries(answerEntries: AnswerEntry[]) {
+async function validateEntries(answerEntries: SubmissionAnswerEntry[]) {
   await Promise.all([
     validateEntriesByAnswerLimits(answerEntries),
     validateEntriesByIsRequired(answerEntries),
@@ -212,14 +216,16 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   ]);
 }
 
-async function validateAttachmentEntries(answerEntries: AnswerEntry[]) {
+async function validateAttachmentEntries(
+  answerEntries: SubmissionAnswerEntry[],
+) {
   const attachmentEntries = answerEntries.filter(
     (entry) => entry.type === 'attachment',
   );
 
   for (const entry of attachmentEntries) {
     // Issues with type inference here so using assertion
-    for (const value of entry.value as (AnswerEntry & {
+    for (const value of entry.value as (SubmissionAnswerEntry & {
       type: 'attachment';
     })['value']) {
       // Data URL validation is the first step
@@ -252,7 +258,9 @@ async function validateAttachmentEntries(answerEntries: AnswerEntry[]) {
  * Applies to both 'budgeting' and 'geo-budgeting' question types.
  * @param answerEntries Answer entries to validate
  */
-async function validateBudgetingEntries(answerEntries: AnswerEntry[]) {
+async function validateBudgetingEntries(
+  answerEntries: SubmissionAnswerEntry[],
+) {
   // Get all budgeting questions and their constraints from db
   const budgetingQuestions = await getDb().manyOrNone<{
     id: number;
@@ -375,7 +383,7 @@ async function savePersonalInfo(personalInfo: DBPersonalInfo) {
 /** Get decrypted personal info question answer from database */
 async function getPersonalInfo(
   submissionId: number,
-): Promise<AnswerEntry | null> {
+): Promise<SubmissionAnswerEntry | null> {
   const result = await getDb().oneOrNone<DBPersonalInfo>(
     `
     SELECT
@@ -406,7 +414,7 @@ async function getPersonalInfo(
       address: result.address,
       custom: result.custom,
     },
-  } as AnswerEntry;
+  } as SubmissionAnswerEntry;
 }
 
 /**
@@ -419,7 +427,7 @@ async function getPersonalInfo(
  */
 export async function createSurveySubmission(
   surveyID: number,
-  answerEntries: AnswerEntry[],
+  answerEntries: SubmissionAnswerEntry[],
   unfinishedToken: string,
   unfinished = false,
   language: LanguageCode,
@@ -536,7 +544,7 @@ export async function createSurveySubmission(
       // Generate rows for subquestion answers with the parent entry ID
       const subQuestionAnswerRows = answerEntriesToRows(
         id,
-        entry.subQuestionAnswers as AnswerEntry[],
+        entry.subQuestionAnswers as SubmissionAnswerEntry[],
         entryId,
       );
       // Insert the rows
@@ -557,7 +565,7 @@ export async function createSurveySubmission(
  * @param submissionEntries
  * @returns SRID describing the coordinate reference system in which the geometry entries are described in
  */
-function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
+function getSRIDFromEntries(submissionEntries: SubmissionAnswerEntry[]) {
   const geometryEntry = submissionEntries.find(
     (entry) =>
       (entry.type === 'map' || entry.type === 'geo-budgeting') &&
@@ -579,7 +587,7 @@ function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
  */
 function answerEntriesToRows(
   submissionID: number,
-  submissionEntries: AnswerEntry[],
+  submissionEntries: SubmissionAnswerEntry[],
   parentEntryId: number = null,
 ) {
   return submissionEntries.reduce((entries, entry) => {
@@ -880,7 +888,7 @@ function dbAnswerEntriesToAnswerEntries(
         case 'checkbox': {
           // Try to find an existing entry for this section
           let entry = entries.find(
-            (entry): entry is AnswerEntry & { type: 'checkbox' } =>
+            (entry): entry is SubmissionAnswerEntry & { type: 'checkbox' } =>
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
@@ -899,7 +907,9 @@ function dbAnswerEntriesToAnswerEntries(
         case 'grouped-checkbox': {
           // Try to find an existing entry for this section
           let entry = entries.find(
-            (entry): entry is AnswerEntry & { type: 'grouped-checkbox' } =>
+            (
+              entry,
+            ): entry is SubmissionAnswerEntry & { type: 'grouped-checkbox' } =>
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
@@ -929,7 +939,7 @@ function dbAnswerEntriesToAnswerEntries(
         case 'map': {
           // Try to find an existing entry for this section
           let entry = entries.find(
-            (entry): entry is AnswerEntry & { type: 'map' } =>
+            (entry): entry is SubmissionAnswerEntry & { type: 'map' } =>
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
@@ -1020,7 +1030,9 @@ function dbAnswerEntriesToAnswerEntries(
         case 'geo-budgeting': {
           // Try to find an existing entry for this section
           let entry = entries.find(
-            (entry): entry is AnswerEntry & { type: 'geo-budgeting' } =>
+            (
+              entry,
+            ): entry is SubmissionAnswerEntry & { type: 'geo-budgeting' } =>
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
@@ -1056,7 +1068,7 @@ function dbAnswerEntriesToAnswerEntries(
           assertNever(row.section_type);
       }
       return entries;
-    }, [] as AnswerEntry[]);
+    }, [] as SubmissionAnswerEntry[]);
 }
 
 /**

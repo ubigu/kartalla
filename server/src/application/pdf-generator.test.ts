@@ -24,7 +24,11 @@ vi.mock('@src/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 
-import { AnswerEntry, Survey, SurveyPageSection } from '@interfaces/survey';
+import {
+  SubmissionAnswerEntry,
+  Survey,
+  SurveyPageSection,
+} from '@interfaces/survey';
 import { createMockSurvey } from '@src/tests/data/survey';
 import { createPdf } from 'pdfmake';
 import { generatePdf } from './pdf-generator';
@@ -70,7 +74,7 @@ describe('generatePdf', () => {
 
   it('silently skips answers whose section is not found', async () => {
     const survey = makeSurveyWithSections([]);
-    const answers: AnswerEntry[] = [
+    const answers: SubmissionAnswerEntry[] = [
       { sectionId: 999, type: 'free-text', value: 'orphan answer' },
     ];
     await generatePdf(survey, SUBMISSION, answers, LANG);

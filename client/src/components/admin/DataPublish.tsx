@@ -22,7 +22,10 @@ import { styled } from '@mui/material/styles';
 import HierarchyIcon from '@src/components/icons/HierarchyIcon';
 import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
 import { Toast, useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { useEffect, useState } from 'react';
 
@@ -109,7 +112,11 @@ export default function DataPublish({ surveyId }: Props) {
   function getErrorObject(err: Response | Error): Toast {
     return {
       severity: 'error',
-      message: err instanceof Error ? err.message : err.statusText,
+      message: getApiTranslation(
+        (err as any).message_code ??
+          (err instanceof Error ? err.message : err.statusText),
+        tr,
+      ),
     };
   }
 

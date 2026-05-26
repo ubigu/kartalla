@@ -1,7 +1,11 @@
 // @ts-strict-ignore
-import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
-import { Box, Button, useTheme } from '@mui/material';
+import {
+  Submission,
+  SubmissionAnswerEntry,
+  SurveyQuestion,
+} from '@interfaces/survey';
 import { Download } from '@mui/icons-material';
+import { Box, Button, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { FunctionComponent, useMemo, useState } from 'react';
 import {
@@ -67,7 +71,10 @@ function LabelTooltip({
   );
 }
 
-function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
+function buildNumericRange(
+  range: Range,
+  answersList: SubmissionAnswerEntry[],
+): number[] {
   const maxBuckets = 10;
   const minBuckets = 5;
 
@@ -190,7 +197,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     const questionAnswers = submissions
       .reduce(
         (answers, submission) => [...answers, ...submission.answerEntries],
-        [] as AnswerEntry[],
+        [] as SubmissionAnswerEntry[],
       )
       .filter((answer) => answer.sectionId === selectedQuestion.id);
     if (!questionAnswers) return;
@@ -208,7 +215,10 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
                 id: option.id,
                 text: option.text[surveyLanguage],
                 count: questionAnswers.reduce(
-                  (count, qa: AnswerEntry & { type: 'checkbox' | 'radio' }) => {
+                  (
+                    count,
+                    qa: SubmissionAnswerEntry & { type: 'checkbox' | 'radio' },
+                  ) => {
                     return qa.value === option.id ||
                       (Array.isArray(qa.value) && qa.value.includes(option.id))
                       ? count + 1
@@ -226,7 +236,9 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
                     count: questionAnswers.reduce(
                       (
                         count,
-                        qa: AnswerEntry & { type: 'checkbox' | 'radio' },
+                        qa: SubmissionAnswerEntry & {
+                          type: 'checkbox' | 'radio';
+                        },
                       ) => {
                         return Array.isArray(qa.value)
                           ? qa.value.some((v) => typeof v === 'string')
@@ -268,7 +280,10 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
                       : parseFloat(bucketMax.toFixed(2)))
               }`,
               count: questionAnswers.reduce(
-                (count, qa: AnswerEntry & { type: 'slider' | 'numeric' }) => {
+                (
+                  count,
+                  qa: SubmissionAnswerEntry & { type: 'slider' | 'numeric' },
+                ) => {
                   if (qa.value == null || qa.value < bucket) {
                     return count;
                   }
@@ -306,7 +321,8 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
           options: selectedQuestion.targets.map((target, index) => {
             // Get raw stored allocations for this target across all submissions
             const allocations = questionAnswers.map(
-              (qa: AnswerEntry & { type: 'budgeting' }) => qa.value[index] ?? 0,
+              (qa: SubmissionAnswerEntry & { type: 'budgeting' }) =>
+                qa.value[index] ?? 0,
             );
 
             // Convert to monetary values if stored as percentages

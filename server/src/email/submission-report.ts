@@ -1,9 +1,13 @@
-import { AnswerEntry, LanguageCode, Survey } from '@interfaces/survey';
+import {
+  LanguageCode,
+  SubmissionAnswerEntry,
+  Survey,
+} from '@interfaces/survey';
 import logger from '@src/logger';
+import useTranslations from '@src/translations/useTranslations';
 import MarkdownIt from 'markdown-it';
 import { Attachment } from 'nodemailer/lib/mailer';
 import { sendMail } from './email';
-import useTranslations from '@src/translations/useTranslations';
 
 // Markdown renderer
 const md = new MarkdownIt({ breaks: true });
@@ -24,10 +28,10 @@ function fileStringToBuffer(fileString: string) {
  * @param answerEntries Answer entries
  * @returns
  */
-function getAttachments(answerEntries: AnswerEntry[]) {
+function getAttachments(answerEntries: SubmissionAnswerEntry[]) {
   return answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'attachment' } =>
+      (entry): entry is SubmissionAnswerEntry & { type: 'attachment' } =>
         entry.type === 'attachment',
     )
     .reduce((files, entry) => {
@@ -61,7 +65,7 @@ export async function sendSubmissionReport({
   language: LanguageCode;
   survey: Survey;
   submissionId: number;
-  answerEntries: AnswerEntry[];
+  answerEntries: SubmissionAnswerEntry[];
   includeAttachments: boolean;
 }) {
   const subject = survey.email.subject?.[language] ?? survey.title[language];

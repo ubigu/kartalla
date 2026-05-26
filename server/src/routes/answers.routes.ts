@@ -73,6 +73,8 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 
@@ -83,7 +85,12 @@ router.get(
     if (req.query.fileType === 'csv') {
       const csv = await getCSVFile(surveyId, withPersonalInfo, lang);
       if (!csv) {
-        res.status(404).json({ message: 'No answers found' });
+        res
+          .status(404)
+          .json({
+            message: 'No answers found',
+            message_code: 'NO_ANSWERS_FOUND',
+          });
       } else {
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader(
@@ -95,7 +102,12 @@ router.get(
     } else {
       const buffer = await getExcelFile(surveyId, withPersonalInfo, lang);
       if (!buffer) {
-        res.status(404).json({ message: 'No answers found' });
+        res
+          .status(404)
+          .json({
+            message: 'No answers found',
+            message_code: 'NO_ANSWERS_FOUND',
+          });
       } else {
         res.setHeader(
           'Content-Type',
@@ -127,12 +139,18 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 
     const geopackageBuffer = await getGeoPackageFile(surveyId);
     if (!geopackageBuffer) {
-      throw new BadRequestError('No answers available');
+      throw new BadRequestError(
+        'No answers available',
+        undefined,
+        'NO_ANSWERS_AVAILABLE',
+      );
     } else {
       res.status(200);
       res.end(geopackageBuffer);
@@ -156,13 +174,19 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 
     const attachments = await getAttachments(surveyId);
 
     if (!attachments) {
-      throw new BadRequestError('No attachments available');
+      throw new BadRequestError(
+        'No attachments available',
+        undefined,
+        'NO_ATTACHMENTS_AVAILABLE',
+      );
     } else {
       res.status(200).json(attachments);
     }

@@ -29,8 +29,11 @@ import { getExcelFile } from './excelExport';
 import {
   makeBudgetingRow,
   makeBudgetingSectionHeader,
+  makeCheckboxSectionHeader,
   makeFreeTextRow,
   makeFreeTextSectionHeader,
+  makeGroupedCheckboxRow,
+  makeGroupedCheckboxSectionHeader,
   makeMatrixRow,
   makeMatrixSectionHeader,
   makeMultiMatrixRow,
@@ -47,14 +50,17 @@ import {
   multiLangSubject,
   multiLangTarget,
   multiLangTitle,
-} from './answerExportHelpers';
+} from '../tests/answerExportHelpers';
 
 describe('getExcelFile', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  async function loadSheet(buffer: ExcelJS.Buffer, sheetName = 'Vastaukset') {
+  async function loadSheet(
+    buffer: ExcelJS.Buffer,
+    sheetName = 'Vastaukset (laaja)',
+  ) {
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buffer);
     return wb.getWorksheet(sheetName);
@@ -83,9 +89,9 @@ describe('getExcelFile', () => {
     });
 
     it.each([
-      ['fi', 'Vastaukset'],
-      ['en', 'Responses'],
-      ['se', 'Svar'],
+      ['fi', 'Vastaukset (laaja)'],
+      ['en', 'Responses (detailed)'],
+      ['se', 'Svar (detaljerade)'],
     ] as const)(
       'creates a sheet with the correct name for lang=%s',
       async (lang, expectedName) => {
@@ -137,7 +143,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(ws.getRow(1).getCell(1).value).toBe(submissionId);
         expect(ws.getRow(1).getCell(2).value).toBe(responseTime);
@@ -284,7 +294,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
 
         const row1Values = [];
@@ -341,7 +355,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(expectedTitle);
         expect(ws.getRow(2).getCell(4).value).toBe(expectedOption);
@@ -363,7 +381,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
           multiLangTitle[lang],
@@ -421,7 +443,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
           multiLangTitle[lang],
@@ -463,7 +489,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
           multiLangTitle[lang],
@@ -492,7 +522,11 @@ describe('getExcelFile', () => {
         const buffer = await getExcelFile(1, false, lang);
         const ws = await loadSheet(
           buffer,
-          { fi: 'Vastaukset', en: 'Responses', se: 'Svar' }[lang],
+          {
+            fi: 'Vastaukset (laaja)',
+            en: 'Responses (detailed)',
+            se: 'Svar (detaljerade)',
+          }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
           multiLangTitle[lang],
@@ -549,6 +583,311 @@ describe('getExcelFile', () => {
       expect(ws.getRow(3).getCell(4).value).toBe('Alice');
       // Question column is pushed to column 5
       expect(String(ws.getRow(1).getCell(5).value)).toContain('Q');
+    });
+  });
+
+  describe('compact sheet', () => {
+    const COMPACT_NAMES = {
+      fi: 'Vastaukset (tiivis)',
+      en: 'Responses (compact)',
+      se: 'Svar (kompakta)',
+    } as const;
+
+    async function loadCompact(
+      buffer: ExcelJS.Buffer,
+      lang: 'fi' | 'en' | 'se' = 'fi',
+    ) {
+      return loadSheet(buffer, COMPACT_NAMES[lang]);
+    }
+
+    it('exists in the workbook', async () => {
+      vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+        makeFreeTextRow(1, 10, 'x'),
+      ]);
+      vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+        makeFreeTextSectionHeader(10, 'Q'),
+      ]);
+      const buffer = await getExcelFile(1);
+      const ws = await loadCompact(buffer);
+      expect(ws).toBeTruthy();
+    });
+
+    it.each([
+      ['fi', 'Vastaukset (tiivis)'],
+      ['en', 'Responses (compact)'],
+      ['se', 'Svar (kompakta)'],
+    ] as const)(
+      'has correct sheet name for lang=%s',
+      async (lang, expectedName) => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeFreeTextRow(1, 10, 'x'),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeFreeTextSectionHeader(10, 'Q'),
+        ]);
+        const buffer = await getExcelFile(1, false, lang);
+        const ws = await loadSheet(buffer, expectedName);
+        expect(ws).toBeTruthy();
+      },
+    );
+
+    it('has the same three meta columns as the main sheet', async () => {
+      vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+        makeFreeTextRow(1, 10, 'x'),
+      ]);
+      vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+        makeFreeTextSectionHeader(10, 'Q'),
+      ]);
+      const buffer = await getExcelFile(1);
+      const ws = await loadCompact(buffer);
+      expect(ws.getRow(1).getCell(1).value).toBe('Vastaustunniste');
+      expect(ws.getRow(1).getCell(2).value).toBe('Tallennusaika');
+      expect(ws.getRow(1).getCell(3).value).toBe('Vastauskieli');
+    });
+
+    describe('free-text', () => {
+      it('writes value in data cell', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeFreeTextRow(1, 10, 'Hello'),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeFreeTextSectionHeader(10, 'Q'),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe('Hello');
+      });
+    });
+
+    describe('radio', () => {
+      it('writes selected option text (not a checkmark) in a single column', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeRadioRow(1, 10, 99),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeRadioSectionHeader(10, 99, 'Choose one', 'Option A'),
+          makeRadioSectionHeader(10, 100, 'Choose one', 'Option B'),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe('Option A');
+        expect(ws.getRow(3).getCell(5).value).toBeNull();
+      });
+
+      it('all options share one column — row 2 secondary header is empty', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeRadioRow(1, 10, 99),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeRadioSectionHeader(10, 99, 'Choose one', 'Option A'),
+          makeRadioSectionHeader(10, 100, 'Choose one', 'Option B'),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        const secondaryHeader = ws.getRow(2).getCell(4).value;
+        expect(secondaryHeader == null || secondaryHeader === '').toBeTruthy();
+      });
+    });
+
+    describe('checkbox', () => {
+      it('comma-separates multiple selected options in one column', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeRadioRow(1, 10, 99),
+          makeRadioRow(1, 10, 100),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeCheckboxSectionHeader(10, 99, 'Pick any', 'Alpha'),
+          makeCheckboxSectionHeader(10, 100, 'Pick any', 'Beta'),
+          makeCheckboxSectionHeader(10, 101, 'Pick any', 'Gamma'),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe('Alpha, Beta');
+      });
+    });
+
+    describe('grouped-checkbox', () => {
+      it('creates one column per group with the group name in row 2', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeGroupedCheckboxRow(1, 10, 99, 1),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeGroupedCheckboxSectionHeader(
+            10,
+            99,
+            'Items',
+            'Option A',
+            1,
+            'Group 1',
+          ),
+          makeGroupedCheckboxSectionHeader(
+            10,
+            100,
+            'Items',
+            'Option B',
+            1,
+            'Group 1',
+          ),
+          makeGroupedCheckboxSectionHeader(
+            10,
+            101,
+            'Items',
+            'Option C',
+            2,
+            'Group 2',
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(2).getCell(4).value).toBe('Group 1');
+        expect(ws.getRow(2).getCell(5).value).toBe('Group 2');
+      });
+
+      it('lists only selected options within each group', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeGroupedCheckboxRow(1, 10, 99, 1),
+          makeGroupedCheckboxRow(1, 10, 101, 2),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeGroupedCheckboxSectionHeader(
+            10,
+            99,
+            'Items',
+            'Option A',
+            1,
+            'Group 1',
+          ),
+          makeGroupedCheckboxSectionHeader(
+            10,
+            100,
+            'Items',
+            'Option B',
+            1,
+            'Group 1',
+          ),
+          makeGroupedCheckboxSectionHeader(
+            10,
+            101,
+            'Items',
+            'Option C',
+            2,
+            'Group 2',
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe('Option A');
+        expect(ws.getRow(3).getCell(5).value).toBe('Option C');
+      });
+    });
+
+    describe('sorting', () => {
+      it('writes items in their sorted order comma-separated', async () => {
+        const sortingRow = {
+          ...makeFreeTextRow(1, 10, null),
+          type: 'sorting',
+          valueJson: [99, 100],
+        };
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([sortingRow]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeSortingSectionHeader(
+            10,
+            0,
+            { fi: 'Rank', en: 'Rank', se: 'Rank' },
+            { fi: 'First', en: 'First', se: 'First' },
+            99,
+          ),
+          makeSortingSectionHeader(
+            10,
+            1,
+            { fi: 'Rank', en: 'Rank', se: 'Rank' },
+            { fi: 'Second', en: 'Second', se: 'Second' },
+            100,
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe('First, Second');
+      });
+    });
+
+    describe('matrix', () => {
+      it('shows subject name in row 2', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeMatrixRow(1, 10, [0]),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeMatrixSectionHeader(10, 'Rate', ['Subject A'], ['Bad', 'Good']),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(2).getCell(4).value).toBe('Subject A');
+      });
+    });
+
+    describe('multi-matrix', () => {
+      it('shows subject name in row 2 (not included in row 1)', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeMultiMatrixRow(1, 10),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeMultiMatrixSectionHeader(
+            10,
+            multiLangTitle,
+            [multiLangSubject],
+            [multiLangClass],
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(String(ws.getRow(1).getCell(4).value)).toContain(
+          multiLangTitle.fi,
+        );
+        expect(String(ws.getRow(1).getCell(4).value)).not.toContain(
+          multiLangSubject.fi,
+        );
+        expect(ws.getRow(2).getCell(4).value).toBe(multiLangSubject.fi);
+      });
+
+      it('comma-separates selected class names in the subject column', async () => {
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
+          makeMultiMatrixRow(1, 10),
+        ]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeMultiMatrixSectionHeader(
+            10,
+            multiLangTitle,
+            [multiLangSubject],
+            [multiLangClass],
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(3).getCell(4).value).toBe(multiLangClass.fi);
+      });
+
+      it('creates one column per subject', async () => {
+        const twoSubjectRow = {
+          ...makeMultiMatrixRow(1, 10),
+          valueJson: [[0], [0]],
+        };
+        vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([twoSubjectRow]);
+        vi.mocked(getSectionHeaders).mockResolvedValueOnce([
+          makeMultiMatrixSectionHeader(
+            10,
+            multiLangTitle,
+            [
+              { fi: 'Subject 1', en: 'Subject 1', se: 'Subject 1' },
+              { fi: 'Subject 2', en: 'Subject 2', se: 'Subject 2' },
+            ],
+            [multiLangClass],
+          ),
+        ]);
+        const buffer = await getExcelFile(1);
+        const ws = await loadCompact(buffer);
+        expect(ws.getRow(2).getCell(4).value).toBe('Subject 1');
+        expect(ws.getRow(2).getCell(5).value).toBe('Subject 2');
+      });
     });
   });
 });

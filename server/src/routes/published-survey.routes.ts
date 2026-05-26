@@ -1,4 +1,4 @@
-import { AnswerEntry, SubmissionInfo } from '@interfaces/survey';
+import { SubmissionAnswerEntry, SubmissionInfo } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   createSurveySubmission,
@@ -93,7 +93,7 @@ router.post(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
-    const answerEntries: AnswerEntry[] = req.body.entries;
+    const answerEntries: SubmissionAnswerEntry[] = req.body.entries;
 
     const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
@@ -119,7 +119,7 @@ router.post(
       survey.email.includePersonalInfo
         ? answerEntries
         : answerEntries.filter(
-            (entry: AnswerEntry) => entry.type !== 'personal-info',
+            (entry: SubmissionAnswerEntry) => entry.type !== 'personal-info',
           ),
       answerLanguage,
     );
@@ -191,7 +191,7 @@ router.post(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
-    const answerEntries: AnswerEntry[] = req.body.entries;
+    const answerEntries: SubmissionAnswerEntry[] = req.body.entries;
     const language = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
 

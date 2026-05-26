@@ -1,7 +1,7 @@
 import {
-  AnswerEntry,
   LanguageCode,
   Submission,
+  SubmissionAnswerEntry,
   Survey,
   SurveyQuestion,
 } from '@interfaces/survey';
@@ -44,7 +44,7 @@ const DEFAULT_VIEW_SECTION_ID = 0;
 
 function answerEntryToItems(
   submission: Submission,
-  entry: AnswerEntry,
+  entry: SubmissionAnswerEntry,
 ): AnswerItem[] {
   // Only split map entries into separate items (one per geometry)
   // Geo-budgeting and other types stay as single items

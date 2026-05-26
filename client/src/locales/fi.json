@@ -956,5 +956,12 @@
   },
   "OlMap": {
     "layerFetchError": "Karttatasojen lataaminen epäonnistui. Käytetään oletuskarttaa."
+  },
+  "ApiResponses": {
+    "NO_ANSWERS_FOUND": "Vastauksia ei löydy.",
+    "NO_ANSWERS_AVAILABLE": "Vastauksia ei ole saatavilla.",
+    "NO_ATTACHMENTS_AVAILABLE": "Liitteitä ei ole saatavilla.",
+    "USER_NOT_PERMITTED_TO_VIEW": "Käyttäjällä ei ole oikeutta tarkastella kyselyä.",
+    "USER_NOT_PERMITTED_TO_EDIT": "Käyttäjällä ei ole oikeutta muokata kyselyä."
   }
 }

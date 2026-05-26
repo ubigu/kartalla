@@ -1,11 +1,11 @@
 // @ts-strict-ignore
 import type {
-  AnswerEntry,
   FileAnswer,
   GeoBudgetingAnswer,
   MapQuestionAnswer,
   PersonalInfoAnswer,
   Submission,
+  SubmissionAnswerEntry,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
 import {
@@ -40,7 +40,7 @@ interface Props {
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
   readOnly?: boolean;
-  value?: AnswerEntry['value'];
+  value?: SubmissionAnswerEntry['value'];
   submission?: Submission;
   isFollowUp?: boolean;
 }

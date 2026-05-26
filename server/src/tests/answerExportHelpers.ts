@@ -1,5 +1,8 @@
-import { type AnswerEntry } from './answerTypes';
-import { type SectionHeader, type SubmissionPersonalInfo } from './exportUtils';
+import { AnswerEntry } from '@src/application/answerTypes';
+import {
+  SectionHeader,
+  SubmissionPersonalInfo,
+} from '@src/application/exportUtils';
 
 export const mockDate = new Date('2024-01-15T10:00:00Z');
 
@@ -336,3 +339,43 @@ export const multiLangOption = {
   en: 'Option EN',
   se: 'Alternativ SE',
 };
+
+export function makeCheckboxSectionHeader(
+  sectionId: number,
+  optionId: number,
+  titleFi: string,
+  optionTextFi: string,
+): SectionHeaderRow {
+  return {
+    ...makeRadioSectionHeader(sectionId, optionId, titleFi, optionTextFi),
+    type: 'checkbox',
+  };
+}
+
+export function makeGroupedCheckboxSectionHeader(
+  sectionId: number,
+  optionId: number,
+  titleFi: string,
+  optionTextFi: string,
+  groupIndex: number,
+  groupNameFi: string,
+): SectionHeaderRow {
+  return {
+    ...makeRadioSectionHeader(sectionId, optionId, titleFi, optionTextFi),
+    type: 'grouped-checkbox',
+    groupIndex,
+    groupName: { fi: groupNameFi, en: groupNameFi, se: groupNameFi },
+  };
+}
+
+export function makeGroupedCheckboxRow(
+  submissionId: number,
+  sectionId: number,
+  valueOptionId: number,
+  groupIndex: number,
+): AnswerEntry {
+  return {
+    ...makeRadioRow(submissionId, sectionId, valueOptionId),
+    groupIndex,
+  };
+}

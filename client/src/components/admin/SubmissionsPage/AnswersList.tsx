@@ -1,8 +1,8 @@
 // @ts-strict-ignore
 import {
-  AnswerEntry,
   SurveyQuestion as Question,
   Submission,
+  SubmissionAnswerEntry,
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import {
@@ -37,7 +37,7 @@ export interface AnswerSelection {
 
 export interface AnswerItem {
   submission: Submission;
-  entry: AnswerEntry & { index?: number };
+  entry: SubmissionAnswerEntry & { index?: number };
 }
 
 function isItemSelected(
@@ -150,29 +150,29 @@ export default function AnswersList({
               <AccordionDetails sx={{ borderTop: 0, padding: '1rem 2rem' }}>
                 {answer.entry.type === 'map' ? (
                   <>
-                    {(answer.entry as AnswerEntry & { type: 'map' }).value.map(
-                      (item) =>
-                        item.subQuestionAnswers.map(
-                          (subquestionAnswer, index) => (
-                            <SurveyQuestion
-                              pageUnfinished={false}
-                              mobileDrawerOpen={false}
-                              key={index}
-                              readOnly
-                              question={(
-                                surveyQuestions.find(
-                                  (question) =>
-                                    question.id === answer.entry.sectionId,
-                                ) as SurveyMapQuestion
-                              )?.subQuestions?.find(
-                                (subQuestion) =>
-                                  subQuestion.id ===
-                                  subquestionAnswer.sectionId,
-                              )}
-                              value={subquestionAnswer.value}
-                            />
-                          ),
+                    {(
+                      answer.entry as SubmissionAnswerEntry & { type: 'map' }
+                    ).value.map((item) =>
+                      item.subQuestionAnswers.map(
+                        (subquestionAnswer, index) => (
+                          <SurveyQuestion
+                            pageUnfinished={false}
+                            mobileDrawerOpen={false}
+                            key={index}
+                            readOnly
+                            question={(
+                              surveyQuestions.find(
+                                (question) =>
+                                  question.id === answer.entry.sectionId,
+                              ) as SurveyMapQuestion
+                            )?.subQuestions?.find(
+                              (subQuestion) =>
+                                subQuestion.id === subquestionAnswer.sectionId,
+                            )}
+                            value={subquestionAnswer.value}
+                          />
                         ),
+                      ),
                     )}
                   </>
                 ) : answer.entry.type === 'geo-budgeting' ? (

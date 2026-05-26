@@ -694,7 +694,7 @@ type LocalizedText = Record<LanguageCode, string>;
 /**
  * Intersected subset of answers for map subquestions.
  */
-export type SurveyMapSubQuestionAnswer = AnswerEntry & {
+export type SurveyMapSubQuestionAnswer = SubmissionAnswerEntry & {
   type: SurveyMapSubQuestion['type'];
 };
 
@@ -734,7 +734,7 @@ export interface GeoBudgetingAnswer {
 /**
  * Submission entry interface
  */
-export type AnswerEntry = {
+export type SubmissionAnswerEntry = {
   /**
    * ID of the page section
    */
@@ -921,7 +921,7 @@ export interface SurveyEmailInfoItem {
 export interface Submission {
   id: number;
   timestamp: Date;
-  answerEntries?: AnswerEntry[];
+  answerEntries?: SubmissionAnswerEntry[];
 }
 
 export type ImageType =

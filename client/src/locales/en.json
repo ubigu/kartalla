@@ -957,5 +957,12 @@
   },
   "OlMap": {
     "layerFetchError": "Failed to load map layers. Using default map."
+  },
+  "ApiResponses": {
+    "NO_ANSWERS_FOUND": "No answers found.",
+    "NO_ANSWERS_AVAILABLE": "No answers available.",
+    "NO_ATTACHMENTS_AVAILABLE": "No attachments available.",
+    "USER_NOT_PERMITTED_TO_VIEW": "User not author, editor nor viewer of the survey.",
+    "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey."
   }
 }
