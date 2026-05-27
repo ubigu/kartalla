@@ -144,12 +144,6 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
 
   function closeCurrentToast() {
     dispatch({ type: 'SET_OPEN', open: false });
-
-    // For better feedback, allow previous toasts to disappear gracefully before
-    // clearing the alert contents and showing the next toast
-    setTimeout(() => {
-      dispatch({ type: 'CLOSE_CURRENT_TOAST' });
-    }, 200);
   }
 
   return (
@@ -159,6 +153,9 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
         open={state.open}
         autoHideDuration={state.currentToast?.autoHideDuration ?? 8000}
         onClose={closeCurrentToast}
+        TransitionProps={{
+          onExited: () => dispatch({ type: 'CLOSE_CURRENT_TOAST' }),
+        }}
       >
         <Alert
           elevation={2}

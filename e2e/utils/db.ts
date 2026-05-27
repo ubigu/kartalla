@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { TEST_SURVEY_URL_NAMES } from './data';
 
 const { Pool } = pg;
 
@@ -19,9 +20,9 @@ class DatabaseConnection {
     await this.pool.end();
   }
 
-  async query(query: string) {
+  async query(query: string, params?: any[]) {
     try {
-      const res = await this.pool.query(query);
+      const res = await this.pool.query(query, params);
       return res.rows;
     } catch (err) {
       console.log(err);
@@ -54,7 +55,51 @@ export async function clearData() {
 SELECT data.truncate_tables();`);
 }
 
+export async function clearTestSurveys(
+  urlNames: string[] = Object.values(TEST_SURVEY_URL_NAMES),
+) {
+  await connection.query(
+    `DELETE FROM data.answer_entry
+     WHERE submission_id IN (
+       SELECT id FROM data.submission
+       WHERE survey_id IN (SELECT id FROM data.survey WHERE name = ANY($1::text[]))
+     )`,
+    [urlNames],
+  );
+  await connection.query(
+    `DELETE FROM data.personal_info
+     WHERE submission_id IN (
+       SELECT id FROM data.submission
+       WHERE survey_id IN (SELECT id FROM data.survey WHERE name = ANY($1::text[]))
+     )`,
+    [urlNames],
+  );
+  await connection.query(
+    `DELETE FROM data.survey WHERE name = ANY($1::text[])`,
+    [urlNames],
+  );
+}
+
 export async function clearSections() {
-  return connection.query(`
-    DELETE FROM data.page_section;`);
+  return connection.query(`DELETE FROM data.page_section;`);
+}
+
+export async function deleteSurveyById(id: string) {
+  const surveyId = Number(id);
+  const submissions = await connection.query(
+    `SELECT id FROM data.submission WHERE survey_id = $1`,
+    [surveyId],
+  );
+  if (submissions && submissions.length > 0) {
+    const submissionIds = submissions.map((s: { id: number }) => s.id);
+    await connection.query(
+      `DELETE FROM data.answer_entry WHERE submission_id = ANY ($1)`,
+      [submissionIds],
+    );
+    await connection.query(
+      `DELETE FROM data.personal_info WHERE submission_id = ANY ($1)`,
+      [submissionIds],
+    );
+  }
+  return connection.query(`DELETE FROM data.survey WHERE id = $1`, [surveyId]);
 }

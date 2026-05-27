@@ -1,56 +1,44 @@
 import { expect } from '@playwright/test';
-import { getCheckBoxQuestionData, testSurveyData } from '../../utils/data';
+import { getCheckBoxQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } from '../../utils/data';
 import { test } from '../../utils/fixtures';
-import { clearData, clearSections } from '../../utils/db';
 
 const PAGE_NAME = 'Sivu 1';
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.checkbox);
+let surveyData = testSurveyData;
 let checkBoxQuestion = getCheckBoxQuestionData(PAGE_NAME);
 
-/** Testing question creation and answering to it. */
 test.describe('CheckBox question', () => {
-  test.beforeAll(async ({ workerShortcuts }) => {
-    await workerShortcuts.createWorkerSurvey(testSurveyData, PAGE_NAME);
+  test.beforeEach(async ({ shortcuts }) => {
+    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
   });
-  test.beforeEach(async ({ workerSurveyEditPage }) => {
-    // Reload the page to refresh cleared sections
-    workerSurveyEditPage.page.reload();
-  });
-  test.afterEach(async () => {
-    await clearSections();
+  test.afterEach(async ({ shortcuts }) => {
+    await shortcuts.deleteSurvey();
   });
 
-  test.afterAll(async () => {
-    await clearData();
-  });
   test('without limits', async ({
-    workerSurveyEditPage,
+    surveyEditPage,
     surveyPage,
     shortcuts,
   }) => {
-    await workerSurveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
-    await expect(workerSurveyEditPage.page.getByRole('alert')).toHaveText(
+    await surveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
+    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
       'Kysely tallennettiin onnistuneesti!',
     );
 
-    // Publish survey and answer question
     await shortcuts.publishAndStartSurvey(
-      testSurveyData.title,
-      testSurveyData.urlName,
+      surveyData.title,
+      surveyData.urlName,
     );
 
     const checkBoxes = await surveyPage.page.getByRole('checkbox').all();
     expect(checkBoxes).toHaveLength(checkBoxQuestion.answerOptions.length);
 
-    // Multiple can be checked at the same time
-
-    // Click first
     await checkBoxes[0].check();
     expect(await checkBoxes[0].isChecked()).toBe(true);
     for (let i = 1; i < checkBoxes.length; i++) {
       expect(await checkBoxes[i].isChecked()).toBe(false);
     }
 
-    // Click second
     await checkBoxes[1].check();
     expect(await checkBoxes[0].isChecked()).toBe(true);
     expect(await checkBoxes[1].isChecked()).toBe(true);
@@ -60,7 +48,7 @@ test.describe('CheckBox question', () => {
   });
 
   test('with limits', async ({
-    workerSurveyEditPage,
+    surveyEditPage,
     surveyPage,
     shortcuts,
   }) => {
@@ -69,32 +57,29 @@ test.describe('CheckBox question', () => {
       answerLimits: { min: 1, max: 3 },
     };
 
-    await workerSurveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
-    await expect(workerSurveyEditPage.page.getByRole('alert')).toHaveText(
+    await surveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
+    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
       'Kysely tallennettiin onnistuneesti!',
     );
 
-    // Publish survey and answer question
     await shortcuts.publishAndStartSurvey(
-      testSurveyData.title,
-      testSurveyData.urlName,
+      surveyData.title,
+      surveyData.urlName,
     );
 
     const checkBoxes = await surveyPage.page.getByRole('checkbox').all();
     expect(checkBoxes).toHaveLength(checkBoxQuestion.answerOptions.length);
 
-    // Check within limits
     await checkBoxes[0].check();
     await checkBoxes[1].check();
     await checkBoxes[2].check();
-    await checkBoxes[3].check();
-    for (let i = 0; i < checkBoxes.length; i++) {
-      expect(await checkBoxes[i].isChecked()).toBe(true);
-    }
 
-    // Try to submit the survey
+    // After reaching max=3, the 4th option is disabled
+    expect(await checkBoxes[3].isDisabled()).toBe(true);
+
     await surveyPage.page.getByRole('button', { name: 'Lähetä' }).click();
-    const pageAlerts = await surveyPage.page.getByRole('alert').all();
-    expect(pageAlerts).toHaveLength(2);
+    await expect(
+      surveyPage.page.locator('h1').filter({ hasText: surveyData.thanksPage.title }),
+    ).toBeVisible();
   });
 });

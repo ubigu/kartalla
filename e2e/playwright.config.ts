@@ -1,11 +1,12 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
+  globalSetup: './utils/globalSetup',
   retries: 1,
-  testMatch: 'survey.test.ts',
   projects: [
     {
       name: 'Chrome',
+      testMatch: '/tests/**/*.test.ts',
       use: {
         ...devices['Desktop Chrome'],
         contextOptions: { ignoreHTTPSErrors: true },
@@ -14,6 +15,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'firefox',
+      testMatch: '/tests/survey.test.ts',
       use: {
         ...devices['Desktop Firefox'],
         contextOptions: { ignoreHTTPSErrors: true },
@@ -22,6 +24,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'Microsoft Edge',
+      testMatch: '/tests/survey.test.ts',
       use: {
         ...devices['Desktop Edge'],
         channel: 'msedge',
@@ -31,6 +34,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'Mobile Chrome',
+      testMatch: '/tests/survey.test.ts',
       use: {
         ...devices['Nokia Lumia 520'],
         contextOptions: { ignoreHTTPSErrors: true },
@@ -38,6 +42,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'Mobile Safari',
+      testMatch: '/tests/survey.test.ts',
       use: {
         ...devices['iPhone SE'],
         contextOptions: { ignoreHTTPSErrors: true },

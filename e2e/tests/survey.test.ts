@@ -12,10 +12,17 @@ import {
   getSliderQuestionDataNumber,
   getSliderQuestionDataString,
   getSortingQuestionData,
-  testSurveyData,
+  getTestSurveyData,
+  TEST_SURVEY_URL_NAMES,
 } from '../utils/data';
-import { clearData } from '../utils/db';
+import { clearTestSurveys } from '../utils/db';
 import { test } from '../utils/fixtures';
+
+const testSurveyData = {
+  ...getTestSurveyData(TEST_SURVEY_URL_NAMES.survey),
+  pageNames: ['Sivu 1', 'Sivu 2'],
+};
+let surveyData = testSurveyData;
 
 const personalInfoQuestion = getPersonalInfoQuestionData(
   testSurveyData.pageNames[0],
@@ -42,10 +49,10 @@ const groupedCheckboxQuestion = getGroupedCheckboxQuestionData(
 
 test.describe('Survey test', () => {
   test.beforeAll(async ({ workerShortcuts }) => {
-    await workerShortcuts.createWorkerSurvey(testSurveyData);
+    surveyData = await workerShortcuts.createWorkerSurvey(testSurveyData);
   });
   test.afterAll(async () => {
-    await clearData();
+    await clearTestSurveys([TEST_SURVEY_URL_NAMES.survey]);
   });
 
   test('create questions', async ({ workerSurveyEditPage, makeAxeBuilder }) => {
@@ -77,20 +84,18 @@ test.describe('Survey test', () => {
   }) => {
     await surveyAdminPage.goto();
     await expect(
-      surveyAdminPage.page
-        .locator('h3')
-        .filter({ hasText: testSurveyData.title }),
+      surveyAdminPage.page.locator('h3').filter({ hasText: surveyData.title }),
     ).toBeVisible();
     expect(await surveyAdminPage.getSurveyList()).toHaveLength(1);
-    await surveyAdminPage.publishSurvey(testSurveyData.urlName);
+    await surveyAdminPage.publishSurvey(surveyData.urlName);
 
     // Start the survey
-    await surveyPage.goto(testSurveyData.urlName);
+    await surveyPage.goto(surveyData.urlName);
     await surveyPage.startSurvey();
 
     // Check title
     expect(await surveyPage.page.locator('h1').textContent()).toBe(
-      testSurveyData.title,
+      surveyData.title,
     );
 
     // Answer questions
@@ -298,7 +303,7 @@ test.describe('Survey test', () => {
     await expect(
       surveyPage.page
         .locator('h1')
-        .filter({ hasText: testSurveyData.thanksPage.title }),
+        .filter({ hasText: surveyData.thanksPage.title }),
     ).toBeVisible();
     expect((await makeAxeBuilder('body').analyze()).violations).toHaveLength(0);
 
@@ -307,12 +312,16 @@ test.describe('Survey test', () => {
     // No point of testing mobile viewports here
     await surveyAdminPage.page.setViewportSize({ width: 1280, height: 720 });
     await expect(
-      surveyAdminPage.page
-        .locator('h3')
-        .filter({ hasText: testSurveyData.title }),
+      surveyAdminPage.page.locator('h3').filter({ hasText: surveyData.title }),
     ).toBeVisible();
+    const surveyItem = surveyAdminPage.page.getByRole('listitem').filter({
+      has: surveyAdminPage.page.getByRole('heading', {
+        name: surveyData.title,
+        exact: true,
+      }),
+    });
     await expect(
-      surveyAdminPage.page.getByRole('link', { name: 'Vastaukset (1)' }),
+      surveyItem.getByRole('link', { name: 'Vastaukset (1)' }),
     ).toBeVisible();
   });
 });

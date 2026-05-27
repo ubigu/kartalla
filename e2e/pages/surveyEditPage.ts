@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 interface SurveyThanksPageParams {
   title: string;
@@ -89,6 +89,14 @@ export interface GroupedCheckboxQuestionParams extends CommonQuestionParams {
   limitAnswers?: { min: number; max: number };
 }
 
+export interface AttachmentQuestionParams extends CommonQuestionParams {}
+
+export interface BudgetingQuestionParams extends CommonQuestionParams {
+  totalBudget: number;
+  unit?: string;
+  targets: string[];
+}
+
 export class SurveyEditPage {
   private _page: Page;
   private _surveyId: string | null;
@@ -156,7 +164,14 @@ export class SurveyEditPage {
       .locator('div')
       .nth(2)
       .fill(params.text);
-    await this._page.getByRole('button', { name: 'Tallenna' }).click();
+  }
+
+  async saveSurvey() {
+    const saveButton = this._page.getByRole('button', { name: 'Tallenna' });
+    await saveButton.waitFor({ state: 'visible' });
+    await expect(saveButton).toBeEnabled();
+    await saveButton.click();
+    await expect(this._page.getByRole('alert')).toBeVisible();
   }
 
   async goToPage(pageName: string) {
@@ -166,7 +181,7 @@ export class SurveyEditPage {
   async renamePage(oldName: string, newName: string) {
     await this.goToPage(oldName);
     await this._page.getByLabel('Sivun nimi *').fill(newName);
-    await this._page.getByRole('button', { name: 'Tallenna' }).click();
+    await this.saveSurvey();
   }
 
   async createPersonalInfoQuestion(
@@ -313,7 +328,7 @@ export class SurveyEditPage {
     }
     if (freeTextQuestionParams.maxLength) {
       await questionLocator
-        .getByLabel('Maksimipituus')
+        .getByLabel('Maksimi merkkimäärä')
         .fill(freeTextQuestionParams.maxLength.toString());
     }
     if (freeTextQuestionParams.additionalInfo) {
@@ -593,6 +608,72 @@ export class SurveyEditPage {
         .locator('div')
         .nth(2)
         .fill(groupedCheckboxQuestionParams.additionalInfo);
+    }
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
+  }
+
+  async createAttachmentQuestion(
+    attachmentQuestionParams: AttachmentQuestionParams,
+  ) {
+    await this.goToPage(attachmentQuestionParams.pageName);
+    await this._page.getByLabel('add-attachment-section').click();
+    const questionLocator = this._page.locator('.section-accordion-expanded');
+    await questionLocator
+      .getByLabel('Otsikko')
+      .fill(attachmentQuestionParams.title);
+    if (attachmentQuestionParams.isRequired) {
+      await questionLocator
+        .getByRole('checkbox', { name: 'Vastaus pakollinen' })
+        .check();
+    }
+    if (attachmentQuestionParams.additionalInfo) {
+      await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
+      await questionLocator
+        .getByLabel('Teksti')
+        .locator('div')
+        .nth(2)
+        .fill(attachmentQuestionParams.additionalInfo);
+    }
+    await this._page.getByRole('button', { name: 'Tallenna' }).click();
+  }
+
+  async createBudgetingQuestion(
+    budgetingQuestionParams: BudgetingQuestionParams,
+  ) {
+    await this.goToPage(budgetingQuestionParams.pageName);
+    await this._page.getByLabel('add-budgeting-section').click();
+    const questionLocator = this._page.locator('.section-accordion-expanded');
+    await questionLocator
+      .getByLabel('Otsikko')
+      .fill(budgetingQuestionParams.title);
+    if (budgetingQuestionParams.isRequired) {
+      await questionLocator
+        .getByRole('checkbox', { name: 'Vastaus pakollinen' })
+        .check();
+    }
+    await questionLocator
+      .getByLabel('Kokonaisbudjetti')
+      .fill(budgetingQuestionParams.totalBudget.toString());
+    if (budgetingQuestionParams.unit) {
+      await questionLocator
+        .getByLabel('Yksikkö')
+        .fill(budgetingQuestionParams.unit);
+    }
+    for (const [idx, target] of budgetingQuestionParams.targets.entries()) {
+      await questionLocator.getByLabel('add-question-option').click();
+      await questionLocator
+        .getByTestId(`radio-input-option-${idx}`)
+        .locator('textarea')
+        .nth(0)
+        .fill(target);
+    }
+    if (budgetingQuestionParams.additionalInfo) {
+      await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
+      await questionLocator
+        .getByLabel('Teksti')
+        .locator('div')
+        .nth(2)
+        .fill(budgetingQuestionParams.additionalInfo);
     }
     await this._page.getByRole('button', { name: 'Tallenna' }).click();
   }
