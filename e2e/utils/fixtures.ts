@@ -1,17 +1,21 @@
-import { test as base, BrowserContext, chromium, Page } from '@playwright/test';
-import { SurveyEditPage, SurveyParams } from '../pages/surveyEditPage';
+import AxeBuilder from '@axe-core/playwright';
+import { test as base, Browser, chromium, Page } from '@playwright/test';
 import { SurveyAdminPage } from '../pages/adminPage';
 import { PublishedSurveyPage } from '../pages/publishedSurveyPage';
-import AxeBuilder from '@axe-core/playwright';
+import { SurveyEditPage, SurveyParams } from '../pages/surveyEditPage';
+import { createSurveyViaApi } from './api';
+import { deleteSurveyById } from './db';
 
 interface PageFixtures {
   surveyEditPage: SurveyEditPage;
   surveyAdminPage: SurveyAdminPage;
   surveyPage: PublishedSurveyPage;
   workerShortcuts: {
-    createWorkerSurvey: (surveyData: SurveyParams) => Promise<void>;
+    createWorkerSurvey: (surveyData: SurveyParams) => Promise<SurveyParams>;
   };
   shortcuts: {
+    createSurveyViaApi: (surveyData: SurveyParams) => Promise<SurveyParams>;
+    deleteSurvey: () => Promise<void>;
     publishAndStartSurvey: (
       surveyTitle: string,
       surveyUrlName: string,
@@ -27,36 +31,48 @@ interface AxeFixture {
   makeAxeBuilder: (include: string) => AxeBuilder;
 }
 
+// Always use chromium for edit page because firefox is not working in CI: https://github.com/microsoft/playwright/issues/32236
+// Some problems with webkit mobile browsers here: https://github.com/microsoft/playwright/issues/28364
+async function createDesktopEditPage(
+  browser: Browser,
+  browserName: string,
+): Promise<Page> {
+  const contextOptions = {
+    viewport: { width: 1280, height: 720 } as const,
+    isMobile: false,
+    hasTouch: false,
+  };
+  const context =
+    browserName !== 'chromium'
+      ? await (await chromium.launch()).newContext(contextOptions)
+      : await browser.newContext(contextOptions);
+  return context.newPage();
+}
+
+function getWorkerSurveyParams(
+  surveyParams: SurveyParams,
+  workerIndex: number,
+) {
+  return {
+    ...surveyParams,
+    title: `${surveyParams.title}-${workerIndex}`,
+    urlName: `${surveyParams.urlName}-${workerIndex}`,
+  };
+}
+
 export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
   workerSurveyEditPage: [
     async ({ browser, browserName }, use) => {
-      // Prevent mobile viewports for edit page
-      // Always use chromium for edit page because firefox is not working in CI: https://github.com/microsoft/playwright/issues/32236
-      // Some problems with webkit mobile browsers here: https://github.com/microsoft/playwright/issues/28364
-      let page: Page;
-      let desktopContext: BrowserContext;
-      if (browserName !== 'chromium') {
-        const chromiumBrowser = await chromium.launch();
-        desktopContext = await chromiumBrowser.newContext({
-          viewport: { width: 1280, height: 720 },
-          isMobile: false,
-          hasTouch: false,
-        });
-      } else {
-        desktopContext = await browser.newContext({
-          viewport: { width: 1280, height: 720 },
-          isMobile: false,
-          hasTouch: false,
-        });
-      }
-      page = await desktopContext.newPage();
-
-      await use(new SurveyEditPage(page));
+      await use(
+        new SurveyEditPage(await createDesktopEditPage(browser, browserName)),
+      );
     },
     { scope: 'worker' },
   ],
-  surveyEditPage: async ({ page }, use) => {
-    await use(new SurveyEditPage(page));
+  surveyEditPage: async ({ browser, browserName }, use) => {
+    await use(
+      new SurveyEditPage(await createDesktopEditPage(browser, browserName)),
+    );
   },
   surveyAdminPage: async ({ page }, use) => {
     await use(new SurveyAdminPage(page));
@@ -73,18 +89,38 @@ export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
 
     await use(makeAxeBuilder);
   },
-  workerShortcuts: async ({ workerSurveyEditPage }, use) => {
+  workerShortcuts: async ({ workerSurveyEditPage }, use, workerInfo) => {
+    const { workerIndex } = workerInfo;
     await use({
       /** Creates a worker survey page that can be reused in a describe block */
       async createWorkerSurvey(surveyData: SurveyParams) {
+        const prefixed = getWorkerSurveyParams(surveyData, workerIndex);
         await workerSurveyEditPage.goto();
-        await workerSurveyEditPage.fillBasicInfo(surveyData);
-        await workerSurveyEditPage.fillThanksPage(surveyData.thanksPage);
+        await workerSurveyEditPage.fillBasicInfo(prefixed);
+        await workerSurveyEditPage.fillThanksPage(prefixed.thanksPage);
+        await workerSurveyEditPage.saveSurvey();
+        return prefixed;
       },
     });
   },
-  shortcuts: async ({ surveyAdminPage, surveyPage }, use) => {
+  shortcuts: async (
+    { surveyEditPage, surveyAdminPage, surveyPage },
+    use,
+    workerInfo,
+  ) => {
+    const { workerIndex } = workerInfo;
     await use({
+      async createSurveyViaApi(surveyData: SurveyParams) {
+        const prefixed = getWorkerSurveyParams(surveyData, workerIndex);
+        const id = await createSurveyViaApi(prefixed);
+        surveyEditPage.surveyId = id;
+        await surveyEditPage.goto();
+        return prefixed;
+      },
+      async deleteSurvey() {
+        const id = surveyEditPage.surveyId;
+        if (id) await deleteSurveyById(id);
+      },
       /** Publishes and starts a survey with provided title */
       async publishAndStartSurvey(surveyTitle: string, surveyUrlName: string) {
         await surveyAdminPage.goto();

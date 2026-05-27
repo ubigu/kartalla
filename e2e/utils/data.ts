@@ -1,4 +1,7 @@
+import dayjs from 'dayjs';
 import {
+  AttachmentQuestionParams,
+  BudgetingQuestionParams,
   CheckBoxQuestionParams,
   FreeTextQuestionParams,
   GroupedCheckboxQuestionParams,
@@ -12,21 +15,38 @@ import {
   SortingQuestionParams,
   SurveyParams,
 } from '../pages/surveyEditPage';
-import dayjs from 'dayjs';
 
-export const testSurveyData: SurveyParams = {
-  title: 'Testikysely',
-  subtitle: 'Testikyselyn aliotsikko',
-  urlName: 'testikysely',
-  author: 'Testaaja',
-  startDate: dayjs().add(1, 'day').format('dd.MM.yyyy HH:mm'),
-  endDate: dayjs().add(1, 'year').format('dd.MM.yyyy HH:mm'),
-  thanksPage: {
-    title: 'Kiitos vastauksestasi!',
-    text: 'Kiitos vastauksestasi! Voit sulkea tämän välilehden.',
-  },
-  pageNames: ['Sivu 1', 'Sivu 2'],
-};
+export const TEST_SURVEY_URL_NAMES = {
+  survey: 'testikysely',
+  attachment: 'testikysely-attachment',
+  budgeting: 'testikysely-budgeting',
+  checkbox: 'testikysely-checkbox',
+  freetext: 'testikysely-freetext',
+  groupedCheckbox: 'testikysely-grouped-checkbox',
+  matrix: 'testikysely-matrix',
+  multiMatrix: 'testikysely-multimatrix',
+  numeric: 'testikysely-numeric',
+  personalInfo: 'testikysely-personalinfo',
+  radio: 'testikysely-radio',
+  slider: 'testikysely-slider',
+  sorting: 'testikysely-sorting',
+} as const;
+
+export function getTestSurveyData(urlName: string): SurveyParams {
+  return {
+    title: urlName,
+    subtitle: 'Testikyselyn aliotsikko',
+    urlName,
+    author: 'Testaaja',
+    startDate: dayjs().add(1, 'day').format('dd.MM.yyyy HH:mm'),
+    endDate: dayjs().add(1, 'year').format('dd.MM.yyyy HH:mm'),
+    thanksPage: {
+      title: 'Kiitos vastauksestasi!',
+      text: 'Kiitos vastauksestasi! Voit sulkea tämän välilehden.',
+    },
+    pageNames: ['Sivu 1'],
+  };
+}
 
 export function getPersonalInfoQuestionData(
   pageName: string,
@@ -151,6 +171,27 @@ export function getMultiMatrixQuestionData(
     matrixRows: ['Rivi 1', 'Rivi 2', 'Rivi 3', 'Rivi 4'],
     matrixColumns: ['Sarake 1', 'Sarake 2', 'Sarake 3'],
     answersLimited: { min: 1, max: 3 },
+  };
+}
+
+export function getAttachmentQuestionData(
+  pageName: string,
+): AttachmentQuestionParams {
+  return {
+    pageName,
+    title: 'Liitetiedosto',
+  };
+}
+
+export function getBudgetingQuestionData(
+  pageName: string,
+): BudgetingQuestionParams {
+  return {
+    pageName,
+    title: 'Budjetti',
+    totalBudget: 100,
+    unit: '€',
+    targets: ['Kohde 1', 'Kohde 2', 'Kohde 3'],
   };
 }
 
