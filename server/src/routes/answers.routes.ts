@@ -3,12 +3,10 @@ import { getAnswerCounts, getAttachments } from '@src/application/answer';
 import { getGeoPackageFile } from '@src/application/answerGeometry';
 import { getCSVFile } from '@src/application/csvExport';
 import { getExcelFile } from '@src/application/excelExport';
-import { userCanViewSurvey } from '@src/application/survey';
+import { getSurvey, userCanViewSurvey } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
-import useTranslations, {
-  isLanguageCode,
-} from '@src/translations/useTranslations';
+import { isLanguageCode } from '@src/translations/useTranslations';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param, query } from 'express-validator';
@@ -81,33 +79,30 @@ router.get(
     const lang = req.query.lang as LanguageCode;
     const withPersonalInfo = req.query.withPersonalInfo === 'true';
 
-    const fileName = `${useTranslations(lang).sheetName}.xlsx`;
+    const survey = await getSurvey({ id: surveyId });
+
     if (req.query.fileType === 'csv') {
       const csv = await getCSVFile(surveyId, withPersonalInfo, lang);
       if (!csv) {
-        res
-          .status(404)
-          .json({
-            message: 'No answers found',
-            message_code: 'NO_ANSWERS_FOUND',
-          });
+        res.status(404).json({
+          message: 'No answers found',
+          message_code: 'NO_ANSWERS_FOUND',
+        });
       } else {
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader(
           'Content-Disposition',
-          `attachment; filename="${fileName}"`,
+          `attachment; filename="${survey.name}_submissions.csv"`,
         );
         res.status(200).send(csv);
       }
     } else {
       const buffer = await getExcelFile(surveyId, withPersonalInfo, lang);
       if (!buffer) {
-        res
-          .status(404)
-          .json({
-            message: 'No answers found',
-            message_code: 'NO_ANSWERS_FOUND',
-          });
+        res.status(404).json({
+          message: 'No answers found',
+          message_code: 'NO_ANSWERS_FOUND',
+        });
       } else {
         res.setHeader(
           'Content-Type',
@@ -115,7 +110,7 @@ router.get(
         );
         res.setHeader(
           'Content-Disposition',
-          `attachment; filename="${fileName}"`,
+          `attachment; filename="${survey.name}_submissions.xlsx"`,
         );
         res.status(200).send(buffer);
       }
@@ -132,6 +127,10 @@ router.get(
   ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('lang')
+      .optional()
+      .custom(isLanguageCode)
+      .withMessage('lang must be a valid language code'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -144,7 +143,11 @@ router.get(
       );
     }
 
-    const geopackageBuffer = await getGeoPackageFile(surveyId);
+    const lang = (req.query.lang as LanguageCode) ?? 'fi';
+    const [geopackageBuffer, survey] = await Promise.all([
+      getGeoPackageFile(surveyId, lang),
+      getSurvey({ id: surveyId }),
+    ]);
     if (!geopackageBuffer) {
       throw new BadRequestError(
         'No answers available',
@@ -153,6 +156,11 @@ router.get(
       );
     } else {
       res.status(200);
+      res.setHeader('Content-Type', 'application/geopackage+sqlite3');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${survey.name}_geospatial_submissions.gpkg"`,
+      );
       res.end(geopackageBuffer);
     }
   }),

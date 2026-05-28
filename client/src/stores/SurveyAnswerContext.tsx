@@ -5,6 +5,7 @@ import {
   PersonalInfoAnswer,
   SubmissionAnswerEntry,
   Survey,
+  SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
   SurveyQuestion,
@@ -25,6 +26,39 @@ import {
 } from 'react';
 import { getLocalizedMapUrls } from './SurveyContext';
 import { useTranslations } from './TranslationContext';
+
+export function getConditionalSectionVisibility(
+  section: SurveyFollowUpSection,
+  answer: SubmissionAnswerEntry,
+) {
+  switch (answer.type) {
+    case 'radio':
+      return section.conditions.equals.some(
+        (answerId) => (isString(answer.value) ? -1 : answer.value) === answerId,
+      );
+    case 'checkbox':
+      return section.conditions.equals.some((answerId) =>
+        answer.value.some((val) => (isString(val) ? -1 : val) === answerId),
+      );
+    case 'numeric':
+    case 'slider': {
+      const { value } = answer;
+      return (
+        section.conditions.equals.some(
+          (conditionValue) => value === conditionValue,
+        ) ||
+        section.conditions.greaterThan.some(
+          (conditionValue) => value >= conditionValue,
+        ) ||
+        section.conditions.lessThan.some(
+          (conditionValue) => value <= conditionValue,
+        )
+      );
+    }
+    default:
+      return false;
+  }
+}
 
 interface State {
   answers: SubmissionAnswerEntry[];
@@ -458,55 +492,9 @@ export function useSurveyAnswers() {
       return [];
     }
 
-    switch (question.type) {
-      case 'radio':
-        return question.followUpSections
-          .filter((section) =>
-            section.conditions.equals.some(
-              (answerId) =>
-                (isString(answer.value) ? -1 : answer.value) === answerId,
-            ),
-          )
-          .map((s) => s.id);
-      case 'checkbox':
-        return question.followUpSections
-          .filter((section) =>
-            section.conditions.equals.some((answerId) =>
-              (
-                answer as Extract<SubmissionAnswerEntry, { type: 'checkbox' }>
-              ).value.some((val) => (isString(val) ? -1 : val) === answerId),
-            ),
-          )
-          .map((s) => s.id);
-      case 'numeric':
-      case 'slider':
-        return question.followUpSections
-          .filter((section) => {
-            const value = (
-              answer as Extract<
-                SubmissionAnswerEntry,
-                { type: 'numeric' | 'slider' }
-              >
-            ).value;
-
-            return section.conditions.equals.some(
-              (conditionValue) => value === conditionValue,
-            )
-              ? true
-              : section.conditions.greaterThan.some(
-                    (conditionValue) => value >= conditionValue,
-                  )
-                ? true
-                : section.conditions.lessThan.some(
-                      (conditionValue) => value <= conditionValue,
-                    )
-                  ? true
-                  : false;
-          })
-          .map((s) => s.id);
-      default:
-        return [];
-    }
+    return question.followUpSections
+      .filter((section) => getConditionalSectionVisibility(section, answer))
+      .map((section) => section.id);
   }
 
   /**

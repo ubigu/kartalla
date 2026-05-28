@@ -48,7 +48,8 @@
     "targetName": "Target",
     "amount": "Amount",
     "total": "Total",
-    "perPiece": "pc"
+    "perPiece": "pc",
+    "totalBudget": "Total budget"
   },
   "MapQuestion": {
     "annotation": "Annotation",

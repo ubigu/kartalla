@@ -404,7 +404,7 @@ export default function SurveySubmissionsPage() {
                   submissionsLoading={submissionsLoading}
                 />
                 <Stack direction="row" spacing={2}>
-                  <DataExport surveyId={survey.id} surveyTitle={survey.title} />
+                  <DataExport surveyId={survey.id} surveyName={survey.name} />
                   {!survey.isArchived && <DataPublish surveyId={survey.id} />}
                 </Stack>
                 <SurveyQuestionSummary

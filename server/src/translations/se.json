@@ -48,7 +48,8 @@
     "targetName": "Mål",
     "amount": "Antal",
     "total": "Totalt",
-    "perPiece": "st"
+    "perPiece": "st",
+    "totalBudget": "Totalbudget"
   },
   "MapQuestion": {
     "annotation": "Anteckning",

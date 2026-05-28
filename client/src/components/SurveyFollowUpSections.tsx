@@ -1,6 +1,8 @@
-// @ts-strict-ignore
 import { Box, Collapse, Typography } from '@mui/material';
-import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
+import {
+  getConditionalSectionVisibility,
+  useSurveyAnswers,
+} from '@src/stores/SurveyAnswerContext';
 
 import {
   SubmissionAnswerEntry,
@@ -40,24 +42,28 @@ function FollowUpSectionAnswers({
           </Typography>
           {(answerEntry as SubmissionAnswerEntry & { type: 'map' }).value.map(
             (item) =>
-              item.subQuestionAnswers.map((subquestionAnswer, index) => (
-                <SurveyQuestion
-                  pageUnfinished={false}
-                  mobileDrawerOpen={false}
-                  key={index}
-                  readOnly
-                  question={section.subQuestions.find(
-                    (question) => question.id === subquestionAnswer.sectionId,
-                  )}
-                  value={subquestionAnswer.value}
-                />
-              )),
+              item.subQuestionAnswers.map((subquestionAnswer, index) => {
+                const subQuestion = section.subQuestions.find(
+                  (question) => question.id === subquestionAnswer.sectionId,
+                );
+                if (!subQuestion) return null;
+                return (
+                  <SurveyQuestion
+                    pageUnfinished={false}
+                    mobileDrawerOpen={false}
+                    key={index}
+                    readOnly
+                    question={subQuestion}
+                    value={subquestionAnswer.value}
+                  />
+                );
+              }),
           )}
         </>
       ) : (
         <SurveyQuestion
           readOnly
-          value={answerEntry.value}
+          value={answerEntry?.value}
           isFollowUp
           key={section.id}
           question={section}
@@ -98,12 +104,16 @@ export function SurveyFollowUpSections({
     );
     // Sections are displayed in submissions page answer list
   } else {
-    const answeredSectionIds = answer.submission.answerEntries
-      .filter((answer) => answer.value)
-      .map((answer) => answer.sectionId);
+    const answeredSectionIds =
+      answer.submission.answerEntries
+        ?.filter((answer) => answer.value)
+        .map((answer) => answer.sectionId) ?? [];
 
-    followUpSectionsToDisplay = section.followUpSections?.filter((sect) =>
-      answeredSectionIds.includes(sect.id),
+    followUpSectionsToDisplay = section.followUpSections?.filter(
+      (followUp) =>
+        followUp.id &&
+        answeredSectionIds.includes(followUp.id) &&
+        getConditionalSectionVisibility(followUp, answer.entry),
     );
   }
 
@@ -142,7 +152,7 @@ export function SurveyFollowUpSections({
           answer ? (
             <FollowUpSectionAnswers
               key={sect.id}
-              answerEntries={answer.submission.answerEntries}
+              answerEntries={answer.submission.answerEntries ?? []}
               mobileDrawerOpen={mobileDrawerOpen}
               pageUnfinished={pageUnfinished}
               section={sect}

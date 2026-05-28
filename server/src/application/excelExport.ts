@@ -365,9 +365,16 @@ function buildExcelColumns(
 
       case 'budgeting':
         if ('targets' in sectionHead.details) {
-          const { targets } = sectionHead.details as {
+          const { targets, totalBudget, unit } = sectionHead.details as {
             targets: { name: LocalizedText }[];
+            totalBudget: number;
+            unit?: string;
           };
+          const budgetSuffix =
+            totalBudget != null
+              ? ` (${tr.BudgetingQuestion.totalBudget}: ${totalBudget}${unit ? ` ${unit}` : ''})`
+              : '';
+          const budgetGroupLabel = `${baseGroupLabel}${budgetSuffix}`;
           targets?.forEach((target, targetIdx) => {
             columns.push({
               key: getHeaderKey(
@@ -378,7 +385,7 @@ function buildExcelColumns(
                 sectionHead.predecessorSection,
                 predecessorIndexes,
               ),
-              groupLabel: baseGroupLabel,
+              groupLabel: budgetGroupLabel,
               groupKey: baseGroupKey,
               optionLabel: target.name?.[lang] ?? target.name?.['fi'] ?? '',
               isFollowUp,
@@ -529,12 +536,6 @@ function applyMerges(
     groupStart = groupEnd + 1;
     columnIndex = nextIndex;
   }
-}
-
-function applyFreezePane(ws: ExcelJS.Worksheet, metaColCount: number) {
-  ws.views = [
-    { state: 'frozen', xSplit: metaColCount, ySplit: HEADER_ROW_COUNT },
-  ];
 }
 
 function groupSizes(columns: ExcelColumn[]): number[] {
@@ -883,9 +884,16 @@ function buildCompactExcelColumns(
 
       case 'budgeting':
         if ('targets' in sectionHead.details) {
-          const { targets } = sectionHead.details as {
+          const { targets, totalBudget, unit } = sectionHead.details as {
             targets: { name: LocalizedText }[];
+            totalBudget: number;
+            unit?: string;
           };
+          const budgetSuffix =
+            totalBudget != null
+              ? ` (${tr.BudgetingQuestion.totalBudget}: ${totalBudget}${unit ? ` ${unit}` : ''})`
+              : '';
+          const budgetGroupLabel = `${baseGroupLabel}${budgetSuffix}`;
           targets?.forEach((target, targetIdx) => {
             columns.push({
               key: getHeaderKey(
@@ -896,7 +904,7 @@ function buildCompactExcelColumns(
                 sectionHead.predecessorSection,
                 predecessorIndexes,
               ),
-              groupLabel: baseGroupLabel,
+              groupLabel: budgetGroupLabel,
               groupKey: baseGroupKey,
               optionLabel: target.name?.[lang] ?? target.name?.['fi'] ?? '',
               isFollowUp,
@@ -967,7 +975,7 @@ function getCompactCellValue(
     }
     case 'sorting': {
       const values = col.sortingPositionKeys
-        .map((key) => answers[key])
+        .map((key, idx) => `${idx + 1}. ${answers[key]}`)
         .filter((v) => v != null && v !== '');
       return values.length > 0 ? values.join(', ') : null;
     }
@@ -1097,7 +1105,6 @@ function buildCompactWorksheet(
   );
   initializeHeaderRows(ws, metaCols, columns);
   applyMerges(ws, metaCols.length, columns);
-  applyFreezePane(ws, metaCols.length);
   writeDataRowsCompact(
     ws,
     metaCols,
@@ -1126,7 +1133,6 @@ function buildMainWorksheet(
   );
   initializeHeaderRows(ws, metaCols, columns);
   applyMerges(ws, metaCols.length, columns);
-  applyFreezePane(ws, metaCols.length);
   writeDataRows(
     ws,
     metaCols,

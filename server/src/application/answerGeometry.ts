@@ -1,4 +1,4 @@
-import { LocalizedSurveyMapLayer } from '@interfaces/survey';
+import { LanguageCode, LocalizedSurveyMapLayer } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
 import fs, { readFileSync, rmSync } from 'fs';
@@ -298,6 +298,7 @@ async function getGeometryDBEntries(
  */
 export async function getGeometryDBEntriesAsGeoJSON(
   surveyId: number,
+  _lang: LanguageCode = 'fi',
 ): Promise<{ [key: string]: FeatureCollection }> {
   const survey = await getSurvey({ id: surveyId });
   const [targetSrid, checkboxOptions, mapLayers] = await Promise.all([
@@ -337,8 +338,14 @@ export async function getGeometryDBEntriesAsGeoJSON(
  * @param surveyId
  * @returns Promise resolving to readable stream streaming geopackage data
  */
-export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
-  const featuresByQuestion = await getGeometryDBEntriesAsGeoJSON(surveyId);
+export async function getGeoPackageFile(
+  surveyId: number,
+  lang: LanguageCode = 'fi',
+): Promise<Buffer> {
+  const featuresByQuestion = await getGeometryDBEntriesAsGeoJSON(
+    surveyId,
+    lang,
+  );
 
   const tmpFilePath = `/tmp/geopackage_${Date.now()}.gpkg`;
 
