@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import { FileAnswer, LocalizedText } from '@interfaces/survey';
+import { FileAnswer } from '@interfaces/survey';
 import {
   Box,
   Button,
@@ -31,7 +31,7 @@ interface AnswerCounts {
 }
 interface Props {
   surveyId: number;
-  surveyTitle: LocalizedText;
+  surveyName: string;
 }
 
 async function handleFileExportError(res: Response) {
@@ -49,7 +49,7 @@ async function handleFileExportError(res: Response) {
   }
 }
 
-export default function DataExport({ surveyId, surveyTitle }: Props) {
+export default function DataExport({ surveyId, surveyName }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [withPersonalInfo, setWithPersonalInfo] = useState(false);
   const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
@@ -59,17 +59,17 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
     attachments: false,
   });
   const [answerCounts, setAnswerCounts] = useState<AnswerCounts | null>();
-  const { tr, language, surveyLanguage } = useTranslations();
-  const { showToast } = useToasts();
+  const { tr, surveyLanguage } = useTranslations();
 
-  function getExportFilename(ext: string) {
-    const title = (surveyTitle?.[language] ?? surveyTitle?.fi ?? '')
+  function getExportFilename(label: string, ext: string) {
+    const sanitizedLabel = label
       .trim()
       .toLowerCase()
       .replace(/\s+/g, '_')
-      .replace(/[^a-z0-9_\u00C0-\u024F]/g, '');
-    return `${title}_${tr.DataExport.submissions}.${ext}`;
+      .replace(/[^a-z0-9_À-ɏ]/g, '');
+    return `${surveyName}_${sanitizedLabel}_${surveyLanguage}.${ext}`;
   }
+  const { showToast } = useToasts();
 
   useEffect(() => {
     async function getAnswerCounts() {
@@ -107,11 +107,10 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
       await handleFileExportError(res);
       const csvText = await res.text();
       const textBlob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
-
       const link = document.createElement('a');
       link.href = URL.createObjectURL(textBlob);
-      link.target = '_blank';
-      link.download = getExportFilename('csv');
+      console.log('exporting csv');
+      link.download = getExportFilename(tr.DataExport.submissions, 'csv');
       link.click();
     } catch (err) {
       showToast({
@@ -133,7 +132,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
       const blob = await res.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = getExportFilename('xlsx');
+      link.download = getExportFilename(tr.DataExport.submissions, 'xlsx');
       link.click();
     } catch (err) {
       showToast({
@@ -146,7 +145,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
   async function exportGeoPackage() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export/geopackage`,
+        `/api/answers/${surveyId}/file-export/geopackage?lang=${surveyLanguage}`,
         {
           method: 'GET',
         },
@@ -155,11 +154,13 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
       await handleFileExportError(res);
 
       const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const blobLink = document.createElement('a');
-      blobLink.href = blobUrl;
-      blobLink.download = 'geopackage.gpkg';
-      blobLink.click();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = getExportFilename(
+        tr.DataExport.geospatialSubmissions,
+        'gpkg',
+      );
+      link.click();
     } catch (err) {
       showToast({
         severity: 'error',
@@ -183,7 +184,7 @@ export default function DataExport({ surveyId, surveyTitle }: Props) {
         ),
       );
       const blob = await zip.generateAsync({ type: 'blob' });
-      saveAs(blob, 'vastaukset.zip');
+      saveAs(blob, getExportFilename(tr.DataExport.attachments, 'zip'));
     } catch (err) {
       showToast({ severity: 'error', message: err.message });
     }

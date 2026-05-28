@@ -48,7 +48,8 @@
     "targetName": "Kohde",
     "amount": "Määrä",
     "total": "Yhteensä",
-    "perPiece": "kpl"
+    "perPiece": "kpl",
+    "totalBudget": "Kokonaisbudjetti"
   },
   "MapQuestion": {
     "annotation": "Merkintä",
