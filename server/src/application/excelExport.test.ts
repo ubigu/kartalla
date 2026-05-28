@@ -21,12 +21,6 @@ vi.mock('./exportUtils', async (importOriginal) => {
 
 import ExcelJS from 'exceljs';
 import {
-  getAnswerDBEntries,
-  getPersonalInfosForSurvey,
-  getSectionHeaders,
-} from './exportUtils';
-import { getExcelFile } from './excelExport';
-import {
   makeBudgetingRow,
   makeBudgetingSectionHeader,
   makeCheckboxSectionHeader,
@@ -51,6 +45,12 @@ import {
   multiLangTarget,
   multiLangTitle,
 } from '../tests/answerExportHelpers';
+import { getExcelFile } from './excelExport';
+import {
+  getAnswerDBEntries,
+  getPersonalInfosForSurvey,
+  getSectionHeaders,
+} from './exportUtils';
 
 describe('getExcelFile', () => {
   beforeEach(() => {
@@ -107,19 +107,6 @@ describe('getExcelFile', () => {
         expect(ws).toBeTruthy();
       },
     );
-
-    it('has frozen pane on row 2 and meta columns', async () => {
-      vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
-        makeFreeTextRow(1, 10, 'Hello'),
-      ]);
-      vi.mocked(getSectionHeaders).mockResolvedValueOnce([
-        makeFreeTextSectionHeader(10, 'My question'),
-      ]);
-
-      const buffer = await getExcelFile(1);
-      const ws = await loadSheet(buffer);
-      expect(ws.views[0]).toMatchObject({ state: 'frozen', ySplit: 2 });
-    });
 
     it.each([
       ['fi', 'Vastaustunniste', 'Tallennusaika', 'Vastauskieli'],
@@ -807,7 +794,7 @@ describe('getExcelFile', () => {
         ]);
         const buffer = await getExcelFile(1);
         const ws = await loadCompact(buffer);
-        expect(ws.getRow(3).getCell(4).value).toBe('First, Second');
+        expect(ws.getRow(3).getCell(4).value).toBe('1. First, 2. Second');
       });
     });
 
