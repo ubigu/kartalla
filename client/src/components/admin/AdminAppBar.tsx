@@ -81,6 +81,7 @@ export function AdminAppBar({
                     textOverflow: 'ellipsis',
                     color: 'white',
                     fontSize: '24px',
+                    lineHeight: 1.5,
                   }}
                 >
                   {item}
