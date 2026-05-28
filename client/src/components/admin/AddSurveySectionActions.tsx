@@ -1,6 +1,6 @@
 // @ts-strict-ignore
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Fab, Grid, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Grid, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
@@ -353,6 +353,26 @@ export default function AddSurveySectionActions(props: Props) {
     },
   ];
 
+  const iconCircleSx = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    bgcolor: 'primary.main',
+    borderRadius: '50%',
+    color: 'white',
+    '& .MuiSvgIcon-root.MuiSvgIcon-root': {
+      fontSize: '22px',
+    },
+  };
+
+  const sectionButtonSx = {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    gap: '12px',
+  };
+
   return (
     <Grid container>
       <Grid container direction="row">
@@ -372,26 +392,27 @@ export default function AddSurveySectionActions(props: Props) {
                     }
                     placement="left"
                   >
-                    <span>
-                      <Fab
-                        color="primary"
-                        aria-label={button.ariaLabel}
-                        size="small"
-                        onClick={handleAdd(button.type)}
-                        disabled={
-                          props.disabled ||
-                          (button.type === 'personal-info' &&
-                            personalInfoDisabled)
-                        }
-                        style={{ minWidth: '40px' }}
-                        sx={{ boxShadow: 'none' }}
+                    <Button
+                      sx={sectionButtonSx}
+                      startIcon={
+                        <Box sx={iconCircleSx}>
+                          {sectionTypeIcons[button.type]}
+                        </Box>
+                      }
+                    >
+                      <Box
+                        component={'span'}
+                        sx={{
+                          textAlign: 'left',
+                          color: 'harmaa.main',
+                          fontSize: '14px',
+                          fontWeight: '400',
+                        }}
                       >
-                        {sectionTypeIcons[button.type]}
-                      </Fab>
-                    </span>
+                        {button.label}
+                      </Box>
+                    </Button>
                   </Tooltip>
-
-                  <Typography>{button.label}</Typography>
                 </div>
               </Grid>
             ))}
@@ -404,31 +425,45 @@ export default function AddSurveySectionActions(props: Props) {
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
                 <div className={classes.actionItem}>
-                  <Fab
-                    color="primary"
+                  <Button
+                    sx={sectionButtonSx}
                     aria-label={button.ariaLabel}
-                    size="small"
                     onClick={handleAdd(button.type)}
                     disabled={props.disabled}
-                    sx={{ boxShadow: 'none' }}
+                    startIcon={
+                      <Box sx={iconCircleSx}>
+                        {sectionTypeIcons[button.type]}
+                      </Box>
+                    }
                   >
-                    {sectionTypeIcons[button.type]}
-                  </Fab>
-                  <Typography>{button.label}</Typography>
+                    <Box
+                      component="span"
+                      sx={{
+                        textAlign: 'left',
+                        color: 'harmaa.main',
+                        fontSize: '14px',
+                        fontWeight: '400',
+                      }}
+                    >
+                      {button.label}
+                    </Box>
+                  </Button>
                 </div>
               </Grid>
             ))}
           {!props.disableSectionPaste && (
             <Grid item style={{ padding: '0.5rem' }}>
               <div className={classes.actionItem}>
-                <Fab
+                <Button
+                  sx={sectionButtonSx}
                   disabled={!clipboardSection}
-                  color="secondary"
                   aria-label={'attach-section-from-clipboard'}
-                  size="small"
-                  sx={{ boxShadow: 'none' }}
+                  startIcon={
+                    <Box sx={{ ...iconCircleSx, bgcolor: 'secondary.main' }}>
+                      <ClipboardSmallIcon />
+                    </Box>
+                  }
                   onClick={async () => {
-                    // Copy content from Clipboard context to active survey
                     if (clipboardSection) {
                       const duplicatedFiles: SurveyPageSection =
                         await duplicateFiles(
@@ -453,9 +488,18 @@ export default function AddSurveySectionActions(props: Props) {
                     }
                   }}
                 >
-                  <ClipboardSmallIcon />
-                </Fab>
-                <Typography>{tr.EditSurveyPage.attachSection}</Typography>
+                  <Box
+                    component="span"
+                    sx={{
+                      textAlign: 'left',
+                      color: 'harmaa.main',
+                      fontSize: '14px',
+                      fontWeight: '400',
+                    }}
+                  >
+                    {tr.EditSurveyPage.attachSection}
+                  </Box>
+                </Button>
               </div>
             </Grid>
           )}
