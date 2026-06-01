@@ -173,13 +173,13 @@ export async function configureMockAuth(app: Express) {
   const userGroups = await getUserGroupsForUser(mockUser.id);
   await upsertUser(mockUser);
   const userGroupIds = userGroups.map((g) => g.id);
-  const mockUserWithDefaultLanguage = (await getUser(mockUser.id)) ?? {
-    ...mockUser,
-    groups: userGroupIds,
-  };
 
   // Inject the mock user to each request
-  app.use((req, _res, next) => {
+  app.use(async (req, _res, next) => {
+    const mockUserWithDefaultLanguage = (await getUser(mockUser.id)) ?? {
+      ...mockUser,
+      groups: userGroupIds,
+    };
     req.user = { ...mockUserWithDefaultLanguage, groups: userGroupIds };
     return next();
   });

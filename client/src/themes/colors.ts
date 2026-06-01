@@ -10,7 +10,7 @@ export const colors = {
   textSubtle: '#6A7181',
   borderPrimary: '#E9ECF0',
   borderSecondary: '#A7B4C3',
-  borderSubtle: '#85909C',
+  borderSubtle: '#89909A',
   surfacePrimary: '#FFFFFF',
   surfaceSubtle: '#F6F8FA',
   surfaceSubtleDark: '#E9ECEF',

@@ -35,6 +35,30 @@ const defaultFocus: CSSInterpolation = {
   '&.Mui-focusVisible': defaultFocusStyles,
 };
 
+const buttonRootOverrides = {
+  boxShadow: 'none',
+  textTransform: 'none' as const,
+  padding: '2px 8px',
+  display: 'flex',
+  gap: '6px',
+  '& .MuiButton-icon': {
+    margin: 0,
+    '& svg': { fontSize: '12px' },
+  },
+  '&.Mui-disabled': {
+    color: disabledColor,
+  },
+  '&:hover': {
+    boxShadow: 'none',
+  },
+  '&.Mui-focusVisible': {
+    boxShadow: 'none',
+  },
+  '&:active': {
+    boxShadow: 'none',
+  },
+};
+
 const buttonOverrides: Components<Omit<Theme, 'components'>> = {
   MuiButtonBase: {
     styleOverrides: {
@@ -89,29 +113,7 @@ const buttonOverrides: Components<Omit<Theme, 'components'>> = {
       text: {
         color: colors.textInteractive,
       },
-      root: {
-        boxShadow: 'none',
-        textTransform: 'none',
-        padding: '2px 8px',
-        display: 'flex',
-        gap: '6px',
-        '& .MuiButton-icon': {
-          margin: 0,
-          '& svg': { fontSize: '12px' },
-        },
-        '&.Mui-disabled': {
-          color: disabledColor,
-        },
-        '&:hover': {
-          boxShadow: 'none',
-        },
-        '&.Mui-focusVisible': {
-          boxShadow: 'none',
-        },
-        '&:active': {
-          boxShadow: 'none',
-        },
-      },
+      root: buttonRootOverrides,
     },
   },
   MuiFab: {
@@ -381,6 +383,13 @@ export const surveyOverrides: Components<Omit<Theme, 'components'>> = {
 export const adminOverrides: Components<Omit<Theme, 'components'>> = {
   ...surveyCardOverrides,
   ...buttonOverrides,
+  MuiButton: {
+    ...buttonOverrides.MuiButton,
+    styleOverrides: {
+      ...buttonOverrides.MuiButton?.styleOverrides,
+      root: { ...buttonRootOverrides, fontSize: '14px' },
+    },
+  },
   MuiCssBaseline: {
     styleOverrides: {
       html: { fontSize: '14px' },
