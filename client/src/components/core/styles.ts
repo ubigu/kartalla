@@ -1,5 +1,9 @@
 import { SxProps, Theme } from '@mui/material';
 
+export const controlBorderRadius = '4px';
+export const dropdownBorderRadius = '8px';
+export const pillBorderRadius = '9999px';
+
 export const loadingPulse: SxProps<Theme> = {
   pointerEvents: 'none',
   animation: 'pulse 1s ease-in infinite',

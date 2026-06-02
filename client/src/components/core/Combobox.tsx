@@ -12,6 +12,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import CheckIcon from '../icons/CheckIcon';
 import ChevronDownSmallIcon from '../icons/ChevronDownSmallIcon';
 import { InputHelperText } from './InputHelperText';
+import { controlBorderRadius, dropdownBorderRadius } from './styles';
 
 const paddingX = 6;
 const chevronWidth = 22;
@@ -76,7 +77,7 @@ function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
         backgroundColor: 'surfacePrimary.main',
         border: '0.5px solid',
         borderColor: 'borderSubtle.main',
-        borderRadius: '8px',
+        borderRadius: dropdownBorderRadius,
         borderTopRightRadius: 0,
         borderTopLeftRadius: 0,
         borderTop: 'none',
@@ -385,7 +386,7 @@ export function Combobox_WIP<T extends string = string>(
             borderColor: isFocused
               ? getBorderColor('focus')
               : getBorderColor('default', !!error),
-            borderRadius: '3px',
+            borderRadius: controlBorderRadius,
             boxShadow: isFocused
               ? getBoxShadow('focus')
               : getBoxShadow('default', !!error),
@@ -417,7 +418,7 @@ export function Combobox_WIP<T extends string = string>(
                   backgroundColor: 'surfacePrimary.main',
                   outline: '1px solid',
                   outlineColor: 'borderSubtle.main',
-                  borderRadius: '4px',
+                  borderRadius: controlBorderRadius,
                   padding: '1px 4px 1px 6px',
                   fontSize: '12px',
                   color: theme.palette.harmaa.main,
@@ -534,7 +535,7 @@ export function Combobox_WIP<T extends string = string>(
                     backgroundColor: getBackgroundColor('default', !!error),
                     border: '0.5px solid',
                     borderColor: getBorderColor('default', !!error),
-                    borderRadius: '3px',
+                    borderRadius: controlBorderRadius,
                     padding: `0 ${paddingX + chevronWidth}px 0 ${paddingX}px`,
                     boxShadow: getBoxShadow('default', !!error),
                     width: '100%',

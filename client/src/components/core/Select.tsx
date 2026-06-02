@@ -18,6 +18,7 @@ import {
 import React, { useId, useState } from 'react';
 import ChevronDownSmallIcon from '../icons/ChevronDownSmallIcon';
 import { InputHelperText } from './InputHelperText';
+import { controlBorderRadius, dropdownBorderRadius } from './styles';
 
 const paddingX = 6;
 const chevronWidth = 22;
@@ -139,7 +140,7 @@ export function Select<T extends string = string>({
               backgroundColor: 'surfacePrimary.main',
               border: '0.5px solid',
               borderColor: 'borderSubtle.main',
-              borderRadius: '8px',
+              borderRadius: dropdownBorderRadius,
               borderTopRightRadius: 0,
               borderTopLeftRadius: 0,
               borderTop: 'none',
@@ -167,7 +168,7 @@ export function Select<T extends string = string>({
             },
             border: '0.5px solid',
             borderColor: getBorderColor('default', !!error),
-            borderRadius: '3px',
+            borderRadius: controlBorderRadius,
             boxShadow: getBoxShadow('default', !!error),
             transition: 'border-color 0.2s, background-color 0.2s',
             width: '100%',
