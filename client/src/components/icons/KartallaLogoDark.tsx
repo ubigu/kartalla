@@ -1,6 +1,8 @@
 import { SvgIcon, SvgIconProps } from '@mui/material';
+import { useId } from 'react';
 
 export function KartallaLogoDark(props: SvgIconProps) {
+  const clipPathId = useId();
   return (
     <SvgIcon {...props}>
       <svg
@@ -10,7 +12,7 @@ export function KartallaLogoDark(props: SvgIconProps) {
         viewBox="0 0 374 95"
         fill="none"
       >
-        <g clipPath="url(#clip0_1907_16466)">
+        <g clipPath={`url(#${clipPathId})`}>
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -31,7 +33,7 @@ export function KartallaLogoDark(props: SvgIconProps) {
           />
         </g>
         <defs>
-          <clipPath id="clip0_1907_16466">
+          <clipPath id={clipPathId}>
             <rect
               width="374"
               height="94.8169"

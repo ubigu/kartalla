@@ -1,9 +1,11 @@
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import { useId } from 'react';
 
 export default function LogoutIcon(props: SvgIconProps) {
+  const clipPathId = useId();
   return (
     <SvgIcon {...props} viewBox="0 0 24 24">
-      <g clipPath="url(#clip0_6590_744)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M7.5 12.004H23.25"
           stroke="currentColor"
@@ -30,7 +32,7 @@ export default function LogoutIcon(props: SvgIconProps) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_6590_744">
+        <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />
         </clipPath>
       </defs>
