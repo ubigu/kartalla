@@ -77,7 +77,7 @@ export default function EditSurveyPermissions(props: Props) {
           label: group.name,
         }))}
         multiselect
-        disabled={surveyUserGroupEditingDisabled()}
+        disabled={surveyUserGroupEditingDisabled() || !props.canEdit}
         value={activeSurvey.userGroups}
         onMultiChange={(value) => {
           editSurvey({

@@ -44,6 +44,19 @@ export const SecondTabActive: Story = {
   },
 };
 
+export const DisabledTab: Story = {
+  render: () => {
+    const [value, setValue] = useState(0);
+    return (
+      <Tabs value={value} onChange={setValue}>
+        <Tab label="Perustiedot" value={0} />
+        <Tab label="Sivut" value={1} />
+        <Tab label="Asetukset" value={2} disabled />
+      </Tabs>
+    );
+  },
+};
+
 export const ManyTabs: Story = {
   render: () => {
     const [value, setValue] = useState(0);

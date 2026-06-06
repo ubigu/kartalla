@@ -16,7 +16,11 @@ import { editPageContainerSx } from './EditSurvey';
 import { EmailPicker } from './EmailPicker';
 import KeyValueForm from './KeyValueForm';
 
-export default function EditSurveyEmail() {
+interface Props {
+  canEdit: boolean;
+}
+
+export default function EditSurveyEmail({ canEdit }: Props) {
   const [autocompleteEmailsLoading, setAutocompleteEmailsLoading] =
     useState(true);
   const [autocompleteEmails, setAutocompleteEmails] = useState<string[]>([]);
@@ -26,6 +30,8 @@ export default function EditSurveyEmail() {
   const { workingLanguage } = useWorkingLanguage();
   const workingLanguageInlineDescription =
     useWorkingLanguageInlineDescription();
+
+  const editingDisabled = !canEdit || activeSurveyLoading;
 
   useEffect(() => {
     async function fetchAutocompleteEmails() {
@@ -56,7 +62,7 @@ export default function EditSurveyEmail() {
         <Checkbox
           aria-describedby={'enable-email-helper'}
           label={tr.EditSurveyEmail.enable}
-          disabled={activeSurveyLoading}
+          disabled={editingDisabled}
           checked={activeSurvey.email.enabled ?? false}
           onChange={(event) => {
             editSurvey({
@@ -77,7 +83,7 @@ export default function EditSurveyEmail() {
           <Box display={'flex'} flexDirection="column" gap={'1rem'}>
             <Checkbox
               label={tr.EditSurveyEmail.includeMarginImages}
-              disabled={activeSurveyLoading}
+              disabled={editingDisabled}
               checked={activeSurvey.email.includeMarginImages}
               onChange={(event) => {
                 editSurvey({
@@ -93,7 +99,7 @@ export default function EditSurveyEmail() {
               <Checkbox
                 aria-describedby={'include-personal-info-helper'}
                 label={tr.EditSurveyEmail.includePersonalInfo}
-                disabled={activeSurveyLoading}
+                disabled={editingDisabled}
                 checked={activeSurvey.email.includePersonalInfo}
                 onChange={(event) => {
                   editSurvey({
@@ -116,7 +122,7 @@ export default function EditSurveyEmail() {
               <Checkbox
                 aria-describedby={'email-required-helper'}
                 label={tr.EditSurveyEmail.required}
-                disabled={activeSurveyLoading}
+                disabled={editingDisabled}
                 checked={activeSurvey.email.required}
                 onChange={(event) => {
                   editSurvey({
@@ -151,11 +157,12 @@ export default function EditSurveyEmail() {
                   },
                 });
               }}
-              disabled={autocompleteEmailsLoading || activeSurveyLoading}
+              disabled={autocompleteEmailsLoading || editingDisabled}
             />
           </div>
           <Input
             label={tr.EditSurveyEmail.emailSubject}
+            disabled={editingDisabled}
             inlineDescription={workingLanguageInlineDescription}
             value={activeSurvey.email.subject?.[workingLanguage] ?? ''}
             onChange={(event) => {
@@ -173,6 +180,7 @@ export default function EditSurveyEmail() {
           />
           <RichTextEditor
             label={tr.EditSurveyEmail.emailBody}
+            disabled={editingDisabled}
             value={activeSurvey.email.body?.[workingLanguage] ?? ''}
             onChange={(value) => {
               editSurvey({
@@ -190,6 +198,7 @@ export default function EditSurveyEmail() {
           <div>
             <KeyValueForm
               label={tr.EditSurveyEmail.info}
+              disabled={editingDisabled}
               value={activeSurvey.email.info ?? []}
               onChange={(value) => {
                 editSurvey({

@@ -21,9 +21,15 @@ interface Props {
   label?: string;
   value: SurveyEmailInfoItem[];
   onChange: (object: SurveyEmailInfoItem[]) => void;
+  disabled?: boolean;
 }
 
-export default function KeyValueForm({ label, value, onChange }: Props) {
+export default function KeyValueForm({
+  label,
+  value,
+  onChange,
+  disabled,
+}: Props) {
   const { tr, initializeLocalizedObject } = useTranslations();
   const { workingLanguage } = useWorkingLanguage();
 
@@ -45,6 +51,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
+                    disabled={disabled}
                     value={row.name?.[workingLanguage]}
                     onChange={(event) => {
                       value[index].name = {
@@ -58,6 +65,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
+                    disabled={disabled}
                     value={row.value?.[workingLanguage]}
                     onChange={(event) => {
                       value[index].value = {
@@ -72,6 +80,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                   <Tooltip title={tr.KeyValueForm.deleteEntry}>
                     <IconButton
                       size="small"
+                      disabled={disabled}
                       onClick={() => {
                         onChange(value.filter((_, i) => i !== index));
                       }}
@@ -90,6 +99,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
           color="primary"
           aria-label="add-key-value-pair"
           size="small"
+          disabled={disabled}
           style={{ margin: '1rem 0' }}
           sx={{ boxShadow: 'none' }}
           onClick={() => {

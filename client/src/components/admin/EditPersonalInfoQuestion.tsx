@@ -1,5 +1,4 @@
-// @ts-strict-ignore
-import { SurveyPersonalInfoQuestion } from '@interfaces/survey';
+import { LocalizedText, SurveyPersonalInfoQuestion } from '@interfaces/survey';
 import { FormGroup, FormLabel, Input } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Checkbox } from '@src/components/core/Checkbox';
@@ -50,6 +49,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           {tr.PersonalInfoQuestion.label}
         </FormLabel>
         <Checkbox
+          sx={{ marginBottom: '8px' }}
           checkboxBackground={palette.surfacePrimary.main}
           name="name"
           checked={section.askName}
@@ -62,6 +62,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           label={tr.PersonalInfoQuestion.nameLabel}
         />
         <Checkbox
+          sx={{ marginBottom: '8px' }}
           checkboxBackground={palette.surfacePrimary.main}
           name="email"
           checked={section.askEmail}
@@ -74,6 +75,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           label={tr.PersonalInfoQuestion.emailLabel}
         />
         <Checkbox
+          sx={{ marginBottom: '8px' }}
           checkboxBackground={palette.surfacePrimary.main}
           name="phone"
           checked={section.askPhone}
@@ -86,6 +88,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           label={tr.PersonalInfoQuestion.phoneLabel}
         />
         <Checkbox
+          sx={{ marginBottom: '8px' }}
           checkboxBackground={palette.surfacePrimary.main}
           name="address"
           checked={section.askAddress}
@@ -98,6 +101,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           label={tr.PersonalInfoQuestion.addressLabel}
         />
         <Checkbox
+          sx={{ marginBottom: '8px' }}
           checkboxBackground={palette.surfacePrimary.main}
           data-testid="custom-checkbox"
           name="customText"
@@ -117,7 +121,13 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                 onChange({
                   ...section,
                   customLabel: {
-                    ...section.customLabel,
+                    ...((section.customLabel
+                      ? Object.fromEntries(
+                          Object.entries(section.customLabel).map(
+                            ([lang, text]) => [lang, text ?? ''],
+                          ),
+                        )
+                      : {}) as LocalizedText),
                     [workingLanguage]: e.target.value,
                   },
                 })

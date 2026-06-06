@@ -8,9 +8,15 @@ interface Props {
   label?: string;
   value: string | null;
   onChange: (color: string) => void;
+  disabled?: boolean;
 }
 
-export default function ColorSelect({ label, value, onChange }: Props) {
+export default function ColorSelect({
+  label,
+  value,
+  onChange,
+  disabled,
+}: Props) {
   const { tr } = useTranslations();
 
   const colors = useMemo<{ name: string; value: string }[]>(
@@ -39,6 +45,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
     <Select
       id="color"
       label={label ?? tr.ColorSelect.color}
+      disabled={disabled}
       value={value ?? ''}
       onChange={onChange}
       renderLabel={(opt) => (

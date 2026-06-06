@@ -103,7 +103,7 @@ export function RadioButton({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            cursor: disabled ? undefined : 'pointer',
           }}
         >
           <Box

@@ -159,10 +159,10 @@ export default function EditSurvey() {
                 <EditSurveyAppearance canEdit={allowEditing} />
               </Route>
               <Route path={`${path}/${editSurveyPaths.mapData}`}>
-                <EditSurveyMapData />
+                <EditSurveyMapData canEdit={allowEditing} />
               </Route>
               <Route path={`${path}/${editSurveyPaths.emails}`}>
-                <EditSurveyEmail />
+                <EditSurveyEmail canEdit={allowEditing} />
               </Route>
               <Route path={`${path}/${editSurveyPaths.pages}/:pageId`}>
                 {checkingAnswers && (

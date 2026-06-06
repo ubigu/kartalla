@@ -41,7 +41,12 @@ type LanguageItemProps = {
   component?: BoxProps['component'];
   onDeleteTranslations?: () => void;
 } & (
-  | { variant: 'checkbox'; isChecked: boolean; onToggle: () => void }
+  | {
+      variant: 'checkbox';
+      isChecked: boolean;
+      onToggle: () => void;
+      disabled?: boolean;
+    }
   | { variant: 'plain' }
 );
 
@@ -116,12 +121,13 @@ function LanguageItem(props: LanguageItemProps) {
   );
 
   if (props.variant === 'checkbox') {
+    const isDisabled = isLocked || props.disabled;
     return (
       <Checkbox
         label={labelContent}
-        onClick={isLocked ? undefined : props.onToggle}
+        onClick={isDisabled ? undefined : props.onToggle}
         checked={props.isChecked}
-        disabled={isLocked}
+        disabled={isDisabled}
       />
     );
   }
@@ -208,7 +214,7 @@ function LanguageList() {
   );
 }
 
-function MultiLanguageFieldset() {
+function MultiLanguageFieldset({ canEdit }: { canEdit: boolean }) {
   const { activeSurvey, editSurvey } = useSurvey();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -261,6 +267,7 @@ function MultiLanguageFieldset() {
           <LanguageItem
             key={`${lang}-${idx}`}
             variant="checkbox"
+            disabled={!canEdit}
             label={getLabel(lang)}
             isChecked={isChecked}
             isWorkingLanguage={lang === workingLanguage}
@@ -433,7 +440,7 @@ export function EditSurveyLanguages({ canEdit }: Props) {
         easing="ease-in-out"
       >
         {activeSurvey.localisationEnabled ? (
-          <MultiLanguageFieldset />
+          <MultiLanguageFieldset canEdit={canEdit} />
         ) : (
           <LanguageList />
         )}

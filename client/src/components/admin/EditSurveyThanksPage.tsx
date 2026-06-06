@@ -35,6 +35,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
       </Typography>
       <Input
         label={tr.EditSurveyThanksPage.title}
+        disabled={!canEdit || activeSurveyLoading}
         inlineDescription={workingLanguageInlineDescription}
         value={activeSurvey.thanksPage?.title?.[workingLanguage] ?? ''}
         onChange={(event) => {
@@ -55,6 +56,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
           minWidth: '540px',
         }}
         label={tr.EditSurveyThanksPage.text}
+        disabled={!canEdit || activeSurveyLoading}
         value={activeSurvey.thanksPage.text?.[workingLanguage] ?? ''}
         editorStyle={{ background: theme.palette.surfaceInput.main }}
         onChange={(value) => {

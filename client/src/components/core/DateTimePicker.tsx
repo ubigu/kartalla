@@ -91,12 +91,13 @@ export function DateTimePicker<TDate>({
             sx: {
               '& .MuiInputBase-root': {
                 ...inputStyles,
-                '&:hover:not(.Mui-focused)': !error
-                  ? {
-                      borderColor: getBorderColor('hover'),
-                      backgroundColor: getBackgroundColor('hover'),
-                    }
-                  : {},
+                '&:hover:not(.Mui-focused)':
+                  !error && !props.disabled
+                    ? {
+                        borderColor: getBorderColor('hover'),
+                        backgroundColor: getBackgroundColor('hover'),
+                      }
+                    : {},
                 '&.Mui-focused': !error
                   ? {
                       outline: '2px solid',

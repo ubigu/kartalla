@@ -43,6 +43,14 @@ export const Required: Story = {
   args: { label: 'Required field', required: true },
 };
 
+export const Disabled: Story = {
+  args: {
+    label: 'Label',
+    disabled: true,
+    value: new Date('2025-06-15T10:30:00'),
+  },
+};
+
 export const NoLabel: Story = {
   args: {},
 };

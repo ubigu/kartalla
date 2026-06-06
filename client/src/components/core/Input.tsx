@@ -36,6 +36,7 @@ export function Input({
   error,
   helperText,
   required,
+  disabled,
   inlineDescription,
   ...props
 }: Props) {
@@ -73,8 +74,10 @@ export function Input({
           borderRadius: controlBorderRadius,
           boxShadow: getBoxShadow('default', !!error),
           transition: 'border-color 0.2s, background-color 0.2s',
-          '&:hover:not(:focus-within)': { ...(!error && hoverStyle) },
-          '&:focus-within': { ...(!error && focusStyle) },
+          '&:hover:not(:focus-within)': {
+            ...(!error && !disabled && hoverStyle),
+          },
+          '&:focus-within': { ...(!error && !disabled && focusStyle) },
         }}
       >
         {inlineDescription && (
@@ -99,6 +102,7 @@ export function Input({
         <Box
           component={'input'}
           id={inputId}
+          disabled={disabled}
           aria-invalid={!!error}
           aria-describedby={
             [inlineDescription && inlineDescriptionId, helperText && helperId]

@@ -391,7 +391,6 @@ export function Combobox_WIP<T extends string = string>(
               ? getBoxShadow('focus')
               : getBoxShadow('default', !!error),
             transition: 'border-color 0.2s, background-color 0.2s',
-            cursor: disabled ? 'not-allowed' : undefined,
             ...(disabled ? getDisabledInputStyles() : {}),
             ...(!error && !disabled && !isFocused
               ? {
@@ -513,7 +512,6 @@ export function Combobox_WIP<T extends string = string>(
               color: theme.palette.harmaa.main,
               outline: 'none',
               textOverflow: 'ellipsis',
-              cursor: disabled ? 'not-allowed' : undefined,
               ...(multiselect
                 ? {
                     flex: 1,
@@ -577,7 +575,7 @@ export function Combobox_WIP<T extends string = string>(
             transition: 'transform 0.15s',
             display: 'flex',
             color: 'primary.main',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            cursor: disabled ? undefined : 'pointer',
           }}
           onClick={() => {
             if (!disabled) isOpen ? close() : open();

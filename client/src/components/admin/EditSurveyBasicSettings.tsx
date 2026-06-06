@@ -79,6 +79,8 @@ export default function EditSurveyBasicSettings(props: Props) {
     return `${window.location.origin}/${originalActiveSurvey.organization.name}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
 
+  const editingDisabled = !props.canEdit || activeSurveyLoading;
+
   const languagesSet = hasEnabledLanguages(activeSurvey);
   const [languagesInitialized, setLanguagesInitialized] = useState(false);
 
@@ -150,6 +152,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         </Stack>
         <Input
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.title')}
           label={tr.EditSurveyInfo.title}
           inlineDescription={workingLanguageInlineDescription}
@@ -166,6 +169,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           label={tr.EditSurveyInfo.subtitle}
+          disabled={editingDisabled}
           inlineDescription={workingLanguageInlineDescription}
           value={activeSurvey.subtitle?.[workingLanguage] ?? ''}
           onChange={(event) =>
@@ -189,6 +193,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             },
           }}
           editorStyle={{ background: theme.palette.surfaceInput.main }}
+          disabled={editingDisabled}
           label={tr.EditSurveyInfo.description}
           value={activeSurvey.description?.[workingLanguage] ?? ''}
           onChange={(value) =>
@@ -203,6 +208,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.name')}
           label={tr.EditSurveyInfo.name}
           value={activeSurvey.name ?? ''}
@@ -217,6 +223,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         <TagPicker
           selectedTags={activeSurvey.tags}
           addEnabled={true}
+          disabled={editingDisabled}
           onSelectedTagsChange={(t) =>
             editSurvey({
               ...activeSurvey,
@@ -226,6 +233,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.author')}
           label={tr.EditSurveyInfo.author}
           value={activeSurvey.author ?? ''}
@@ -238,6 +246,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           label={tr.EditSurveyInfo.authorUnit}
+          disabled={editingDisabled}
           value={activeSurvey.authorUnit ?? ''}
           onChange={(event) => {
             editSurvey({
@@ -263,6 +272,7 @@ export default function EditSurveyBasicSettings(props: Props) {
           >
             <DateTimePicker
               label={tr.EditSurveyInfo.startDate}
+              disabled={editingDisabled}
               value={activeSurvey.startDate}
               ampm={false}
               format="dd.MM.yyyy HH:mm"
@@ -276,6 +286,7 @@ export default function EditSurveyBasicSettings(props: Props) {
             />
             <DateTimePicker
               label={tr.EditSurveyInfo.endDate}
+              disabled={editingDisabled}
               value={activeSurvey.endDate}
               format="dd.MM.yyyy HH:mm"
               placeholder={tr.EditSurveyInfo.selectDate}
@@ -290,6 +301,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         </LocalizationProvider>
         <Checkbox
           label={tr.EditSurvey.allowSavingUnfinished}
+          disabled={editingDisabled}
           checked={activeSurvey.allowSavingUnfinished}
           onChange={(event) =>
             editSurvey({
@@ -301,6 +313,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Checkbox
           label={tr.EditSurvey.displayPrivacyStatement}
+          disabled={editingDisabled}
           checked={activeSurvey.displayPrivacyStatement}
           onChange={(event) =>
             editSurvey({
@@ -315,6 +328,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         <div>
           <Checkbox
             label={tr.EditSurveyInfo.allowTestSurvey}
+            disabled={editingDisabled}
             checked={activeSurvey.allowTestSurvey}
             aria-describedby={'publish-survey-helper-text'}
             onChange={(event) => {

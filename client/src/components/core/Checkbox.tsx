@@ -60,9 +60,10 @@ export function Checkbox({ label, sx, checkboxBackground, ...props }: Props) {
       disableRipple
       sx={{
         paddingY: 0,
-        '&:hover .icon-wrapper, &:focus .icon-wrapper': {
-          backgroundColor: `${palette.surfaceSubtle.dark} !important`,
-        },
+        '&:hover:not(.Mui-disabled) .icon-wrapper, &:focus:not(.Mui-disabled) .icon-wrapper':
+          {
+            backgroundColor: `${palette.surfaceSubtle.dark} !important`,
+          },
       }}
       size="large"
       checkedIcon={<CheckedIcon backgroundColor={checkboxBackground} />}

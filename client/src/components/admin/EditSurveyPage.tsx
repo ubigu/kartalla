@@ -162,6 +162,7 @@ export default function EditSurveyPage(props: Props) {
       <Input
         label={tr.EditSurveyPage.name}
         required
+        disabled={loading || !props.canEdit}
         inlineDescription={workingLanguageInlineDescription}
         value={page?.title?.[workingLanguage] ?? ''}
         onChange={(event) => {
@@ -198,6 +199,7 @@ export default function EditSurveyPage(props: Props) {
         <ToggleButtonGroup
           color="primary"
           exclusive
+          disabled={loading || !props.canEdit}
           value={page.sidebar.type}
           onChange={(_, newValue) => {
             editPage({
@@ -238,7 +240,11 @@ export default function EditSurveyPage(props: Props) {
                     <FormControlLabel
                       sx={{ maxWidth: '500px' }}
                       key={layer.id}
-                      disabled={activeSurvey.mapProvider === 'openlayers'}
+                      disabled={
+                        loading ||
+                        !props.canEdit ||
+                        activeSurvey.mapProvider === 'openlayers'
+                      }
                       label={getLayerName(
                         layer,
                         workingLanguage,
@@ -323,6 +329,7 @@ export default function EditSurveyPage(props: Props) {
                   </Button>
                   <Button
                     variant="outlined"
+                    disabled={loading || !props.canEdit}
                     onClick={() => {
                       setModifyMapView(true);
                       setMapPreviewOpen(true);
@@ -334,6 +341,7 @@ export default function EditSurveyPage(props: Props) {
                   <Button
                     sx={{ marginLeft: 'auto' }}
                     color="error"
+                    disabled={loading || !props.canEdit}
                     onClick={() => handleDeleteDefaultView()}
                   >
                     {tr.EditSurveyPage.mapViewButtons.deleteDefaultView}
@@ -343,6 +351,7 @@ export default function EditSurveyPage(props: Props) {
                 <Button
                   sx={{ marginTop: '12px' }}
                   variant="contained"
+                  disabled={loading || !props.canEdit}
                   onClick={() => {
                     setModifyMapView(true);
                     setMapPreviewOpen(true);
@@ -358,6 +367,7 @@ export default function EditSurveyPage(props: Props) {
         <div>
           <FileUpload
             forMedia
+            disabled={loading || !props.canEdit}
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
             surveyOrganizationId={activeSurvey.organization.id}
@@ -393,6 +403,7 @@ export default function EditSurveyPage(props: Props) {
           />
           <TextField
             style={{ width: '100%', marginTop: 2 }}
+            disabled={loading || !props.canEdit}
             label={tr.EditSurveyPage.imageAltText}
             value={page.sidebar?.imageAltText?.[workingLanguage] ?? ''}
             onChange={(event) => {
@@ -410,6 +421,7 @@ export default function EditSurveyPage(props: Props) {
           />
           <TextField
             style={{ width: '100%', marginTop: 10 }}
+            disabled={loading || !props.canEdit}
             label={tr.EditSurveyPage.imageAttributions}
             value={page.sidebar?.imageAttributions ?? ''}
             onChange={(event) => {
@@ -422,7 +434,10 @@ export default function EditSurveyPage(props: Props) {
               });
             }}
           />
-          <FormControl sx={{ marginTop: 2 }}>
+          <FormControl
+            sx={{ marginTop: 2 }}
+            disabled={loading || !props.canEdit}
+          >
             <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
             <RadioGroup
               row
