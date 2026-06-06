@@ -7,6 +7,7 @@ import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { createRef, useEffect, useMemo } from 'react';
 import OptionInfoDialog from './OptionInfoDialog';
 
@@ -48,7 +49,8 @@ export default function QuestionOptions({
   allowOptionInfo = false,
 }: Props) {
   const classes = useStyles();
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -91,13 +93,13 @@ export default function QuestionOptions({
             ...(index === 0
               ? optionToChange.text
               : initializeLocalizedObject(null)),
-            [surveyLanguage]: optionFields[0],
+            [workingLanguage]: optionFields[0],
           },
           ...(allowOptionInfo
             ? {
                 info: {
                   ...initializeLocalizedObject(null),
-                  [surveyLanguage]: optionInfo,
+                  [workingLanguage]: optionInfo,
                 },
               }
             : {}),
@@ -144,7 +146,7 @@ export default function QuestionOptions({
                 variant="standard"
                 disabled={disabled}
                 size="small"
-                value={option.text?.[surveyLanguage] ?? ''}
+                value={option.text?.[workingLanguage] ?? ''}
                 onChange={(event) => {
                   // Only allow copying from clipboard if
                   // 1) feature is enabled
@@ -160,7 +162,7 @@ export default function QuestionOptions({
                               ...option,
                               text: {
                                 ...option.text,
-                                [surveyLanguage]: event.target.value,
+                                [workingLanguage]: event.target.value,
                               },
                             }
                           : option,
@@ -187,7 +189,7 @@ export default function QuestionOptions({
             </div>
             {allowOptionInfo && (
               <OptionInfoDialog
-                infoText={option?.info?.[surveyLanguage]}
+                infoText={option?.info?.[workingLanguage]}
                 onChangeOptionInfo={(newInfoText) => {
                   onChange(
                     options.map((option, i) =>
@@ -196,7 +198,7 @@ export default function QuestionOptions({
                             ...option,
                             info: {
                               ...option.info,
-                              [surveyLanguage]: newInfoText,
+                              [workingLanguage]: newInfoText,
                             },
                           }
                         : option,

@@ -9,7 +9,10 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  supportedLanguages,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 
 import { useToasts } from '@src/stores/ToastContext';
 import CopyToClipboard from '../CopyToClipboard';
@@ -125,7 +128,7 @@ export default function EditSurveyTranslations() {
     editFollowUpSection,
     editPage,
   } = useSurvey();
-  const { tr, languages } = useTranslations();
+  const { tr } = useTranslations();
   const classes = useStyles();
   const { showToast } = useToasts();
 
@@ -180,7 +183,7 @@ export default function EditSurveyTranslations() {
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
             </Typography>
             <div className={classes.rowContainer}>
-              {languages.map((lang, langIndex) => {
+              {supportedLanguages.map((lang, langIndex) => {
                 return (
                   <div
                     className={classes.langContainer}

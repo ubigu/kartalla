@@ -1,18 +1,13 @@
 import { expect, Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class SurveyAdminPage {
-  private _page: Page;
-
+export class SurveyAdminPage extends BasePage {
   constructor(page: Page) {
-    this._page = page;
+    super(page);
   }
 
-  get page() {
-    return this._page;
-  }
-
-  async goto() {
-    await this._page.goto(`http://localhost:8080/admin/`);
+  async goto(lang?: string) {
+    await this._page.goto(`/admin/${lang ? `?lang=${lang}` : ''}`);
   }
 
   async getSurveyList() {

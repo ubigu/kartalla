@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import { Survey } from '@interfaces/survey';
+import { LanguageCode, Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
@@ -117,8 +117,11 @@ export default function SurveyListItem(props: Props) {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { tr } = useTranslations();
-  const surveyLanguage = survey.primaryLanguage;
+  const { tr, language } = useTranslations();
+  const surveyLanguage =
+    (Object.entries(survey.enabledLanguages).find(
+      ([, enabled]) => enabled,
+    )?.[0] as LanguageCode) ?? language;
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();

@@ -14,6 +14,7 @@ import {
 import { GeoBudgetTargets } from '@src/components/admin/GeoBudgetTargets';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 interface Props {
   section: SurveyGeoBudgetingQuestion;
@@ -21,7 +22,8 @@ interface Props {
 }
 
 export function EditGeoBudgetingQuestion({ section, onChange }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   return (
     <FormGroup sx={{ gap: 2 }}>
       <Box sx={{ display: 'flex', gap: 2 }}>
@@ -80,14 +82,14 @@ export function EditGeoBudgetingQuestion({ section, onChange }: Props) {
         />
       </RadioGroup>
       <RichTextEditor
-        value={section.helperText?.[surveyLanguage] ?? ''}
+        value={section.helperText?.[workingLanguage] ?? ''}
         label={tr.GeoBudgetingQuestion.helperText}
         onChange={(value) =>
           onChange({
             ...section,
             helperText: {
               ...section.helperText,
-              [surveyLanguage]: value,
+              [workingLanguage]: value,
             },
           })
         }

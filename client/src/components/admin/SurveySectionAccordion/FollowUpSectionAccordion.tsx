@@ -48,6 +48,7 @@ import SliderIcon from '@src/components/icons/SliderIcon';
 import TextFieldIcon from '@src/components/icons/TextFieldIcon';
 import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
@@ -117,7 +118,8 @@ interface Props {
 export function FollowUpSectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const classes = useStyles();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>(null);
@@ -375,7 +377,7 @@ export function FollowUpSectionAccordion(props: Props) {
           </div>
 
           <Typography className={classes.sectionTitle}>
-            {props.section.title?.[surveyLanguage] || (
+            {props.section.title?.[workingLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
@@ -388,7 +390,7 @@ export function FollowUpSectionAccordion(props: Props) {
           accordion={accordion}
           pageId={props.pageId}
           section={props.section}
-          parentTitle={props.parentSection?.title?.[surveyLanguage]}
+          parentTitle={props.parentSection?.title?.[workingLanguage]}
           parentSection={props.parentSection}
           parentSectionIndex={props.parentSectionIndex}
         />

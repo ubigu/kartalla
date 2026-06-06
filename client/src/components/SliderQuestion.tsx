@@ -27,7 +27,7 @@ export default function SliderQuestion({
   setDirty,
   readOnly = false,
 }: Props) {
-  const { surveyLanguage } = useTranslations();
+  const { language } = useTranslations();
   const classes = useStyles();
   const sliderRef = useRef<HTMLElement | null>(null);
   const { tr } = useTranslations();
@@ -36,17 +36,15 @@ export default function SliderQuestion({
     return verbalExtremes
       ? {
           min:
-            question.minLabel?.[surveyLanguage] ??
-            tr.SliderQuestion.defaultMinLabel,
+            question.minLabel?.[language] ?? tr.SliderQuestion.defaultMinLabel,
           max:
-            question.maxLabel?.[surveyLanguage] ??
-            tr.SliderQuestion.defaultMaxLabel,
+            question.maxLabel?.[language] ?? tr.SliderQuestion.defaultMaxLabel,
         }
       : {
           min: question.minValue,
           max: question.maxValue,
         };
-  }, [question, surveyLanguage]);
+  }, [question, language]);
 
   // "Dummy" value to be displayed (in the middle) before a valid input is given
   const visibleEmptyValue = useMemo(() => {
@@ -81,7 +79,7 @@ export default function SliderQuestion({
       </FormLabel>
       <Slider
         disabled={readOnly}
-        aria-label={question.title?.[surveyLanguage]}
+        aria-label={question.title?.[language]}
         ref={sliderRef}
         slotProps={{
           input: {

@@ -23,6 +23,14 @@ export const Default: Story = {
   args: { label: 'Label', placeholder: 'Placeholder text' },
 };
 
+export const WithTranslationKey: Story = {
+  args: {
+    label: 'Kyselyn otsikko',
+    placeholder: 'Syötä otsikko tähän',
+    inlineDescription: { visible: 'fi', screenReader: 'Kieli fi' },
+  },
+};
+
 export const WithValue: Story = {
   args: { label: 'Label', defaultValue: 'Some input value' },
 };

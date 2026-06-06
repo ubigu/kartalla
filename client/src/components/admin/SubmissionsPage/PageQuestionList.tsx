@@ -18,7 +18,7 @@ import { SurveyQuestion } from '@interfaces/survey';
 import { Person } from '@mui/icons-material';
 import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { assertNever } from '@src/utils/typeCheck';
 
 interface Props {
@@ -66,7 +66,7 @@ function getQuestionIcon(
 }
 
 export function PageQuestionList({ questions, handleClick }: Props) {
-  const { surveyLanguage } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <>
@@ -90,7 +90,7 @@ export function PageQuestionList({ questions, handleClick }: Props) {
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {getQuestionIcon(question.type)}
-                  <Typography>{question.title[surveyLanguage]}</Typography>
+                  <Typography>{question.title[workingLanguage]}</Typography>
                 </Box>
 
                 <ChevronRightIcon sx={{ color: '#41BBFF' }} />

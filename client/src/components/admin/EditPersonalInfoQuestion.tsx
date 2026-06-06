@@ -4,6 +4,7 @@ import { FormGroup, FormLabel, Input } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Checkbox } from '@src/components/core/Checkbox';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 interface Props {
   section: SurveyPersonalInfoQuestion;
@@ -18,7 +19,8 @@ const inputStyle = {
 };
 
 export function EditPersonalInfoQuestion({ section, onChange }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const { palette } = useTheme();
 
   return (
@@ -108,7 +110,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
           }}
           label={
             <Input
-              value={section.customLabel?.[surveyLanguage] ?? ''}
+              value={section.customLabel?.[workingLanguage] ?? ''}
               style={inputStyle}
               placeholder={tr.PersonalInfoQuestion.customLabel}
               onChange={(e) =>
@@ -116,7 +118,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                   ...section,
                   customLabel: {
                     ...section.customLabel,
-                    [surveyLanguage]: e.target.value,
+                    [workingLanguage]: e.target.value,
                   },
                 })
               }

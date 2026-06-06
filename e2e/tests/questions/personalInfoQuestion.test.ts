@@ -3,23 +3,20 @@ import { getPersonalInfoQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES }
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.personalInfo);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.personalInfo, ['fi']);
 const personalInfoQuestion = getPersonalInfoQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Personal info question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('all fields', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('all fields', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createPersonalInfoQuestion(personalInfoQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -39,7 +36,7 @@ test.describe('Personal info question', () => {
     ).toBeVisible();
   });
 
-  test('only name and email', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('only name and email', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createPersonalInfoQuestion({
       ...personalInfoQuestion,
       name: true,
@@ -48,9 +45,7 @@ test.describe('Personal info question', () => {
       address: false,
       custom: false,
     });
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

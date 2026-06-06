@@ -72,7 +72,7 @@ export function PersonalInfoQuestion({
   onChange,
 }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const [hasInvalidInput, setHasInvalidInput] = useState({
     name: false,
     email: false,
@@ -269,12 +269,12 @@ export function PersonalInfoQuestion({
           showError={showInputErrorsFor.custom}
           errorMessage={tr.PersonalInfoQuestion.customError.replace(
             '{label}',
-            question.customLabel?.[surveyLanguage] ?? '',
+            question.customLabel?.[language] ?? '',
           )}
           labelColor={survey.sectionTitleColor}
         >
           <label htmlFor={getInputFieldId(question.id, 'customInput')}>
-            {question?.customLabel?.[surveyLanguage] ?? ''}
+            {question?.customLabel?.[language] ?? ''}
           </label>
           <input
             aria-describedby={`${getInputFieldId(question.id, 'customInput')}-error`}

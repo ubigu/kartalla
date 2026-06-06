@@ -1,8 +1,13 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { BASE_URL } from './utils/config';
 
 const config: PlaywrightTestConfig = {
   globalSetup: './utils/globalSetup',
-  retries: 1,
+  globalTeardown: './utils/globalTeardown',
+  use: {
+    locale: 'fi-FI',
+    baseURL: BASE_URL,
+  },
   projects: [
     {
       name: 'Chrome',

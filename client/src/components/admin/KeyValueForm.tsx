@@ -15,6 +15,7 @@ import {
 import AddIcon from '@src/components/icons/AddIcon';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 interface Props {
   label?: string;
@@ -23,7 +24,8 @@ interface Props {
 }
 
 export default function KeyValueForm({ label, value, onChange }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <div>
@@ -43,11 +45,11 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
-                    value={row.name?.[surveyLanguage]}
+                    value={row.name?.[workingLanguage]}
                     onChange={(event) => {
                       value[index].name = {
                         ...value[index].name,
-                        [surveyLanguage]: event.target.value,
+                        [workingLanguage]: event.target.value,
                       };
                       onChange(value);
                     }}
@@ -56,11 +58,11 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
-                    value={row.value?.[surveyLanguage]}
+                    value={row.value?.[workingLanguage]}
                     onChange={(event) => {
                       value[index].value = {
                         ...value[index].value,
-                        [surveyLanguage]: event.target.value,
+                        [workingLanguage]: event.target.value,
                       };
                       onChange(value);
                     }}

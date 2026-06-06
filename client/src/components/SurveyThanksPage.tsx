@@ -50,7 +50,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
     !survey.marginImages.bottom.imageUrl,
   );
 
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const hasImage = typeof survey.thanksPage.imageUrl === 'string';
   const lowWidth = useMediaQuery('(max-width: 400px)');
   const mediumWidth = useMediaQuery('(max-width: 640px)');
@@ -122,11 +122,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           }}
         >
           <Typography variant="h5" component="h1">
-            {survey.thanksPage.title?.[surveyLanguage]}
+            {survey.thanksPage.title?.[language]}
           </Typography>
-          <MarkdownView>
-            {survey.thanksPage.text?.[surveyLanguage]}
-          </MarkdownView>
+          <MarkdownView>{survey.thanksPage.text?.[language]}</MarkdownView>
         </Box>
         {thanksPageImageHeaderQuery.imageHeaders && (
           <div
@@ -176,7 +174,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           <Link
             sx={(theme) => ({ color: theme.palette.textInteractive.main })}
             underline="hover"
-            href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
+            href={`/saavutettavuusseloste?lang=${language}`}
             target="_blank"
           >
             {tr.FooterLinks.accessibility}
@@ -185,7 +183,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             <Link
               sx={(theme) => ({ color: theme.palette.textInteractive.main })}
               underline="hover"
-              href={`/tietosuojaseloste?lang=${surveyLanguage}`}
+              href={`/tietosuojaseloste?lang=${language}`}
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}

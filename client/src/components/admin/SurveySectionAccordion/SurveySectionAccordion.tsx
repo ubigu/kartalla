@@ -56,6 +56,7 @@ import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { replaceIdsWithNull } from '@src/utils/schemaValidation';
 import { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
@@ -127,7 +128,8 @@ interface Props {
 export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const classes = useStyles();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const { setSection, clipboardPage } = useClipboard();
   const { showToast } = useToasts();
 
@@ -375,7 +377,7 @@ export default function SurveySectionAccordion(props: Props) {
           </div>
 
           <Typography className={classes.sectionTitle}>
-            {props.section.title?.[surveyLanguage] || (
+            {props.section.title?.[workingLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>

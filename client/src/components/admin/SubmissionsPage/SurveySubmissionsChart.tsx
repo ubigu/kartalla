@@ -7,6 +7,7 @@ import {
 import { Download } from '@mui/icons-material';
 import { Box, Button, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { FunctionComponent, useMemo, useState } from 'react';
 import {
   Bar,
@@ -156,9 +157,9 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
 
 export default function Chart({ submissions, selectedQuestion }: Props) {
   const [chartWidth, setChartWidth] = useState(380);
-  const { surveyLanguage, language } = useTranslations();
+  const { language, tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const theme = useTheme();
-  const { tr } = useTranslations();
   const [tooltip, setTooltip] = useState(null);
 
   const secondColumnHeader: Partial<
@@ -213,7 +214,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
             ...selectedQuestion.options.map((option) => {
               return {
                 id: option.id,
-                text: option.text[surveyLanguage],
+                text: option.text[workingLanguage],
                 count: questionAnswers.reduce(
                   (
                     count,
@@ -349,7 +350,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
 
             return {
               id: index,
-              text: target.name[surveyLanguage],
+              text: target.name[workingLanguage],
               count: displayValue,
             };
           }),
@@ -370,7 +371,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         : 380 + ((optionCount > 20 ? optionCount / 2 : optionCount) - 2) * 65,
     );
     return base;
-  }, [selectedQuestion, surveyLanguage]);
+  }, [selectedQuestion, workingLanguage]);
 
   if (!answerData) return null;
 

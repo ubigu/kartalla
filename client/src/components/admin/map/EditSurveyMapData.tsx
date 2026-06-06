@@ -4,6 +4,7 @@ import { Box, Skeleton, Typography } from '@mui/material';
 import { getMapPublications } from '@src/controllers/MapPublicationsController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { getLayerName } from '@src/utils/map/oskariHelpers';
 import { useEffect, useState } from 'react';
 import { Combobox_WIP } from '../../core/Combobox';
@@ -24,7 +25,8 @@ export function EditSurveyMapData() {
     availableMapLayers,
     availableMapLayersLoading,
   } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   useEffect(() => {
     async function fetchMapPublications() {
@@ -113,7 +115,7 @@ export function EditSurveyMapData() {
                   <li key={layer.id}>
                     {getLayerName(
                       layer,
-                      surveyLanguage,
+                      workingLanguage,
                       tr.EditSurveyInfo.layerNameFallback,
                     )}
                   </li>

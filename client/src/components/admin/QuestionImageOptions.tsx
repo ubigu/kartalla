@@ -16,6 +16,7 @@ import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { createRef, useEffect, useMemo } from 'react';
 import { HelpCircleIcon } from '../icons/HelpCircleIcon';
 import FileUpload from './FileUpload';
@@ -62,7 +63,8 @@ export default function QuestionImageOptions({
   title,
   allowOptionInfo = false,
 }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const { activeSurvey } = useSurvey();
   const theme = useTheme();
 
@@ -133,12 +135,12 @@ export default function QuestionImageOptions({
                   variant="standard"
                   disabled={disabled}
                   size="small"
-                  value={option.text?.[surveyLanguage] ?? ''}
+                  value={option.text?.[workingLanguage] ?? ''}
                   onChange={(event) =>
                     updateOption(index, {
                       text: {
                         ...option.text,
-                        [surveyLanguage]: event.target.value,
+                        [workingLanguage]: event.target.value,
                       },
                     })
                   }
@@ -197,13 +199,13 @@ export default function QuestionImageOptions({
                 onDelete={() => updateOption(index, { imageUrl: null })}
               />
               <TextField
-                value={option.altText[surveyLanguage]}
+                value={option.altText[workingLanguage]}
                 label={tr.EditImageSection.altText}
                 onChange={(event) =>
                   updateOption(index, {
                     altText: {
                       ...option.altText,
-                      [surveyLanguage]: event.target.value,
+                      [workingLanguage]: event.target.value,
                     },
                   })
                 }
@@ -220,12 +222,12 @@ export default function QuestionImageOptions({
             </Box>
             {allowOptionInfo && (
               <OptionInfoDialog
-                infoText={option?.info?.[surveyLanguage]}
+                infoText={option?.info?.[workingLanguage]}
                 onChangeOptionInfo={(newInfoText) =>
                   updateOption(index, {
                     info: {
                       ...option.info,
-                      [surveyLanguage]: newInfoText,
+                      [workingLanguage]: newInfoText,
                     },
                   })
                 }

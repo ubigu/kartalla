@@ -271,7 +271,7 @@ export function isAnswerEmpty(
  */
 export function useSurveyAnswers() {
   const context = useContext(SurveyAnswerContext);
-  const { setLanguage, surveyLanguage } = useTranslations();
+  const { setLanguage, language } = useTranslations();
   if (!context) {
     throw new Error('useSurvey must be used within the SurveyProvider');
   }
@@ -615,7 +615,7 @@ export function useSurveyAnswers() {
           // Skip sections that shouldn't get answers
           .filter<SurveyQuestion>((section) => isSurveyQuestion(section))
           .map((section) => ({
-            [section.title[surveyLanguage]]: getValidationErrors(section),
+            [section.title[language]]: getValidationErrors(section),
           }))
       );
     },

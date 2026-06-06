@@ -1,5 +1,4 @@
 import {
-  LanguageCode,
   Submission,
   SubmissionAnswerEntry,
   Survey,
@@ -14,10 +13,14 @@ import {
   isAnswerEmpty,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { Language, useTranslations } from '@src/stores/TranslationContext';
+import {
+  WorkingLanguageContext,
+  resolveWorkingLanguage,
+} from '@src/stores/WorkingLanguageContext';
 import { request } from '@src/utils/request';
 import { isSurveyQuestion } from '@src/utils/typeCheck';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
 import DataExport from '../DataExport';
@@ -78,8 +81,21 @@ export default function SurveySubmissionsPage() {
     useState<SurveyQuestion | null>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr, surveyLanguage, setSurveyLanguage, languages } =
-    useTranslations();
+  const { tr, language } = useTranslations();
+
+  const [workingLanguage, setWorkingLanguageState] =
+    useState<Language>(language);
+  const setWorkingLanguage = useCallback(
+    (lang: Language) => setWorkingLanguageState(lang),
+    [],
+  );
+
+  const resetWorkingLanguage = useCallback(
+    (originalSurvey: Survey) => {
+      setWorkingLanguageState(resolveWorkingLanguage(originalSurvey, language));
+    },
+    [language],
+  );
 
   const loading = useMemo(() => {
     return surveyLoading || submissionsLoading || responsesLoading;
@@ -117,8 +133,8 @@ export default function SurveySubmissionsPage() {
   }, [name, surveyId]);
 
   useEffect(() => {
-    if (survey?.primaryLanguage) {
-      setSurveyLanguage(survey.primaryLanguage as LanguageCode);
+    if (survey) {
+      setWorkingLanguageState(language);
     }
   }, [survey?.id]);
 
@@ -184,11 +200,11 @@ export default function SurveySubmissionsPage() {
       [
         {
           id: DEFAULT_VIEW_SECTION_ID,
-          title: { [surveyLanguage]: tr.SurveySubmissionsPage.summary },
+          title: { [workingLanguage]: tr.SurveySubmissionsPage.summary },
         },
       ] as SurveyQuestion[],
     );
-  }, [survey]);
+  }, [survey, workingLanguage]);
 
   /**
    * All answers flattened from all submissions
@@ -295,10 +311,12 @@ export default function SurveySubmissionsPage() {
   }
 
   return (
-    <>
+    <WorkingLanguageContext.Provider
+      value={{ workingLanguage, setWorkingLanguage, resetWorkingLanguage }}
+    >
       <AdminAppBar
         labels={[
-          survey.title[surveyLanguage],
+          survey.title[workingLanguage],
           tr.AnswersList.answers.toLocaleLowerCase(),
         ]}
       />
@@ -334,7 +352,7 @@ export default function SurveySubmissionsPage() {
               })}
               options={questions.map((question) => ({
                 value: String(question.id),
-                label: question.title[surveyLanguage],
+                label: question.title[workingLanguage],
               }))}
               renderValue={(opt) => {
                 const question = questions.find(
@@ -370,7 +388,7 @@ export default function SurveySubmissionsPage() {
                         minWidth: 0,
                       }}
                     >
-                      {question.title[surveyLanguage]}
+                      {question.title[workingLanguage]}
                     </span>
                   </Box>
                 );
@@ -380,14 +398,16 @@ export default function SurveySubmissionsPage() {
             <Combobox_WIP
               id="submissions-survey-language"
               label={tr.SurveyLanguageMenu.answerLanguage}
-              value={surveyLanguage}
-              onChange={(value) => setSurveyLanguage(value as LanguageCode)}
-              options={languages
-                .filter((lang) => survey.enabledLanguages[lang])
-                .map((lang) => ({
-                  value: lang,
-                  label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
-                }))}
+              value={workingLanguage}
+              onChange={(value) => setWorkingLanguage(value as Language)}
+              options={(
+                Object.entries(survey.enabledLanguages)
+                  .filter(([, enabled]) => enabled)
+                  .map(([lang]) => lang) as Language[]
+              ).map((lang) => ({
+                value: lang,
+                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+              }))}
             />
 
             {!selectedQuestion ||
@@ -449,6 +469,6 @@ export default function SurveySubmissionsPage() {
           title: null,
         }}
       />
-    </>
+    </WorkingLanguageContext.Provider>
   );
 }

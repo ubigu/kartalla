@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "strict": true,
+    "types": ["node"],
+    "resolveJsonModule": true
+  },
+  "include": ["**/*.ts"]
+}

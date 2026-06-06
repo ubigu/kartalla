@@ -45,10 +45,10 @@
     "saveFailedAnswerSubmitted": "Kyselyn vastaukset estävät muutosten tallentamisen.",
     "invalidFields": "Seuraavien kenttien arvot eivät ole sallittuja:",
     "validationError": {
-      "survey.title": "Kyselyn otsikko",
-      "survey.name": "Kyselyn nimi",
-      "survey.author": "Kyselyn laatija/yhteyshenkilö",
-      "survey.mapUrl": "Oskari-karttajulkaisun osoite"
+      "survey.title": "Kyselyn otsikko asettamatta",
+      "survey.name": "Kyselyn nimi asettamatta",
+      "survey.author": "Kyselyn laatija/yhteyshenkilö asettamatta",
+      "survey.mapUrl": "Oskari-karttajulkaisun osoite asettamatta"
     },
     "toFrontPage": "Takaisin hallintapaneeliin",
     "basicSettings": "Kyselyn perusasetukset",
@@ -80,6 +80,8 @@
     "content": "Sisältö",
     "multilingualism": "Monikielisyys",
     "manageTranslations": "Hallitse käännöksiä",
+    "languageSettings": "Kieliasetukset",
+    "languageSettingsNotConfirmed": "Kieliasetukset vahvistamatta",
     "developedBy": "Kartalla-kyselypalvelua kehittää Ubigu Oy"
   },
   "EditSurveyInfo": {
@@ -107,6 +109,7 @@
     "availableMapLayers": "Saatavilla olevat karttatasot:",
     "startDate": "Alkamisaika",
     "endDate": "Loppumisaika",
+    "selectDate": "Valitse päivämäärä...",
     "selectDateAndTime": "Valitse päivämäärä ja aika",
     "theme": "Teema",
     "selectTheme": "Valitse teema",
@@ -771,15 +774,40 @@
     "surveyLanguage": "Kyselyn kieli",
     "workingLanguage": "Työstökieli",
     "answerLanguage": "Vastauskieli",
-    "multilingual": "Monikielinen",
-    "workingLanguageHelperText": "Millä kielellä rakennat kyselyn? Jos kysely on monikielinen, voit vaihtaa työstökieltä ja syöttää kyselyn tiedot ja sisällön eri kielillä."
+    "multilingual": "Kysely on monikielinen",
+    "multilingualOption": "Monikielinen",
+    "workingLanguageHelperText": "Millä kielellä rakennat kyselyä? Jos kysely on monikielinen, valitse myös, mitä kieliä kyselyssä tuetaan.",
+    "confirmLanguageSettings": "Vahvista kieliasetukset",
+    "discardLanguageChanges": "Hylkää kielimuutokset",
+    "workingLanguageInputLabel": "Kieli",
+    "initialSettingsTitle": "Uuden kyselyn kieliasetukset",
+    "initialSettingsDescription": "Olet luomassa uutta kyselyä. Katsotaan aluksi kieliasiat kuntoon.",
+    "workingLanguageSelectLabel": "Millä kielellä työstät kyselyn?",
+    "multilingualQuestion": "Onko kyselyyn tarkoitus lisätä käännökset?",
+    "monolingualPrefix": "Kysely julkaistaan ainoastaan kielellä",
+    "multilingualRadioLabel": "Kysely käännetään useille kielille",
+    "initialSettingsFootnote": "Voit muokata ja täydentää kieliasetuksia myöhemmin Kieliasetuksissa.",
+    "translationsEntered": "käännöksiä syötetty",
+    "deleteTranslations": "Poista käännökset...",
+    "enteredTranslations": "Syötetyt käännökset",
+    "supportedLanguagesLabel": "Kyselyssä tuetut kielet",
+    "moveContentDialogTitle": "Siirretäänkö nykyinen kielisisältö?",
+    "moveContentDialogPart1": "Haluatko siirtää nykyiset, kielellä",
+    "moveContentDialogPart2": "lisätyt sisällöt kieleen",
+    "dontMove": "Älä siirrä",
+    "move": "Siirrä",
+    "languageNames": {
+      "fi": "suomi",
+      "en": "englanti",
+      "se": "ruotsi"
+    }
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
     "provideTranslations": "Mikäli kysely julkaistaan usealla eri kielellä, tulee kaikki kyselyssä esiintyvät tekstit kääntää ko. kielille. Anna alla olevassa listassa kielikäännös jokaiseen puuttuvaan kohtaan.",
     "surveyInformation": "Kyselyn perusasetukset",
     "copyTextFields": "Kopioi käännettävät tietueet leikepöydälle",
-    "supportedLanguages": "Kyselyssä tuetut kielet",
+    "supportedLanguages": "Mitä muita kieliä tuetaan?",
     "surveyPages": "Kyselyn sivut",
     "surveyTitle": "Kyselyn otsikko",
     "surveySubtitle": "Kyselyn aliotsikko",
@@ -957,11 +985,16 @@
   "OlMap": {
     "layerFetchError": "Karttatasojen lataaminen epäonnistui. Käytetään oletuskarttaa."
   },
+  "TranslationProvider": {
+    "loadingTranslations": "Ladataan käännöksiä"
+  },
   "ApiResponses": {
     "NO_ANSWERS_FOUND": "Vastauksia ei löydy.",
     "NO_ANSWERS_AVAILABLE": "Vastauksia ei ole saatavilla.",
     "NO_ATTACHMENTS_AVAILABLE": "Liitteitä ei ole saatavilla.",
     "USER_NOT_PERMITTED_TO_VIEW": "Käyttäjällä ei ole oikeutta tarkastella kyselyä.",
-    "USER_NOT_PERMITTED_TO_EDIT": "Käyttäjällä ei ole oikeutta muokata kyselyä."
+    "USER_NOT_PERMITTED_TO_EDIT": "Käyttäjällä ei ole oikeutta muokata kyselyä.",
+    "DUPLICATE_SURVEY_NAME": "Saman niminen kysely on jo olemassa. Valitse toinen nimi ja yritä uudestaan.",
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Kyselyn vastaukset estävät muutosten tallentamisen."
   }
 }

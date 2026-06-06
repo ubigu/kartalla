@@ -39,7 +39,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import { isLanguageCode } from '@src/translations/useTranslations';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -55,7 +54,6 @@ import {
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 
-const DEFAULT_LANGUAGE: LanguageCode = 'fi';
 const DEFAULT_MAP_PROVIDER: SurveyMapProvider = 'openlayers';
 const DEFAULT_MAP_LAYERS: number[] = [0]; // OpenStreetMap base layer
 
@@ -114,7 +112,6 @@ interface DBSurvey {
   organization: string;
   tags: string[];
   languages: LanguageCode[];
-  primary_language: string;
   is_archived: boolean;
   user_groups?: string[];
 }
@@ -381,7 +378,6 @@ export async function getPublishedSurvey(
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
           survey.languages,
-          survey.primary_language,
           ${params.organizationName ? '$3 as organization,' : ''} -- To prevent organization id public exposure
           theme_name,
           theme_data,
@@ -989,16 +985,10 @@ export async function getPublicationAccesses(
 export async function createSurvey(user: User) {
   const { surveyRow, groupRow } = await getDb().tx(async (t) => {
     const row = await t.one<DBSurvey>(
-      `INSERT INTO data.survey (author_id, organization, languages, primary_language, map_provider)
-      VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO data.survey (author_id, organization, languages, map_provider)
+      VALUES ($1, $2, $3, $4)
       RETURNING *`,
-      [
-        user.id,
-        user.organizations[0].id,
-        [user.defaultLanguage ?? DEFAULT_LANGUAGE],
-        user.defaultLanguage ?? DEFAULT_LANGUAGE,
-        DEFAULT_MAP_PROVIDER,
-      ], // For now, use the first organization
+      [user.id, user.organizations[0].id, [], DEFAULT_MAP_PROVIDER], // For now, use the first organization
     );
     if (user.groups.length === 1) {
       const groupRow = await t.one(
@@ -1707,8 +1697,7 @@ export async function updateSurvey(survey: Survey) {
           languages = $33,
           email_include_personal_info = $34,
           email_include_margin_images = $35,
-          primary_language = $36,
-          map_provider = $37
+          map_provider = $36
         WHERE id = $1 RETURNING *`,
         [
           survey.id,
@@ -1748,7 +1737,6 @@ export async function updateSurvey(survey: Survey) {
             .map(([lang]) => lang),
           survey.email.includePersonalInfo,
           survey.email.includeMarginImages,
-          survey.primaryLanguage,
           survey.mapProvider,
         ],
       )
@@ -1756,7 +1744,8 @@ export async function updateSurvey(survey: Survey) {
         throw error.constraint === 'survey_name_organization_unique_key'
           ? new BadRequestError(
               `Survey name ${survey.name} already exists`,
-              'duplicate_survey_name',
+              undefined,
+              'DUPLICATE_SURVEY_NAME',
             )
           : error;
       });
@@ -1902,9 +1891,6 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     organization: dbOrganizationIdToOrganization(dbSurvey.organization),
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
-    primaryLanguage: isLanguageCode(dbSurvey.primary_language)
-      ? dbSurvey.primary_language
-      : DEFAULT_LANGUAGE,
     isArchived: dbSurvey.is_archived,
     userGroups: dbSurvey.user_groups ?? [],
   };
@@ -2136,7 +2122,7 @@ export async function createSurveyPage(
      SELECT
        $1 as survey_id,
        COALESCE(MAX(idx) + 1, 0) as idx,
-       json_build_object((SELECT primary_language FROM data.survey WHERE id = $1), ''),
+       '{}'::json,
        $2::json
      FROM data.survey_page WHERE survey_id = $1
      RETURNING *;`,

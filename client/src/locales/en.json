@@ -45,10 +45,10 @@
     "saveFailedAnswerSubmitted": "Survey responses prevent saving changes.",
     "invalidFields": "The following fields have invalid values:",
     "validationError": {
-      "survey.title": "Survey title",
-      "survey.name": "Survey name",
-      "survey.author": "Survey author / contact person",
-      "survey.mapUrl": "URL for the Oskari map publication"
+      "survey.title": "Survey title not set",
+      "survey.name": "Survey name not set",
+      "survey.author": "Survey author / contact person not set",
+      "survey.mapUrl": "Oskari map publication URL not set"
     },
     "toFrontPage": "Back to the admin panel",
     "basicSettings": "Survey basic settings",
@@ -80,6 +80,8 @@
     "content": "Content",
     "multilingualism": "Multilingualism",
     "manageTranslations": "Manage translations",
+    "languageSettings": "Language settings",
+    "languageSettingsNotConfirmed": "Language settings not confirmed",
     "developedBy": "Kartalla survey service developed by Ubigu Oy"
   },
   "EditSurveyInfo": {
@@ -107,6 +109,7 @@
     "availableMapLayers": "Available map layers:",
     "startDate": "Start date",
     "endDate": "End date",
+    "selectDate": "Select date...",
     "selectDateAndTime": "Select date and time",
     "theme": "Theme",
     "selectTheme": "Choose a theme",
@@ -771,8 +774,33 @@
     "surveyLanguage": "Survey language",
     "workingLanguage": "Working language",
     "answerLanguage": "Answer language",
-    "multilingual": "Multilingual",
-    "workingLanguageHelperText": "In which language are you building the survey? If the survey is multilingual, you can change the working language and enter the survey content in different languages."
+    "multilingual": "The survey is multilingual",
+    "multilingualOption": "Multilingual",
+    "workingLanguageHelperText": "In which language are you building the survey? If the survey is multilingual, also select which languages are supported in the survey.",
+    "confirmLanguageSettings": "Confirm language settings",
+    "discardLanguageChanges": "Discard language changes",
+    "workingLanguageInputLabel": "Language",
+    "initialSettingsTitle": "New survey language settings",
+    "initialSettingsDescription": "You are creating a new survey. Let's set up the language settings first.",
+    "workingLanguageSelectLabel": "In which language are you building the survey?",
+    "multilingualQuestion": "Do you plan to add translations to the survey?",
+    "monolingualPrefix": "The survey will only be published in the language",
+    "multilingualRadioLabel": "The survey will be translated into multiple languages",
+    "initialSettingsFootnote": "You can edit and complete the language settings later in Language Settings.",
+    "translationsEntered": "translations entered",
+    "deleteTranslations": "Delete translations...",
+    "enteredTranslations": "Entered translations",
+    "supportedLanguagesLabel": "Languages supported in the survey",
+    "moveContentDialogTitle": "Move current language content?",
+    "moveContentDialogPart1": "Do you want to move the current content added in",
+    "moveContentDialogPart2": "to language",
+    "dontMove": "Don't move",
+    "move": "Move",
+    "languageNames": {
+      "fi": "Finnish",
+      "en": "English",
+      "se": "Swedish"
+    }
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Allow publishing the survey with multiple languages",
@@ -958,11 +986,16 @@
   "OlMap": {
     "layerFetchError": "Failed to load map layers. Using default map."
   },
+  "TranslationProvider": {
+    "loadingTranslations": "Loading translations"
+  },
   "ApiResponses": {
     "NO_ANSWERS_FOUND": "No answers found.",
     "NO_ANSWERS_AVAILABLE": "No answers available.",
     "NO_ATTACHMENTS_AVAILABLE": "No attachments available.",
     "USER_NOT_PERMITTED_TO_VIEW": "User not author, editor nor viewer of the survey.",
-    "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey."
+    "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey.",
+    "DUPLICATE_SURVEY_NAME": "Survey with the same name already exists. Please choose another name and try again.",
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes."
   }
 }

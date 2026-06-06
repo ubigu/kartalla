@@ -3,23 +3,20 @@ import { getMatrixQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } from 
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.matrix);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.matrix, ['fi']);
 const matrixQuestion = getMatrixQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Matrix question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('answer each row', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('answer each row', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createMatrixQuestion(matrixQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

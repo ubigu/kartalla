@@ -1,12 +1,6 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
+import { Button, DialogContentText } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { BaseDialog } from './core/BaseDialog';
 
 type PaletteColor =
   | 'inherit'
@@ -28,40 +22,30 @@ interface Props {
 export default function ConfirmDialog(props: Props) {
   const { tr } = useTranslations();
 
-  function handleClose(result: boolean) {
-    return function () {
-      props.onClose(result);
-    };
-  }
-
   return (
-    <Dialog
+    <BaseDialog
       open={props.open}
-      onClose={handleClose(false)}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      {props.title && (
-        <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
-      )}
-
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          {props.text}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus variant="outlined" onClick={handleClose(false)}>
-          {tr.options.no}
-        </Button>
-        <Button
-          variant="contained"
-          color={props.submitColor}
-          onClick={handleClose(true)}
-        >
-          {tr.options.yes}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      onClose={() => props.onClose(false)}
+      title={props.title}
+      content={<DialogContentText>{props.text}</DialogContentText>}
+      actions={
+        <>
+          <Button
+            autoFocus
+            variant="outlined"
+            onClick={() => props.onClose(false)}
+          >
+            {tr.options.no}
+          </Button>
+          <Button
+            variant="contained"
+            color={props.submitColor}
+            onClick={() => props.onClose(true)}
+          >
+            {tr.options.yes}
+          </Button>
+        </>
+      }
+    />
   );
 }

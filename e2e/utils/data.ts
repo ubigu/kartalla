@@ -32,7 +32,10 @@ export const TEST_SURVEY_URL_NAMES = {
   sorting: 'testikysely-sorting',
 } as const;
 
-export function getTestSurveyData(urlName: string): SurveyParams {
+export function getTestSurveyData(
+  urlName: string,
+  languages?: string[],
+): SurveyParams {
   return {
     title: urlName,
     subtitle: 'Testikyselyn aliotsikko',
@@ -45,6 +48,7 @@ export function getTestSurveyData(urlName: string): SurveyParams {
       text: 'Kiitos vastauksestasi! Voit sulkea tämän välilehden.',
     },
     pageNames: ['Sivu 1'],
+    ...(languages && { languages }),
   };
 }
 

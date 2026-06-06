@@ -7,26 +7,23 @@ import {
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.multiMatrix);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.multiMatrix, ['fi']);
 const multiMatrixQuestion = getMultiMatrixQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Multi matrix question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('without limits', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('without limits', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createMultiMatrixQuestion({
       ...multiMatrixQuestion,
       answersLimited: undefined,
     });
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -64,6 +61,7 @@ test.describe('Multi matrix question', () => {
   });
 
   test('with answer limits exceeded', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
@@ -72,9 +70,7 @@ test.describe('Multi matrix question', () => {
       ...multiMatrixQuestion,
       answersLimited: { min: 1, max: 1 },
     });
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

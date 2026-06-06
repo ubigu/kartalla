@@ -20,7 +20,7 @@ interface Props {
 
 export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr, surveyLanguage, language } = useTranslations();
+  const { tr, language } = useTranslations();
   const [isVideo, setIsVideo] = useState(false);
 
   useEffect(() => {
@@ -54,13 +54,13 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
             variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
             sx={{ color: survey.sectionTitleColor ?? '#000000' }}
           >
-            {section.title?.[surveyLanguage]}
+            {section.title?.[language]}
           </Typography>
         </FormLabel>
-        {section.info && section.info?.[surveyLanguage] && (
+        {section.info && section.info?.[language] && (
           <SectionInfo
-            infoText={section.info?.[surveyLanguage]}
-            subject={section.title?.[surveyLanguage]}
+            infoText={section.info?.[language]}
+            subject={section.title?.[language]}
           />
         )}
       </div>

@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -30,14 +29,19 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  useWorkingLanguage,
+  useWorkingLanguageInlineDescription,
+} from '@src/stores/WorkingLanguageContext';
 import { getLayerName } from '@src/utils/map/oskariHelpers';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
+import { Input } from '../core/Input';
 import { loadingPulse } from '../core/styles';
 import DeleteBinIcon from '../icons/DeleteBinIcon';
 import AddSurveySectionActions from './AddSurveySectionActions';
-import { editPageContainerSx } from './EditSurvey';
+import { editPageContainerSx, editSurveyPaths } from './EditSurvey';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import { AdminSurveyMapPreview } from './map/AdminSurveyMapPreview';
@@ -51,9 +55,12 @@ const useStyles = makeStyles({
 
 interface Props {
   canEdit: boolean;
+  isEditable: boolean | null;
+  onEditableChange: (isEditable: boolean | null) => void;
 }
 
 export default function EditSurveyPage(props: Props) {
+  const { isEditable, onEditableChange } = props;
   const [loading, setLoading] = useState(false);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<number>(null);
@@ -74,12 +81,14 @@ export default function EditSurveyPage(props: Props) {
   } = useSurvey();
 
   const history = useHistory();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+  const workingLanguageInlineDescription =
+    useWorkingLanguageInlineDescription();
   const { showToast } = useToasts();
   const { setDefaultView } = useAdminMap();
   const [mapPreviewOpen, setMapPreviewOpen] = useState(false);
   const [modifyMapView, setModifyMapView] = useState(false);
-  const [isEditable, setIsEditable] = useState<boolean | null>(null);
 
   const theme = useTheme();
 
@@ -89,17 +98,13 @@ export default function EditSurveyPage(props: Props) {
         const submissions = await (
           await fetch(`/api/surveys/${surveyId}/submissions`)
         ).json();
-        if (submissions.length > 0) {
-          setIsEditable(false);
-        } else {
-          setIsEditable(true);
-        }
+        onEditableChange(submissions.length > 0 ? false : true);
       } catch (error) {
         showToast({
           severity: 'error',
           message: tr.EditSurveyPage.errorFetchingSubmissions,
         });
-        setIsEditable(true);
+        onEditableChange(true);
       }
     };
     getSubmissions();
@@ -137,48 +142,11 @@ export default function EditSurveyPage(props: Props) {
     editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
   }
 
-  if (isEditable === null) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          textAlign: 'center',
-          alignItems: 'center',
-          mt: 4,
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            color: 'primary.main',
-            mt: 2,
-            '&::after': {
-              display: 'inline-block',
-              width: '1em',
-              textAlign: 'left',
-              animation: 'blink 1s steps(1, end) infinite',
-              content: '""',
-            },
-            '@keyframes blink': {
-              '0%, 20%': { content: '""' },
-              '40%': { content: '"."' },
-              '60%': { content: '".."' },
-              '80%, 100%': { content: '"..."' },
-            },
-          }}
-        >
-          {tr.EditSurveyPage.fetchingSubmissions}
-        </Typography>
-
-        <CircularProgress sx={{ color: 'primary.main' }} />
-      </Box>
-    );
-  }
+  if (isEditable === null) return null;
 
   const pageNumber = activeSurvey.pages.findIndex((p) => p.id === page?.id) + 1;
-  const pageTitle = page?.title?.[surveyLanguage] || tr.EditSurvey.untitledPage;
+  const pageTitle =
+    page?.title?.[workingLanguage] || tr.EditSurvey.untitledPage;
 
   return !page ? null : (
     <Box
@@ -191,14 +159,15 @@ export default function EditSurveyPage(props: Props) {
       <Typography variant="mainHeader" component="h1" sx={{ maxWidth: '85%' }}>
         {`${tr.EditSurvey.page} ${pageNumber}: ${pageTitle}`}
       </Typography>
-      <TextField
+      <Input
         label={tr.EditSurveyPage.name}
         required
-        value={page?.title?.[surveyLanguage] ?? ''}
+        inlineDescription={workingLanguageInlineDescription}
+        value={page?.title?.[workingLanguage] ?? ''}
         onChange={(event) => {
           editPage({
             ...page,
-            title: { ...page.title, [surveyLanguage]: event.target.value },
+            title: { ...page.title, [workingLanguage]: event.target.value },
           });
         }}
       />
@@ -272,7 +241,7 @@ export default function EditSurveyPage(props: Props) {
                       disabled={activeSurvey.mapProvider === 'openlayers'}
                       label={getLayerName(
                         layer,
-                        surveyLanguage,
+                        workingLanguage,
                         tr.EditSurveyInfo.layerNameFallback,
                       )}
                       control={
@@ -296,7 +265,7 @@ export default function EditSurveyPage(props: Props) {
                           }}
                           name={getLayerName(
                             layer,
-                            surveyLanguage,
+                            workingLanguage,
                             tr.EditSurveyInfo.layerNameFallback,
                           )}
                         />
@@ -425,7 +394,7 @@ export default function EditSurveyPage(props: Props) {
           <TextField
             style={{ width: '100%', marginTop: 2 }}
             label={tr.EditSurveyPage.imageAltText}
-            value={page.sidebar?.imageAltText?.[surveyLanguage] ?? ''}
+            value={page.sidebar?.imageAltText?.[workingLanguage] ?? ''}
             onChange={(event) => {
               editPage({
                 ...page,
@@ -433,7 +402,7 @@ export default function EditSurveyPage(props: Props) {
                   ...page.sidebar,
                   imageAltText: {
                     ...page.sidebar.imageAltText,
-                    [surveyLanguage]: event.target.value,
+                    [workingLanguage]: event.target.value,
                   },
                 },
               });
@@ -523,7 +492,7 @@ export default function EditSurveyPage(props: Props) {
       />
       <AdminSurveyMapPreview
         provider={activeSurvey.mapProvider}
-        url={activeSurvey.localizedMapUrls[surveyLanguage]}
+        url={activeSurvey.localizedMapUrls[workingLanguage]}
         isOpen={mapPreviewOpen}
         setIsOpen={setMapPreviewOpen}
         modifyView={modifyMapView}
@@ -564,14 +533,18 @@ export default function EditSurveyPage(props: Props) {
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={() => history.push(`kyselyt/${surveyId}/perusasetukset`)}
+            onClick={() =>
+              history.push(
+                `kyselyt/${surveyId}/${editSurveyPaths.basicSettings}`,
+              )
+            }
             color="primary"
           >
             {tr.commands.cancel}
           </Button>
           <Button
             onClick={() => {
-              setIsEditable(true);
+              onEditableChange(true);
             }}
             color="primary"
           >

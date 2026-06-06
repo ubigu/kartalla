@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import {
   getBackgroundColor,
   getBorderColor,
@@ -7,6 +7,7 @@ import {
 } from '@src/themes/colorHelpers';
 import React, { useId, useState } from 'react';
 import { InputHelperText } from './InputHelperText';
+import { controlBorderRadius, visuallyHidden } from './styles';
 
 const paddingX = 6;
 
@@ -25,6 +26,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: boolean;
   helperText?: string;
+  inlineDescription?: { visible: string; screenReader: string };
 }
 
 export function Input({
@@ -34,10 +36,12 @@ export function Input({
   error,
   helperText,
   required,
+  inlineDescription,
   ...props
 }: Props) {
   const theme = useTheme();
   const helperId = useId();
+  const inlineDescriptionId = useId();
   const internalId = useId();
   const inputId = id ?? internalId;
   const [isFocused, setIsFocused] = useState(false);
@@ -59,39 +63,72 @@ export function Input({
         </Box>
       )}
       <Box
-        component={'input'}
-        id={inputId}
-        aria-invalid={!!error}
-        aria-describedby={helperText ? helperId : undefined}
-        onFocus={(e) => {
-          setIsFocused(true);
-          props.onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setIsFocused(false);
-          props.onBlur?.(e);
-        }}
         sx={{
-          height: '28px',
-          fontSize: '14px',
-          fontFamily: theme.typography.fontFamily,
-          color: theme.palette.harmaa.main,
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden',
           backgroundColor: getBackgroundColor('default', !!error),
           border: `0.5px solid`,
           borderColor: getBorderColor('default', !!error),
-          borderRadius: '3px',
-          padding: `0 ${paddingX}px`,
+          borderRadius: controlBorderRadius,
           boxShadow: getBoxShadow('default', !!error),
-          outline: 'none',
-          width: '100%',
-          boxSizing: 'border-box',
           transition: 'border-color 0.2s, background-color 0.2s',
-          '&:hover:not(:focus)': { ...(!error && hoverStyle) },
-          '&:focus-visible': { ...(!error && focusStyle) },
-          ...style,
+          '&:hover:not(:focus-within)': { ...(!error && hoverStyle) },
+          '&:focus-within': { ...(!error && focusStyle) },
         }}
-        {...props}
-      />
+      >
+        {inlineDescription && (
+          <Typography
+            component={'span'}
+            id={inlineDescriptionId}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              alignSelf: 'stretch',
+              color: 'textSecondary.main',
+              paddingX: '6px',
+              borderRight: '0.5px solid',
+              borderColor: getBorderColor('default', !!error),
+              background: `linear-gradient(180deg, ${theme.palette.surfacePrimary.main} 0%, transparent 100%), ${theme.palette.surfaceSubtle.main}`,
+            }}
+          >
+            <span aria-hidden="true">{inlineDescription.visible}</span>
+            <span style={visuallyHidden}>{inlineDescription.screenReader}</span>
+          </Typography>
+        )}
+        <Box
+          component={'input'}
+          id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={
+            [inlineDescription && inlineDescriptionId, helperText && helperId]
+              .filter(Boolean)
+              .join(' ') || undefined
+          }
+          onFocus={(e) => {
+            setIsFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            props.onBlur?.(e);
+          }}
+          sx={{
+            height: '28px',
+            fontSize: '14px',
+            fontFamily: theme.typography.fontFamily,
+            color: theme.palette.harmaa.main,
+            padding: `0 ${paddingX}px`,
+            border: 'none',
+            backgroundColor: 'transparent',
+            outline: 'none',
+            width: '100%',
+            boxSizing: 'border-box',
+            ...style,
+          }}
+          {...props}
+        />
+      </Box>
       {error ? (
         helperText && (
           <InputHelperText id={helperId} isError>

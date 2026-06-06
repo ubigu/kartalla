@@ -156,6 +156,8 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey.',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 
@@ -293,7 +295,8 @@ router.put(
         Boolean(error.constraint)
         ? new BadRequestError(
             `Submitted answer prevents survey update: ${error.constraint}`,
-            'submitted_answer_prevents_update',
+            undefined,
+            'SUBMITTED_ANSWER_PREVENTS_UPDATE',
           )
         : error;
     }
@@ -594,6 +597,8 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 
@@ -640,6 +645,8 @@ router.get(
     if (!isEditor) {
       throw new ForbiddenError(
         'User not author, editor nor viewer of the survey',
+        undefined,
+        'USER_NOT_PERMITTED_TO_VIEW',
       );
     }
 

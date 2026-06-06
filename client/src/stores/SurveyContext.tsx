@@ -33,6 +33,10 @@ interface State {
   availableMapLayersError: string;
 }
 
+export function hasEnabledLanguages(survey: Pick<Survey, 'enabledLanguages'>) {
+  return Object.values(survey.enabledLanguages).some(Boolean);
+}
+
 /** Replace the language parameter in the map URL (like fi or fi_FI) with specific language codes. */
 export function getLocalizedMapUrls(mapUrl: string) {
   return {
@@ -180,7 +184,7 @@ const validationMap = {
   'survey.author': (survey: Survey) =>
     survey.author && survey.author.length > 0,
   'survey.title': (survey: Survey) =>
-    survey.title && survey.title[survey.primaryLanguage]?.length > 0,
+    survey.title && Object.values(survey.title).some((t) => t?.length > 0),
   'survey.mapUrl': (survey: Survey, state: State) =>
     !survey.mapUrl || !state.availableMapLayersError,
 };

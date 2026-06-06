@@ -14,6 +14,7 @@ import LogoutIcon from '@src/components/icons/LogoutIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
+import { AdminLanguageButton } from './AdminLanguageButton';
 import AppBarUserMenu from './AppBarUserMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
@@ -100,6 +101,7 @@ export function AdminAppBar({
           >
             <GeneralNotificationNavigationButton />
             <AppBarInstructionsMenu />
+            <AdminLanguageButton />
             <AppBarUserMenu />
             <Tooltip arrow title={tr.AppBarUserMenu.logout}>
               <IconButton

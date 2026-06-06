@@ -55,7 +55,7 @@ function SurveyQuestion({
 }: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const [dirty, setDirty] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [backdropOpen, setBackdropOpen] = useState(false);
@@ -111,7 +111,7 @@ function SurveyQuestion({
           </FormHelperText>
           <FormHelperText style={visuallyHidden} role="alert">
             {tr.SurveyQuestion.accessibilityTooltip}{' '}
-            {question.title?.[surveyLanguage]}
+            {question.title?.[language]}
           </FormHelperText>
         </>
       )}
@@ -132,7 +132,7 @@ function SurveyQuestion({
           }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
-          {question.title?.[surveyLanguage]}
+          {question.title?.[language]}
           <span aria-hidden="true"> </span>
         </Typography>
         {question.type == 'sorting' && (
@@ -140,12 +140,12 @@ function SurveyQuestion({
             {tr.SortingQuestion.confirmationGuide}
           </span>
         )}
-        {question.info && question.info?.[surveyLanguage] && (
+        {question.info && question.info?.[language] && (
           <SectionInfo
             ref={infoDialogRef}
             hiddenFromScreenReader={false}
-            infoText={question.info?.[surveyLanguage]}
-            subject={question.title?.[surveyLanguage]}
+            infoText={question.info?.[language]}
+            subject={question.title?.[language]}
           />
         )}
       </FormLabel>

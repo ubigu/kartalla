@@ -1,111 +1,106 @@
-import { Fab, Tooltip, useTheme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Button, Tooltip } from '@mui/material';
 import SaveIcon from '@src/components/icons/SaveIcon';
-import UndoIcon from '@src/components/icons/UndoIcon';
-import { useSurvey } from '@src/stores/SurveyContext';
+import { hasEnabledLanguages, useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { useMemo } from 'react';
+import ClearIcon from '../icons/ClearIcon';
 
-const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    gap: '1rem',
-    position: 'fixed',
-    bottom: '1rem',
-    right: '1rem',
-  },
-});
+const rootSx = {
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '1rem',
+  justifyContent: 'space-between',
+};
 
-export default function EditSurveyControls() {
-  const classes = useStyles();
+interface Props {
+  disabled?: boolean;
+}
+
+export default function EditSurveyControls({ disabled }: Props) {
   const {
+    originalActiveSurvey,
+    activeSurvey,
     hasActiveSurveyChanged,
     activeSurveyLoading,
     saveChanges,
     discardChanges,
     validationErrors,
   } = useSurvey();
+  const { resetWorkingLanguage } = useWorkingLanguage();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
-  const theme = useTheme();
 
-  const undoDisabled = !hasActiveSurveyChanged || activeSurveyLoading;
-  const invalidFieldsLabel = `${tr.EditSurvey.invalidFields} ${validationErrors
-    ?.filter((e) => e !== null)
-    .map((e) => tr.EditSurvey.validationError[e])
-    .join(', ')}`;
-
-  function getErrorInfoText(info: string) {
-    switch (info) {
-      case 'duplicate_survey_name':
-        return tr.EditSurvey.saveFailedDuplicateName;
-      case 'submitted_answer_prevents_update':
-        return tr.EditSurvey.saveFailedAnswerSubmitted;
-      default:
-        return tr.EditSurvey.saveFailed;
-    }
-  }
+  const languagesNotSet = !hasEnabledLanguages(activeSurvey);
+  const undoDisabled =
+    disabled || !hasActiveSurveyChanged || activeSurveyLoading;
+  const invalidFieldsLabel = [
+    languagesNotSet ? tr.EditSurvey.languageSettingsNotConfirmed : null,
+    ...(validationErrors
+      ?.filter((e) => e !== null)
+      .map((e) => tr.EditSurvey.validationError[e!]) ?? []),
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   const validationErrorTooltip = useMemo(() => {
     return (
-      <>
-        {tr.EditSurvey.invalidFields}
-        <ul>
-          {validationErrors?.map(
-            (error) =>
-              error && (
-                <li key={error}>{tr.EditSurvey.validationError[error]}</li>
-              ),
-          )}
-        </ul>
-      </>
+      <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
+        {languagesNotSet && (
+          <li>{tr.EditSurvey.languageSettingsNotConfirmed}</li>
+        )}
+        {validationErrors?.map(
+          (error) =>
+            error && (
+              <li key={error}>{tr.EditSurvey.validationError[error]}</li>
+            ),
+        )}
+      </ul>
     );
-  }, [validationErrors]);
+  }, [languagesNotSet, validationErrors]);
 
   return (
-    <div className={classes.root}>
-      <Tooltip title={tr.commands.discard}>
-        <span>
-          <Fab
-            disabled={undoDisabled}
-            sx={{
-              backgroundColor: theme.palette.surfacePrimary.main,
-              border: !undoDisabled
-                ? `solid 1px ${theme.palette.primary.main}`
-                : undefined,
-            }}
-            aria-label={tr.commands.discard}
-            onClick={() => {
-              discardChanges();
-            }}
-          >
-            <UndoIcon
-              htmlColor={!undoDisabled ? theme.palette.primary.main : undefined}
-            />
-          </Fab>
-        </span>
-      </Tooltip>
+    <Box sx={rootSx}>
+      <Button
+        variant="text"
+        disabled={undoDisabled}
+        startIcon={<ClearIcon />}
+        onClick={() => {
+          discardChanges();
+          resetWorkingLanguage(originalActiveSurvey);
+        }}
+      >
+        {tr.commands.cancel}
+      </Button>
       <Tooltip
         title={
-          validationErrors?.length && validationErrors.length > 0
+          languagesNotSet ||
+          (validationErrors?.length && validationErrors.length > 0)
             ? validationErrorTooltip
             : tr.commands.save
         }
       >
         <span>
-          <Fab
+          <Button
+            variant="contained"
             disabled={
+              disabled ||
               !hasActiveSurveyChanged ||
               activeSurveyLoading ||
               Boolean(validationErrors?.length && validationErrors.length > 0)
             }
             color="primary"
             aria-label={
-              validationErrors?.length && validationErrors.length > 0
+              languagesNotSet ||
+              (validationErrors?.length && validationErrors.length > 0)
                 ? invalidFieldsLabel
                 : tr.commands.save
             }
+            startIcon={<SaveIcon />}
             onClick={async () => {
               try {
                 await saveChanges();
@@ -116,15 +111,17 @@ export default function EditSurveyControls() {
               } catch (error: any) {
                 showToast({
                   severity: 'error',
-                  message: getErrorInfoText(error.info),
+                  message:
+                    getApiTranslation(error.message_code, tr) ||
+                    tr.EditSurvey.saveFailed,
                 });
               }
             }}
           >
-            <SaveIcon />
-          </Fab>
+            {tr.commands.save}
+          </Button>
         </span>
       </Tooltip>
-    </div>
+    </Box>
   );
 }

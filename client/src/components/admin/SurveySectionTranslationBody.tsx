@@ -252,10 +252,13 @@ export function SurveySectionTranslationBody({
     Record<SurveyPageSection['type'], () => ReactNode>
   > = {
     map: () => {
-      const s = section as Extract<SurveyPageSection, { type: 'map' }>;
-      return s.subQuestions.map((question, questionIndex) => {
+      const mapQuestion = section as Extract<
+        SurveyPageSection,
+        { type: 'map' }
+      >;
+      return mapQuestion.subQuestions.map((subQuestion, questionIndex) => {
         const subQuestionLabel =
-          question.title?.[language] ||
+          subQuestion.title?.[language] ||
           `${sectionIndex + 1}.${questionIndex + 1}.`;
         return (
           <Fragment key={`fu-${questionIndex}`}>
@@ -264,7 +267,7 @@ export function SurveySectionTranslationBody({
               prefix="↳"
               label={`${sectionIndex + 1}.${questionIndex + 1} ${subQuestionLabel}`}
               colCount={totalCols}
-              icon={sectionTypeIcons[question.type]}
+              icon={sectionTypeIcons[subQuestion.type]}
             />
             <TranslationRow
               stripe={nextStripe()}
@@ -272,13 +275,22 @@ export function SurveySectionTranslationBody({
               cols={visibleCols}
               render={(lang) => (
                 <Input
-                  value={question.title?.[lang] ?? ''}
-                  onChange={(e) =>
-                    editSection(activePage.id, section.id!, {
-                      ...question,
-                      title: { ...question.title, [lang]: e.target.value },
-                    })
-                  }
+                  value={subQuestion.title?.[lang] ?? ''}
+                  onChange={(e) => {
+                    const updatedSubQuestions = mapQuestion.subQuestions.map(
+                      (sq, i) =>
+                        i === questionIndex
+                          ? {
+                              ...sq,
+                              title: { ...sq.title, [lang]: e.target.value },
+                            }
+                          : sq,
+                    );
+                    editSection(activePage.id, sectionIndex, {
+                      ...mapQuestion,
+                      subQuestions: updatedSubQuestions,
+                    });
+                  }}
                 />
               )}
             />

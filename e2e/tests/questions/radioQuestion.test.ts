@@ -7,27 +7,24 @@ import {
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.radio);
-let surveyData = testSurveyData;
 const radioQuestion = getRadioQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: getTestSurveyData(TEST_SURVEY_URL_NAMES.radio, ['fi']) });
+
 test.describe('Radio question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
   test('with regular options', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
   }) => {
     await surveyEditPage.createRadioQuestion(radioQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(surveyData.title, surveyData.urlName);
 
@@ -49,6 +46,7 @@ test.describe('Radio question', () => {
   });
 
   test('with alternative answer', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
@@ -57,9 +55,7 @@ test.describe('Radio question', () => {
       ...radioQuestion,
       allowCustom: true,
     });
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(surveyData.title, surveyData.urlName);
 

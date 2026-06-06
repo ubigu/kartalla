@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { convertFromHTML } from 'draft-convert';
 import { convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -230,7 +231,8 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
     [],
   );
 
-  const { language, surveyLanguage } = useTranslations();
+  const { language } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   useEffect(() => {
     async function updateEditorState() {
@@ -241,7 +243,7 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
     return () => {
       updateEditorState();
     };
-  }, [language, surveyLanguage]);
+  }, [language, workingLanguage]);
 
   const classes = useStyles({
     editorHeight: props.editorHeight,

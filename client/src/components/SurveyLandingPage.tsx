@@ -116,7 +116,7 @@ export default function SurveyLandingPage({
   surveyBackgroundImage,
 }: Props) {
   const classes = useStyles({ imageUrl: survey?.backgroundImageUrl ?? '' });
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
 
   const topImagePath = `/api/file/${survey.marginImages.top.imageUrl}`;
@@ -190,15 +190,15 @@ export default function SurveyLandingPage({
       >
         <div>
           <h1 className={getClassList([classes.heading, classes.title])}>
-            <span>{survey.title?.[surveyLanguage]}</span>
+            <span>{survey.title?.[language]}</span>
           </h1>
-          {survey.subtitle?.[surveyLanguage] && (
+          {survey.subtitle?.[language] && (
             <h2 className={getClassList([classes.heading, classes.subtitle])}>
-              <span>{survey.subtitle?.[surveyLanguage]}</span>
+              <span>{survey.subtitle?.[language]}</span>
             </h2>
           )}
         </div>
-        {survey.description?.[surveyLanguage] && (
+        {survey.description?.[language] && (
           <Box
             component="aside"
             sx={(theme) => ({
@@ -212,7 +212,7 @@ export default function SurveyLandingPage({
           >
             <MarkdownView sanitizeCustomSchema={customSchema}>
               {/* Replace each newline with <br/> to get multiple line breaks working */}
-              {survey.description?.[surveyLanguage]?.replace(/\n/g, '<br/>')}
+              {survey.description?.[language]?.replace(/\n/g, '<br/>')}
             </MarkdownView>
           </Box>
         )}
@@ -247,7 +247,7 @@ export default function SurveyLandingPage({
           <Link
             sx={(theme) => ({ color: theme.palette.textInteractive.main })}
             underline="hover"
-            href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
+            href={`/saavutettavuusseloste?lang=${language}`}
             target="_blank"
           >
             {tr.FooterLinks.accessibility}
@@ -256,7 +256,7 @@ export default function SurveyLandingPage({
             <Link
               sx={(theme) => ({ color: theme.palette.textInteractive.main })}
               underline="hover"
-              href={`/tietosuojaseloste?lang=${surveyLanguage}`}
+              href={`/tietosuojaseloste?lang=${language}`}
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}

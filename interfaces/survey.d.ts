@@ -610,10 +610,6 @@ export interface Survey {
    */
   enabledLanguages: EnabledLanguages;
   /**
-   * The primary authoring language of the survey
-   */
-  primaryLanguage: LanguageCode;
-  /**
    * Is the survey archived
    */
   isArchived: boolean;

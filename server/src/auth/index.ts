@@ -174,13 +174,22 @@ export async function configureMockAuth(app: Express) {
   await upsertUser(mockUser);
   const userGroupIds = userGroups.map((g) => g.id);
 
-  // Inject the mock user to each request
+  // Injects a mock user to each request
   app.use(async (req, _res, next) => {
-    const mockUserWithDefaultLanguage = (await getUser(mockUser.id)) ?? {
-      ...mockUser,
-      groups: userGroupIds,
-    };
-    req.user = { ...mockUserWithDefaultLanguage, groups: userGroupIds };
+    // Extra header for e2e-tests
+    const requestedId = req.header('x-mock-user-id') ?? mockUser.id;
+    const userForRequest =
+      requestedId === mockUser.id ? mockUser : { ...mockUser, id: requestedId };
+
+    let storedUser = await getUser(requestedId);
+    if (!storedUser) {
+      await upsertUser(userForRequest);
+      storedUser = (await getUser(requestedId)) ?? {
+        ...userForRequest,
+        groups: userGroupIds,
+      };
+    }
+    req.user = { ...storedUser, groups: userGroupIds };
     return next();
   });
 }

@@ -394,6 +394,12 @@ export default function AddSurveySectionActions(props: Props) {
                   >
                     <Button
                       sx={sectionButtonSx}
+                      onClick={handleAdd(button.type)}
+                      disabled={
+                        props.disabled ||
+                        (button.type === 'personal-info' &&
+                          personalInfoDisabled)
+                      }
                       startIcon={
                         <Box sx={iconCircleSx}>
                           {sectionTypeIcons[button.type]}

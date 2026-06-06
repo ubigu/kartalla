@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 interface Props {
@@ -30,7 +31,8 @@ export function FollowUpSectionDetails({
   accordion,
   setDeleteConfirmDialogOpen,
 }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <AccordionDetails
@@ -44,14 +46,14 @@ export function FollowUpSectionDetails({
       <TextField
         autoFocus
         label={tr.EditSurveyPage.title}
-        value={section.title?.[surveyLanguage] ?? ''}
+        value={section.title?.[workingLanguage] ?? ''}
         variant="standard"
         onChange={(event) => {
           handleEdit({
             ...section,
             title: {
               ...section.title,
-              [surveyLanguage]: event.target.value,
+              [workingLanguage]: event.target.value,
             },
           });
         }}
@@ -79,12 +81,12 @@ export function FollowUpSectionDetails({
       </FormGroup>
       {section.showInfo && (
         <RichTextEditor
-          value={section.info?.[surveyLanguage] ?? ''}
+          value={section.info?.[workingLanguage] ?? ''}
           label={tr.EditTextSection.text}
           onChange={(value) =>
             handleEdit({
               ...section,
-              info: { ...section.info, [surveyLanguage]: value },
+              info: { ...section.info, [workingLanguage]: value },
             })
           }
         />

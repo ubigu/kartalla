@@ -6,7 +6,8 @@
   "scripts": {
     "codegen": "playwright codegen http://localhost:8080/admin",
     "test-ui": "playwright test --ui",
-    "test": "playwright test --reporter=html"
+    "test-html": "playwright test --reporter=html",
+    "test": "playwright test"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "@axe-core/playwright": "^4.11.1",
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.5.0",
+    "@types/pg": "^8.20.0",
     "dayjs": "^1.11.20",
     "pg": "^8.20.0"
   }

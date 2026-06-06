@@ -3,27 +3,25 @@ import { getCheckBoxQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } fro
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.checkbox);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.checkbox, ['fi']);
 let checkBoxQuestion = getCheckBoxQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('CheckBox question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
   test('without limits', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
   }) => {
     await surveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -48,6 +46,7 @@ test.describe('CheckBox question', () => {
   });
 
   test('with limits', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
@@ -58,9 +57,7 @@ test.describe('CheckBox question', () => {
     };
 
     await surveyEditPage.createCheckBoxQuestion(checkBoxQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

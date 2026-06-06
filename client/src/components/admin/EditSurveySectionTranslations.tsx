@@ -6,7 +6,7 @@ import {
   SurveyPageSection,
 } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { supportedLanguages } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
 import TranslationField from './TranslationField';
 
@@ -32,7 +32,6 @@ export default function EditSurveySectionTranslations({
   languageCode,
   onEdit,
 }: Props) {
-  const { languages } = useTranslations();
   const classes = useStyles();
 
   return (
@@ -213,7 +212,7 @@ export default function EditSurveySectionTranslations({
                         onEdit({ ...section, groups: updatedGroups });
                       }}
                     />
-                    {languages
+                    {supportedLanguages
                       .map((supportedLanguage) =>
                         Boolean(option.info?.[supportedLanguage]),
                       )

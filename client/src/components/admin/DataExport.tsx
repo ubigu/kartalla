@@ -18,6 +18,7 @@ import {
   getApiTranslation,
   useTranslations,
 } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { request } from '@src/utils/request';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
@@ -59,7 +60,8 @@ export default function DataExport({ surveyId, surveyName }: Props) {
     attachments: false,
   });
   const [answerCounts, setAnswerCounts] = useState<AnswerCounts | null>();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   function getExportFilename(label: string, ext: string) {
     const sanitizedLabel = label
@@ -67,7 +69,7 @@ export default function DataExport({ surveyId, surveyName }: Props) {
       .toLowerCase()
       .replace(/\s+/g, '_')
       .replace(/[^a-z0-9_À-ɏ]/g, '');
-    return `${surveyName}_${sanitizedLabel}_${surveyLanguage}.${ext}`;
+    return `${surveyName}_${sanitizedLabel}_${workingLanguage}.${ext}`;
   }
   const { showToast } = useToasts();
 
@@ -98,7 +100,7 @@ export default function DataExport({ surveyId, surveyName }: Props) {
   async function exportCSV() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export?fileType=csv&withPersonalInfo=${withPersonalInfo}&lang=${surveyLanguage}`,
+        `/api/answers/${surveyId}/file-export?fileType=csv&withPersonalInfo=${withPersonalInfo}&lang=${workingLanguage}`,
         {
           method: 'GET',
         },
@@ -122,7 +124,7 @@ export default function DataExport({ surveyId, surveyName }: Props) {
   async function exportExcel() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export?fileType=excel&withPersonalInfo=${withPersonalInfo}&lang=${surveyLanguage}`,
+        `/api/answers/${surveyId}/file-export?fileType=excel&withPersonalInfo=${withPersonalInfo}&lang=${workingLanguage}`,
         { method: 'GET' },
       );
 
@@ -144,7 +146,7 @@ export default function DataExport({ surveyId, surveyName }: Props) {
   async function exportGeoPackage() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export/geopackage?lang=${surveyLanguage}`,
+        `/api/answers/${surveyId}/file-export/geopackage?lang=${workingLanguage}`,
         {
           method: 'GET',
         },

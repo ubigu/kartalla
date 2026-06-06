@@ -1,6 +1,10 @@
 import { Box, FormHelperText, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  useWorkingLanguage,
+  useWorkingLanguageInlineDescription,
+} from '@src/stores/WorkingLanguageContext';
 import { request } from '@src/utils/request';
 import { useEffect, useState } from 'react';
 import { Checkbox } from '../core/Checkbox';
@@ -18,7 +22,10 @@ export default function EditSurveyEmail() {
   const [autocompleteEmails, setAutocompleteEmails] = useState<string[]>([]);
 
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+  const workingLanguageInlineDescription =
+    useWorkingLanguageInlineDescription();
 
   useEffect(() => {
     async function fetchAutocompleteEmails() {
@@ -149,7 +156,8 @@ export default function EditSurveyEmail() {
           </div>
           <Input
             label={tr.EditSurveyEmail.emailSubject}
-            value={activeSurvey.email.subject?.[surveyLanguage] ?? ''}
+            inlineDescription={workingLanguageInlineDescription}
+            value={activeSurvey.email.subject?.[workingLanguage] ?? ''}
             onChange={(event) => {
               editSurvey({
                 ...activeSurvey,
@@ -157,7 +165,7 @@ export default function EditSurveyEmail() {
                   ...activeSurvey.email,
                   subject: {
                     ...activeSurvey.email.subject,
-                    [surveyLanguage]: event.target.value,
+                    [workingLanguage]: event.target.value,
                   },
                 },
               });
@@ -165,7 +173,7 @@ export default function EditSurveyEmail() {
           />
           <RichTextEditor
             label={tr.EditSurveyEmail.emailBody}
-            value={activeSurvey.email.body?.[surveyLanguage] ?? ''}
+            value={activeSurvey.email.body?.[workingLanguage] ?? ''}
             onChange={(value) => {
               editSurvey({
                 ...activeSurvey,
@@ -173,7 +181,7 @@ export default function EditSurveyEmail() {
                   ...activeSurvey.email,
                   body: {
                     ...activeSurvey.email.body,
-                    [surveyLanguage]: value,
+                    [workingLanguage]: value,
                   },
                 },
               });
