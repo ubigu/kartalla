@@ -105,6 +105,7 @@ export async function getStaticMapsScreenshots(
 ): Promise<ScreenshotJobReturnData[]> {
   const returnData: ScreenshotJobReturnData[] = [];
   const availableMapLayers = await getOlMapLayers();
+  const { language } = jobData;
 
   for (const answer of jobData.answers) {
     const { feature, question, markerIcon, sectionId, index } = answer;
@@ -153,7 +154,7 @@ export async function getStaticMapsScreenshots(
           );
           return typeof layer?.name === 'string'
             ? layer.name
-            : (layer?.name?.['fi'] ?? null);
+            : (layer?.name?.[language] ?? layer?.name?.['fi'] ?? null);
         })
         .filter(Boolean),
     });

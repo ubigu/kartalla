@@ -4,6 +4,8 @@
   "somethingElse": "Joku muu, mikä",
   "question": "Kysymys",
   "subquestion": "Alikysymys",
+  "page": "Sivu",
+  "unnamedSubquestion": "Nimetön alikysymys",
   "dontKnow": "En osaa sanoa",
   "unfinishedSubmission": "Keskeneräinen vastaus",
   "unfinishedSurveyInfo": "Vastauksesi kyselyyn {surveyTitle} on tallennettu keskeneräisenä. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
@@ -56,6 +58,9 @@
     "visibleLayers": "Näkyvät tasot"
   },
   "GeoBudgetingQuestion": {
-    "summary": "Yhteenveto"
+    "summary": "Yhteenveto",
+    "target": "Kohde",
+    "price": "Hinta",
+    "unit": "Yksikkö"
   }
 }

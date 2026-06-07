@@ -4,6 +4,8 @@
   "somethingElse": "Något annat, vad",
   "question": "Fråga",
   "subquestion": "Underfråga",
+  "page": "Sida",
+  "unnamedSubquestion": "Namnlös delfråga",
   "dontKnow": "Jag vet inte",
   "unfinishedSubmission": "Ofullständigt svar",
   "unfinishedSurveyInfo": "Ditt svar på enkäten {surveyTitle} har sparats som ofullständigt. Ditt svar kommer att beaktas först när du har besvarat hela enkäten och skickat in ditt slutgiltiga svar.",
@@ -56,6 +58,9 @@
     "visibleLayers": "Synliga lager"
   },
   "GeoBudgetingQuestion": {
-    "summary": "Sammanfattning"
+    "summary": "Sammanfattning",
+    "target": "Mål",
+    "price": "Pris",
+    "unit": "Enhet"
   }
 }

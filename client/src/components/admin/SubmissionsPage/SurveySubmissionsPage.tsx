@@ -8,6 +8,7 @@ import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
 import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
 import { Combobox_WIP } from '@src/components/core/Combobox';
+import { Select } from '@src/components/core/Select';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
@@ -15,12 +16,12 @@ import {
 } from '@src/stores/SurveyAnswerContext';
 import { Language, useTranslations } from '@src/stores/TranslationContext';
 import {
-  WorkingLanguageContext,
-  resolveWorkingLanguage,
+  WorkingLanguageProvider,
+  useWorkingLanguage,
 } from '@src/stores/WorkingLanguageContext';
 import { request } from '@src/utils/request';
 import { isSurveyQuestion } from '@src/utils/typeCheck';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
 import DataExport from '../DataExport';
@@ -68,38 +69,10 @@ function answerEntryToItems(
 export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
   const [error, setError] = useState<{ status: number } | null>(null);
-  const [submissions, setSubmissions] = useState<Submission[] | null>(null);
-  const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [surveyLoading, setSurveyLoading] = useState(true);
-  const [responsesLoading, setResponsesLoading] = useState(true);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
-  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection | null>(
-    null,
-  );
-  const [refreshSurvey, setRefreshSurvey] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] =
-    useState<SurveyQuestion | null>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
   const { tr, language } = useTranslations();
-
-  const [workingLanguage, setWorkingLanguageState] =
-    useState<Language>(language);
-  const setWorkingLanguage = useCallback(
-    (lang: Language) => setWorkingLanguageState(lang),
-    [],
-  );
-
-  const resetWorkingLanguage = useCallback(
-    (originalSurvey: Survey) => {
-      setWorkingLanguageState(resolveWorkingLanguage(originalSurvey, language));
-    },
-    [language],
-  );
-
-  const loading = useMemo(() => {
-    return surveyLoading || submissionsLoading || responsesLoading;
-  }, [surveyLoading, submissionsLoading, responsesLoading]);
 
   const errorMessage = useMemo(() => {
     if (!error) {
@@ -132,21 +105,83 @@ export default function SurveySubmissionsPage() {
     return () => setSurvey(null);
   }, [name, surveyId]);
 
-  useEffect(() => {
-    if (survey) {
-      setWorkingLanguageState(language);
+  if (surveyLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography variant="body1">{errorMessage}</Typography>
+      </Box>
+    );
+  }
+
+  if (!survey) {
+    return null;
+  }
+
+  return (
+    <WorkingLanguageProvider survey={survey} uiLanguage={language}>
+      <SurveySubmissionsContent survey={survey} />
+    </WorkingLanguageProvider>
+  );
+}
+
+function SurveySubmissionsContent({ survey }: { survey: Survey }) {
+  const { surveyId } = useParams<{ name: string; surveyId: string }>();
+  const [error, setError] = useState<{ status: number } | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[] | null>(null);
+  const [submissionsLoading, setSubmissionsLoading] = useState(true);
+  const [responsesLoading, setResponsesLoading] = useState(true);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
+  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection | null>(
+    null,
+  );
+  const [refreshSurvey, setRefreshSurvey] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] =
+    useState<SurveyQuestion | null>(null);
+
+  const { tr } = useTranslations();
+  const { workingLanguage, setWorkingLanguage } = useWorkingLanguage();
+
+  const loading = useMemo(() => {
+    return submissionsLoading || responsesLoading;
+  }, [submissionsLoading, responsesLoading]);
+
+  const errorMessage = useMemo(() => {
+    if (!error) {
+      return null;
     }
-  }, [survey?.id]);
+    if (error.status === 404) {
+      return tr.SurveyPage.errorSurveyNotFound;
+    }
+    return tr.SurveyPage.errorFetchingSurvey;
+  }, [error]);
 
   // Fetch submissions from server after the survey has been loaded
   useEffect(() => {
-    if (survey == null) {
-      return;
-    }
-
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = `/api/surveys/${survey?.id}/submissions?withPersonalInfo=true`;
+      const submissionUrl = `/api/surveys/${survey.id}/submissions?withPersonalInfo=true`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(
@@ -165,9 +200,6 @@ export default function SurveySubmissionsPage() {
 
   // Fetch submission/answer responses after the survey has been loaded
   useEffect(() => {
-    if (survey == null) {
-      return;
-    }
     setResponsesLoading(true);
     async function fetchResponses() {
       try {
@@ -182,7 +214,6 @@ export default function SurveySubmissionsPage() {
 
   // TODO: Could surveyQuestions and questions be combined into a single variable?
   const surveyQuestions = useMemo(() => {
-    if (!survey) return [];
     return (survey.pages ?? []).reduce(
       (sections, page) => [...sections, ...page.sections] as SurveyQuestion[],
       [] as SurveyQuestion[],
@@ -191,7 +222,6 @@ export default function SurveySubmissionsPage() {
 
   // All map type questions across the entire survey
   const questions = useMemo(() => {
-    if (!survey) return [];
     return (survey.pages ?? []).reduce(
       (questions, page) => [
         ...questions,
@@ -259,7 +289,6 @@ export default function SurveySubmissionsPage() {
       MAP_TYPES.includes(selectedQuestion.type) ||
       selectedQuestion.id === DEFAULT_VIEW_SECTION_ID
     ) {
-      if (!survey) return false as const;
       return (
         <AnswerMap
           survey={survey}
@@ -306,14 +335,8 @@ export default function SurveySubmissionsPage() {
     );
   }
 
-  if (!survey) {
-    return null;
-  }
-
   return (
-    <WorkingLanguageContext.Provider
-      value={{ workingLanguage, setWorkingLanguage, resetWorkingLanguage }}
-    >
+    <>
       <AdminAppBar
         labels={[
           survey.title[workingLanguage],
@@ -395,7 +418,7 @@ export default function SurveySubmissionsPage() {
               }}
             />
 
-            <Combobox_WIP
+            <Select
               id="submissions-survey-language"
               label={tr.SurveyLanguageMenu.answerLanguage}
               value={workingLanguage}
@@ -469,6 +492,6 @@ export default function SurveySubmissionsPage() {
           title: null,
         }}
       />
-    </WorkingLanguageContext.Provider>
+    </>
   );
 }
