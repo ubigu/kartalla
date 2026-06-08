@@ -41,8 +41,8 @@ import PgPromise from 'pg-promise';
 const SURVEY_NAME = 'tievelho-kayttajakysely';
 
 /** Builds a LocalizedText with the same value for all three languages. */
-function loc(fi: string, en: string, se = en): LocalizedText {
-  return { fi, en, se };
+function loc(fi: string, en: string, sv = en): LocalizedText {
+  return { fi, en, sv };
 }
 
 // ---------------------------------------------------------------------------
@@ -868,7 +868,7 @@ async function main() {
         ),
         'Väylävirasto',
         'Tietopalvelut',
-        ['fi', 'en', 'se'],
+        ['fi', 'en', 'sv'],
         USER_GROUP_ORG,
       ],
     );

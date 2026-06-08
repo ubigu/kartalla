@@ -443,12 +443,12 @@
     "defaultMinLabel": "Strongly disagree",
     "defaultMaxLabel": "Strongly agree",
     "defaultTranslatedMinLabel": {
-      "se": "Helt oense",
+      "sv": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
-      "se": "Helt enig",
+      "sv": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },
@@ -767,7 +767,7 @@
     "changeLanguage": "Change service language",
     "fi": "Suomi",
     "en": "English",
-    "se": "Svenska"
+    "sv": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -800,7 +800,7 @@
     "languageNames": {
       "fi": "Finnish",
       "en": "English",
-      "se": "Swedish"
+      "sv": "Swedish"
     }
   },
   "EditSurveyTranslations": {
@@ -815,7 +815,7 @@
     "surveySubtitle": "Survey subtitle",
     "fi": "Finnish",
     "en": "English",
-    "se": "Swedish",
+    "sv": "Swedish",
     "page": "page",
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",

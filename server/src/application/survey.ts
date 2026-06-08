@@ -1900,7 +1900,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
       languages[lang] = true;
       return languages;
     },
-    { fi: false, en: false, se: false } as EnabledLanguages,
+    { fi: false, en: false, sv: false } as EnabledLanguages,
   );
   return {
     ...survey,
@@ -2026,7 +2026,7 @@ function dbSurveyJoinToImageOption(
         altText:
           'altText' in dbSurveyJoin.option_details
             ? (dbSurveyJoin.option_details.altText as LocalizedText)
-            : { fi: '', en: '', se: '' },
+            : { fi: '', en: '', sv: '' },
         attributions:
           'attributions' in dbSurveyJoin.option_details
             ? (dbSurveyJoin.option_details.attributions as string)
@@ -2642,7 +2642,7 @@ export async function getImageOptionsForSurvey(surveyId: number) {
       altText:
         'altText' in row.details
           ? (row.details.altText as LocalizedText)
-          : { fi: '', en: '', se: '' },
+          : { fi: '', en: '', sv: '' },
       attributions:
         'attributions' in row.details
           ? (row.details.attributions as string)

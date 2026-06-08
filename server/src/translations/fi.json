@@ -21,7 +21,7 @@
   "newUserRequest": "Uusi käyttäjäpyyntö",
   "fi": "suomi",
   "en": "englanti",
-  "se": "ruotsi",
+  "sv": "ruotsi",
   "questionTypes": {
     "radio": "Valintakysymys",
     "radio-image": "Kuvavalintakysymys",

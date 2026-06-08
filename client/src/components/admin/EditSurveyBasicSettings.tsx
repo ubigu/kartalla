@@ -95,7 +95,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         return fiLocale;
       case 'en':
         return enLocale;
-      case 'se':
+      case 'sv':
         return svLocale;
       default:
         return assertNever(language);

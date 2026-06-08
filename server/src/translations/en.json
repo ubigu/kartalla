@@ -21,7 +21,7 @@
   "newUserRequest": "New user request",
   "fi": "Finnish",
   "en": "English",
-  "se": "Swedish",
+  "sv": "Swedish",
   "questionTypes": {
     "radio": "Single choice question",
     "radio-image": "Image choice question",

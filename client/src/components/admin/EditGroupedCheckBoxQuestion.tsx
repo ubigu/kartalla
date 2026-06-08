@@ -265,7 +265,7 @@ export default function EditGroupedCheckBoxQuestion({
                 ...section.groups,
                 {
                   id,
-                  name: { fi: '', se: '', en: '' },
+                  name: { fi: '', sv: '', en: '' },
                   options: [],
                 },
               ],

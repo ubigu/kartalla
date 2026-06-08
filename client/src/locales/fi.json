@@ -443,12 +443,12 @@
     "defaultMinLabel": "Täysin eri mieltä",
     "defaultMaxLabel": "Täysin samaa mieltä",
     "defaultTranslatedMinLabel": {
-      "se": "Helt oense",
+      "sv": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
-      "se": "Helt enig",
+      "sv": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },
@@ -767,7 +767,7 @@
     "changeLanguage": "Vaihda palvelun kieltä",
     "fi": "Suomi",
     "en": "English",
-    "se": "Svenska"
+    "sv": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -800,7 +800,7 @@
     "languageNames": {
       "fi": "suomi",
       "en": "englanti",
-      "se": "ruotsi"
+      "sv": "ruotsi"
     }
   },
   "EditSurveyTranslations": {
@@ -815,7 +815,7 @@
     "surveyDescription": "Kyselyn kuvaus",
     "fi": "suomi",
     "en": "englanti",
-    "se": "ruotsi",
+    "sv": "ruotsi",
     "page": "sivu",
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",

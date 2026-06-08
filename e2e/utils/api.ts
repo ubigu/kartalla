@@ -68,7 +68,7 @@ export async function postSurvey(params: SurveyParams): Promise<string> {
       endDate: new Date(Date.now() + 365 * 24 * 3_600_000).toISOString(),
       ...(params.languages && {
         enabledLanguages: Object.fromEntries(
-          ['fi', 'en', 'se'].map((l) => [l, params.languages!.includes(l)]),
+          ['fi', 'en', 'sv'].map((l) => [l, params.languages!.includes(l)]),
         ),
         localisationEnabled: params.languages.length > 1,
       }),

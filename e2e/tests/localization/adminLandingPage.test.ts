@@ -27,7 +27,7 @@ test.describe('Admin landing page default language', () => {
     surveyAdminPage,
     mockUserId,
   }) => {
-    await setUserDefaultLanguage('se', mockUserId);
+    await setUserDefaultLanguage('sv', mockUserId);
     await surveyAdminPage.goto();
     await expect(
       surveyAdminPage.page.getByRole('button', { name: 'Användarmeny' }),

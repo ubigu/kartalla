@@ -41,7 +41,7 @@ export function hasEnabledLanguages(survey: Pick<Survey, 'enabledLanguages'>) {
 export function getLocalizedMapUrls(mapUrl: string) {
   return {
     fi: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=fi') ?? '',
-    se: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=sv') ?? '',
+    sv: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=sv') ?? '',
     en: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=en') ?? '',
   };
 }

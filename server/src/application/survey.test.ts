@@ -77,9 +77,9 @@ describe('updateSurvey', () => {
             {
               id: -1,
               type: 'radio',
-              title: { fi: 'Test radio', en: '', se: '' },
+              title: { fi: 'Test radio', en: '', sv: '' },
               isRequired: false,
-              options: [{ text: { fi: 'first', en: '', se: '' } }],
+              options: [{ text: { fi: 'first', en: '', sv: '' } }],
               allowCustomAnswer: false,
               followUpSections: [
                 {

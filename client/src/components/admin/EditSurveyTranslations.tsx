@@ -52,7 +52,7 @@ const useStyles = makeStyles({
 });
 
 function surveyToTranslationString(survey: Survey) {
-  const columnHeaders = 'Label \t fi \t en \t se \n';
+  const columnHeaders = 'Label \t fi \t en \t sv \n';
   const surveyStrings: string[] = [];
 
   function isPartialLocalizedText(
@@ -61,7 +61,7 @@ function surveyToTranslationString(survey: Survey) {
     return (
       typeof value === 'object' &&
       value !== null &&
-      ('fi' in value || 'en' in value || 'se' in value)
+      ('fi' in value || 'en' in value || 'sv' in value)
     );
   }
 
@@ -92,7 +92,7 @@ function surveyToTranslationString(survey: Survey) {
 
     if (isPartialLocalizedText(obj)) {
       surveyStrings.push(
-        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? '', obj?.se ?? ''),
+        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? '', obj?.sv ?? ''),
       );
       return;
     }
@@ -109,7 +109,7 @@ function surveyToTranslationString(survey: Survey) {
         addRowString(value, `${label}.${key}[${index}]`, index);
       } else if (isPartialLocalizedText(value)) {
         surveyStrings.push(
-          getRowString(`${label}.${key}`, value.fi, value.en, value.se),
+          getRowString(`${label}.${key}`, value.fi, value.en, value.sv),
         );
       }
     });

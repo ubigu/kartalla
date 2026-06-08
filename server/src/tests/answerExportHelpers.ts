@@ -22,7 +22,7 @@ export function makeFreeTextRow(
     sectionIndex: 0,
     submissionId,
     submissionLanguage: 'fi',
-    title: { fi: '', en: '', se: '' },
+    title: { fi: '', en: '', sv: '' },
     type: 'free-text',
     geometrySRID: null,
     valueGeometry: null,
@@ -48,7 +48,7 @@ export function makeFreeTextSectionHeader(
     text: null,
     sectionId,
     sectionIndex: 0,
-    title: { fi: titleFi, en: titleFi, se: titleFi },
+    title: { fi: titleFi, en: titleFi, sv: titleFi },
     type: 'free-text',
     details: {},
     parentSection: null,
@@ -76,7 +76,7 @@ export function makeRadioRow(
     sectionIndex: 0,
     submissionId,
     submissionLanguage: 'fi',
-    title: { fi: '', en: '', se: '' },
+    title: { fi: '', en: '', sv: '' },
     type: 'radio',
     geometrySRID: null,
     valueGeometry: null,
@@ -101,10 +101,10 @@ export function makeRadioSectionHeader(
   return {
     optionId,
     optionIndex: 0,
-    text: { fi: optionTextFi, en: optionTextFi, se: optionTextFi },
+    text: { fi: optionTextFi, en: optionTextFi, sv: optionTextFi },
     sectionId,
     sectionIndex: 0,
-    title: { fi: titleFi, en: titleFi, se: titleFi },
+    title: { fi: titleFi, en: titleFi, sv: titleFi },
     type: 'radio',
     details: {},
     parentSection: null,
@@ -130,7 +130,7 @@ export function makeMatrixRow(
     sectionIndex: 1,
     submissionId,
     submissionLanguage: 'fi',
-    title: { fi: '', en: '', se: '' },
+    title: { fi: '', en: '', sv: '' },
     type: 'matrix',
     geometrySRID: null,
     valueGeometry: null,
@@ -157,7 +157,7 @@ export function makeMatrixSectionHeader(
     text: null,
     sectionId,
     sectionIndex: 1,
-    title: { fi: titleFi, en: titleFi, se: titleFi },
+    title: { fi: titleFi, en: titleFi, sv: titleFi },
     type: 'matrix',
     details: {
       subjects: subjects.map((s) => ({ fi: s })),
@@ -308,7 +308,7 @@ export function makePersonalInfo(
       askPhone: false,
       askAddress: false,
       askCustom: false,
-      customLabel: { fi: '', en: '', se: '' },
+      customLabel: { fi: '', en: '', sv: '' },
     },
     ...overrides,
   };
@@ -317,27 +317,27 @@ export function makePersonalInfo(
 export const multiLangTitle = {
   fi: 'Suomalainen kysymys',
   en: 'English question',
-  se: 'Svensk fråga',
+  sv: 'Svensk fråga',
 };
 export const multiLangSubject = {
   fi: 'Kohde FI',
   en: 'Subject EN',
-  se: 'Ämne SE',
+  sv: 'Ämne SE',
 };
 export const multiLangClass = {
   fi: 'Luokka FI',
   en: 'Class EN',
-  se: 'Klass SE',
+  sv: 'Klass SE',
 };
 export const multiLangTarget = {
   fi: 'Kohde FI',
   en: 'Target EN',
-  se: 'Mål SE',
+  sv: 'Mål SE',
 };
 export const multiLangOption = {
   fi: 'Vaihtoehto FI',
   en: 'Option EN',
-  se: 'Alternativ SE',
+  sv: 'Alternativ SE',
 };
 
 export function makeCheckboxSectionHeader(
@@ -364,7 +364,7 @@ export function makeGroupedCheckboxSectionHeader(
     ...makeRadioSectionHeader(sectionId, optionId, titleFi, optionTextFi),
     type: 'grouped-checkbox',
     groupIndex,
-    groupName: { fi: groupNameFi, en: groupNameFi, se: groupNameFi },
+    groupName: { fi: groupNameFi, en: groupNameFi, sv: groupNameFi },
   };
 }
 

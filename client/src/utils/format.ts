@@ -8,7 +8,7 @@ export function getNumberFormatter(
   },
 ) {
   return new Intl.NumberFormat(
-    language === 'fi' ? 'fi-FI' : language === 'se' ? 'sv-SE' : 'en-US',
+    language === 'fi' ? 'fi-FI' : language === 'sv' ? 'sv-SE' : 'en-US',
     options,
   );
 }

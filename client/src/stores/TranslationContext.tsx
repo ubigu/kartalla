@@ -11,12 +11,12 @@ import {
 import { useHistory } from 'react-router-dom';
 import en from '../locales/en.json';
 import fi from '../locales/fi.json';
-import se from '../locales/se.json';
+import sv from '../locales/sv.json';
 
 const translations = {
   fi,
   en,
-  se,
+  sv,
 };
 
 export type Language = keyof typeof translations;
@@ -24,7 +24,7 @@ export type Language = keyof typeof translations;
 const localeMap: Record<Language, string> = {
   fi: 'fi-FI',
   en: 'en-GB',
-  se: 'sv-SE',
+  sv: 'sv-SE',
 };
 
 type State = Language;

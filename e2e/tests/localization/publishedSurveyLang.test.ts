@@ -65,7 +65,7 @@ test.describe('Public survey language routing', () => {
     surveyAdminPage,
     surveyPage,
   }) => {
-    // fi + en enabled, se is not
+    // fi + en enabled, sv is not
     await surveyEditPage.goto();
     await enableMultilingualWithEnglish(surveyEditPage.page);
     await surveyEditPage.saveSurvey();
@@ -73,15 +73,15 @@ test.describe('Public survey language routing', () => {
     await surveyAdminPage.goto();
     await surveyAdminPage.publishSurvey(surveyData.title);
 
-    // ?lang=se is not an enabled language — should fall back browser default en
+    // ?lang=sv is not an enabled language — should fall back browser default en
     await surveyPage.setLocale('en-Gb');
-    await surveyPage.goto(surveyData.urlName, 'se');
+    await surveyPage.goto(surveyData.urlName, 'sv');
     await expect(
       surveyPage.page.getByRole('button', { name: 'Start the survey' }),
     ).toBeVisible();
     await surveyPage.setLocale('none');
-    // ?lang=se is not an enabled language — should fall back to fi
-    await surveyPage.goto(surveyData.urlName, 'se');
+    // ?lang=sv is not an enabled language — should fall back to fi
+    await surveyPage.goto(surveyData.urlName, 'sv');
     await expect(
       surveyPage.page.getByRole('button', { name: 'Aloita kysely tästä' }),
     ).toBeVisible();

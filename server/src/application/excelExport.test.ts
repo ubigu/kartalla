@@ -91,7 +91,7 @@ describe('getExcelFile', () => {
     it.each([
       ['fi', 'Vastaukset (laaja)'],
       ['en', 'Responses (detailed)'],
-      ['se', 'Svar (detaljerade)'],
+      ['sv', 'Svar (detaljerade)'],
     ] as const)(
       'creates a sheet with the correct name for lang=%s',
       async (lang, expectedName) => {
@@ -116,7 +116,7 @@ describe('getExcelFile', () => {
         'Time of the response',
         'Response language',
       ],
-      ['se', 'Svarsid', 'Svarstid', 'Svarsspråk'],
+      ['sv', 'Svarsid', 'Svarstid', 'Svarsspråk'],
     ] as const)(
       'has translated meta column labels in row 1 for lang=%s',
       async (lang, submissionId, responseTime, responseLanguage) => {
@@ -133,7 +133,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(ws.getRow(1).getCell(1).value).toBe(submissionId);
@@ -248,7 +248,7 @@ describe('getExcelFile', () => {
     it.each([
       ['fi', 'Jatkokysymys'],
       ['en', 'Follow-up'],
-      ['se', 'Följdfråga'],
+      ['sv', 'Följdfråga'],
     ] as const)(
       'prefixes follow-up question group label with the translated prefix for lang=%s',
       async (lang, expectedPrefix) => {
@@ -284,7 +284,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
 
@@ -298,7 +298,7 @@ describe('getExcelFile', () => {
   });
 
   describe('submitted answer language', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'is written to the response language column for lang=%s',
       async (lang) => {
         const row = {
@@ -321,7 +321,7 @@ describe('getExcelFile', () => {
     it.each([
       ['fi', 'Suomalainen kysymys', 'Vaihtoehto A'],
       ['en', 'English question', 'Option A'],
-      ['se', 'Svensk fråga', 'Alternativ A'],
+      ['sv', 'Svensk fråga', 'Alternativ A'],
     ] as const)(
       'uses the correct language for question titles and option labels for lang=%s',
       async (lang, expectedTitle, expectedOption) => {
@@ -330,9 +330,9 @@ describe('getExcelFile', () => {
           title: {
             fi: 'Suomalainen kysymys',
             en: 'English question',
-            se: 'Svensk fråga',
+            sv: 'Svensk fråga',
           },
-          text: { fi: 'Vaihtoehto A', en: 'Option A', se: 'Alternativ A' },
+          text: { fi: 'Vaihtoehto A', en: 'Option A', sv: 'Alternativ A' },
         };
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
           makeRadioRow(1, 10, 99),
@@ -345,7 +345,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(expectedTitle);
@@ -355,7 +355,7 @@ describe('getExcelFile', () => {
   });
 
   describe('sorting question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'row 1 uses correct title and row 3 uses correct option text for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -371,7 +371,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
@@ -393,14 +393,14 @@ describe('getExcelFile', () => {
           10,
           0,
           multiLangTitle,
-          { fi: 'First', en: 'First', se: 'First' },
+          { fi: 'First', en: 'First', sv: 'First' },
           99,
         ),
         makeSortingSectionHeader(
           10,
           1,
           multiLangTitle,
-          { fi: 'Second', en: 'Second', se: 'Second' },
+          { fi: 'Second', en: 'Second', sv: 'Second' },
           100,
         ),
       ]);
@@ -413,7 +413,7 @@ describe('getExcelFile', () => {
   });
 
   describe('matrix question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'row 1 uses correct title and row 2 uses correct subject label for lang=%s',
       async (lang) => {
         const header = {
@@ -433,7 +433,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
@@ -458,7 +458,7 @@ describe('getExcelFile', () => {
   });
 
   describe('multi-matrix question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'row 1 uses correct subject group label and row 2 uses correct class label for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -479,7 +479,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
@@ -494,7 +494,7 @@ describe('getExcelFile', () => {
   });
 
   describe('budgeting question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'row 1 uses correct title and row 2 uses correct target name for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -512,7 +512,7 @@ describe('getExcelFile', () => {
           {
             fi: 'Vastaukset (laaja)',
             en: 'Responses (detailed)',
-            se: 'Svar (detaljerade)',
+            sv: 'Svar (detaljerade)',
           }[lang],
         );
         expect(String(ws.getRow(1).getCell(4).value)).toContain(
@@ -557,7 +557,7 @@ describe('getExcelFile', () => {
             askPhone: false,
             askAddress: false,
             askCustom: false,
-            customLabel: { fi: '', en: '', se: '' },
+            customLabel: { fi: '', en: '', sv: '' },
           },
         }),
       ]);
@@ -577,12 +577,12 @@ describe('getExcelFile', () => {
     const COMPACT_NAMES = {
       fi: 'Vastaukset (tiivis)',
       en: 'Responses (compact)',
-      se: 'Svar (kompakta)',
+      sv: 'Svar (kompakta)',
     } as const;
 
     async function loadCompact(
       buffer: ExcelJS.Buffer,
-      lang: 'fi' | 'en' | 'se' = 'fi',
+      lang: 'fi' | 'en' | 'sv' = 'fi',
     ) {
       return loadSheet(buffer, COMPACT_NAMES[lang]);
     }
@@ -602,7 +602,7 @@ describe('getExcelFile', () => {
     it.each([
       ['fi', 'Vastaukset (tiivis)'],
       ['en', 'Responses (compact)'],
-      ['se', 'Svar (kompakta)'],
+      ['sv', 'Svar (kompakta)'],
     ] as const)(
       'has correct sheet name for lang=%s',
       async (lang, expectedName) => {
@@ -780,15 +780,15 @@ describe('getExcelFile', () => {
           makeSortingSectionHeader(
             10,
             0,
-            { fi: 'Rank', en: 'Rank', se: 'Rank' },
-            { fi: 'First', en: 'First', se: 'First' },
+            { fi: 'Rank', en: 'Rank', sv: 'Rank' },
+            { fi: 'First', en: 'First', sv: 'First' },
             99,
           ),
           makeSortingSectionHeader(
             10,
             1,
-            { fi: 'Rank', en: 'Rank', se: 'Rank' },
-            { fi: 'Second', en: 'Second', se: 'Second' },
+            { fi: 'Rank', en: 'Rank', sv: 'Rank' },
+            { fi: 'Second', en: 'Second', sv: 'Second' },
             100,
           ),
         ]);
@@ -864,8 +864,8 @@ describe('getExcelFile', () => {
             10,
             multiLangTitle,
             [
-              { fi: 'Subject 1', en: 'Subject 1', se: 'Subject 1' },
-              { fi: 'Subject 2', en: 'Subject 2', se: 'Subject 2' },
+              { fi: 'Subject 1', en: 'Subject 1', sv: 'Subject 1' },
+              { fi: 'Subject 2', en: 'Subject 2', sv: 'Subject 2' },
             ],
             [multiLangClass],
           ),

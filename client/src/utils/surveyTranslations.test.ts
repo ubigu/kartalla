@@ -13,7 +13,7 @@ import {
 
 describe('isLocalizedText', () => {
   it('accepts objects keyed only by language codes with string values', () => {
-    expect(isLocalizedText({ fi: 'a', en: 'b', se: 'c' })).toBe(true);
+    expect(isLocalizedText({ fi: 'a', en: 'b', sv: 'c' })).toBe(true);
     expect(isLocalizedText({ fi: 'a' })).toBe(true);
   });
 
@@ -30,25 +30,25 @@ describe('isLocalizedText', () => {
 describe('walkLocalizedTexts', () => {
   it('yields every localized node nested in objects and arrays', () => {
     const tree = {
-      title: { fi: 'a', en: 'b', se: '' },
-      meta: { id: 1, label: { fi: 'c', en: 'd', se: '' } },
-      options: [{ text: { fi: 'e', en: 'f', se: '' } }],
+      title: { fi: 'a', en: 'b', sv: '' },
+      meta: { id: 1, label: { fi: 'c', en: 'd', sv: '' } },
+      options: [{ text: { fi: 'e', en: 'f', sv: '' } }],
     };
     const nodes = [...walkLocalizedTexts(tree)];
     expect(nodes).toEqual([
-      { fi: 'a', en: 'b', se: '' },
-      { fi: 'c', en: 'd', se: '' },
-      { fi: 'e', en: 'f', se: '' },
+      { fi: 'a', en: 'b', sv: '' },
+      { fi: 'c', en: 'd', sv: '' },
+      { fi: 'e', en: 'f', sv: '' },
     ]);
   });
 
   it('skips denylisted keys such as localizedMapUrls', () => {
     const tree = {
-      title: { fi: 'a', en: 'b', se: '' },
-      localizedMapUrls: { fi: 'url', en: 'url', se: 'url' },
+      title: { fi: 'a', en: 'b', sv: '' },
+      localizedMapUrls: { fi: 'url', en: 'url', sv: 'url' },
     };
     expect([...walkLocalizedTexts(tree)]).toEqual([
-      { fi: 'a', en: 'b', se: '' },
+      { fi: 'a', en: 'b', sv: '' },
     ]);
   });
 });
@@ -56,15 +56,15 @@ describe('walkLocalizedTexts', () => {
 describe('clearSurveyLanguage', () => {
   it('empties only the given language in every localized node', () => {
     const obj = {
-      title: { fi: 'otsikko', en: 'title', se: 'rubrik' },
-      nested: { label: { fi: 'a', en: 'b', se: 'c' } },
-      options: [{ text: { fi: 'x', en: 'y', se: 'z' } }],
+      title: { fi: 'otsikko', en: 'title', sv: 'rubrik' },
+      nested: { label: { fi: 'a', en: 'b', sv: 'c' } },
+      options: [{ text: { fi: 'x', en: 'y', sv: 'z' } }],
     };
     clearSurveyLanguage(obj, 'en');
     expect(obj).toEqual({
-      title: { fi: 'otsikko', en: '', se: 'rubrik' },
-      nested: { label: { fi: 'a', en: '', se: 'c' } },
-      options: [{ text: { fi: 'x', en: '', se: 'z' } }],
+      title: { fi: 'otsikko', en: '', sv: 'rubrik' },
+      nested: { label: { fi: 'a', en: '', sv: 'c' } },
+      options: [{ text: { fi: 'x', en: '', sv: 'z' } }],
     });
   });
 
@@ -76,19 +76,19 @@ describe('clearSurveyLanguage', () => {
 
   it('leaves localizedMapUrls and non-localized values untouched', () => {
     const obj = {
-      title: { fi: 'a', en: 'b', se: 'c' },
-      localizedMapUrls: { fi: 'url', en: 'url', se: 'url' },
-      enabledLanguages: { fi: true, en: true, se: false },
+      title: { fi: 'a', en: 'b', sv: 'c' },
+      localizedMapUrls: { fi: 'url', en: 'url', sv: 'url' },
+      enabledLanguages: { fi: true, en: true, sv: false },
       author: 'Tester',
     };
     clearSurveyLanguage(obj, 'en');
-    expect(obj.localizedMapUrls).toEqual({ fi: 'url', en: 'url', se: 'url' });
-    expect(obj.enabledLanguages).toEqual({ fi: true, en: true, se: false });
+    expect(obj.localizedMapUrls).toEqual({ fi: 'url', en: 'url', sv: 'url' });
+    expect(obj.enabledLanguages).toEqual({ fi: true, en: true, sv: false });
     expect(obj.author).toBe('Tester');
   });
 
   it('mutates in place and returns the same reference', () => {
-    const obj = { title: { fi: 'a', en: 'b', se: 'c' } };
+    const obj = { title: { fi: 'a', en: 'b', sv: 'c' } };
     expect(clearSurveyLanguage(obj, 'en')).toBe(obj);
   });
 });
@@ -96,55 +96,55 @@ describe('clearSurveyLanguage', () => {
 describe('copySurveyLanguage', () => {
   it('moves the source onto the target by default, clearing the source', () => {
     const obj = {
-      title: { fi: 'otsikko', en: 'old', se: '' },
-      options: [{ text: { fi: 'vaihtoehto', en: 'old', se: '' } }],
+      title: { fi: 'otsikko', en: 'old', sv: '' },
+      options: [{ text: { fi: 'vaihtoehto', en: 'old', sv: '' } }],
     };
     copySurveyLanguage(obj, 'fi', 'en');
     expect(obj).toEqual({
-      title: { fi: '', en: 'otsikko', se: '' },
-      options: [{ text: { fi: '', en: 'vaihtoehto', se: '' } }],
+      title: { fi: '', en: 'otsikko', sv: '' },
+      options: [{ text: { fi: '', en: 'vaihtoehto', sv: '' } }],
     });
   });
 
   it('keeps the source intact when clearFrom is false', () => {
     const obj = {
-      title: { fi: 'otsikko', en: 'old', se: '' },
-      options: [{ text: { fi: 'vaihtoehto', en: 'old', se: '' } }],
+      title: { fi: 'otsikko', en: 'old', sv: '' },
+      options: [{ text: { fi: 'vaihtoehto', en: 'old', sv: '' } }],
     };
     copySurveyLanguage(obj, 'fi', 'en', false);
     expect(obj).toEqual({
-      title: { fi: 'otsikko', en: 'otsikko', se: '' },
-      options: [{ text: { fi: 'vaihtoehto', en: 'vaihtoehto', se: '' } }],
+      title: { fi: 'otsikko', en: 'otsikko', sv: '' },
+      options: [{ text: { fi: 'vaihtoehto', en: 'vaihtoehto', sv: '' } }],
     });
   });
 
   it('clears the target when the source is empty or missing', () => {
     const obj = {
-      empty: { fi: '', en: 'keep-me', se: '' },
+      empty: { fi: '', en: 'keep-me', sv: '' },
       missing: { fi: 'x', en: 'keep-me' } as Record<string, string>,
     };
-    copySurveyLanguage(obj, 'se', 'en', false);
+    copySurveyLanguage(obj, 'sv', 'en', false);
     expect(obj.empty.en).toBe('');
     expect(obj.missing.en).toBe('');
   });
 
   it('leaves localizedMapUrls and non-localized values untouched', () => {
     const obj = {
-      title: { fi: 'a', en: 'b', se: 'c' },
-      localizedMapUrls: { fi: 'fi-url', en: 'en-url', se: 'se-url' },
-      enabledLanguages: { fi: true, en: false, se: false },
+      title: { fi: 'a', en: 'b', sv: 'c' },
+      localizedMapUrls: { fi: 'fi-url', en: 'en-url', sv: 'se-url' },
+      enabledLanguages: { fi: true, en: false, sv: false },
     };
     copySurveyLanguage(obj, 'fi', 'en');
     expect(obj.localizedMapUrls).toEqual({
       fi: 'fi-url',
       en: 'en-url',
-      se: 'se-url',
+      sv: 'se-url',
     });
-    expect(obj.enabledLanguages).toEqual({ fi: true, en: false, se: false });
+    expect(obj.enabledLanguages).toEqual({ fi: true, en: false, sv: false });
   });
 
   it('mutates in place and returns the same reference', () => {
-    const obj = { title: { fi: 'a', en: 'b', se: 'c' } };
+    const obj = { title: { fi: 'a', en: 'b', sv: 'c' } };
     expect(copySurveyLanguage(obj, 'fi', 'en')).toBe(obj);
   });
 });
@@ -186,7 +186,7 @@ describe('on a realistic survey', () => {
     expect(radio.options[0].text.fi).toBe('');
     expect(radio.options[1].text.en).toBe('Vaihtoehto 2');
     // Map urls remain untouched
-    expect(survey.localizedMapUrls).toEqual({ fi: '', en: '', se: '' });
+    expect(survey.localizedMapUrls).toEqual({ fi: '', en: '', sv: '' });
   });
 
   it('copies Finnish onto English without clearing Finnish when clearFrom is false', () => {

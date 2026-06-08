@@ -5,7 +5,7 @@ export function A11yStatement() {
   const { search } = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(search), [search]);
   const surveyLanguage =
-    (queryParams.get('lang') as 'fi' | 'se' | 'en') || 'fi';
+    (queryParams.get('lang') as 'fi' | 'sv' | 'en') || 'fi';
 
   const translations = {
     fi: {
@@ -44,7 +44,7 @@ export function A11yStatement() {
         'Maps not intended for navigation purposes (e.g., weather or terrain maps)',
       ],
     },
-    se: {
+    sv: {
       title: 'Tillgänglighetsutlåtande',
       description:
         'Detta tillgänglighetsutlåtande gäller Kartalla-applikationen som tillhandahålls av Ubigu Oy.',

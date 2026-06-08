@@ -680,7 +680,7 @@ export interface SectionOptionGroup {
 /**
  * Supported language codes
  */
-export type LanguageCode = 'fi' | 'en' | 'se';
+export type LanguageCode = 'fi' | 'en' | 'sv';
 
 /**
  * Type for localization typing
