@@ -46,7 +46,7 @@
     "invalidFields": "Seuraavien kenttien arvot eivät ole sallittuja:",
     "validationError": {
       "survey.title": "Kyselyn otsikko asettamatta",
-      "survey.name": "Kyselyn nimi asettamatta",
+      "survey.name": "Kyselyn osoite asettamatta",
       "survey.author": "Kyselyn laatija/yhteyshenkilö asettamatta",
       "survey.mapUrl": "Oskari-karttajulkaisun osoite asettamatta"
     },
@@ -88,7 +88,6 @@
     "title": "Kyselyn otsikko",
     "subtitle": "Kyselyn aliotsikko",
     "description": "Kyselyn kuvaus",
-    "name": "Kyselyn nimi",
     "address": "Osoite",
     "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
     "author": "Kyselyn laatija/yhteyshenkilö",

@@ -149,7 +149,7 @@ export class SurveyEditPage extends BasePage {
     }
     await this._page.getByLabel('Kyselyn otsikko *').fill(params.title);
     await this._page.getByLabel('Kyselyn aliotsikko').fill(params.subtitle);
-    await this._page.getByLabel('Kyselyn nimi *').fill(params.urlName);
+    await this._page.getByLabel('Osoite *').fill(params.urlName);
     await this._page
       .getByRole('textbox', { name: 'Kyselyn laatija/yhteyshenkilö' })
       .fill(params.author);
@@ -230,7 +230,11 @@ export class SurveyEditPage extends BasePage {
   private async fillAdditionalInfo(question: Locator, additionalInfo?: string) {
     if (!additionalInfo) return;
     await question.getByLabel('Anna lisätietoja kysymykseen').check();
-    await question.getByLabel('Teksti').locator('div').nth(2).fill(additionalInfo);
+    await question
+      .getByLabel('Teksti')
+      .locator('div')
+      .nth(2)
+      .fill(additionalInfo);
   }
 
   /**
@@ -282,8 +286,12 @@ export class SurveyEditPage extends BasePage {
   ) {
     if (!limits) return;
     await question.getByLabel('Rajoita vastauslukumäärää').check();
-    await question.getByLabel('Vastauksia vähintään').fill(limits.min.toString());
-    await question.getByLabel('Vastauksia enintään').fill(limits.max.toString());
+    await question
+      .getByLabel('Vastauksia vähintään')
+      .fill(limits.min.toString());
+    await question
+      .getByLabel('Vastauksia enintään')
+      .fill(limits.max.toString());
   }
 
   private saveQuestion() {

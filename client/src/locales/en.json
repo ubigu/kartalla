@@ -46,7 +46,7 @@
     "invalidFields": "The following fields have invalid values:",
     "validationError": {
       "survey.title": "Survey title not set",
-      "survey.name": "Survey name not set",
+      "survey.name": "Survey address not set",
       "survey.author": "Survey author / contact person not set",
       "survey.mapUrl": "Oskari map publication URL not set"
     },
@@ -88,7 +88,6 @@
     "title": "Survey title",
     "subtitle": "Survey subtitle",
     "description": "Survey description",
-    "name": "Survey name",
     "address": "Address",
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",

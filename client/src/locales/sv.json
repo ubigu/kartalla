@@ -46,7 +46,7 @@
     "invalidFields": "Följande fält har ogiltiga värden:",
     "validationError": {
       "survey.title": "Undersökningens titel ej angiven",
-      "survey.name": "Undersökningens namn ej angivet",
+      "survey.name": "Undersökningens adress ej angiven",
       "survey.author": "Undersökningens författare/kontaktperson ej angiven",
       "survey.mapUrl": "Oskari-kartpubliceringens adress ej angiven"
     },
@@ -88,7 +88,6 @@
     "title": "Undersökningens titel",
     "subtitle": "Undersökningens undertitel",
     "description": "Undersökningens beskrivning",
-    "name": "Undersökningens namn",
     "address": "Adress",
     "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
     "author": "Undersökningens författare/kontaktperson",

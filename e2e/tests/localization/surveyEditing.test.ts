@@ -33,7 +33,7 @@ async function fillMandatoryBasicSettings(surveyEditPage: SurveyEditPage) {
   const page = surveyEditPage.page;
   await goToBasicSettings(page);
   await page.getByLabel('Kyselyn otsikko *').fill('Test survey title');
-  await page.getByLabel('Kyselyn nimi * ').fill(LOCALIZATION_URL_NAME);
+  await page.getByLabel('Osoite * ').fill(LOCALIZATION_URL_NAME);
   await page.getByLabel('Kyselyn laatija/yhteyshenkilö *').fill('Testaaja');
   await surveyEditPage.saveSurvey();
 }
