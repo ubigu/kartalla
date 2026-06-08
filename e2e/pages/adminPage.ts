@@ -20,7 +20,7 @@ export class SurveyAdminPage extends BasePage {
     });
     const publishButton = surveyItem.getByRole('button', { name: 'julkaise' });
     const unPublishButton = surveyItem.getByRole('button', {
-      name: 'Päätä kysely',
+      name: 'Päätä',
     });
 
     // Need to wait here because isVisible() does not wait for the element to be visible

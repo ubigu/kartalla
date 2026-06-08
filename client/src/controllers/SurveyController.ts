@@ -56,7 +56,7 @@ export async function getSurvey(id: number) {
  * Get all premade surveys
  */
 export async function getSurveys(
-  abortController?: AbortController,
+  abortController: AbortController | null,
   showAuthoredOnly?: boolean,
   showPublishedOnly?: boolean,
 ) {

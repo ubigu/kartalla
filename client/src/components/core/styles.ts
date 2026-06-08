@@ -1,9 +1,26 @@
 import { SxProps, Theme } from '@mui/material';
 import { CSSProperties } from 'react';
+import {
+  getBackgroundColor,
+  getBorderColor,
+  getBoxShadow,
+} from '@src/themes/colorHelpers';
 
 export const controlBorderRadius = '4px';
 export const dropdownBorderRadius = '8px';
 export const pillBorderRadius = '9999px';
+
+export const focusStyle = {
+  outline: '2px solid',
+  outlineColor: getBorderColor('focus'),
+  backgroundColor: getBackgroundColor('focus'),
+  boxShadow: getBoxShadow('focus'),
+};
+
+export const hoverStyle = {
+  borderColor: getBorderColor('hover'),
+  backgroundColor: getBackgroundColor('hover'),
+};
 
 export const visuallyHidden: CSSProperties = {
   position: 'absolute',

@@ -12,7 +12,12 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import CheckIcon from '../icons/CheckIcon';
 import ChevronDownSmallIcon from '../icons/ChevronDownSmallIcon';
 import { InputHelperText } from './InputHelperText';
-import { controlBorderRadius, dropdownBorderRadius } from './styles';
+import {
+  controlBorderRadius,
+  dropdownBorderRadius,
+  focusStyle,
+  hoverStyle,
+} from './styles';
 
 const paddingX = 6;
 const chevronWidth = 22;
@@ -383,22 +388,14 @@ export function Combobox_WIP<T extends string = string>(
             minHeight: '28px',
             backgroundColor: getBackgroundColor('default', !!error),
             border: '0.5px solid',
-            borderColor: isFocused
-              ? getBorderColor('focus')
-              : getBorderColor('default', !!error),
+            borderColor: getBorderColor('default', !!error),
             borderRadius: controlBorderRadius,
-            boxShadow: isFocused
-              ? getBoxShadow('focus')
-              : getBoxShadow('default', !!error),
+            boxShadow: getBoxShadow('default', !!error),
             transition: 'border-color 0.2s, background-color 0.2s',
             ...(disabled ? getDisabledInputStyles() : {}),
+            ...(isFocused && !error && !disabled ? focusStyle : {}),
             ...(!error && !disabled && !isFocused
-              ? {
-                  '&:hover': {
-                    borderColor: getBorderColor('hover'),
-                    backgroundColor: getBackgroundColor('hover'),
-                  },
-                }
+              ? { '&:hover': hoverStyle }
               : {}),
           }),
         }}
@@ -544,22 +541,9 @@ export function Combobox_WIP<T extends string = string>(
                     },
                     transition: 'border-color 0.2s, background-color 0.2s',
                     ...(disabled ? getDisabledInputStyles() : {}),
-                    '&:hover:not(:focus)':
-                      !error && !disabled
-                        ? {
-                            borderColor: getBorderColor('hover'),
-                            backgroundColor: getBackgroundColor('hover'),
-                          }
-                        : {},
-                    '&:focus-visible': !error
-                      ? {
-                          paddingLeft: `${paddingX - 1}px`,
-                          border: '2px solid',
-                          borderColor: getBorderColor('focus'),
-                          backgroundColor: getBackgroundColor('focus'),
-                          boxShadow: getBoxShadow('focus'),
-                        }
-                      : {},
+                    '&:hover:not(:focus-visible)':
+                      !error && !disabled ? hoverStyle : {},
+                    '&:focus-visible': !error ? focusStyle : {},
                   }),
             },
             ...(Array.isArray(sx) ? sx : [sx ?? {}]),

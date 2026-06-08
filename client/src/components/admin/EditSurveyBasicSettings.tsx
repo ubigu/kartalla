@@ -18,6 +18,7 @@ import {
   useWorkingLanguage,
   useWorkingLanguageInlineDescription,
 } from '@src/stores/WorkingLanguageContext';
+import { getPublicSurveyUrl } from '@src/utils/path';
 import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
 import fiLocale from 'date-fns/locale/fi';
@@ -76,7 +77,11 @@ export default function EditSurveyBasicSettings(props: Props) {
   const classes = useStyles();
   const theme = useTheme();
   const testSurveyUrl = useMemo(() => {
-    return `${window.location.origin}/${originalActiveSurvey.organization.name}/${originalActiveSurvey.name}/testi`;
+    return getPublicSurveyUrl(
+      originalActiveSurvey.organization.name,
+      originalActiveSurvey.name,
+      { test: true },
+    );
   }, [originalActiveSurvey.name]);
 
   const editingDisabled = !props.canEdit || activeSurveyLoading;
@@ -101,6 +106,7 @@ export default function EditSurveyBasicSettings(props: Props) {
     <>
       <Box
         sx={{
+          width: '600px',
           ...editPageContainerSx,
           ...(activeSurveyLoading && loadingPulse),
         }}
@@ -207,10 +213,22 @@ export default function EditSurveyBasicSettings(props: Props) {
           }
         />
         <Input
+          sx={{
+            '& .Input-inlineDescription': {
+              color: 'textSubtle.main',
+            },
+          }}
           required
           disabled={editingDisabled}
           error={validationErrors.includes('survey.name')}
-          label={tr.EditSurveyInfo.name}
+          label={tr.EditSurveyInfo.address}
+          inlineDescription={{
+            visible: getPublicSurveyUrl(
+              originalActiveSurvey.organization.name,
+              undefined,
+              { excludeProtocol: true },
+            ),
+          }}
           value={activeSurvey.name ?? ''}
           onChange={(event) => {
             editSurvey({

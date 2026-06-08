@@ -61,11 +61,14 @@ export default function EditSurveyTranslationsV2() {
   const enabledLanguages = supportedLanguages.filter(
     (lang) => activeSurvey.enabledLanguages[lang],
   );
+  const otherEnabledLanguages = enabledLanguages.filter(
+    (lang) => lang !== workingLanguage,
+  );
   const [columnLangs, setColumnLangs] = useState<LanguageCode[]>(
     enabledLanguages.filter((l) => l !== workingLanguage),
   );
   const [visibleColCount, setVisibleColCount] = useState(
-    supportedLanguages.length,
+    enabledLanguages.length,
   );
 
   const visibleCols = [
@@ -154,7 +157,7 @@ export default function EditSurveyTranslationsV2() {
             >
               <Select
                 value={String(visibleColCount)}
-                options={supportedLanguages.map((_, colIndex) => ({
+                options={enabledLanguages.map((_, colIndex) => ({
                   value: String(colIndex + 1),
                   label: `${colIndex + 1} ${colIndex === 0 ? tr.EditSurveyTranslations.column : tr.EditSurveyTranslations.columns}`,
                 }))}
@@ -196,25 +199,40 @@ export default function EditSurveyTranslationsV2() {
                   key={`${lang}-${colIdx}`}
                   sx={{ padding: '2px 8px' }}
                 >
-                  <Select
-                    value={lang}
-                    options={supportedLanguages
-                      .filter((l) => l !== workingLanguage)
-                      .map((langCode) => ({
+                  {otherEnabledLanguages.length <= 1 ? (
+                    <Typography
+                      sx={(theme) => ({
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: theme.palette.textSecondary.main,
+                        textAlign: 'left',
+                        height: '28px',
+                        lineHeight: '28px',
+                        padding: '0 6px',
+                      })}
+                    >
+                      {capitalizeFirst(tr.EditSurveyTranslations[lang])} ({lang}
+                      )
+                    </Typography>
+                  ) : (
+                    <Select
+                      value={lang}
+                      options={otherEnabledLanguages.map((langCode) => ({
                         value: langCode,
                         label: `${capitalizeFirst(tr.EditSurveyTranslations[langCode])} (${langCode})`,
                       }))}
-                    onChange={(value) => {
-                      const next = [...columnLangs];
-                      next[colIdx] = value as LanguageCode;
-                      setColumnLangs(next);
-                    }}
-                    sx={(theme) => ({
-                      width: '100%',
-                      fontWeight: 700,
-                      color: theme.palette.textSecondary.main,
-                    })}
-                  />
+                      onChange={(value) => {
+                        const next = [...columnLangs];
+                        next[colIdx] = value as LanguageCode;
+                        setColumnLangs(next);
+                      }}
+                      sx={(theme) => ({
+                        width: '100%',
+                        fontWeight: 700,
+                        color: theme.palette.textSecondary.main,
+                      })}
+                    />
+                  )}
                 </Box>
               ))}
           </Box>

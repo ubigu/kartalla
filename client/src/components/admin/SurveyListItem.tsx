@@ -1,12 +1,11 @@
 // @ts-strict-ignore
-import { LanguageCode, Survey } from '@interfaces/survey';
+import { EnabledLanguages, Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
-  Chip,
   Link,
   ListItem,
   Stack,
@@ -25,11 +24,16 @@ import {
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  isLanguage,
+  Language,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 
 import { CredentialsEntry } from '@interfaces/submission';
 import { theme } from '@src/themes/admin';
+import { getPublicSurveyUrl } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
@@ -37,6 +41,12 @@ import { NavLink, useRouteMatch } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
+import { Chip } from '../core/Chip';
+import BlockIcon from '../icons/BlockIcon';
+import CheckIcon from '../icons/CheckIcon';
+import CopyPlusIcon from '../icons/CopyPlusIcon';
+import FolderIcon from '../icons/FolderIcon';
+import SettingsIcon from '../icons/SettingsIcon';
 
 const fadeTimeout = 350;
 const CARD_BORDER_RADIUS = '8px';
@@ -97,6 +107,20 @@ const cardStyles = (theme: Theme, loading: boolean) => ({
   }),
 });
 
+function getTranslationLanguage(
+  uiLang: Language,
+  enabledSurveyLanguages: string[],
+) {
+  if (
+    enabledSurveyLanguages.includes(uiLang) ||
+    enabledSurveyLanguages.length === 0
+  )
+    return uiLang;
+  return isLanguage(enabledSurveyLanguages[0])
+    ? enabledSurveyLanguages[0]
+    : uiLang;
+}
+
 interface Props {
   survey: Survey;
   onArchive?: (surveyId: number) => void;
@@ -118,10 +142,12 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const { tr, language } = useTranslations();
-  const surveyLanguage =
-    (Object.entries(survey.enabledLanguages).find(
-      ([, enabled]) => enabled,
-    )?.[0] as LanguageCode) ?? language;
+  const surveyLanguage = getTranslationLanguage(
+    language,
+    Object.keys(survey.enabledLanguages).filter(
+      (lang) => survey.enabledLanguages[lang as keyof EnabledLanguages],
+    ),
+  );
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
@@ -144,14 +170,10 @@ export default function SurveyListItem(props: Props) {
     [activeUser, survey],
   );
 
-  const surveyUrl = useMemo(() => {
-    if (!survey.name) {
-      return null;
-    }
-    return `${window.location.protocol}//${window.location.hostname}${
-      window.location.port ? `:${window.location.port}` : ''
-    }/${survey.organization.name}/${survey.name}`;
-  }, [survey.name]);
+  const surveyUrl = useMemo(
+    () => getPublicSurveyUrl(survey.organization.name, survey.name),
+    [survey.name],
+  );
 
   return (
     <ListItem
@@ -185,133 +207,183 @@ export default function SurveyListItem(props: Props) {
       <Card sx={cardStyles(theme, loading)}>
         <BarberPoleBorder published={survey.isPublished} />
         <Box flex={1}>
-          <CardContent sx={{ paddingBottom: '8px' }}>
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
-              {!survey.title?.[surveyLanguage] ? (
-                <em>{tr.SurveyList.untitledSurvey}</em>
-              ) : (
-                (survey?.title?.[surveyLanguage] ?? '')
-              )}
-            </Typography>
+          <CardContent sx={{ paddingX: '8px', paddingY: '16px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="h5" component="h3" sx={{ fontWeight: 700 }}>
+                {!survey.title?.[surveyLanguage] ? (
+                  <em>{tr.SurveyList.untitledSurvey}</em>
+                ) : (
+                  (survey?.title?.[surveyLanguage] ?? '')
+                )}
+              </Typography>
+              <Box
+                sx={{ display: 'flex', gap: '2px', listStyle: 'none' }}
+                component={'ul'}
+              >
+                {Object.keys(survey.enabledLanguages)
+                  .filter(
+                    (lang) =>
+                      survey.enabledLanguages[lang as keyof EnabledLanguages],
+                  )
+                  .map((lang) => (
+                    <Box key={lang} component={'li'}>
+                      <Chip
+                        label={lang}
+                        sx={{
+                          height: '28px',
+                          width: '28px',
+                          borderRadius: '50%',
+                        }}
+                      />
+                    </Box>
+                  ))}
+              </Box>
+            </Box>
             {survey.subtitle?.[surveyLanguage] && (
-              <Typography color="textSecondary" component="p" gutterBottom>
+              <Typography
+                fontSize={'1.15rem'}
+                color="textSecondary.main"
+                component="p"
+              >
                 {survey.subtitle?.[surveyLanguage]}
               </Typography>
             )}
-            <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
-              {survey.tags.map((tag, i) => (
-                <Chip label={tag} key={i} />
-              ))}
-            </Box>
-            <Stack direction="row">
-              <div>
+            {survey.tags.length > 0 && (
+              <Box
+                rowGap={1}
+                columnGap={1}
+                sx={{ marginTop: '8px', flexWrap: 'wrap', display: 'flex' }}
+              >
+                {survey.tags.map((tag, i) => (
+                  <Chip label={tag} key={i} />
+                ))}
+              </Box>
+            )}
+            <Stack sx={{ gap: '4px' }}>
+              <Stack
+                sx={{
+                  flexDirection: 'row',
+                  marginTop: '8px',
+                  '& p': { fontSize: '0.875rem' },
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
                 <LinkSmallIcon
                   color="primary"
                   fontSize="small"
-                  sx={{ marginTop: 1, marginRight: 1 }}
+                  sx={{ fontSize: '14px' }}
                 />
-              </div>
-              {surveyUrl && (
-                <Typography variant="body1" color="textSecondary" gutterBottom>
-                  <Link
-                    href={`${surveyUrl}${
-                      survey.localisationEnabled
-                        ? '?lang=' + surveyLanguage
-                        : ''
-                    }`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {`${surveyUrl}${
-                      survey.localisationEnabled
-                        ? '?lang=' + surveyLanguage
-                        : ''
-                    }`}
-                  </Link>
-                  <CopyToClipboard
-                    data={`${surveyUrl}${
-                      survey.localisationEnabled
-                        ? '?lang=' + surveyLanguage
-                        : ''
-                    }`}
-                  />
-                </Typography>
-              )}
-            </Stack>
-            <Stack direction="row">
-              <div>
+                {surveyUrl && (
+                  <Typography variant="body1" color="textSecondary.main">
+                    <Link
+                      href={`${surveyUrl}${
+                        survey.localisationEnabled
+                          ? '?lang=' + surveyLanguage
+                          : ''
+                      }`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {`${surveyUrl}${
+                        survey.localisationEnabled
+                          ? '?lang=' + surveyLanguage
+                          : ''
+                      }`}
+                    </Link>
+                    <CopyToClipboard
+                      sx={{
+                        '& svg': {
+                          fontSize: '14px',
+                        },
+                      }}
+                      data={`${surveyUrl}${
+                        survey.localisationEnabled
+                          ? '?lang=' + surveyLanguage
+                          : ''
+                      }`}
+                    />
+                  </Typography>
+                )}
+              </Stack>
+              <Stack
+                direction="row"
+                sx={{
+                  '& p': { fontSize: '0.875rem' },
+                  gap: '8px',
+                  alignItems: 'center',
+                }}
+              >
                 <UserSmallIcon
                   color="primary"
                   fontSize="small"
-                  sx={{ marginTop: 0, marginRight: 1 }}
+                  sx={{ fontSize: '14px' }}
                 />
-              </div>
-              <Typography
-                variant="body1"
-                fontSize="bigger"
-                color="textSecondary"
-                gutterBottom
+                <Typography
+                  variant="body1"
+                  fontSize="bigger"
+                  color="textSecondary"
+                >
+                  {survey.author}
+                  {survey.authorUnit && `, ${survey.authorUnit}`}
+                </Typography>
+              </Stack>
+              <Stack
+                direction="row"
+                sx={{
+                  '& p': { fontSize: '0.875rem' },
+                  gap: '8px',
+                  alignItems: 'center',
+                }}
               >
-                {survey.author}
-                {survey.authorUnit && `, ${survey.authorUnit}`}
-              </Typography>
+                {/* Scheduling info (start/end dates) */}
+                <CalendarSmallIcon
+                  fontSize="small"
+                  color="primary"
+                  sx={{ fontSize: '14px' }}
+                />
+                {survey.startDate && survey.endDate ? (
+                  <Typography>
+                    {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')}{' '}
+                    - {format(survey.endDate, 'd.M.yyyy')}
+                  </Typography>
+                ) : survey.startDate ? (
+                  <Typography>
+                    {tr.SurveyList.openFrom}{' '}
+                    {format(survey.startDate, 'd.M.yyyy')}
+                  </Typography>
+                ) : null}
+                {/* Current publish status */}
+                {survey.isPublished ? (
+                  <Typography
+                    variant="published"
+                    color={'textInteractive'}
+                    sx={{
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {' '}
+                    - {tr.SurveyList.published}
+                  </Typography>
+                ) : (
+                  <Typography
+                    variant="published"
+                    color={'textInteractive'}
+                    sx={{
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {' '}
+                    - {tr.SurveyList.notPublished}
+                  </Typography>
+                )}
+              </Stack>
             </Stack>
-
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              {/* Scheduling info (start/end dates) */}
-              <CalendarSmallIcon
-                fontSize="small"
-                color="primary"
-                sx={{ marginRight: 1 }}
-              />
-              {survey.startDate && survey.endDate ? (
-                <Typography
-                  variant="body1"
-                  color="textInteractive"
-                  gutterBottom
-                >
-                  {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
-                  {format(survey.endDate, 'd.M.yyyy')}
-                </Typography>
-              ) : survey.startDate ? (
-                <Typography
-                  variant="body1"
-                  color="textInteractive"
-                  gutterBottom
-                >
-                  {tr.SurveyList.openFrom}{' '}
-                  {format(survey.startDate, 'd.M.yyyy')}
-                </Typography>
-              ) : null}
-              {/* Current publish status */}
-              {survey.isPublished ? (
-                <Typography
-                  variant="published"
-                  color={'textInteractive'}
-                  sx={{
-                    paddingLeft: '0.5rem',
-                  }}
-                >
-                  {' '}
-                  - {tr.SurveyList.published}
-                </Typography>
-              ) : (
-                <Typography
-                  variant="published"
-                  color={'textInteractive'}
-                  sx={{
-                    paddingLeft: '0.5rem',
-                  }}
-                >
-                  {' '}
-                  - {tr.SurveyList.notPublished}
-                </Typography>
-              )}
-            </div>
           </CardContent>
           <CardActions
             style={{
               paddingTop: '0',
+              paddingBottom: '14px',
               width: '100%',
               display: 'flex',
               flexDirection: 'row',
@@ -319,6 +391,7 @@ export default function SurveyListItem(props: Props) {
             }}
           >
             <Button
+              startIcon={<SettingsIcon stroke="currentColor" />}
               component={NavLink}
               to={`${url}kyselyt/${survey.id}`}
               disabled={disableUsersViewAccessToSurvey}
@@ -334,6 +407,7 @@ export default function SurveyListItem(props: Props) {
             {/* Allow publish only if it isn't yet published, has a name, and is not archived */}
             {!survey.isPublished && survey.name && !survey.isArchived && (
               <Button
+                startIcon={<CheckIcon />}
                 disabled={disableUsersWriteAccessToSurvey}
                 onClick={() => {
                   setPublishConfirmDialogOpen(true);
@@ -345,6 +419,7 @@ export default function SurveyListItem(props: Props) {
             {/* Allow unpublish when survey is published and is not archived */}
             {survey.isPublished && !survey.isArchived && (
               <Button
+                startIcon={<BlockIcon />}
                 disabled={disableUsersWriteAccessToSurvey}
                 onClick={() => {
                   setUnpublishConfirmDialogOpen(true);
@@ -354,6 +429,7 @@ export default function SurveyListItem(props: Props) {
               </Button>
             )}
             <Button
+              startIcon={<CopyPlusIcon />}
               disabled={disableUsersViewAccessToSurvey}
               onClick={async () => {
                 props.onCopyStart?.();
@@ -364,7 +440,7 @@ export default function SurveyListItem(props: Props) {
               }}
             >
               {' '}
-              {tr.SurveyList.copySurvey}{' '}
+              {tr.SurveyList.duplicateSurvey}{' '}
             </Button>
 
             {(activeUserIsSuperUser ||
@@ -372,6 +448,7 @@ export default function SurveyListItem(props: Props) {
               survey.editors.includes(activeUser?.id) ||
               activeUser?.id === survey.authorId) && (
               <LoadingButton
+                startIcon={<FolderIcon />}
                 onClick={async () => {
                   if (survey.isArchived) {
                     try {
