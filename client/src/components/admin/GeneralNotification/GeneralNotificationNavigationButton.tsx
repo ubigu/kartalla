@@ -25,8 +25,8 @@ export function GeneralNotificationNavigationButton() {
             component="span"
             sx={(theme) => ({
               position: 'absolute',
-              top: '12px',
-              right: '0',
+              top: '5px',
+              right: '-2px',
               boxShadow: theme.shadows[1],
               width: '7px',
               height: '7px',
