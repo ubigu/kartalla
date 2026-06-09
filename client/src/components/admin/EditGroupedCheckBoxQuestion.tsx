@@ -16,6 +16,7 @@ import { makeStyles } from '@mui/styles';
 import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import AddIcon from '../icons/AddIcon';
@@ -52,7 +53,8 @@ export default function EditGroupedCheckBoxQuestion({
 }: Props) {
   const [openedGroupId, setOpenedGroupId] = useState<number>(null);
 
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const classes = useStyles();
 
   return (
@@ -168,7 +170,7 @@ export default function EditGroupedCheckBoxQuestion({
                       ref={provided.innerRef}
                       key={group.id}
                       className={classes.accordion}
-                      data-testId={`group-${index}-${
+                      data-testid={`group-${index}-${
                         openedGroupId === group.id ? 'expanded' : 'collapsed'
                       }`}
                       expanded={openedGroupId === group.id}
@@ -182,7 +184,7 @@ export default function EditGroupedCheckBoxQuestion({
                         id={`group-${index}-header`}
                       >
                         <Typography style={{ flexGrow: 1 }}>
-                          {group.name[surveyLanguage] || (
+                          {group.name[workingLanguage] || (
                             <em>
                               {tr.EditGroupedCheckBoxQuestion.untitledGroup}
                             </em>
@@ -200,10 +202,10 @@ export default function EditGroupedCheckBoxQuestion({
                           autoFocus
                           disabled={disabled}
                           label={tr.EditGroupedCheckBoxQuestion.groupName}
-                          value={group.name[surveyLanguage]}
+                          value={group.name[workingLanguage]}
                           variant="standard"
                           onChange={(event) => {
-                            group.name[surveyLanguage] = event.target.value;
+                            group.name[workingLanguage] = event.target.value;
                             onChange({
                               ...section,
                             });
@@ -263,7 +265,7 @@ export default function EditGroupedCheckBoxQuestion({
                 ...section.groups,
                 {
                   id,
-                  name: { fi: '', se: '', en: '' },
+                  name: { fi: '', sv: '', en: '' },
                   options: [],
                 },
               ],

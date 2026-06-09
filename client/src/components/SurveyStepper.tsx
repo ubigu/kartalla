@@ -161,7 +161,7 @@ export default function SurveyStepper({
     getAllLayers,
   } = useSurveyMap();
   const classes = useStyles();
-  const { tr, language, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [visiblePages, setVisiblePages] = useState<number[]>(getVisiblePages());
@@ -448,12 +448,12 @@ export default function SurveyStepper({
 
   function getConditionalPageTitle(page: SurveyPage) {
     if (visiblePages.includes(page.id)) {
-      return page.title?.[surveyLanguage];
+      return page.title?.[language];
     }
     if (pageConditionsPassed(page)) {
-      return `${page.title?.[surveyLanguage]} (${tr.SurveyStepper.conditionalPageNotActivated})`;
+      return `${page.title?.[language]} (${tr.SurveyStepper.conditionalPageNotActivated})`;
     }
-    return `${page.title?.[surveyLanguage]} (${tr.SurveyStepper.conditionalPage})`;
+    return `${page.title?.[language]} (${tr.SurveyStepper.conditionalPage})`;
   }
   const stepperPane = (
     <>
@@ -463,7 +463,6 @@ export default function SurveyStepper({
           (langEnabled) => langEnabled,
         ).length > 1 && (
           <SurveyLanguageMenu
-            changeUILanguage={true}
             style={{
               position: 'absolute',
               top: '1rem',
@@ -473,7 +472,7 @@ export default function SurveyStepper({
           />
         )}
       <main>
-        <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
+        <h1 style={{ marginLeft: '1rem' }}>{survey.title[language]}</h1>
 
         <Stepper
           className={classes.stepper}
@@ -562,7 +561,7 @@ export default function SurveyStepper({
                 <FormControl style={{ width: '100%' }} component="fieldset">
                   {currentPage.sidebar.imageUrl && (
                     <img
-                      alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                      alt={currentPage.sidebar?.imageAltText?.[language]}
                       src={`/api/file/${currentPage.sidebar?.imageUrl}`}
                       style={visuallyHidden}
                     />
@@ -681,7 +680,7 @@ export default function SurveyStepper({
         <Link
           sx={(theme) => ({ color: theme.palette.textInteractive.main })}
           underline="hover"
-          href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
+          href={`/saavutettavuusseloste?lang=${language}`}
           target="_blank"
         >
           {tr.FooterLinks.accessibility}
@@ -690,7 +689,7 @@ export default function SurveyStepper({
           <Link
             sx={(theme) => ({ color: theme.palette.textInteractive.main })}
             underline="hover"
-            href={`/tietosuojaseloste?lang=${surveyLanguage}`}
+            href={`/tietosuojaseloste?lang=${language}`}
             target="_blank"
           >
             {tr.FooterLinks.privacyStatement}
@@ -713,10 +712,10 @@ export default function SurveyStepper({
           />
         ) : (
           <SurveyOskariMap
-            key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount if the map URL changes
+            key={survey.localizedMapUrls[language]} // Force re-mount if the map URL changes
             pageId={currentPage.id}
             defaultMapView={currentPage.sidebar?.defaultMapView}
-            url={survey.localizedMapUrls[surveyLanguage]}
+            url={survey.localizedMapUrls[language]}
             layers={currentPage.sidebar.mapLayers}
           />
         );
@@ -743,7 +742,7 @@ export default function SurveyStepper({
                       : null
                 }
                 aria-hidden={true}
-                alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                alt={currentPage.sidebar?.imageAltText?.[language]}
                 src={`/api/file/${currentPage.sidebar?.imageUrl}`}
               />
             )}
@@ -774,7 +773,7 @@ export default function SurveyStepper({
       default:
         return <div />;
     }
-  }, [survey, currentPage.sidebar, surveyLanguage]);
+  }, [survey, currentPage.sidebar, language]);
 
   return (
     <div className={getClassList([classes.root, loading && classes.loading])}>
@@ -896,12 +895,7 @@ export default function SurveyStepper({
             {survey.localisationEnabled &&
               Object.values(survey.enabledLanguages).filter(
                 (langEnabled) => langEnabled,
-              ).length > 1 && (
-                <SurveyLanguageMenu
-                  changeUILanguage={true}
-                  style={{ flexGrow: 0 }}
-                />
-              )}
+              ).length > 1 && <SurveyLanguageMenu style={{ flexGrow: 0 }} />}
           </Paper>
           <Drawer
             anchor="top"

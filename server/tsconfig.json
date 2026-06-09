@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "nodeNext",
     "moduleResolution": "nodenext",
+    "target": "es2022",
     "isolatedModules": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { useEffect } from 'react';
 
 interface Props {
@@ -31,7 +32,8 @@ export default function EditSliderQuestion({
   disabled,
   onChange,
 }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   const classes = useStyles();
 
@@ -97,15 +99,15 @@ export default function EditSliderQuestion({
           <TextField
             label={tr.EditSliderQuestion.minValue}
             value={
-              section.minLabel?.[surveyLanguage] ??
-              tr.EditSliderQuestion.defaultTranslatedMinLabel?.[surveyLanguage]
+              section.minLabel?.[workingLanguage] ??
+              tr.EditSliderQuestion.defaultTranslatedMinLabel?.[workingLanguage]
             }
             onChange={(event) => {
               onChange({
                 ...section,
                 minLabel: {
                   ...section.maxLabel,
-                  [surveyLanguage]: event.target.value,
+                  [workingLanguage]: event.target.value,
                 },
               });
             }}
@@ -113,15 +115,15 @@ export default function EditSliderQuestion({
           <TextField
             label={tr.EditSliderQuestion.maxValue}
             value={
-              section.maxLabel?.[surveyLanguage] ??
-              tr.EditSliderQuestion.defaultTranslatedMaxLabel?.[surveyLanguage]
+              section.maxLabel?.[workingLanguage] ??
+              tr.EditSliderQuestion.defaultTranslatedMaxLabel?.[workingLanguage]
             }
             onChange={(event) => {
               onChange({
                 ...section,
                 maxLabel: {
                   ...section.maxLabel,
-                  [surveyLanguage]: event.target.value,
+                  [workingLanguage]: event.target.value,
                 },
               });
             }}

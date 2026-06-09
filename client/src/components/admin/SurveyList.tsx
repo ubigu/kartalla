@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { Survey } from '@interfaces/survey';
 import {
   FormControlLabel,
@@ -56,7 +55,7 @@ export default function SurveyList() {
   const history = useHistory();
 
   useEffect(() => {
-    let abortController = new AbortController();
+    let abortController: AbortController | null = new AbortController();
     async function updateSurveys() {
       try {
         setSurveys(

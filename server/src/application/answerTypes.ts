@@ -25,7 +25,7 @@ export interface DBAnswerEntry {
   value_option_id: number;
   value_numeric: number;
   created_at: Date;
-  option_text: string;
+  option_text: LocalizedText;
   option_group_index: number;
   map_layers: (number | string)[];
 }
@@ -55,7 +55,7 @@ export interface AnswerEntry {
   createdAt: Date;
   groupIndex: number | null;
   optionIndex: number | null;
-  optionText?: string;
+  optionText?: LocalizedText;
   mapLayers: (number | string)[];
 }
 

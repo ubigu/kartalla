@@ -1,7 +1,10 @@
 import { LanguageCode } from '@interfaces/survey';
 import { MenuItem, Select, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  supportedLanguages,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { CSSProperties } from 'react';
 import LanguageIcon from './icons/LanguageIcon';
 
@@ -19,7 +22,7 @@ const useStyles = makeStyles({
 });
 
 export default function LanguageMenu({ style }: Props) {
-  const { tr, setLanguage, languages, language } = useTranslations();
+  const { tr, setLanguage, language } = useTranslations();
   const classes = useStyles();
 
   return (
@@ -40,16 +43,13 @@ export default function LanguageMenu({ style }: Props) {
           sx={{
             color: 'inherit',
             '&>.MuiSelect-select': {
-              // Accommodate the larger globe icon
               paddingRight: '38px !important',
             },
             '&>fieldset': {
-              // Visual label not used, hide border and legend
               borderWidth: 0,
               '&>legend': { display: 'none' },
             },
             '&>.MuiSvgIcon-root': {
-              // The component is used in admin panel and survey, must adapt
               color: 'inherit',
               fill: 'currentColor',
               position: 'absolute',
@@ -59,7 +59,7 @@ export default function LanguageMenu({ style }: Props) {
             },
           }}
         >
-          {languages.map((lang, index) => (
+          {supportedLanguages.map((lang, index) => (
             <MenuItem
               key={`lang-item-${index}`}
               value={lang}

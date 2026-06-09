@@ -66,7 +66,6 @@ export function getDisabledInputStyles() {
   return {
     backgroundColor: 'surfaceSubtle.main',
     color: 'textSubtle.main',
-    cursor: 'not-allowed',
     '&::placeholder': { color: 'textSubtle.main', opacity: 1 },
     '&:hover:not(:focus)': {},
   } as const;

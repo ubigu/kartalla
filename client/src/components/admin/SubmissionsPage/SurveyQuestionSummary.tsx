@@ -3,6 +3,7 @@ import { SurveyQuestion } from '@interfaces/survey';
 import { Box, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { isSurveyQuestion } from '@src/utils/typeCheck';
 import { Dispatch, SetStateAction } from 'react';
 import { PageQuestionList } from './PageQuestionList';
@@ -13,7 +14,8 @@ interface Props {
 
 export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <>
@@ -24,7 +26,7 @@ export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {
               '{x}',
               String(index + 1),
             )}{' '}
-            {page.title[surveyLanguage]}
+            {page.title[workingLanguage]}
           </Typography>
           <PageQuestionList
             handleClick={(question: SurveyQuestion) =>

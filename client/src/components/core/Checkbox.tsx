@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
+import { controlBorderRadius } from './styles';
 
 interface IconProps {
   backgroundColor?: string;
@@ -17,7 +18,7 @@ const iconBaseStyle = (backgroundColor?: string) => {
     backgroundColor: backgroundColor ?? palette.surfaceInput.main,
     width: '28px',
     height: '28px',
-    borderRadius: '4px',
+    borderRadius: controlBorderRadius,
     boxShadow: '0px 1px 2px 0px #59788626 inset',
     border: `0.5px solid ${palette.borderSubtle.main}`,
   };
@@ -59,9 +60,10 @@ export function Checkbox({ label, sx, checkboxBackground, ...props }: Props) {
       disableRipple
       sx={{
         paddingY: 0,
-        '&:hover .icon-wrapper, &:focus .icon-wrapper': {
-          backgroundColor: `${palette.surfaceSubtle.dark} !important`,
-        },
+        '&:hover:not(.Mui-disabled) .icon-wrapper, &:focus:not(.Mui-disabled) .icon-wrapper':
+          {
+            backgroundColor: `${palette.surfaceSubtle.dark} !important`,
+          },
       }}
       size="large"
       checkedIcon={<CheckedIcon backgroundColor={checkboxBackground} />}

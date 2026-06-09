@@ -1,8 +1,16 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { BASE_URL } from './utils/config';
 
 const config: PlaywrightTestConfig = {
   globalSetup: './utils/globalSetup',
-  retries: 1,
+  globalTeardown: './utils/globalTeardown',
+  // The heavy survey tests (create/answer all question types) exceed the
+  // default 30s budget on slower engines (Edge, WebKit). Give them headroom.
+  timeout: 60 * 1000,
+  use: {
+    locale: 'fi-FI',
+    baseURL: BASE_URL,
+  },
   projects: [
     {
       name: 'Chrome',

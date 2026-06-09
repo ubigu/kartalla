@@ -8,24 +8,21 @@ import {
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.slider);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.slider, ['fi']);
 const sliderNumberQuestion = getSliderQuestionDataNumber(PAGE_NAME);
 const sliderStringQuestion = getSliderQuestionDataString(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Slider question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('number variant', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('number variant', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createSliderQuestion(sliderNumberQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -42,11 +39,9 @@ test.describe('Slider question', () => {
     ).toBeVisible();
   });
 
-  test('string variant', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('string variant', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createSliderQuestion(sliderStringQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

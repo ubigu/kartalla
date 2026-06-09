@@ -18,6 +18,7 @@ import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 
 import { SvgIconSelect } from '@src/components/admin/SvgIconSelect';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { createRef, useEffect, useMemo } from 'react';
 
 const styles = {
@@ -59,7 +60,8 @@ export function GeoBudgetTargets({
   disabled,
   onChange,
 }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -135,12 +137,12 @@ export function GeoBudgetTargets({
                   variant="standard"
                   disabled={disabled}
                   size="small"
-                  value={target.name?.[surveyLanguage] ?? ''}
+                  value={target.name?.[workingLanguage] ?? ''}
                   onChange={(event) =>
                     updateTarget(index, {
                       name: {
                         ...target.name,
-                        [surveyLanguage]: event.target.value,
+                        [workingLanguage]: event.target.value,
                       },
                     })
                   }

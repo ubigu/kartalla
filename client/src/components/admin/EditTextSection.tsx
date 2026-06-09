@@ -1,4 +1,5 @@
 import { SurveyTextSection } from '@interfaces/survey';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
 import ColorSelect from './ColorSelect';
@@ -14,7 +15,8 @@ export default function EditTextSection({
   disabled,
   onChange,
 }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <>
@@ -27,12 +29,12 @@ export default function EditTextSection({
       />
       <RichTextEditor
         disabled={disabled}
-        value={section.body[surveyLanguage]}
+        value={section.body[workingLanguage]}
         label={tr.EditTextSection.text}
         onChange={(value) =>
           onChange({
             ...section,
-            body: { ...section.body, [surveyLanguage]: value },
+            body: { ...section.body, [workingLanguage]: value },
           })
         }
       />

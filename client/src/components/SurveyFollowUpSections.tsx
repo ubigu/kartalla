@@ -28,7 +28,7 @@ function FollowUpSectionAnswers({
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
 }) {
-  const { surveyLanguage } = useTranslations();
+  const { language } = useTranslations();
   const answerEntry = answerEntries.find(
     (entry) => entry.sectionId === section.id,
   );
@@ -38,7 +38,7 @@ function FollowUpSectionAnswers({
       {section.type === 'map' ? (
         <>
           <Typography variant="followUpSectionTitle">
-            {section.title?.[surveyLanguage]}
+            {section.title?.[language]}
           </Typography>
           {(answerEntry as SubmissionAnswerEntry & { type: 'map' }).value.map(
             (item) =>

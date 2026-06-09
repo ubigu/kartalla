@@ -45,10 +45,10 @@
     "saveFailedAnswerSubmitted": "Enkätens svar förhindrar att ändringarna sparas.",
     "invalidFields": "Följande fält har ogiltiga värden:",
     "validationError": {
-      "survey.title": "Undersökningens titel",
-      "survey.name": "Undersökningens namn",
-      "survey.author": "Undersökningens författare/kontaktperson",
-      "survey.mapUrl": "Oskari-kartpubliceringens adress"
+      "survey.title": "Undersökningens titel ej angiven",
+      "survey.name": "Undersökningens adress ej angiven",
+      "survey.author": "Undersökningens författare/kontaktperson ej angiven",
+      "survey.mapUrl": "Oskari-kartpubliceringens adress ej angiven"
     },
     "toFrontPage": "Tillbaka till adminpanelen",
     "basicSettings": "Undersökningens grundinställningar",
@@ -80,13 +80,15 @@
     "content": "Innehåll",
     "multilingualism": "Flerspråkighet",
     "manageTranslations": "Hantera översättningar",
+    "languageSettings": "Språkinställningar",
+    "languageSettingsNotConfirmed": "Språkinställningar ej bekräftade",
     "developedBy": "Kartalla-enkättjänsten utvecklas av Ubigu Oy"
   },
   "EditSurveyInfo": {
     "title": "Undersökningens titel",
     "subtitle": "Undersökningens undertitel",
     "description": "Undersökningens beskrivning",
-    "name": "Undersökningens namn",
+    "address": "Adress",
     "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
     "author": "Undersökningens författare/kontaktperson",
     "authorUnit": "Författarens enhet",
@@ -107,6 +109,7 @@
     "availableMapLayers": "Tillgängliga kartlager:",
     "startDate": "Startdatum",
     "endDate": "Slutdatum",
+    "selectDate": "Välj datum...",
     "selectDateAndTime": "Välj datum och tid",
     "theme": "Tema",
     "selectTheme": "Välj tema",
@@ -438,12 +441,12 @@
     "defaultMinLabel": "Helt oenig",
     "defaultMaxLabel": "Helt enig",
     "defaultTranslatedMinLabel": {
-      "se": "Helt oense",
+      "sv": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
-      "se": "Helt enig",
+      "sv": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },
@@ -522,13 +525,14 @@
       "frontPage": "Enkäter"
     },
     "errorFetchingSurveys": "Ett fel uppstod vid hämtning av enkäter. Försök igen senare.",
-    "editSurvey": "Redigera enkät",
-    "viewSurvey": "Visa enkät",
+    "editSurvey": "Redigera",
+    "viewSurvey": "Detaljer",
+    "settings": "Inställningar",
     "publishNow": "Publicera nu",
     "confirmPublish": "Vill du verkligen publicera enkäten?",
     "publishSuccessful": "Enkäten har publicerats!",
     "publishFailed": "Det uppstod ett fel vid publiceringen av enkäten. Försök igen senare.",
-    "unpublish": "Avsluta enkät",
+    "unpublish": "Avsluta",
     "confirmUnpublish": "Vill du verkligen avsluta enkäten?",
     "unpublishSuccessful": "Enkäten har avslutats!",
     "unpublishFailed": "Det uppstod ett fel vid avslutningen av enkäten. Försök igen senare.",
@@ -541,9 +545,10 @@
     "openFrom": "Öppen från",
     "published": "Publicerad",
     "notPublished": "Ej publicerad",
+    "noPublishDate": "Inget publiceringsdatum angivet",
     "showAuthoredOnly": "Visa bara mina enkäter",
     "showPublishedOnly": "Visa bara öppna enkäter",
-    "copySurvey": "Kopiera",
+    "duplicateSurvey": "Duplicera",
     "answers": "Svar",
     "archiveLabel": "Arkiv",
     "activeLabel": "Aktiva",
@@ -762,7 +767,7 @@
     "changeLanguage": "Byt språk för tjänsten",
     "fi": "Suomi",
     "en": "English",
-    "se": "Svenska"
+    "sv": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Språk",
@@ -770,22 +775,47 @@
     "surveyLanguage": "Enkätens språk",
     "workingLanguage": "Arbetsspråk",
     "answerLanguage": "Svarsspråk",
-    "multilingual": "Flerspråkig",
-    "workingLanguageHelperText": "På vilket språk bygger du enkäten? Om enkäten är flerspråkig kan du byta arbetsspråk och ange enkätens information och innehåll på olika språk."
+    "multilingual": "Enkäten är flerspråkig",
+    "multilingualOption": "Flerspråkig",
+    "workingLanguageHelperText": "På vilket språk bygger du enkäten? Om enkäten är flerspråkig, välj också vilka språk som stöds i enkäten.",
+    "confirmLanguageSettings": "Bekräfta språkinställningar",
+    "discardLanguageChanges": "Ignorera språkändringar",
+    "workingLanguageInputLabel": "Språk",
+    "initialSettingsTitle": "Språkinställningar för ny enkät",
+    "initialSettingsDescription": "Du skapar en ny enkät. Låt oss börja med att ställa in språkinställningarna.",
+    "workingLanguageSelectLabel": "På vilket språk arbetar du med enkäten",
+    "multilingualQuestion": "Planerar du att lägga till översättningar i enkäten?",
+    "monolingualPrefix": "Enkäten publiceras endast på",
+    "multilingualRadioLabel": "Enkäten översätts till flera språk",
+    "initialSettingsFootnote": "Du kan redigera och komplettera språkinställningarna senare under Språkinställningar.",
+    "translationsEntered": "översättningar angivna",
+    "deleteTranslations": "Ta bort översättningar...",
+    "enteredTranslations": "Angivna översättningar",
+    "supportedLanguagesLabel": "Språk som stöds i enkäten",
+    "moveContentDialogTitle": "Flytta nuvarande språkinnehåll?",
+    "moveContentDialogPart1": "Vill du flytta det nuvarande innehållet lagt till på",
+    "moveContentDialogPart2": "till språket",
+    "dontMove": "Flytta inte",
+    "move": "Flytta",
+    "languageNames": {
+      "fi": "finska",
+      "en": "engelska",
+      "sv": "svenska"
+    }
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
     "provideTranslations": "Om enkäten publiceras på flera språk, måste all text i enkäten översättas till dessa språk. Ange översättningar för varje saknad post i listan nedan.",
     "surveyInformation": "Grundinställningar för enkäten",
     "copyTextFields": "Kopiera översättningsbara fält till Urklipp",
-    "supportedLanguages": "Språk som stöds i enkäten",
+    "supportedLanguages": "Språk som stöds",
     "surveyPages": "Enkätens sidor",
     "surveyTitle": "Enkätens rubrik",
     "surveySubtitle": "Enkätens underrubrik",
     "surveyDescription": "Enkätens beskrivning",
     "fi": "Finska",
     "en": "Engelska",
-    "se": "Svenska",
+    "sv": "Svenska",
     "page": "sida",
     "missingTranslation": "Översättning saknas",
     "optionInfo": "Ytterligare information om alternativet",
@@ -957,11 +987,16 @@
   "OlMap": {
     "layerFetchError": "Det gick inte att läsa in kartlager. Standardkartan används."
   },
+  "TranslationProvider": {
+    "loadingTranslations": "Laddar översättningar"
+  },
   "ApiResponses": {
     "NO_ANSWERS_FOUND": "Inga svar hittades.",
     "NO_ANSWERS_AVAILABLE": "Inga svar tillgängliga.",
     "NO_ATTACHMENTS_AVAILABLE": "Inga bilagor tillgängliga.",
     "USER_NOT_PERMITTED_TO_VIEW": "Användaren är inte skapare, redaktör eller granskare av enkäten.",
-    "USER_NOT_PERMITTED_TO_EDIT": "Användaren är inte skapare eller redaktör av enkäten."
+    "USER_NOT_PERMITTED_TO_EDIT": "Användaren är inte skapare eller redaktör av enkäten.",
+    "DUPLICATE_SURVEY_NAME": "En enkät med samma namn finns redan. Välj ett annat namn och försök igen.",
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Enkätens svar förhindrar att ändringarna sparas."
   }
 }

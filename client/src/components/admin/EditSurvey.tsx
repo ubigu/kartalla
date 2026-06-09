@@ -1,10 +1,11 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { usePreventUnload } from '@src/hooks/usePreventUnload';
-import { useSurvey } from '@src/stores/SurveyContext';
+import { hasEnabledLanguages, useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import { useEffect } from 'react';
+import { WorkingLanguageProvider } from '@src/stores/WorkingLanguageContext';
+import { useEffect, useState } from 'react';
 import {
   Redirect,
   Route,
@@ -13,36 +14,54 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
+import { VisualSeparator } from '../core/VisualSeparator';
 import EditSurveyAppearance from './EditSurveyAppearance';
 import EditSurveyBasicSettings from './EditSurveyBasicSettings';
 import EditSurveyControls from './EditSurveyControls';
 import EditSurveyEmail from './EditSurveyEmail';
 import EditSurveyHeader from './EditSurveyHeader';
+import { EditSurveyLanguages } from './EditSurveyLanguages';
 import EditSurveyPage from './EditSurveyPage';
 import EditSurveyPermissions from './EditSurveyPermissions';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslationsV2 from './EditSurveyTranslationsV2';
+import Loader from './Loader';
 import { EditSurveyMapData } from './map/EditSurveyMapData';
+
+export const innerContentMaxWidth = '800px';
 
 export const editPageContainerSx = {
   display: 'flex',
   flexDirection: 'column' as const,
   gap: '36px',
-  minWidth: 'fit-content',
-  maxWidth: 'min(55em, 70%)',
+  maxWidth: 'min(55em, 70vw)',
 };
+
+export const editSurveyPaths = {
+  basicSettings: 'perusasetukset',
+  languageSettings: 'kieliasetukset',
+  permissions: 'käyttäjäoikeudet',
+  appearance: 'ulkoasu',
+  mapData: 'kartta-aineistot',
+  emails: 'sähköpostit',
+  pages: 'sivut',
+  thanksPage: 'kiitos-sivu',
+  translations: 'käännökset',
+} as const;
 
 export default function EditSurvey() {
   const { path, url } = useRouteMatch();
   const { surveyId } = useParams<{ surveyId: string }>();
+  const [isEditable, setIsEditable] = useState<boolean | null>(null);
   const {
     fetchSurveyToContext,
     activeSurveyLoading,
     activeSurvey,
     hasActiveSurveyChanged,
   } = useSurvey();
-  const { tr, setSurveyLanguage } = useTranslations();
+
+  const { tr, language } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
   const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
@@ -56,7 +75,6 @@ export default function EditSurvey() {
       (activeUser && activeSurvey.editors.includes(activeUser?.id))),
   );
 
-  // Prevent page unload when there are unsaved changes
   usePreventUnload(
     allowEditing && hasActiveSurveyChanged,
     tr.EditSurvey.preventUnloadConfirm,
@@ -78,37 +96,38 @@ export default function EditSurvey() {
     fetchSurvey();
   }, [surveyId]);
 
-  useEffect(() => {
-    if (activeSurvey?.primaryLanguage) {
-      setSurveyLanguage(activeSurvey.primaryLanguage);
-    }
-  }, [activeSurvey?.id]);
+  if (!activeSurvey || String(activeSurvey.id) !== surveyId) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {activeSurveyLoading ? (
+          <CircularProgress />
+        ) : (
+          <Typography variant="body1">
+            {tr.EditSurvey.errorFetchingSurvey}
+          </Typography>
+        )}
+      </Box>
+    );
+  }
 
-  return !activeSurvey || String(activeSurvey.id) !== surveyId ? (
-    <Box
-      sx={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {activeSurveyLoading ? (
-        <CircularProgress />
-      ) : (
-        <Typography variant="body1">
-          {tr.EditSurvey.errorFetchingSurvey}
-        </Typography>
-      )}
-    </Box>
-  ) : (
-    <>
+  const checkingAnswers =
+    path.includes(editSurveyPaths.pages) && isEditable === null;
+
+  return (
+    <WorkingLanguageProvider survey={activeSurvey} uiLanguage={language}>
       <EditSurveyHeader />
       <Box
         sx={{
           display: 'flex',
           height: 'calc(min(100svh, 100vh) - 64px)',
-          flexDirection: 'row-reverse', // So that h1 header comes before subheaders at dom
+          flexDirection: 'row-reverse',
         }}
       >
         <Box
@@ -120,42 +139,65 @@ export default function EditSurvey() {
             p: '24px',
           }}
         >
-          <Switch>
-            <Route path={`${path}/perusasetukset`}>
-              <EditSurveyBasicSettings canEdit={allowEditing} />
-            </Route>
-            <Route path={`${path}/käyttäjäoikeudet`}>
-              <EditSurveyPermissions canEdit={allowEditing} />
-            </Route>
-            <Route path={`${path}/ulkoasu`}>
-              <EditSurveyAppearance canEdit={allowEditing} />
-            </Route>
-            <Route path={`${path}/kartta-aineistot`}>
-              <EditSurveyMapData />
-            </Route>
-            <Route path={`${path}/sähköpostit`}>
-              <EditSurveyEmail />
-            </Route>
-            <Route path={`${path}/sivut/:pageId`}>
-              <EditSurveyPage canEdit={allowEditing} />
-            </Route>
-            <Route path={`${path}/kiitos-sivu`}>
-              <EditSurveyThanksPage canEdit={allowEditing} />
-            </Route>
-            {activeSurvey.localisationEnabled && (
-              <Route path={`${path}/käännökset`}>
-                <EditSurveyTranslationsV2 />
+          <Stack
+            sx={{
+              gap: '24px',
+              width: 'fit-content',
+            }}
+          >
+            <Switch>
+              <Route path={`${path}/${editSurveyPaths.basicSettings}`}>
+                <EditSurveyBasicSettings canEdit={allowEditing} />
               </Route>
+              <Route path={`${path}/${editSurveyPaths.languageSettings}`}>
+                <EditSurveyLanguages canEdit={allowEditing} />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.permissions}`}>
+                <EditSurveyPermissions canEdit={allowEditing} />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.appearance}`}>
+                <EditSurveyAppearance canEdit={allowEditing} />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.mapData}`}>
+                <EditSurveyMapData canEdit={allowEditing} />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.emails}`}>
+                <EditSurveyEmail canEdit={allowEditing} />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.pages}/:pageId`}>
+                {checkingAnswers && (
+                  <Loader label={tr.EditSurveyPage.fetchingSubmissions} />
+                )}
+                <EditSurveyPage
+                  canEdit={allowEditing}
+                  isEditable={isEditable}
+                  onEditableChange={setIsEditable}
+                />
+              </Route>
+              <Route path={`${path}/${editSurveyPaths.thanksPage}`}>
+                <EditSurveyThanksPage canEdit={allowEditing} />
+              </Route>
+              {activeSurvey.localisationEnabled && (
+                <Route path={`${path}/${editSurveyPaths.translations}`}>
+                  <EditSurveyTranslationsV2 />
+                </Route>
+              )}
+              <Route path="*">
+                <Redirect to={`${url}/${editSurveyPaths.basicSettings}`} />
+              </Route>
+            </Switch>
+            {!checkingAnswers && (
+              <>
+                <VisualSeparator />
+                <EditSurveyControls
+                  disabled={!allowEditing || !hasEnabledLanguages(activeSurvey)}
+                />
+              </>
             )}
-            <Route path="*">
-              {/* By default redirect to basic settings */}
-              <Redirect to={`${url}/perusasetukset`} />
-            </Route>
-          </Switch>
-          {allowEditing && <EditSurveyControls />}
+          </Stack>
         </Box>
         <EditSurveySideBar allowEditing={allowEditing} />
       </Box>
-    </>
+    </WorkingLanguageProvider>
   );
 }

@@ -16,6 +16,7 @@ import {
   SurveyPageConditions,
 } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
 import { useParams } from 'react-router-dom';
 import { ConditionRow } from './ConditionRow';
@@ -122,9 +123,9 @@ function SurveyPageCondition({
 
 export function EditSurveyPageConditions() {
   const { activeSurvey } = useSurvey();
-  const { surveyLanguage } = useTranslations();
-  const { editPage } = useSurvey();
   const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+  const { editPage } = useSurvey();
 
   const { pageId } = useParams<{
     pageId: string;
@@ -283,13 +284,13 @@ export function EditSurveyPageConditions() {
                 >
                   <Typography>{`${
                     previousNonConditionalPages[question.pageIndex].title[
-                      surveyLanguage
+                      workingLanguage
                     ] === ''
                       ? tr.EditSurvey.untitledPage
                       : previousNonConditionalPages[question.pageIndex].title[
-                          surveyLanguage
+                          workingLanguage
                         ]
-                  }: ${question.title[surveyLanguage]}`}</Typography>
+                  }: ${question.title[workingLanguage]}`}</Typography>
                 </MenuItem>
               ))}
             </Select>

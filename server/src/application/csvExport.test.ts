@@ -68,7 +68,7 @@ describe('getCSVFile', () => {
         'Time of the response',
         'Response language',
       ],
-      ['se', 'Svarsid', 'Svarstid', 'Svarsspråk'],
+      ['sv', 'Svarsid', 'Svarstid', 'Svarsspråk'],
     ] as const)(
       'uses translated meta column headers for lang=%s',
       async (lang, submissionId, responseTime, responseLanguage) => {
@@ -93,7 +93,7 @@ describe('getCSVFile', () => {
     it.each([
       ['fi', 'Suomalainen kysymys', 'Vaihtoehto A'],
       ['en', 'English question', 'Option A'],
-      ['se', 'Svensk fråga', 'Alternativ A'],
+      ['sv', 'Svensk fråga', 'Alternativ A'],
     ] as const)(
       'uses the correct language for question titles and option labels for lang=%s',
       async (lang, expectedTitle, expectedOption) => {
@@ -102,9 +102,9 @@ describe('getCSVFile', () => {
           title: {
             fi: 'Suomalainen kysymys',
             en: 'English question',
-            se: 'Svensk fråga',
+            sv: 'Svensk fråga',
           },
-          text: { fi: 'Vaihtoehto A', en: 'Option A', se: 'Alternativ A' },
+          text: { fi: 'Vaihtoehto A', en: 'Option A', sv: 'Alternativ A' },
         };
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
           makeRadioRow(1, 10, 99),
@@ -121,7 +121,7 @@ describe('getCSVFile', () => {
   });
 
   describe('sorting question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'header and data use correct language for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -139,7 +139,7 @@ describe('getCSVFile', () => {
   });
 
   describe('matrix question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'header uses correct language for title and subject for lang=%s',
       async (lang) => {
         const header = {
@@ -196,7 +196,7 @@ describe('getCSVFile', () => {
   });
 
   describe('multi-matrix question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'header uses correct language for title, subject and class for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -221,7 +221,7 @@ describe('getCSVFile', () => {
   });
 
   describe('budgeting question', () => {
-    it.each(['fi', 'en', 'se'] as const)(
+    it.each(['fi', 'en', 'sv'] as const)(
       'header uses correct language for title and target name for lang=%s',
       async (lang) => {
         vi.mocked(getAnswerDBEntries).mockResolvedValueOnce([
@@ -433,7 +433,7 @@ describe('getCSVFile', () => {
             askPhone: false,
             askAddress: false,
             askCustom: false,
-            customLabel: { fi: '', en: '', se: '' },
+            customLabel: { fi: '', en: '', sv: '' },
           },
         }),
       ]);
@@ -455,7 +455,7 @@ describe('getCSVFile', () => {
             askPhone: false,
             askAddress: true,
             askCustom: false,
-            customLabel: { fi: '', en: '', se: '' },
+            customLabel: { fi: '', en: '', sv: '' },
           },
         }),
       ]);
@@ -477,7 +477,7 @@ describe('getCSVFile', () => {
             askPhone: false,
             askAddress: false,
             askCustom: true,
-            customLabel: { fi: 'Extra info', en: '', se: '' },
+            customLabel: { fi: 'Extra info', en: '', sv: '' },
           },
         }),
       ]);
@@ -499,7 +499,7 @@ describe('getCSVFile', () => {
             askPhone: true,
             askAddress: false,
             askCustom: false,
-            customLabel: { fi: '', en: '', se: '' },
+            customLabel: { fi: '', en: '', sv: '' },
           },
         }),
       ]);
@@ -526,7 +526,7 @@ describe('getCSVFile', () => {
             askPhone: false,
             askAddress: false,
             askCustom: false,
-            customLabel: { fi: '', en: '', se: '' },
+            customLabel: { fi: '', en: '', sv: '' },
           },
         }),
       ]);

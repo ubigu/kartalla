@@ -157,7 +157,7 @@ async function generateScreenshots({
           );
           return typeof layer?.name === 'string'
             ? layer.name
-            : (layer?.name?.['fi'] ?? null);
+            : (layer?.name?.[language] ?? layer?.name?.['fi'] ?? null);
         })
         .filter(Boolean),
     });

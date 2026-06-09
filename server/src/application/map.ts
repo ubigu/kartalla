@@ -50,7 +50,7 @@ export async function getAvailableOskariMapLayers(
   const oskariLanguage = {
     fi: 'fi',
     en: 'en',
-    se: 'sv',
+    sv: 'sv',
   }[language];
 
   // Separate query parameters and possible trailing slash

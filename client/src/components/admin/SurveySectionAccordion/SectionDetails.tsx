@@ -13,6 +13,7 @@ import RichTextEditor from '@src/components/RichTextEditor';
 import { NewLineIcon } from '@src/components/icons/NewLineIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 
 interface Props {
@@ -36,7 +37,8 @@ export function SectionDetails({
   setDeleteConfirmDialogOpen,
   pageId,
 }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   const { addFollowUpSection } = useSurvey();
   // Sequence for making each follow-up section ID unique before they're added to database
   const [followUpSectionSequence, setFollowUpSectionSequence] = useState(-1);
@@ -60,14 +62,14 @@ export function SectionDetails({
         autoFocus
         disabled={disabled}
         label={tr.EditSurveyPage.title}
-        value={section.title?.[surveyLanguage] ?? null}
+        value={section.title?.[workingLanguage] ?? null}
         variant="standard"
         onChange={(event) => {
           handleEdit({
             ...section,
             title: {
               ...section.title,
-              [surveyLanguage]: event.target.value,
+              [workingLanguage]: event.target.value,
             },
           });
         }}
@@ -95,12 +97,12 @@ export function SectionDetails({
       </FormGroup>
       {section.showInfo && (
         <RichTextEditor
-          value={section.info?.[surveyLanguage] ?? ''}
+          value={section.info?.[workingLanguage] ?? ''}
           label={tr.EditTextSection.text}
           onChange={(value) =>
             handleEdit({
               ...section,
-              info: { ...section.info, [surveyLanguage]: value },
+              info: { ...section.info, [workingLanguage]: value },
             })
           }
         />

@@ -1,6 +1,10 @@
 import { Box, Typography, useTheme } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  useWorkingLanguage,
+  useWorkingLanguageInlineDescription,
+} from '@src/stores/WorkingLanguageContext';
 import { Input } from '../core/Input';
 import { loadingPulse } from '../core/styles';
 import RichTextEditor from '../RichTextEditor';
@@ -13,7 +17,10 @@ interface Props {
 
 export default function EditSurveyThanksPage({ canEdit = true }: Props) {
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+  const workingLanguageInlineDescription =
+    useWorkingLanguageInlineDescription();
   const theme = useTheme();
 
   return (
@@ -28,7 +35,9 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
       </Typography>
       <Input
         label={tr.EditSurveyThanksPage.title}
-        value={activeSurvey.thanksPage?.title?.[surveyLanguage] ?? ''}
+        disabled={!canEdit || activeSurveyLoading}
+        inlineDescription={workingLanguageInlineDescription}
+        value={activeSurvey.thanksPage?.title?.[workingLanguage] ?? ''}
         onChange={(event) => {
           editSurvey({
             ...activeSurvey,
@@ -36,15 +45,19 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
               ...activeSurvey.thanksPage,
               title: {
                 ...activeSurvey.thanksPage.title,
-                [surveyLanguage]: event.target.value,
+                [workingLanguage]: event.target.value,
               },
             },
           });
         }}
       />
       <RichTextEditor
+        wrapperStyle={{
+          minWidth: '540px',
+        }}
         label={tr.EditSurveyThanksPage.text}
-        value={activeSurvey.thanksPage.text?.[surveyLanguage] ?? ''}
+        disabled={!canEdit || activeSurveyLoading}
+        value={activeSurvey.thanksPage.text?.[workingLanguage] ?? ''}
         editorStyle={{ background: theme.palette.surfaceInput.main }}
         onChange={(value) => {
           editSurvey({
@@ -53,7 +66,7 @@ export default function EditSurveyThanksPage({ canEdit = true }: Props) {
               ...activeSurvey.thanksPage,
               text: {
                 ...activeSurvey.thanksPage.text,
-                [surveyLanguage]: value,
+                [workingLanguage]: value,
               },
             },
           });

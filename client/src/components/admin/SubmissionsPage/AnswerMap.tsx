@@ -7,7 +7,7 @@ import {
   SurveyPageSection,
   SurveyQuestion,
 } from '@interfaces/survey';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { Feature as GeojsonFeature } from 'geojson';
 import { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
@@ -77,7 +77,7 @@ export default function AnswerMap({
   surveyQuestions,
   questions,
 }: Props) {
-  const { surveyLanguage } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   function holdsMapQuestions(question: SurveyQuestion) {
     if (!question) return false;
 
@@ -233,8 +233,8 @@ export default function AnswerMap({
     <>
       {survey.mapProvider === 'oskari' ? (
         <OskariMap
-          key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount on URL change
-          url={survey.localizedMapUrls[surveyLanguage]}
+          key={survey.localizedMapUrls[workingLanguage]} // Force re-mount on URL change
+          url={survey.localizedMapUrls[workingLanguage]}
           layers={layers}
           features={features}
           onFeatureClick={(feature) => {

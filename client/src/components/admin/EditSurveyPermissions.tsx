@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../stores/UserContext';
 import { Combobox_WIP } from '../core/Combobox';
 import { loadingPulse } from '../core/styles';
-import { editPageContainerSx } from './EditSurvey';
+import { editPageContainerSx, innerContentMaxWidth } from './EditSurvey';
 
 interface Props {
   canEdit: boolean;
@@ -69,6 +69,7 @@ export default function EditSurveyPermissions(props: Props) {
       </Typography>
 
       <Combobox_WIP
+        wrapperSx={{ maxWidth: innerContentMaxWidth }}
         label={tr.EditSurveyInfo.userGroups}
         helperText={tr.EditSurveyInfo.userGroupsHelperText}
         options={availableUserGroups.map((group) => ({
@@ -76,7 +77,7 @@ export default function EditSurveyPermissions(props: Props) {
           label: group.name,
         }))}
         multiselect
-        disabled={surveyUserGroupEditingDisabled()}
+        disabled={surveyUserGroupEditingDisabled() || !props.canEdit}
         value={activeSurvey.userGroups}
         onMultiChange={(value) => {
           editSurvey({
@@ -87,6 +88,7 @@ export default function EditSurveyPermissions(props: Props) {
       />
 
       <Combobox_WIP
+        wrapperSx={{ maxWidth: innerContentMaxWidth }}
         label={tr.EditSurveyInfo.editors}
         helperText={tr.EditSurveyInfo.editorsHelperText}
         options={(
@@ -106,6 +108,7 @@ export default function EditSurveyPermissions(props: Props) {
         }}
       />
       <Combobox_WIP
+        wrapperSx={{ maxWidth: innerContentMaxWidth }}
         label={tr.EditSurveyInfo.viewers}
         helperText={tr.EditSurveyInfo.viewersHelperText}
         options={(

@@ -9,9 +9,10 @@ import ColorIndicator from './ColorIndicator';
 interface Props {
   value: number | null;
   onChange: (theme: SurveyTheme | null) => void;
+  disabled?: boolean;
 }
 
-export default function ThemeSelect({ value, onChange }: Props) {
+export default function ThemeSelect({ value, onChange, disabled }: Props) {
   const [loading, setLoading] = useState(true);
   const [themes, setThemes] = useState<SurveyTheme[]>([]);
 
@@ -50,7 +51,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
     <Select
       id="theme"
       label={tr.EditSurveyInfo.theme}
-      disabled={loading}
+      disabled={loading || disabled}
       placeholder={tr.EditSurveyInfo.selectTheme}
       value={loading || value == null ? '-1' : String(value)}
       onChange={(selectedValue) => {

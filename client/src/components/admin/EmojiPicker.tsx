@@ -11,7 +11,7 @@ export function EmojiPicker({ onSelect }: Props) {
   const { tr, language } = useTranslations();
   return (
     <Frimousse.Root
-      locale={language === 'se' ? 'sv' : language}
+      locale={language}
       onEmojiSelect={({ emoji }) => {
         onSelect(emoji);
       }}

@@ -12,6 +12,12 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import CheckIcon from '../icons/CheckIcon';
 import ChevronDownSmallIcon from '../icons/ChevronDownSmallIcon';
 import { InputHelperText } from './InputHelperText';
+import {
+  controlBorderRadius,
+  dropdownBorderRadius,
+  focusStyle,
+  hoverStyle,
+} from './styles';
 
 const paddingX = 6;
 const chevronWidth = 22;
@@ -76,7 +82,7 @@ function ComboboxListbox<T extends string>(props: ComboboxListboxProps<T>) {
         backgroundColor: 'surfacePrimary.main',
         border: '0.5px solid',
         borderColor: 'borderSubtle.main',
-        borderRadius: '8px',
+        borderRadius: dropdownBorderRadius,
         borderTopRightRadius: 0,
         borderTopLeftRadius: 0,
         borderTop: 'none',
@@ -382,23 +388,14 @@ export function Combobox_WIP<T extends string = string>(
             minHeight: '28px',
             backgroundColor: getBackgroundColor('default', !!error),
             border: '0.5px solid',
-            borderColor: isFocused
-              ? getBorderColor('focus')
-              : getBorderColor('default', !!error),
-            borderRadius: '3px',
-            boxShadow: isFocused
-              ? getBoxShadow('focus')
-              : getBoxShadow('default', !!error),
+            borderColor: getBorderColor('default', !!error),
+            borderRadius: controlBorderRadius,
+            boxShadow: getBoxShadow('default', !!error),
             transition: 'border-color 0.2s, background-color 0.2s',
-            cursor: disabled ? 'not-allowed' : undefined,
             ...(disabled ? getDisabledInputStyles() : {}),
+            ...(isFocused && !error && !disabled ? focusStyle : {}),
             ...(!error && !disabled && !isFocused
-              ? {
-                  '&:hover': {
-                    borderColor: getBorderColor('hover'),
-                    backgroundColor: getBackgroundColor('hover'),
-                  },
-                }
+              ? { '&:hover': hoverStyle }
               : {}),
           }),
         }}
@@ -417,7 +414,7 @@ export function Combobox_WIP<T extends string = string>(
                   backgroundColor: 'surfacePrimary.main',
                   outline: '1px solid',
                   outlineColor: 'borderSubtle.main',
-                  borderRadius: '4px',
+                  borderRadius: controlBorderRadius,
                   padding: '1px 4px 1px 6px',
                   fontSize: '12px',
                   color: theme.palette.harmaa.main,
@@ -512,7 +509,6 @@ export function Combobox_WIP<T extends string = string>(
               color: theme.palette.harmaa.main,
               outline: 'none',
               textOverflow: 'ellipsis',
-              cursor: disabled ? 'not-allowed' : undefined,
               ...(multiselect
                 ? {
                     flex: 1,
@@ -534,7 +530,7 @@ export function Combobox_WIP<T extends string = string>(
                     backgroundColor: getBackgroundColor('default', !!error),
                     border: '0.5px solid',
                     borderColor: getBorderColor('default', !!error),
-                    borderRadius: '3px',
+                    borderRadius: controlBorderRadius,
                     padding: `0 ${paddingX + chevronWidth}px 0 ${paddingX}px`,
                     boxShadow: getBoxShadow('default', !!error),
                     width: '100%',
@@ -545,22 +541,9 @@ export function Combobox_WIP<T extends string = string>(
                     },
                     transition: 'border-color 0.2s, background-color 0.2s',
                     ...(disabled ? getDisabledInputStyles() : {}),
-                    '&:hover:not(:focus)':
-                      !error && !disabled
-                        ? {
-                            borderColor: getBorderColor('hover'),
-                            backgroundColor: getBackgroundColor('hover'),
-                          }
-                        : {},
-                    '&:focus-visible': !error
-                      ? {
-                          paddingLeft: `${paddingX - 1}px`,
-                          border: '2px solid',
-                          borderColor: getBorderColor('focus'),
-                          backgroundColor: getBackgroundColor('focus'),
-                          boxShadow: getBoxShadow('focus'),
-                        }
-                      : {},
+                    '&:hover:not(:focus-visible)':
+                      !error && !disabled ? hoverStyle : {},
+                    '&:focus-visible': !error ? focusStyle : {},
                   }),
             },
             ...(Array.isArray(sx) ? sx : [sx ?? {}]),
@@ -576,7 +559,7 @@ export function Combobox_WIP<T extends string = string>(
             transition: 'transform 0.15s',
             display: 'flex',
             color: 'primary.main',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            cursor: disabled ? undefined : 'pointer',
           }}
           onClick={() => {
             if (!disabled) isOpen ? close() : open();

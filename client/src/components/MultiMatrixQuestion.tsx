@@ -85,7 +85,7 @@ export default function MultiMatrixQuestion({
   setBackdropOpen,
   readOnly = false,
 }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
   const [componentState, setComponentState] = useState<ComponentState>({
     isOverflow: false,
@@ -204,7 +204,7 @@ export default function MultiMatrixQuestion({
     if (valueList[0] === '-1') {
       return tr.MatrixQuestion.emptyAnswer;
     }
-    return question.classes[Number(valueList[0])]?.[surveyLanguage];
+    return question.classes[Number(valueList[0])]?.[language];
   }
 
   const answerLimitText = useMemo(() => {
@@ -222,7 +222,7 @@ export default function MultiMatrixQuestion({
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);
-  }, [question.answerLimits, surveyLanguage]);
+  }, [question.answerLimits, language]);
 
   const unAnsweredRowsText = useMemo(() => {
     if (!question.answerLimits) {
@@ -299,7 +299,7 @@ export default function MultiMatrixQuestion({
           </FormHelperText>
           {validationErrors && validationErrors.includes('answerLimits') && (
             <FormHelperText style={visuallyHidden} role="alert">
-              {`${question.title?.[surveyLanguage]}, ${answerLimitText}\n${unAnsweredRowsText}`}
+              {`${question.title?.[language]}, ${answerLimitText}\n${unAnsweredRowsText}`}
             </FormHelperText>
           )}
         </>
@@ -317,7 +317,7 @@ export default function MultiMatrixQuestion({
                       key={index.toString()}
                       sx={{ ...styles.matrixCell, ...styles.matrixText }}
                     >
-                      {entry?.[surveyLanguage] ?? index}
+                      {entry?.[language] ?? index}
                     </TableCell>
                   );
                 })}
@@ -348,7 +348,7 @@ export default function MultiMatrixQuestion({
                         ...styles.matrixText,
                       }}
                     >
-                      {subject?.[surveyLanguage]}
+                      {subject?.[language]}
                     </TableCell>
                     {question.classes.map((_entry, classIndex) => {
                       return (
@@ -446,7 +446,7 @@ export default function MultiMatrixQuestion({
           <Table size="small">
             {question.title && (
               <caption style={visuallyHidden}>
-                {question.title?.[surveyLanguage]}
+                {question.title?.[language]}
               </caption>
             )}
             <TableHead>
@@ -488,7 +488,7 @@ export default function MultiMatrixQuestion({
                         ...styles.stickyLeft,
                       }}
                     >
-                      {subject?.[surveyLanguage]}
+                      {subject?.[language]}
                     </TableCell>
 
                     <TableCell>
@@ -532,7 +532,7 @@ export default function MultiMatrixQuestion({
                                   classIndex.toString(),
                                 )}
                               />
-                              {entry?.[surveyLanguage]}
+                              {entry?.[language]}
                             </MenuItem>
                           ))}
                           {question.allowEmptyAnswer && (
@@ -580,7 +580,7 @@ export default function MultiMatrixQuestion({
                     fontSize: '0.875rem',
                   }}
                 >
-                  {subject?.[surveyLanguage]}
+                  {subject?.[language]}
                 </FormLabel>
                 <Select
                   onOpen={() => setBackdropOpen(true)}
@@ -616,7 +616,7 @@ export default function MultiMatrixQuestion({
                           classIndex.toString(),
                         )}
                       />
-                      {entry?.[surveyLanguage]}
+                      {entry?.[language]}
                     </MenuItem>
                   ))}
                   {question.allowEmptyAnswer && (

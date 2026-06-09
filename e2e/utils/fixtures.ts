@@ -1,21 +1,30 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test as base, Browser, chromium, Page } from '@playwright/test';
 import { SurveyAdminPage } from '../pages/adminPage';
+import { BasePage } from '../pages/basePage';
 import { PublishedSurveyPage } from '../pages/publishedSurveyPage';
 import { SurveyEditPage, SurveyParams } from '../pages/surveyEditPage';
-import { createSurveyViaApi } from './api';
+import { postSurvey } from './api';
+import { BASE_URL } from './config';
 import { deleteSurveyById } from './db';
 
 interface PageFixtures {
+  basePage: BasePage;
   surveyEditPage: SurveyEditPage;
   surveyAdminPage: SurveyAdminPage;
   surveyPage: PublishedSurveyPage;
+  /** Input params for the `surveyData` fixture; set per file via `test.use()`. */
+  surveyParams: SurveyParams | undefined;
+  /** A survey created via the API before each test and deleted afterwards. */
+  surveyData: SurveyParams & { id: string };
   workerShortcuts: {
     createWorkerSurvey: (surveyData: SurveyParams) => Promise<SurveyParams>;
   };
   shortcuts: {
-    createSurveyViaApi: (surveyData: SurveyParams) => Promise<SurveyParams>;
-    deleteSurvey: () => Promise<void>;
+    createSurveyViaApi: (
+      surveyData: SurveyParams,
+    ) => Promise<SurveyParams & { id: string }>;
+    deleteSurvey: (surveyId: string) => Promise<void>;
     publishAndStartSurvey: (
       surveyTitle: string,
       surveyUrlName: string,
@@ -36,11 +45,14 @@ interface AxeFixture {
 async function createDesktopEditPage(
   browser: Browser,
   browserName: string,
+  locale?: string,
 ): Promise<Page> {
   const contextOptions = {
+    baseURL: BASE_URL,
     viewport: { width: 1280, height: 720 } as const,
     isMobile: false,
     hasTouch: false,
+    ...(locale && { locale }),
   };
   const context =
     browserName !== 'chromium'
@@ -60,25 +72,46 @@ function getWorkerSurveyParams(
   };
 }
 
+/** Builds a desktop SurveyEditPage whose `setLocale` recreates the page in-place. */
+async function makeSurveyEditPage(
+  browser: Browser,
+  browserName: string,
+): Promise<SurveyEditPage> {
+  const pageFactory = (locale: string) =>
+    createDesktopEditPage(browser, browserName, locale);
+  const page = await createDesktopEditPage(browser, browserName);
+  return new SurveyEditPage(page, undefined, pageFactory);
+}
+
 export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
   workerSurveyEditPage: [
     async ({ browser, browserName }, use) => {
-      await use(
-        new SurveyEditPage(await createDesktopEditPage(browser, browserName)),
-      );
+      await use(await makeSurveyEditPage(browser, browserName));
     },
     { scope: 'worker' },
   ],
   surveyEditPage: async ({ browser, browserName }, use) => {
-    await use(
-      new SurveyEditPage(await createDesktopEditPage(browser, browserName)),
-    );
+    await use(await makeSurveyEditPage(browser, browserName));
+  },
+  basePage: async ({ page }, use) => {
+    await use(new BasePage(page));
   },
   surveyAdminPage: async ({ page }, use) => {
     await use(new SurveyAdminPage(page));
   },
   surveyPage: async ({ page }, use) => {
     await use(new PublishedSurveyPage(page));
+  },
+  surveyParams: [undefined, { option: true }],
+  surveyData: async ({ shortcuts, surveyParams }, use) => {
+    if (!surveyParams) {
+      throw new Error(
+        'The `surveyData` fixture requires `surveyParams` to be set via test.use({ surveyParams }).',
+      );
+    }
+    const created = await shortcuts.createSurveyViaApi(surveyParams);
+    await use(created);
+    await shortcuts.deleteSurvey(created.id);
   },
   makeAxeBuilder: async ({ page }, use) => {
     const makeAxeBuilder = (include: string) =>
@@ -103,23 +136,16 @@ export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
       },
     });
   },
-  shortcuts: async (
-    { surveyEditPage, surveyAdminPage, surveyPage },
-    use,
-    workerInfo,
-  ) => {
+  shortcuts: async ({ surveyAdminPage, surveyPage }, use, workerInfo) => {
     const { workerIndex } = workerInfo;
     await use({
       async createSurveyViaApi(surveyData: SurveyParams) {
         const prefixed = getWorkerSurveyParams(surveyData, workerIndex);
-        const id = await createSurveyViaApi(prefixed);
-        surveyEditPage.surveyId = id;
-        await surveyEditPage.goto();
-        return prefixed;
+        const id = await postSurvey(prefixed);
+        return { ...prefixed, id };
       },
-      async deleteSurvey() {
-        const id = surveyEditPage.surveyId;
-        if (id) await deleteSurveyById(id);
+      async deleteSurvey(surveyId: string) {
+        await deleteSurveyById(surveyId);
       },
       /** Publishes and starts a survey with provided title */
       async publishAndStartSurvey(surveyTitle: string, surveyUrlName: string) {

@@ -12,7 +12,7 @@ interface Props {
 
 export default function TextSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
-  const { surveyLanguage } = useTranslations();
+  const { language } = useTranslations();
 
   return (
     <>
@@ -23,23 +23,23 @@ export default function TextSection({ section, isFollowUp = false }: Props) {
           alignItems: 'center',
         }}
       >
-        {section.title?.[surveyLanguage] && (
+        {section.title?.[language] && (
           <Typography
             variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
             sx={{ color: survey?.sectionTitleColor, margin: 0 }}
           >
-            {section.title?.[surveyLanguage]}
+            {section.title?.[language]}
           </Typography>
         )}
-        {section.info && section.info?.[surveyLanguage] && (
+        {section.info && section.info?.[language] && (
           <SectionInfo
-            infoText={section.info?.[surveyLanguage]}
-            subject={section.title?.[surveyLanguage]}
+            infoText={section.info?.[language]}
+            subject={section.title?.[language]}
           />
         )}
       </div>
       <div style={{ color: section.bodyColor }}>
-        <MarkdownView>{section.body?.[surveyLanguage]}</MarkdownView>
+        <MarkdownView>{section.body?.[language]}</MarkdownView>
       </div>
     </>
   );

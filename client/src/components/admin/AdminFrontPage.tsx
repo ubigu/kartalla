@@ -16,6 +16,7 @@ export default function AdminFrontPage() {
           p: 3,
           height: '100vh',
           overflowY: 'auto',
+          scrollbarGutter: 'stable',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

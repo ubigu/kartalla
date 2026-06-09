@@ -5,7 +5,7 @@ export function DataProtectionStatement() {
   const { search } = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(search), [search]);
   const surveyLanguage =
-    (queryParams.get('lang') as 'fi' | 'se' | 'en') || 'fi';
+    (queryParams.get('lang') as 'fi' | 'sv' | 'en') || 'fi';
 
   const translations = {
     fi: {
@@ -80,7 +80,7 @@ export function DataProtectionStatement() {
         },
       ],
     },
-    se: {
+    sv: {
       title: 'Dataskydds- och informationshanteringsbeskrivning',
       intro:
         'Denna dataskydds- och informationshanteringsbeskrivning gäller för Kartalla-applikationen som tillhandahålls av Ubigu Oy.',

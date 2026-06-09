@@ -19,7 +19,7 @@ import { clearTestSurveys } from '../utils/db';
 import { test } from '../utils/fixtures';
 
 const testSurveyData = {
-  ...getTestSurveyData(TEST_SURVEY_URL_NAMES.survey),
+  ...getTestSurveyData(TEST_SURVEY_URL_NAMES.survey, ['fi']),
   pageNames: ['Sivu 1', 'Sivu 2'],
 };
 let surveyData = testSurveyData;
@@ -98,53 +98,32 @@ test.describe('Survey test', () => {
       surveyData.title,
     );
 
-    // Answer questions
-    const firstPageQuestionFieldsets = await surveyPage.page
-      .locator('.question-fieldset')
-      .all();
-
-    const firstPageQuestions = await Promise.all(
-      firstPageQuestionFieldsets.map(async (element) => {
-        const title = await element.locator('h3').textContent();
-        return { element, title };
-      }),
-    );
-
-    // Find each question type based on the title used during creation
+    // Answer questions, targeting each by the title used during creation
 
     // Personal info question
-    const personalInfoFieldset = firstPageQuestions.find((item) =>
-      item.title?.includes(personalInfoQuestion.title),
+    const personalInfoFieldset = surveyPage.getQuestionByTitle(
+      personalInfoQuestion.title,
     );
-    await personalInfoFieldset?.element
-      .getByLabel('Nimi')
-      .fill('Testi Testaaja');
-    await personalInfoFieldset?.element
+    await personalInfoFieldset.getByLabel('Nimi').fill('Testi Testaaja');
+    await personalInfoFieldset
       .getByLabel('Sähköposti')
       .fill('testi@testaaja.fi');
-    await personalInfoFieldset?.element
-      .getByLabel('Puhelinnumero')
-      .fill('0401234567');
-    await personalInfoFieldset?.element
+    await personalInfoFieldset.getByLabel('Puhelinnumero').fill('0401234567');
+    await personalInfoFieldset
       .getByLabel('Osoite')
       .fill('Testikatu 1, 00100 Helsinki');
-    await personalInfoFieldset?.element
-      .getByLabel('Y-tunnus')
-      .fill('1234567-8');
+    await personalInfoFieldset.getByLabel('Y-tunnus').fill('1234567-8');
 
     // Radio question
-    const radioFieldset = firstPageQuestions.find((item) =>
-      item.title?.includes(radioQuestion.title),
-    );
+    const radioFieldset = surveyPage.getQuestionByTitle(radioQuestion.title);
 
     // Checkbox question
-    const checkBoxFieldset = firstPageQuestions.find((item) =>
-      item.title?.includes(checkBoxQuestion.title),
+    const checkBoxFieldset = surveyPage.getQuestionByTitle(
+      checkBoxQuestion.title,
     );
-
     await Promise.all(
       checkBoxQuestion.answerOptions.map(async (option) => {
-        await checkBoxFieldset?.element
+        await checkBoxFieldset
           .locator(`input[name=${option}]`)
           .first()
           .check({ force: true }); // Check doesn't work here:
@@ -152,40 +131,36 @@ test.describe('Survey test', () => {
     );
 
     // Free text question
-    const freeTextFieldset = firstPageQuestions.find((item) =>
-      item.title?.includes(freeTextQuestion.title),
+    const freeTextFieldset = surveyPage.getQuestionByTitle(
+      freeTextQuestion.title,
     );
-
-    await freeTextFieldset?.element.getByRole('textbox').fill('Testivastaus');
+    await freeTextFieldset.getByRole('textbox').fill('Testivastaus');
 
     // Numeric question
-    const numericFieldset = firstPageQuestions.find((item) =>
-      item.title?.includes(numericQuestion.title),
-    );
-
+    const numericFieldset = surveyPage.getQuestionByTitle(numericQuestion.title);
     if (numericQuestion.maxValue) {
-      await numericFieldset?.element
+      await numericFieldset
         .getByRole('spinbutton')
         .fill(String(numericQuestion.maxValue));
     } else if (numericQuestion.minValue) {
-      await numericFieldset?.element
+      await numericFieldset
         .getByRole('spinbutton')
         .fill(String(numericQuestion.minValue));
     } else {
-      await numericFieldset?.element.getByRole('spinbutton').fill('5');
+      await numericFieldset.getByRole('spinbutton').fill('5');
     }
 
     // Try to change page without answering mandatory questions
-    await surveyPage.page.getByRole('button', { name: 'Seuraava' }).click();
+    await surveyPage.goToNextPage();
     await expect(
       surveyPage.page.getByText(
         'Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin.',
       ),
     ).toBeVisible();
     // Answer mandatory radio question that was left unanswered
-    await radioFieldset?.element.getByRole('radio').first().click();
+    await radioFieldset.getByRole('radio').first().click();
     // Change page
-    await surveyPage.page.getByRole('button', { name: 'Seuraava' }).click();
+    await surveyPage.goToNextPage();
     await expect(
       surveyPage.page.getByRole('button', { name: 'Edellinen' }),
     ).toBeVisible();
@@ -194,51 +169,34 @@ test.describe('Survey test', () => {
       .locator('.question-fieldset')
       .first()
       .waitFor({ state: 'visible' });
-    const secondPageQuestionFieldsets = await surveyPage.page
-      .locator('.question-fieldset')
-      .all();
-    const secondPageQuestions = await Promise.all(
-      secondPageQuestionFieldsets.map(async (element) => {
-        const title = await element.locator('h3').textContent();
-        return { element, title };
-      }),
-    );
 
     // Sorting question
-    const sortingFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(sortingQuestion.title),
-    );
-
-    await sortingFieldset?.element
+    const sortingFieldset = surveyPage.getQuestionByTitle(sortingQuestion.title);
+    await sortingFieldset
       .locator('input')
       .first()
-      .dragTo(sortingFieldset?.element.locator('input').last());
+      .dragTo(sortingFieldset.locator('input').last());
 
     // Slider question (number)
-    const sliderNumberFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(sliderNumberQuestion.title),
+    const sliderNumberFieldset = surveyPage.getQuestionByTitle(
+      sliderNumberQuestion.title,
     );
-
-    await sliderNumberFieldset?.element.locator('input').focus();
+    await sliderNumberFieldset.locator('input').focus();
     await surveyPage.page.keyboard.press('ArrowRight');
 
     // Slider question (string)
-    const sliderStringFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(sliderStringQuestion.title),
+    const sliderStringFieldset = surveyPage.getQuestionByTitle(
+      sliderStringQuestion.title,
     );
-
-    await sliderStringFieldset?.element.locator('input').focus();
+    await sliderStringFieldset.locator('input').focus();
     await surveyPage.page.keyboard.press('ArrowRight');
 
     // Matrix question
-    const matrixFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(matrixQuestion.title),
-    );
-
+    const matrixFieldset = surveyPage.getQuestionByTitle(matrixQuestion.title);
     const viewPortSize = surveyPage.page.viewportSize();
     if (viewPortSize && viewPortSize.width < 430) {
       for (const row of matrixQuestion.matrixRows) {
-        await matrixFieldset?.element.getByLabel(row).click();
+        await matrixFieldset.getByLabel(row).click();
         // Select listbox is not a child of the fieldset
         await surveyPage.page
           .getByRole('listbox')
@@ -248,8 +206,8 @@ test.describe('Survey test', () => {
       }
     } else {
       await Promise.all(
-        matrixQuestion.matrixRows.map(async (_row, idx) => {
-          await matrixFieldset?.element
+        matrixQuestion.matrixRows.map(async () => {
+          await matrixFieldset
             .locator('input')
             .first()
             .check({ force: true }); // Check doesn't work here: https://github.com/microsoft/playwright/issues/27016
@@ -258,14 +216,14 @@ test.describe('Survey test', () => {
     }
 
     // Multi matrix question
-    const multiMatrixFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(multiMatrixQuestion.title),
+    const multiMatrixFieldset = surveyPage.getQuestionByTitle(
+      multiMatrixQuestion.title,
     );
-    expect(multiMatrixFieldset).toBeDefined();
+    await expect(multiMatrixFieldset).toBeVisible();
 
     if (viewPortSize && viewPortSize.width < 430) {
       for (const row of multiMatrixQuestion.matrixRows) {
-        await multiMatrixFieldset?.element.getByLabel(row).click();
+        await multiMatrixFieldset.getByLabel(row).click();
         // Select listbox is not a child of the fieldset
         await surveyPage.page
           .getByRole('listbox')
@@ -277,7 +235,7 @@ test.describe('Survey test', () => {
     } else {
       await Promise.all(
         multiMatrixQuestion.matrixRows.map(async (_row, idx) => {
-          await multiMatrixFieldset?.element
+          await multiMatrixFieldset
             .locator(`input[name="question-${idx}"]`)
             .first()
             .check({ force: true }); // Check doesn't work here: https://github.com/microsoft/playwright/issues/27016
@@ -285,19 +243,18 @@ test.describe('Survey test', () => {
       );
     }
     // Grouped checkbox question
-    const groupedCheckboxFieldset = secondPageQuestions.find((item) =>
-      item.title?.includes(groupedCheckboxQuestion.title),
+    const groupedCheckboxFieldset = surveyPage.getQuestionByTitle(
+      groupedCheckboxQuestion.title,
     );
-
-    await groupedCheckboxFieldset?.element.getByRole('button').first().click();
-    await groupedCheckboxFieldset?.element.locator('input').first().check();
-    await groupedCheckboxFieldset?.element.getByRole('button').last().click();
-    await groupedCheckboxFieldset?.element.locator('input').last().check();
+    await groupedCheckboxFieldset.getByRole('button').first().click();
+    await groupedCheckboxFieldset.locator('input').first().check();
+    await groupedCheckboxFieldset.getByRole('button').last().click();
+    await groupedCheckboxFieldset.locator('input').last().check();
 
     // Accessibility check
     expect((await makeAxeBuilder('main').analyze()).violations).toHaveLength(0);
 
-    await surveyPage.page.getByText('Lähetä').click();
+    await surveyPage.submit();
 
     // Thanks page
     await expect(

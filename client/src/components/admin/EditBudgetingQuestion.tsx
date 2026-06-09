@@ -16,6 +16,7 @@ import {
 import { QuestionBudgetTargets } from '@src/components/admin/QuestionBudgetTargets';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 interface Props {
   section: SurveyBudgetingQuestion;
@@ -23,7 +24,8 @@ interface Props {
 }
 
 export default function EditBudgetingQuestion({ section, onChange }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
   return (
     <FormGroup sx={{ gap: 2 }}>
       <FormControlLabel
@@ -144,14 +146,14 @@ export default function EditBudgetingQuestion({ section, onChange }: Props) {
         />
       </RadioGroup>
       <RichTextEditor
-        value={section.helperText?.[surveyLanguage]}
+        value={section.helperText?.[workingLanguage]}
         label={tr.BudgetingQuestion.helperText}
         onChange={(value) =>
           onChange({
             ...section,
             helperText: {
               ...section.helperText,
-              [surveyLanguage]: value,
+              [workingLanguage]: value,
             },
           })
         }

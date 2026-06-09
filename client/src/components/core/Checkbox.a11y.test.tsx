@@ -36,3 +36,23 @@ it('CoreCheckbox checked state has no accessibility violations', async () => {
   const { violations } = await axe.run(container);
   expect(violations).toEqual([]);
 });
+
+it('CoreCheckbox disabled state has no accessibility violations', async () => {
+  const { container } = render(
+    <TestWrapper>
+      <Checkbox label="Accept terms" disabled />
+    </TestWrapper>,
+  );
+  const { violations } = await axe.run(container);
+  expect(violations).toEqual([]);
+});
+
+it('CoreCheckbox disabled checked state has no accessibility violations', async () => {
+  const { container } = render(
+    <TestWrapper>
+      <Checkbox label="Accept terms" disabled checked />
+    </TestWrapper>,
+  );
+  const { violations } = await axe.run(container);
+  expect(violations).toEqual([]);
+});

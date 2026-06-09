@@ -45,7 +45,7 @@ export default function GeoBudgetingQuestion({
   readOnly = false,
   validationErrors = [],
 }: Props) {
-  const { tr, surveyLanguage, language } = useTranslations();
+  const { tr, language } = useTranslations();
   const theme = useTheme();
   const {
     draw,
@@ -296,7 +296,7 @@ export default function GeoBudgetingQuestion({
               unit={question.unit ?? ''}
               isActive={activeTargetId === index}
               isMapReady={isMapReady && !readOnly}
-              currentLanguage={surveyLanguage}
+              currentLanguage={language}
               remainingBudget={remainingBudget}
               onSelect={() => handleTargetSelect(index)}
             />

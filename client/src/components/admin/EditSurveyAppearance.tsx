@@ -39,6 +39,7 @@ export default function EditSurveyAppearance(props: Props) {
       >
         <ThemeSelect
           value={activeSurvey.theme?.id}
+          disabled={!props.canEdit || activeSurveyLoading}
           onChange={(theme) => {
             editSurvey({
               ...activeSurvey,
@@ -49,6 +50,7 @@ export default function EditSurveyAppearance(props: Props) {
         <ColorSelect
           label={tr.EditSurveyInfo.titleColor}
           value={activeSurvey.sectionTitleColor}
+          disabled={!props.canEdit || activeSurveyLoading}
           onChange={(color) => {
             editSurvey({
               ...activeSurvey,

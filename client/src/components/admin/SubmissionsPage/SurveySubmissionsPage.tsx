@@ -1,5 +1,4 @@
 import {
-  LanguageCode,
   Submission,
   SubmissionAnswerEntry,
   Survey,
@@ -9,12 +8,17 @@ import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
 import { sectionTypeIcons } from '@src/components/admin/surveySectionIcons';
 import { Combobox_WIP } from '@src/components/core/Combobox';
+import { Select } from '@src/components/core/Select';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { Language, useTranslations } from '@src/stores/TranslationContext';
+import {
+  WorkingLanguageProvider,
+  useWorkingLanguage,
+} from '@src/stores/WorkingLanguageContext';
 import { request } from '@src/utils/request';
 import { isSurveyQuestion } from '@src/utils/typeCheck';
 import { useEffect, useMemo, useState } from 'react';
@@ -65,25 +69,10 @@ function answerEntryToItems(
 export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
   const [error, setError] = useState<{ status: number } | null>(null);
-  const [submissions, setSubmissions] = useState<Submission[] | null>(null);
-  const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [surveyLoading, setSurveyLoading] = useState(true);
-  const [responsesLoading, setResponsesLoading] = useState(true);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
-  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection | null>(
-    null,
-  );
-  const [refreshSurvey, setRefreshSurvey] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] =
-    useState<SurveyQuestion | null>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr, surveyLanguage, setSurveyLanguage, languages } =
-    useTranslations();
-
-  const loading = useMemo(() => {
-    return surveyLoading || submissionsLoading || responsesLoading;
-  }, [surveyLoading, submissionsLoading, responsesLoading]);
+  const { tr, language } = useTranslations();
 
   const errorMessage = useMemo(() => {
     if (!error) {
@@ -116,21 +105,83 @@ export default function SurveySubmissionsPage() {
     return () => setSurvey(null);
   }, [name, surveyId]);
 
-  useEffect(() => {
-    if (survey?.primaryLanguage) {
-      setSurveyLanguage(survey.primaryLanguage as LanguageCode);
+  if (surveyLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography variant="body1">{errorMessage}</Typography>
+      </Box>
+    );
+  }
+
+  if (!survey) {
+    return null;
+  }
+
+  return (
+    <WorkingLanguageProvider survey={survey} uiLanguage={language}>
+      <SurveySubmissionsContent survey={survey} />
+    </WorkingLanguageProvider>
+  );
+}
+
+function SurveySubmissionsContent({ survey }: { survey: Survey }) {
+  const { surveyId } = useParams<{ name: string; surveyId: string }>();
+  const [error, setError] = useState<{ status: number } | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[] | null>(null);
+  const [submissionsLoading, setSubmissionsLoading] = useState(true);
+  const [responsesLoading, setResponsesLoading] = useState(true);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(true);
+  const [selectedAnswer, setSelectedAnswer] = useState<AnswerSelection | null>(
+    null,
+  );
+  const [refreshSurvey, setRefreshSurvey] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] =
+    useState<SurveyQuestion | null>(null);
+
+  const { tr } = useTranslations();
+  const { workingLanguage, setWorkingLanguage } = useWorkingLanguage();
+
+  const loading = useMemo(() => {
+    return submissionsLoading || responsesLoading;
+  }, [submissionsLoading, responsesLoading]);
+
+  const errorMessage = useMemo(() => {
+    if (!error) {
+      return null;
     }
-  }, [survey?.id]);
+    if (error.status === 404) {
+      return tr.SurveyPage.errorSurveyNotFound;
+    }
+    return tr.SurveyPage.errorFetchingSurvey;
+  }, [error]);
 
   // Fetch submissions from server after the survey has been loaded
   useEffect(() => {
-    if (survey == null) {
-      return;
-    }
-
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = `/api/surveys/${survey?.id}/submissions?withPersonalInfo=true`;
+      const submissionUrl = `/api/surveys/${survey.id}/submissions?withPersonalInfo=true`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(
@@ -149,9 +200,6 @@ export default function SurveySubmissionsPage() {
 
   // Fetch submission/answer responses after the survey has been loaded
   useEffect(() => {
-    if (survey == null) {
-      return;
-    }
     setResponsesLoading(true);
     async function fetchResponses() {
       try {
@@ -166,7 +214,6 @@ export default function SurveySubmissionsPage() {
 
   // TODO: Could surveyQuestions and questions be combined into a single variable?
   const surveyQuestions = useMemo(() => {
-    if (!survey) return [];
     return (survey.pages ?? []).reduce(
       (sections, page) => [...sections, ...page.sections] as SurveyQuestion[],
       [] as SurveyQuestion[],
@@ -175,7 +222,6 @@ export default function SurveySubmissionsPage() {
 
   // All map type questions across the entire survey
   const questions = useMemo(() => {
-    if (!survey) return [];
     return (survey.pages ?? []).reduce(
       (questions, page) => [
         ...questions,
@@ -184,11 +230,11 @@ export default function SurveySubmissionsPage() {
       [
         {
           id: DEFAULT_VIEW_SECTION_ID,
-          title: { [surveyLanguage]: tr.SurveySubmissionsPage.summary },
+          title: { [workingLanguage]: tr.SurveySubmissionsPage.summary },
         },
       ] as SurveyQuestion[],
     );
-  }, [survey]);
+  }, [survey, workingLanguage]);
 
   /**
    * All answers flattened from all submissions
@@ -243,7 +289,6 @@ export default function SurveySubmissionsPage() {
       MAP_TYPES.includes(selectedQuestion.type) ||
       selectedQuestion.id === DEFAULT_VIEW_SECTION_ID
     ) {
-      if (!survey) return false as const;
       return (
         <AnswerMap
           survey={survey}
@@ -290,15 +335,11 @@ export default function SurveySubmissionsPage() {
     );
   }
 
-  if (!survey) {
-    return null;
-  }
-
   return (
     <>
       <AdminAppBar
         labels={[
-          survey.title[surveyLanguage],
+          survey.title[workingLanguage],
           tr.AnswersList.answers.toLocaleLowerCase(),
         ]}
       />
@@ -334,7 +375,7 @@ export default function SurveySubmissionsPage() {
               })}
               options={questions.map((question) => ({
                 value: String(question.id),
-                label: question.title[surveyLanguage],
+                label: question.title[workingLanguage],
               }))}
               renderValue={(opt) => {
                 const question = questions.find(
@@ -370,24 +411,26 @@ export default function SurveySubmissionsPage() {
                         minWidth: 0,
                       }}
                     >
-                      {question.title[surveyLanguage]}
+                      {question.title[workingLanguage]}
                     </span>
                   </Box>
                 );
               }}
             />
 
-            <Combobox_WIP
+            <Select
               id="submissions-survey-language"
               label={tr.SurveyLanguageMenu.answerLanguage}
-              value={surveyLanguage}
-              onChange={(value) => setSurveyLanguage(value as LanguageCode)}
-              options={languages
-                .filter((lang) => survey.enabledLanguages[lang])
-                .map((lang) => ({
-                  value: lang,
-                  label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
-                }))}
+              value={workingLanguage}
+              onChange={(value) => setWorkingLanguage(value as Language)}
+              options={(
+                Object.entries(survey.enabledLanguages)
+                  .filter(([, enabled]) => enabled)
+                  .map(([lang]) => lang) as Language[]
+              ).map((lang) => ({
+                value: lang,
+                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+              }))}
             />
 
             {!selectedQuestion ||

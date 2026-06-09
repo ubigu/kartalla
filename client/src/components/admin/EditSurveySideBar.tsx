@@ -19,10 +19,13 @@ import SettingsIcon from '@src/components/icons/SettingsIcon';
 import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
 import ThanksPageIcon from '@src/components/icons/ThanksPageIcon';
 
-import { Combobox_WIP } from '@src/components/core/Combobox';
-import { useSurvey } from '@src/stores/SurveyContext';
+import { hasEnabledLanguages, useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  supportedLanguages,
+  useTranslations,
+} from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -32,14 +35,17 @@ import { Conditions, LanguageCode, SurveyPage } from '@interfaces/survey';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { replaceIdsWithNull } from '@src/utils/schemaValidation';
+import { collectPageFields } from '@src/utils/surveyTranslations';
+import { Select } from '../core/Select';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import ConditionalPageIcon from '../icons/ConditionalPageIcon';
+import LanguageIcon from '../icons/LanguageIcon';
 import MapGridIcon from '../icons/MapGridIcon';
 import PadlockIcon from '../icons/PadlockIcon';
 import PaintPaletteIcon from '../icons/PaintPaletteIcon';
 import ShareExternalLinkIcon from '../icons/ShareExternalLinkIcon';
 import TranslateTextIcon from '../icons/TranslateTextIcon';
-import { collectPageFields } from './EditSurveyTranslationsV2';
+import { editSurveyPaths } from './EditSurvey';
 
 const pulse = keyframes`
   0% { opacity: 0.4; }
@@ -144,11 +150,13 @@ export default function EditSurveySideBar(props: Props) {
     activeSurveyLoading,
     movePage,
   } = useSurvey();
-  const { tr, surveyLanguage, setSurveyLanguage, language, languages } =
-    useTranslations();
+  const { tr, language } = useTranslations();
+  const { workingLanguage, setWorkingLanguage } = useWorkingLanguage();
   const { showToast } = useToasts();
   const { clipboardSection, setClipboardPage, clipboardPage } = useClipboard();
   const theme = useTheme();
+
+  const languageSettingsSet = hasEnabledLanguages(activeSurvey);
 
   return (
     <Box
@@ -182,21 +190,21 @@ export default function EditSurveySideBar(props: Props) {
             borderBottom: `solid 1px ${theme.palette.borderSecondary.main}`,
           }}
         >
-          <Combobox_WIP
+          <Select
             sx={(theme) => ({
               '&&': { background: theme.palette.surfacePrimary.main },
             })}
             id="sidebar-survey-language"
             label={tr.SurveyLanguageMenu.workingLanguage}
-            value={surveyLanguage}
+            value={workingLanguage}
             onChange={(value) =>
-              setSurveyLanguage(value as typeof surveyLanguage)
+              setWorkingLanguage(value as typeof workingLanguage)
             }
-            options={languages
+            options={supportedLanguages
               .filter((lang) => activeSurvey.enabledLanguages[lang])
               .map((lang) => ({
                 value: lang,
-                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
+                label: `${tr.EditSurveyTranslations[lang].toLocaleLowerCase()} (${lang})`,
               }))}
           />
         </Box>
@@ -211,36 +219,51 @@ export default function EditSurveySideBar(props: Props) {
       </Typography>
       <List sx={styles.list}>
         <ListItem disablePadding>
-          <SideBarItem to={`${url}/perusasetukset?lang=${language}`}>
+          <SideBarItem
+            to={`${url}/${editSurveyPaths.basicSettings}?lang=${language}`}
+          >
             <SettingsIcon stroke="currentColor" />
             <ListItemText primary={tr.EditSurvey.basicSettings} />
           </SideBarItem>
         </ListItem>
+        {languageSettingsSet && (
+          <ListItem disablePadding>
+            <SideBarItem
+              to={`${url}/${editSurveyPaths.languageSettings}?lang=${language}`}
+            >
+              <LanguageIcon stroke="currentColor" />
+              <ListItemText primary={tr.EditSurvey.languageSettings} />
+            </SideBarItem>
+          </ListItem>
+        )}
         <ListItem disablePadding>
-          <SideBarItem to={`${url}/käyttäjäoikeudet?lang=${language}`}>
+          <SideBarItem
+            to={`${url}/${editSurveyPaths.permissions}?lang=${language}`}
+          >
             <PadlockIcon />
-
             <ListItemText primary={tr.EditSurvey.permissions} />
           </SideBarItem>
         </ListItem>
         <ListItem disablePadding>
-          <SideBarItem to={`${url}/ulkoasu?lang=${language}`}>
+          <SideBarItem
+            to={`${url}/${editSurveyPaths.appearance}?lang=${language}`}
+          >
             <PaintPaletteIcon />
-
             <ListItemText primary={tr.EditSurvey.appearance} />
           </SideBarItem>
         </ListItem>
         <ListItem disablePadding>
-          <SideBarItem to={`${url}/kartta-aineistot?lang=${language}`}>
+          <SideBarItem
+            to={`${url}/${editSurveyPaths.mapData}?lang=${language}`}
+          >
             <MapGridIcon />
 
             <ListItemText primary={tr.EditSurvey.mapData} />
           </SideBarItem>
         </ListItem>
         <ListItem disablePadding>
-          <SideBarItem to={`${url}/sähköpostit?lang=${language}`}>
+          <SideBarItem to={`${url}/${editSurveyPaths.emails}?lang=${language}`}>
             <MailIcon />
-
             <ListItemText primary={tr.EditSurvey.emailReports} />
           </SideBarItem>
         </ListItem>
@@ -258,7 +281,7 @@ export default function EditSurveySideBar(props: Props) {
               originalActiveSurvey.name
             }${
               originalActiveSurvey?.localisationEnabled
-                ? '?lang=' + surveyLanguage
+                ? '?lang=' + workingLanguage
                 : ''
             }`}
           >
@@ -322,7 +345,7 @@ export default function EditSurveySideBar(props: Props) {
                         <DragHandleIcon sx={{ fontSize: 14 }} />
                       </div>
                       <SideBarItem
-                        to={`${url}/sivut/${page.id}?lang=${language}`}
+                        to={`${url}/${editSurveyPaths.pages}/${page.id}?lang=${language}`}
                         sxProps={{
                           '&:not(:hover) .page-copy-btn': {
                             visibility: 'hidden',
@@ -349,7 +372,7 @@ export default function EditSurveySideBar(props: Props) {
                         <ListItemText
                           primaryTypographyProps={{ noWrap: true }}
                           primary={
-                            page.title?.[surveyLanguage] || (
+                            page.title?.[workingLanguage] || (
                               <em>{tr.EditSurvey.untitledPage}</em>
                             )
                           }
@@ -423,7 +446,11 @@ export default function EditSurveySideBar(props: Props) {
                 <>
                   <ListItem disablePadding>
                     <SideBarItem
-                      disabled={newPageDisabled || activeSurveyLoading}
+                      disabled={
+                        newPageDisabled ||
+                        activeSurveyLoading ||
+                        !hasEnabledLanguages(activeSurvey)
+                      }
                       sxProps={
                         newPageLoading ? styles.loading(theme) : undefined
                       }
@@ -432,7 +459,7 @@ export default function EditSurveySideBar(props: Props) {
                         try {
                           const page = await createPage();
                           history.push(
-                            `${url}/sivut/${page.id}?lang=${language}`,
+                            `${url}/${editSurveyPaths.pages}/${page.id}?lang=${language}`,
                           );
                           setNewPageDisabled(false);
                         } catch (error) {
@@ -521,7 +548,9 @@ export default function EditSurveySideBar(props: Props) {
                 </>
               )}
               <ListItem disablePadding>
-                <SideBarItem to={`${url}/kiitos-sivu?lang=${language}`}>
+                <SideBarItem
+                  to={`${url}/${editSurveyPaths.thanksPage}?lang=${language}`}
+                >
                   <ThanksPageIcon
                     className={SIDEBAR_PAGE_ICON_CLASS}
                     stroke={theme.palette.borderSecondary.main}
@@ -544,14 +573,14 @@ export default function EditSurveySideBar(props: Props) {
           </Typography>
           <SideBarItem
             sxProps={styles.languagesBox}
-            to={`${url}/käännökset?lang=${language}`}
+            to={`${url}/${editSurveyPaths.translations}?lang=${language}`}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <TranslateTextIcon />
               <Typography>{tr.EditSurvey.manageTranslations}</Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: '4px', marginLeft: '16px' }}>
-              {languages
+              {supportedLanguages
                 .filter((lang) => activeSurvey.enabledLanguages[lang])
                 .map((lang) => (
                   <Box

@@ -38,3 +38,7 @@ export const Clickable: Story = {
 export const Deletable: Story = {
   args: { label: 'Deletable', onDelete: () => {} },
 };
+
+export const Disabled: Story = {
+  args: { label: 'Disabled', onClick: () => {}, disabled: true },
+};

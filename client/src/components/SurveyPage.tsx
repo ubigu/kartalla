@@ -37,7 +37,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
-  const { tr, language, setAvailableLanguages } = useTranslations();
+  const { tr, language } = useTranslations();
   const { showToast } = useToasts();
 
   const unfinishedToken = useMemo(
@@ -66,7 +66,6 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         setSurvey(survey);
         setThemeFromSurvey(survey);
         setLoading(false);
-        setAvailableLanguages(survey.enabledLanguages);
       } catch (error) {
         setErrorStatusCode(error.status);
         setLoading(false);
@@ -144,25 +143,20 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
-        {(showLandingPage || showThanksPage) &&
-          survey.localisationEnabled &&
-          Object.values(survey.enabledLanguages).filter(
-            (langEnabled) => langEnabled,
-          ).length > 1 && (
-            <SurveyLanguageMenu
-              changeUILanguage={true}
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                backdropFilter: 'blur(7px)',
-                padding: '0.2rem 1rem 0.2rem 0.2rem',
-                position: 'absolute',
-                top: '1rem',
-                left: '1rem',
-                zIndex: 10,
-                borderRadius: '7px',
-              }}
-            />
-          )}
+        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
+          <SurveyLanguageMenu
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.4)',
+              backdropFilter: 'blur(7px)',
+              padding: '0.2rem 1rem 0.2rem 0.2rem',
+              position: 'absolute',
+              top: '1rem',
+              left: '1rem',
+              zIndex: 10,
+              borderRadius: '7px',
+            }}
+          />
+        )}
         {/* Landing page */}
         {showLandingPage && (
           <SurveyLandingPage

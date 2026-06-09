@@ -3,23 +3,20 @@ import { getSortingQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } from
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.sorting);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.sorting, ['fi']);
 const sortingQuestion = getSortingQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Sorting question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('drag to sort', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('drag to sort', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createSortingQuestion(sortingQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

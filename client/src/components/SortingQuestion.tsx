@@ -29,7 +29,7 @@ interface Props {
 }
 
 export default function SortingQuestion(props: Props) {
-  const { surveyLanguage, tr } = useTranslations();
+  const { language, tr } = useTranslations();
   const [verified, setVerified] = useState(props.value ? true : false);
   const [sortedOptionIds, setSortedOptionIds] = useState(
     props.value ?? props.question.options.map((option) => option.id),
@@ -203,7 +203,7 @@ export default function SortingQuestion(props: Props) {
                           {
                             props.question.options.find(
                               (option) => option.id === optionId,
-                            ).text?.[surveyLanguage]
+                            ).text?.[language]
                           }
                         </Typography>
                         <Box style={visuallyHidden}>

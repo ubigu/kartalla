@@ -1,9 +1,11 @@
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import { useId } from 'react';
 
 export default function ArrowLeftIcon(props: SvgIconProps) {
+  const clipPathId = useId();
   return (
     <SvgIcon {...props} viewBox="0 0 24 24">
-      <g clipPath="url(#clip0_6584_739)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M23.25 12H0.75"
           stroke="currentColor"
@@ -22,7 +24,7 @@ export default function ArrowLeftIcon(props: SvgIconProps) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_6584_739">
+        <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />
         </clipPath>
       </defs>

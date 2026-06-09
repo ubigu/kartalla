@@ -70,7 +70,7 @@ export default function MatrixQuestion({
   question,
   setBackdropOpen,
 }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const classes = useStyles();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
   const [componentState, setComponentState] = useState<ComponentState>({
@@ -158,7 +158,7 @@ export default function MatrixQuestion({
           <Table size="small">
             {question.title && (
               <caption style={visuallyHidden}>
-                {question.title?.[surveyLanguage]}
+                {question.title?.[language]}
               </caption>
             )}
             <TableHead>
@@ -171,7 +171,7 @@ export default function MatrixQuestion({
                       key={index}
                       className={`${classes.matrixCell} ${classes.matrixText}`}
                     >
-                      {entry?.[surveyLanguage] ?? index}
+                      {entry?.[language] ?? index}
                     </TableCell>
                   );
                 })}
@@ -199,7 +199,7 @@ export default function MatrixQuestion({
                         classes.matrixText,
                       ].join(' ')}
                     >
-                      {subject?.[surveyLanguage]}
+                      {subject?.[language]}
                     </TableCell>
                     {question.classes.map((_entry, classIndex) => (
                       <TableCell
@@ -281,7 +281,7 @@ export default function MatrixQuestion({
                         classes.matrixText,
                       ].join(' ')}
                     >
-                      {subject?.[surveyLanguage]}
+                      {subject?.[language]}
                     </TableCell>
 
                     <TableCell>
@@ -299,7 +299,7 @@ export default function MatrixQuestion({
                               key={classIndex}
                               value={classIndex.toString()}
                             >
-                              {entry?.[surveyLanguage]}
+                              {entry?.[language]}
                             </MenuItem>
                           ))}
                           {question.allowEmptyAnswer && (
@@ -335,7 +335,7 @@ export default function MatrixQuestion({
                     fontSize: '0.875rem',
                   }}
                 >
-                  {subject?.[surveyLanguage]}
+                  {subject?.[language]}
                 </FormLabel>
                 <Select
                   onOpen={() => setBackdropOpen(true)}
@@ -352,7 +352,7 @@ export default function MatrixQuestion({
                   </MenuItem>
                   {question.classes.map((entry, classIndex) => (
                     <MenuItem key={classIndex} value={classIndex.toString()}>
-                      {entry?.[surveyLanguage]}
+                      {entry?.[language]}
                     </MenuItem>
                   ))}
                   {question.allowEmptyAnswer && (

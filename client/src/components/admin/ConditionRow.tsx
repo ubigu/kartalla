@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { isNumeric } from '@src/utils/typeCheck';
 
 interface SelectPlaceholderProps {
@@ -21,7 +22,8 @@ interface SelectPlaceholderProps {
 }
 
 function SelectPlaceholder({ selected, options }: SelectPlaceholderProps) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   if (selected.length === 0) {
     return (
@@ -49,7 +51,7 @@ function SelectPlaceholder({ selected, options }: SelectPlaceholderProps) {
       {selectedOptionId === -1
         ? tr.EditSurveyPage.conditions.somethingElse
         : options.find((option) => option.id === selectedOptionId)?.text[
-            surveyLanguage
+            workingLanguage
           ]}
     </Typography>
   );
@@ -79,7 +81,8 @@ export function ConditionRow({
   labelPrefix = '',
 }: RowProps) {
   const [validationError, setValidationError] = useState(false);
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <FormControl
@@ -153,7 +156,7 @@ export function ConditionRow({
           {options?.map((option) => (
             <MenuItem value={option.id} key={option.id}>
               <Checkbox checked={conditions?.equals.includes(option.id)} />
-              <Typography>{option.text[surveyLanguage]}</Typography>
+              <Typography>{option.text[workingLanguage]}</Typography>
             </MenuItem>
           ))}
 

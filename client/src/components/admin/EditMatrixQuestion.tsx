@@ -12,6 +12,7 @@ import {
 import AddIcon from '@src/components/icons/AddIcon';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 import QuestionOptions from './QuestionOptions';
 
@@ -21,7 +22,8 @@ interface Props {
 }
 
 export default function EditMatrixQuestion({ section, onChange }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <>
@@ -68,24 +70,24 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
           return (
             <div
               key={`matrix-class-${index}`}
-              data-testId={`matrix-class-${index}`}
+              data-testid={`matrix-class-${index}`}
               style={{ position: 'relative' }}
             >
-              <Tooltip title={entry[surveyLanguage] ?? ''}>
+              <Tooltip title={entry[workingLanguage] ?? ''}>
                 <TextField
                   inputProps={{ autoFocus: true }}
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',
                   }}
-                  value={entry[surveyLanguage] ?? ''}
+                  value={entry[workingLanguage] ?? ''}
                   onChange={(event) => {
                     const updatedClasses = [...section.classes];
-                    updatedClasses[index][surveyLanguage] = event.target.value;
+                    updatedClasses[index][workingLanguage] = event.target.value;
                     onChange({ ...section, classes: updatedClasses });
                   }}
                 >
-                  {entry[surveyLanguage]}
+                  {entry[workingLanguage]}
                 </TextField>
               </Tooltip>
               <IconButton

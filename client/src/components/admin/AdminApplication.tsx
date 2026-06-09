@@ -14,7 +14,7 @@ import fiLocale from 'date-fns/locale/fi';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Compose from '../Compose';
-import LanguageRouter from '../LanguageRouter';
+import AdminLanguageRouter from '../AdminLanguageRouter';
 import AdminFrontPage from './AdminFrontPage';
 import EditSurvey from './EditSurvey';
 import { GeneralNotifications } from './GeneralNotification';
@@ -45,7 +45,7 @@ export default function AdminApplication() {
       <BrowserRouter basename="/admin">
         <UserProvider>
           <GeneralNotificationProvider>
-            <LanguageRouter />
+            <AdminLanguageRouter />
             <Switch>
               <Route path="/kyselyt/:surveyId">
                 <EditSurvey />

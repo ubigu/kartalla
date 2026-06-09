@@ -9,12 +9,14 @@ interface Props {
   selectedTags: string[];
   addEnabled: boolean;
   onSelectedTagsChange: (tags: string[]) => void;
+  disabled?: boolean;
 }
 
 export function TagPicker({
   selectedTags,
   addEnabled,
   onSelectedTagsChange,
+  disabled,
 }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
@@ -56,6 +58,7 @@ export function TagPicker({
             value={selectedTags}
             options={tags.map((tag) => ({ value: tag, label: tag }))}
             onMultiChange={handleTagChange}
+            disabled={disabled}
           />
         </Box>
         <Box sx={{ display: 'flex', gap: '8px' }}>
@@ -63,11 +66,14 @@ export function TagPicker({
             placeholder={tr.TagPicker.newTag}
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
+            disabled={disabled}
           />
           <Button
             variant="contained"
             onClick={handleAddTag}
-            disabled={!newTag.trim() || tags.includes(newTag.trim())}
+            disabled={
+              disabled || !newTag.trim() || tags.includes(newTag.trim())
+            }
             sx={{ height: '28px' }}
           >
             {tr.TagPicker.add ?? 'Add'}
@@ -84,6 +90,7 @@ export function TagPicker({
       value={selectedTags}
       options={tags.map((tag) => ({ value: tag, label: tag }))}
       onMultiChange={handleTagChange}
+      disabled={disabled}
       wrapperSx={{ width: '100%' }}
     />
   );

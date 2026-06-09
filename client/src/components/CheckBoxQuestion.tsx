@@ -34,7 +34,7 @@ export default function CheckBoxQuestion({
   validationErrors = null,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const actionRef = useRef([]);
 
   if (autoFocus) {
@@ -63,7 +63,7 @@ export default function CheckBoxQuestion({
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);
-  }, [question.answerLimits, surveyLanguage]);
+  }, [question.answerLimits, language]);
 
   // Update custom answer value if value from context is string
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function CheckBoxQuestion({
           </FormHelperText>
           {validationErrors && validationErrors.includes('answerLimits') && (
             <FormHelperText style={visuallyHidden} role="alert">
-              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
+              {`${question.title?.[language]}, ${answerLimitText}`}
             </FormHelperText>
           )}
         </>
@@ -102,7 +102,7 @@ export default function CheckBoxQuestion({
         {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
-            label={option.text?.[surveyLanguage] ?? ''}
+            label={option.text?.[language] ?? ''}
             control={
               <Checkbox
                 action={actionRef.current[index]}
@@ -119,7 +119,7 @@ export default function CheckBoxQuestion({
                       value.filter((optionId) => optionId !== option.id);
                   onChange(newValue);
                 }}
-                name={option.text?.[surveyLanguage]}
+                name={option.text?.[language]}
               />
             }
             sx={{

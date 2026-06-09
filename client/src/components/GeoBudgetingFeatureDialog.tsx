@@ -23,7 +23,7 @@ export default function GeoBudgetingFeatureDialog({
   onDeleteClick,
   onClose,
 }: Props) {
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -42,7 +42,7 @@ export default function GeoBudgetingFeatureDialog({
             aria-hidden="true"
           />
         )}
-        <span>{targetName?.[surveyLanguage] ?? ''}</span>
+        <span>{targetName?.[language] ?? ''}</span>
       </DialogTitle>
       <DialogContent />
       <DialogActions>

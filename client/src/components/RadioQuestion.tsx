@@ -34,7 +34,7 @@ export default function RadioQuestion({
   setDirty,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, language } = useTranslations();
   const classes = useStyles();
   const actionRef = useRef([]);
 
@@ -72,13 +72,13 @@ export default function RadioQuestion({
               : event.currentTarget.value,
           );
         }}
-        name={`${question.title?.[surveyLanguage]}-group`}
+        name={`${question.title?.[language]}-group`}
       >
         {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
             value={option.id}
-            label={option.text?.[surveyLanguage] ?? ''}
+            label={option.text?.[language] ?? ''}
             control={
               <Radio
                 action={actionRef.current[index]}

@@ -1,4 +1,5 @@
 import { ChipProps, Chip as MuiChip } from '@mui/material';
+import { pillBorderRadius } from './styles';
 
 export function Chip({ sx, ...props }: ChipProps) {
   return (
@@ -8,7 +9,7 @@ export function Chip({ sx, ...props }: ChipProps) {
         (theme) => ({
           height: '28px',
           fontSize: '12px',
-          borderRadius: '9999px',
+          borderRadius: pillBorderRadius,
           '& .MuiChip-label': { px: '8px' },
           ...(props.variant === 'outlined'
             ? {

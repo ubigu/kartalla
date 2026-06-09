@@ -27,8 +27,8 @@ vi.mock('@src/user', () => ({
 }));
 
 import { getDb } from '@src/database';
-import { createSurvey, updateSurvey } from './survey';
 import { buildMockDb } from '@src/tests/helpers';
+import { createSurvey, updateSurvey } from './survey';
 
 describe('updateSurvey', () => {
   beforeEach(() => {
@@ -77,9 +77,9 @@ describe('updateSurvey', () => {
             {
               id: -1,
               type: 'radio',
-              title: { fi: 'Test radio', en: '', se: '' },
+              title: { fi: 'Test radio', en: '', sv: '' },
               isRequired: false,
-              options: [{ text: { fi: 'first', en: '', se: '' } }],
+              options: [{ text: { fi: 'first', en: '', sv: '' } }],
               allowCustomAnswer: false,
               followUpSections: [
                 {
@@ -180,26 +180,15 @@ describe('createSurvey', () => {
     (getDb as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
   });
 
-  it('should use user defaultLanguage when set', async () => {
+  it('should set survey languages as an empty array', async () => {
     const user: User = { ...baseUser, defaultLanguage: 'en' };
     mockDb.one
-      .mockResolvedValueOnce({ ...mockSurveyRow, languages: ['en'] })
+      .mockResolvedValueOnce({ ...mockSurveyRow, languages: [] })
       .mockResolvedValueOnce(mockPageRow);
 
     await createSurvey(user);
 
     const insertParams = mockDb.one.mock.calls[0][1];
-    expect(insertParams[2]).toEqual(['en']);
-  });
-
-  it('should fall back to DEFAULT_LANGUAGE when user has no defaultLanguage', async () => {
-    mockDb.one
-      .mockResolvedValueOnce({ ...mockSurveyRow, languages: ['fi'] })
-      .mockResolvedValueOnce(mockPageRow);
-
-    await createSurvey(baseUser);
-
-    const insertParams = mockDb.one.mock.calls[0][1];
-    expect(insertParams[2]).toEqual(['fi']);
+    expect(insertParams[2]).toEqual([]);
   });
 });

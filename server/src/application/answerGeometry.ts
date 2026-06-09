@@ -13,7 +13,13 @@ import {
 import { getAvailableOskariMapLayers, getSurveyTargetSrid } from './map';
 import { getSurvey } from './survey';
 
-const tr = useTranslations('fi');
+function localize(
+  text: Record<string, string> | undefined | null,
+  lang: LanguageCode,
+  fallback = '',
+) {
+  return text?.[lang] ?? text?.['fi'] ?? fallback;
+}
 
 interface CheckboxOptions {
   text: { [key: string]: string };
@@ -68,6 +74,7 @@ interface PageSectionDetails {
 function geometryAnswerToFeature(
   answer: AnswerEntry,
   mapLayers: LocalizedSurveyMapLayer[],
+  lang: LanguageCode,
   questionDetails?: PageSectionDetails,
   answerType?: string,
 ) {
@@ -75,24 +82,25 @@ function geometryAnswerToFeature(
   if (!answer.valueGeometry) {
     return null;
   }
+  const tr = useTranslations(lang);
   const mapLayerNames = answer.mapLayers
     .map((layerId) => mapLayers.find((layer) => layer.id === layerId))
     .filter(Boolean)
     .map((layer) =>
       typeof layer?.name === 'string'
         ? layer.name
-        : (layer?.name?.['fi'] ?? ''),
+        : localize(layer?.name, lang),
     )
     .filter(Boolean);
 
   const properties = {
-    ['Vastaustunniste']: answer.submissionId,
-    ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
-    ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
-    ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
+    [tr.submissionId]: answer.submissionId,
+    [tr.timestamp]: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
+    [tr.responseLanguage]: tr[answer?.submissionLanguage ?? 'fi'],
+    [tr.question]: `${tr.page} ${answer.pageIndex + 1} / ${tr.question} ${
       answer.sectionIndex + 1
-    }: ${answer.title?.['fi'] ?? ''}`,
-    ['Näkyvät tasot']: mapLayerNames.join(', '),
+    }: ${localize(answer.title, lang)}`,
+    [tr.MapQuestion.visibleLayers]: mapLayerNames.join(', '),
   };
 
   // Add target information for geobudgeting answers
@@ -105,11 +113,15 @@ function geometryAnswerToFeature(
     const targetIndex = answer.valueNumeric;
     const target = questionDetails.targets[targetIndex];
     if (target) {
-      properties['Kohde'] = target.name?.['fi'] ?? `Target ${targetIndex}`;
+      properties[tr.GeoBudgetingQuestion.target] = localize(
+        target.name,
+        lang,
+        `${tr.GeoBudgetingQuestion.target} ${targetIndex}`,
+      );
       if (target.price !== undefined && target.price !== null) {
-        properties['Hinta'] = target.price;
+        properties[tr.GeoBudgetingQuestion.price] = target.price;
         if (questionDetails.unit) {
-          properties['Yksikkö'] = questionDetails.unit;
+          properties[tr.GeoBudgetingQuestion.unit] = questionDetails.unit;
         }
       }
     }
@@ -134,9 +146,11 @@ function dbEntriesToFeatures(
   entries: AnswerEntry[],
   checkboxOptions: CheckboxOptions[],
   mapLayers: LocalizedSurveyMapLayer[],
+  lang: LanguageCode,
 ) {
   // Sort entries first by submission, then by sectionId
   // Each sectionId instance (separated by submission) will represent a single Feature
+  const tr = useTranslations(lang);
 
   const answersToSubmissions = entries.reduce((submissionGroup, answer) => {
     const { submissionId } = answer;
@@ -148,16 +162,19 @@ function dbEntriesToFeatures(
       submissionGroup[submissionId][answer.answerId] = geometryAnswerToFeature(
         answer,
         mapLayers,
+        lang,
         questionDetails,
         answer.type,
       );
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
-      let newAnswer: string;
-      let key: string = `Alikysymys ${answer.sectionIndex + 1}: ${
-        answer.title?.['fi'] ?? 'Nimetön alikysymys'
-      }`;
-      const keyOther: string = `${key} - jokin muu, mikä?`;
+      let newAnswer: string | number;
+      let key: string = `${tr.subquestion} ${answer.sectionIndex + 1}: ${localize(
+        answer.title,
+        lang,
+        tr.unnamedSubquestion,
+      )}`;
+      const keyOther: string = `${key} - ${tr.customAnswerLabel}`;
 
       switch (answer.type) {
         case 'checkbox':
@@ -165,7 +182,7 @@ function dbEntriesToFeatures(
           checkboxOptions
             .filter((opt) => opt.sectionId === answer.sectionId)
             .forEach((opt) => {
-              const questionKey = `${key} - ${opt.text['fi']}`;
+              const questionKey = `${key} - ${localize(opt.text, lang)}`;
               if (
                 !submissionGroup[submissionId][answer.parentEntryId].properties[
                   questionKey
@@ -193,8 +210,8 @@ function dbEntriesToFeatures(
             submissionGroup[submissionId][answer.parentEntryId].properties[
               keyOther
             ] = answer.valueText;
-          } else if (answer.optionText?.['fi']) {
-            key = `${key} - ${answer?.optionText?.['fi']}`;
+          } else if (localize(answer.optionText, lang)) {
+            key = `${key} - ${localize(answer.optionText, lang)}`;
             submissionGroup[submissionId][answer.parentEntryId].properties[
               key
             ] = 'true';
@@ -205,8 +222,7 @@ function dbEntriesToFeatures(
           newAnswer =
             answer.valueNumeric ??
             answer.valueText ??
-            answer.optionText?.['fi'] ??
-            '';
+            localize(answer.optionText, lang);
 
           submissionGroup[submissionId][answer.parentEntryId].properties[key] =
             newAnswer;
@@ -298,7 +314,7 @@ async function getGeometryDBEntries(
  */
 export async function getGeometryDBEntriesAsGeoJSON(
   surveyId: number,
-  _lang: LanguageCode = 'fi',
+  lang: LanguageCode = 'fi',
 ): Promise<{ [key: string]: FeatureCollection }> {
   const survey = await getSurvey({ id: surveyId });
   const [targetSrid, checkboxOptions, mapLayers] = await Promise.all([
@@ -310,15 +326,17 @@ export async function getGeometryDBEntriesAsGeoJSON(
 
   if (!rows) return null;
 
-  const features = dbEntriesToFeatures(rows, checkboxOptions, mapLayers);
+  const features = dbEntriesToFeatures(rows, checkboxOptions, mapLayers, lang);
   /* There could be rows where the parent map answer (erroneously) has null geometry
   - if there are no valid map answers, return null from here too */
   if (!features.length) return null;
 
+  const tr = useTranslations(lang);
+
   // Group features by question to add them to separate layers
   return features.reduce((questions, feature) => {
     const { properties } = feature;
-    const questionTitle = properties['Kysymys'];
+    const questionTitle = properties[tr.question];
 
     questions[questionTitle] = questions[questionTitle] ?? {
       type: 'FeatureCollection',

@@ -1,12 +1,12 @@
 import { LanguageCode } from '@interfaces/survey';
 import { MenuItem, Select, Tooltip } from '@mui/material';
 import { CSSProperties, makeStyles } from '@mui/styles';
+import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LanguageIcon from './icons/LanguageIcon';
 
 interface Props {
   style?: CSSProperties;
-  changeUILanguage?: boolean;
 }
 
 const useStyles = makeStyles({
@@ -18,13 +18,18 @@ const useStyles = makeStyles({
   },
 });
 
-export default function SurveyLanguageMenu({
-  style,
-  changeUILanguage = false,
-}: Props) {
-  const { tr, setSurveyLanguage, setLanguage, languages, surveyLanguage } =
-    useTranslations();
+export default function SurveyLanguageMenu({ style }: Props) {
+  const { tr, language, setLanguage } = useTranslations();
+  const { survey } = useSurveyAnswers();
   const classes = useStyles();
+
+  const languages = survey
+    ? (Object.entries(survey.enabledLanguages)
+        .filter(([, enabled]) => enabled)
+        .map(([lang]) => lang) as LanguageCode[])
+    : [];
+
+  if (languages.length <= 1) return null;
 
   return (
     <div className={classes.root} style={style}>
@@ -36,24 +41,18 @@ export default function SurveyLanguageMenu({
         <Select
           inputProps={{ 'aria-label': tr.SurveyLanguageMenu.languageControl }}
           size="small"
-          value={surveyLanguage}
-          onChange={(event) => {
-            const targetLanguage = event.target.value as LanguageCode;
-            setSurveyLanguage(targetLanguage);
-            if (changeUILanguage) setLanguage(targetLanguage);
-          }}
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as LanguageCode)}
           IconComponent={LanguageIcon}
           sx={{
             color: 'inherit',
             '&>.MuiSelect-select': {
-              // Accommodate the larger globe icon
               paddingRight: '38px !important',
             },
             '&>fieldset': {
               display: 'none',
             },
             '&>.MuiSvgIcon-root': {
-              // The component is used in admin panel and survey, must adapt
               color: 'inherit',
               fill: 'currentColor',
               position: 'absolute',
@@ -67,7 +66,7 @@ export default function SurveyLanguageMenu({
             <MenuItem
               key={`lang-item-${index}`}
               value={lang}
-              selected={lang === surveyLanguage}
+              selected={lang === language}
             >
               {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
             </MenuItem>

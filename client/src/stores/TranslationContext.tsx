@@ -1,12 +1,9 @@
-import {
-  EnabledLanguages,
-  LanguageCode,
-  LocalizedText,
-} from '@interfaces/survey';
+import { LocalizedText } from '@interfaces/survey';
 import {
   createContext,
   Dispatch,
   ReactNode,
+  useCallback,
   useContext,
   useMemo,
   useReducer,
@@ -14,73 +11,53 @@ import {
 import { useHistory } from 'react-router-dom';
 import en from '../locales/en.json';
 import fi from '../locales/fi.json';
-import se from '../locales/se.json';
+import sv from '../locales/sv.json';
 
-// Object containing all translations
 const translations = {
   fi,
   en,
-  se,
+  sv,
 };
 
-/**
- * All possible languages
- */
 export type Language = keyof typeof translations;
 
-/**
- * Locale map for supported languages
- */
 const localeMap: Record<Language, string> = {
   fi: 'fi-FI',
   en: 'en-GB',
-  se: 'sv-SE',
+  sv: 'sv-SE',
 };
 
-/**
- * Reducer state type
- */
-type State = {
+type State = Language;
+
+type Action = {
+  type: 'SET_LANGUAGE';
   language: Language;
-  surveyLanguage: Language;
-  languages: Language[];
 };
 
-/**
- * Reducer action type
- */
-type Action =
-  | {
-      type: 'SET_LANGUAGE' | 'SET_SURVEY_LANGUAGE';
-      language: Language;
-    }
-  | {
-      type: 'SET_AVAILABLE_LANGUAGES';
-      languages: EnabledLanguages;
-    };
+type Context = [Language, Dispatch<Action>];
 
-/**
- * Type of stored context (state & reducer returned from useReducer)
- */
-type Context = [State, Dispatch<Action>];
-
-/**
- * Type of provider props
- */
 interface Props {
   children: ReactNode;
 }
 
-/** Translation context initial values */
-const stateDefaults: State = {
-  language: 'fi',
-  surveyLanguage: 'fi',
-  languages: ['fi', 'en', 'se'],
-};
+export const supportedLanguages = Object.keys(translations) as Language[];
+
+export function detectBrowserLanguage(): Language {
+  for (const lang of navigator.languages ?? [navigator.language]) {
+    const code = lang.split('-')[0];
+    if (isLanguage(code)) return code;
+  }
+  return 'fi';
+}
+
+const stateDefaults: State = 'fi';
+
+export function isLanguage(key: unknown): key is Language {
+  return typeof key === 'string' && key in translations;
+}
 
 export const TranslationContext = createContext<Context | null>(null);
 
-/** Custom hook for accessing the workspace context */
 export function useTranslations() {
   const context = useContext(TranslationContext);
   const history = useHistory();
@@ -90,41 +67,40 @@ export function useTranslations() {
       'useTranslations must be used within the TranslationProvider',
     );
   }
-  const [state, dispatch] = context;
+  const [language, dispatch] = context;
 
-  const setLanguage = (language: Language) => {
-    history.push(`?lang=${language ?? stateDefaults.surveyLanguage}`);
-    dispatch({
-      type: 'SET_LANGUAGE',
-      language: language ?? stateDefaults.surveyLanguage,
-    });
-  };
+  const setLanguage = useCallback(
+    (language: Language) => {
+      history.push(`?lang=${language}`);
+      dispatch({ type: 'SET_LANGUAGE', language });
+    },
+    [history],
+  );
 
-  const setSurveyLanguage = (language: Language) => {
-    dispatch({ type: 'SET_SURVEY_LANGUAGE', language });
-  };
+  /** Sets language without pushing to browser history (used for init/validation). */
+  const setLanguageQuiet = useCallback((language: Language) => {
+    dispatch({ type: 'SET_LANGUAGE', language });
+  }, []);
 
-  const setAvailableLanguages = (languages: EnabledLanguages) => {
-    dispatch({ type: 'SET_AVAILABLE_LANGUAGES', languages });
-  };
-
-  return {
-    setLanguage,
-    setSurveyLanguage,
-    setAvailableLanguages,
-    language: state.language,
-    surveyLanguage: state.surveyLanguage,
-    tr: translations[state.language],
-    initializeLocalizedObject: (initialValue: string | null): LocalizedText => {
-      return state.languages.reduce((prevValue, currentValue) => {
+  const initializeLocalizedObject = useCallback(
+    (initialValue: string | null): LocalizedText => {
+      return supportedLanguages.reduce((prevValue, currentValue) => {
         return {
           ...prevValue,
           [currentValue]: initialValue,
         };
       }, {} as LocalizedText);
     },
-    languages: state.languages,
-    activeLanguageLocale: localeMap[state.language],
+    [],
+  );
+
+  return {
+    setLanguage,
+    setLanguageQuiet,
+    language,
+    tr: translations[language],
+    initializeLocalizedObject,
+    activeLanguageLocale: localeMap[language],
   };
 }
 
@@ -134,7 +110,6 @@ function isApiTranslationKey(key: unknown): key is ApiTranslationKey {
   return typeof key === 'string' && key in fi.ApiResponses;
 }
 
-/** Returns the translation for an API response key, falling back to the key itself if no translation exists. */
 export function getApiTranslation(
   key: unknown,
   tr: (typeof translations)[Language],
@@ -143,38 +118,18 @@ export function getApiTranslation(
   return tr.ApiResponses[key];
 }
 
-/** Reducer function for dispatching actions and changing the state provided by the TranslationContext */
-function reducer(state: State, action: Action): State {
+function reducer(_state: State, action: Action): State {
   switch (action.type) {
     case 'SET_LANGUAGE':
-      return {
-        ...state,
-        language: action.language,
-      };
-    case 'SET_SURVEY_LANGUAGE':
-      return {
-        ...state,
-        surveyLanguage: action.language,
-      };
-    case 'SET_AVAILABLE_LANGUAGES':
-      return {
-        ...state,
-        languages: Object.entries(action.languages)
-          .filter(([, isEnabled]) => isEnabled)
-          .map(([lang]) => lang as LanguageCode),
-      };
+      return action.language;
     default:
       throw new Error('Invalid action type');
   }
 }
 
 export default function TranslationProvider({ children }: Props) {
-  const [state, dispatch] = useReducer(reducer, stateDefaults);
-  /**
-   * Use useMemo here to avoid unnecessary rerenders
-   * @see https://reactjs.org/docs/hooks-reference.html#usememo
-   */
-  const value = useMemo<Context>(() => [state, dispatch], [state]);
+  const [language, dispatch] = useReducer(reducer, stateDefaults);
+  const value = useMemo<Context>(() => [language, dispatch], [language]);
 
   return (
     <TranslationContext.Provider value={value}>

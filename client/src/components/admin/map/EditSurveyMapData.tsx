@@ -4,6 +4,7 @@ import { Box, Skeleton, Typography } from '@mui/material';
 import { getMapPublications } from '@src/controllers/MapPublicationsController';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { getLayerName } from '@src/utils/map/oskariHelpers';
 import { useEffect, useState } from 'react';
 import { Combobox_WIP } from '../../core/Combobox';
@@ -12,7 +13,11 @@ import { Select } from '../../core/Select';
 import { loadingPulse } from '../../core/styles';
 import { editPageContainerSx } from '../EditSurvey';
 
-export function EditSurveyMapData() {
+interface Props {
+  canEdit: boolean;
+}
+
+export function EditSurveyMapData({ canEdit }: Props) {
   const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
   const [mapPublicationsLoading, setMapPublicationsLoading] = useState(true);
 
@@ -24,7 +29,10 @@ export function EditSurveyMapData() {
     availableMapLayers,
     availableMapLayersLoading,
   } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+
+  const editingDisabled = !canEdit || activeSurveyLoading;
 
   useEffect(() => {
     async function fetchMapPublications() {
@@ -52,6 +60,7 @@ export function EditSurveyMapData() {
       </Typography>
       <Select<SurveyMapProvider>
         label={tr.EditSurveyInfo.mapProvider}
+        disabled={editingDisabled}
         value={activeSurvey.mapProvider}
         onChange={(value) => {
           editSurvey({
@@ -73,6 +82,7 @@ export function EditSurveyMapData() {
             <Skeleton variant="rectangular" height={40} />
           ) : (
             <Combobox_WIP
+              disabled={editingDisabled}
               options={mapPublications.map((pub) => ({
                 value: pub.url,
                 label: pub.name,
@@ -91,6 +101,7 @@ export function EditSurveyMapData() {
           <Input
             error={validationErrors?.includes('survey.mapUrl')}
             label={tr.EditSurveyInfo.mapUrl}
+            disabled={editingDisabled}
             value={activeSurvey.mapUrl ?? ''}
             onChange={(event) => {
               editSurvey({
@@ -113,7 +124,7 @@ export function EditSurveyMapData() {
                   <li key={layer.id}>
                     {getLayerName(
                       layer,
-                      surveyLanguage,
+                      workingLanguage,
                       tr.EditSurveyInfo.layerNameFallback,
                     )}
                   </li>

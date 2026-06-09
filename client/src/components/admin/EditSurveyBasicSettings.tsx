@@ -1,30 +1,46 @@
 // @ts-strict-ignore
-import { Box, Link, Stack, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  Link,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { TagPicker } from '@src/components/admin/TagPicker';
-import { useSurvey } from '@src/stores/SurveyContext';
+import { hasEnabledLanguages, useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  useWorkingLanguage,
+  useWorkingLanguageInlineDescription,
+} from '@src/stores/WorkingLanguageContext';
+import { getPublicSurveyUrl } from '@src/utils/path';
 import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
 import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
 import { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import LoadingButton from '../LoadingButton';
 import RichTextEditor from '../RichTextEditor';
 import { Checkbox } from '../core/Checkbox';
+import { DateTimePicker } from '../core/DateTimePicker';
 import { Input } from '../core/Input';
 import { InputHelperText } from '../core/InputHelperText';
-import { Select } from '../core/Select';
-import { loadingPulse } from '../core/styles';
-import { editPageContainerSx } from './EditSurvey';
-import { LanguageSelector } from './EditSurveyTranslationsV2';
+import {
+  controlBorderRadius,
+  gradientBackground,
+  loadingPulse,
+} from '../core/styles';
+import ArrowLeftIcon from '../icons/ArrowLeftIcon';
+import { editPageContainerSx, editSurveyPaths } from './EditSurvey';
+import { InitialSurveyLanguageSettings } from './InitialSurveyLanguageSettings';
 
 const useStyles = makeStyles({
   actions: {
@@ -50,15 +66,28 @@ export default function EditSurveyBasicSettings(props: Props) {
     deleteActiveSurvey,
   } = useSurvey();
 
-  const { languages, tr, language, surveyLanguage, setSurveyLanguage } =
-    useTranslations();
+  const { url } = useRouteMatch();
+  const surveyUrl = url.replace(`/${editSurveyPaths.basicSettings}`, '');
+  const { tr, language } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
+  const workingLanguageInlineDescription =
+    useWorkingLanguageInlineDescription();
   const { showToast } = useToasts();
   const history = useHistory();
   const classes = useStyles();
   const theme = useTheme();
   const testSurveyUrl = useMemo(() => {
-    return `${window.location.origin}/${originalActiveSurvey.organization.name}/${originalActiveSurvey.name}/testi`;
+    return getPublicSurveyUrl(
+      originalActiveSurvey.organization.name,
+      originalActiveSurvey.name,
+      { test: true },
+    );
   }, [originalActiveSurvey.name]);
+
+  const editingDisabled = !props.canEdit || activeSurveyLoading;
+
+  const languagesSet = hasEnabledLanguages(activeSurvey);
+  const [languagesInitialized, setLanguagesInitialized] = useState(false);
 
   const localLanguage = useMemo(() => {
     switch (language) {
@@ -66,7 +95,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         return fiLocale;
       case 'en':
         return enLocale;
-      case 'se':
+      case 'sv':
         return svLocale;
       default:
         return assertNever(language);
@@ -77,117 +106,84 @@ export default function EditSurveyBasicSettings(props: Props) {
     <>
       <Box
         sx={{
+          width: '600px',
           ...editPageContainerSx,
           ...(activeSurveyLoading && loadingPulse),
         }}
       >
-        <Typography variant="mainHeader" component={'h1'}>
-          {tr.EditSurvey.basicSettings}
-        </Typography>
-        <Stack sx={{ gap: '4px' }}>
-          <Box
+        <Stack>
+          <Typography variant="mainHeader" component={'h1'}>
+            {tr.EditSurvey.basicSettings}
+          </Typography>
+          <Stack
             sx={{
-              display: 'flex',
-              gap: '12px',
-              alignItems: 'flex-start',
-              position: 'relative',
+              marginTop:
+                !languagesSet || languagesInitialized
+                  ? editPageContainerSx.gap
+                  : 0,
             }}
           >
-            <Select
-              sx={(theme) => ({
-                background: theme.palette.surfacePrimary.main,
-              })}
-              aria-describedby="common-helper-basic-setting-language-select"
-              id="basic-settings-survey-language"
-              label={tr.SurveyLanguageMenu.workingLanguage}
-              labelProps={{ style: { position: 'absolute', top: '-18px' } }}
-              value={activeSurvey.primaryLanguage}
-              onChange={(lang) => {
-                setSurveyLanguage(lang);
-                editSurvey({
-                  ...activeSurvey,
-                  primaryLanguage: lang,
-                  enabledLanguages: {
-                    ...activeSurvey.enabledLanguages,
-                    [lang]: true,
-                  },
-                });
-              }}
-              options={languages.map((lang) => ({
-                value: lang,
-                label: `${tr.LanguageMenu[lang].toLocaleLowerCase()} (${lang})`,
-              }))}
-            />
-            <Checkbox
-              inputProps={{
-                'aria-describedby':
-                  'common-helper-basic-setting-language-select',
-              }}
-              checkboxBackground={theme.palette.surfaceSubtle.main}
-              label={tr.SurveyLanguageMenu.multilingual}
-              checked={activeSurvey.localisationEnabled ?? false}
-              onChange={(_, checked) => {
-                editSurvey({
-                  ...activeSurvey,
-                  enabledLanguages: {
-                    ...activeSurvey.enabledLanguages,
-                    [activeSurvey.primaryLanguage]: true,
-                  },
-                  localisationEnabled: checked,
-                });
-              }}
-            />
-          </Box>
-          <InputHelperText id={'common-helper-basic-setting-language-select'}>
-            {tr.SurveyLanguageMenu.workingLanguageHelperText}
-          </InputHelperText>
+            <Collapse in={!languagesSet} timeout={400} easing={'ease-in-out'}>
+              <InitialSurveyLanguageSettings
+                onSave={() => setLanguagesInitialized(true)}
+              />
+            </Collapse>
+            <Collapse
+              in={languagesInitialized}
+              timeout={300}
+              easing={'ease-in-out'}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  color: 'textSecondary.main',
+                  ...gradientBackground(theme),
+                  border: `0.5px solid ${theme.palette.borderSubtle.main}`,
+                  borderRadius: controlBorderRadius,
+                  textDecoration: 'none',
+                  padding: '20px 10px',
+                  gap: '12px',
+                  alignItems: 'center',
+                }}
+                component={NavLink}
+                to={`${surveyUrl}/${editSurveyPaths.languageSettings}`}
+              >
+                <ArrowLeftIcon htmlColor={theme.palette.primary.main} />
+                <span>
+                  {'Voit muokata ja täydentää kieliasetuksia Kieliasetuksissa.'}
+                </span>
+              </Box>
+            </Collapse>
+          </Stack>
         </Stack>
-        {activeSurvey.localisationEnabled && (
-          <LanguageSelector
-            allLanguages={languages}
-            enabledLanguages={activeSurvey.enabledLanguages}
-            label={tr.EditSurveyTranslations.supportedLanguages}
-            getLabel={(lang) => `${tr.EditSurveyTranslations[lang]} (${lang})`}
-            onToggle={(lang, enabled) => {
-              const next = {
-                ...activeSurvey.enabledLanguages,
-                [lang]: enabled,
-              };
-              if (!Object.values(next).some(Boolean)) {
-                showToast({
-                  severity: 'error',
-                  message: tr.EditSurveyTranslations.errorAtleastOnelanguage,
-                });
-                return;
-              }
-              editSurvey({ ...activeSurvey, enabledLanguages: next });
-            }}
-          />
-        )}
         <Input
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.title')}
           label={tr.EditSurveyInfo.title}
-          value={activeSurvey.title?.[surveyLanguage] ?? ''}
+          inlineDescription={workingLanguageInlineDescription}
+          value={activeSurvey.title?.[workingLanguage] ?? ''}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
               title: {
                 ...activeSurvey.title,
-                [surveyLanguage]: event.target.value,
+                [workingLanguage]: event.target.value,
               },
             });
           }}
         />
         <Input
           label={tr.EditSurveyInfo.subtitle}
-          value={activeSurvey.subtitle?.[surveyLanguage] ?? ''}
+          disabled={editingDisabled}
+          inlineDescription={workingLanguageInlineDescription}
+          value={activeSurvey.subtitle?.[workingLanguage] ?? ''}
           onChange={(event) =>
             editSurvey({
               ...activeSurvey,
               subtitle: {
                 ...activeSurvey.subtitle,
-                [surveyLanguage]: event.target.value,
+                [workingLanguage]: event.target.value,
               },
             })
           }
@@ -203,22 +199,36 @@ export default function EditSurveyBasicSettings(props: Props) {
             },
           }}
           editorStyle={{ background: theme.palette.surfaceInput.main }}
+          disabled={editingDisabled}
           label={tr.EditSurveyInfo.description}
-          value={activeSurvey.description?.[surveyLanguage] ?? ''}
+          value={activeSurvey.description?.[workingLanguage] ?? ''}
           onChange={(value) =>
             editSurvey({
               ...activeSurvey,
               description: {
                 ...activeSurvey.description,
-                [surveyLanguage]: value,
+                [workingLanguage]: value,
               },
             })
           }
         />
         <Input
+          sx={{
+            '& .Input-inlineDescription': {
+              color: 'textSubtle.main',
+            },
+          }}
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.name')}
-          label={tr.EditSurveyInfo.name}
+          label={tr.EditSurveyInfo.address}
+          inlineDescription={{
+            visible: getPublicSurveyUrl(
+              originalActiveSurvey.organization.name,
+              undefined,
+              { excludeProtocol: true },
+            ),
+          }}
           value={activeSurvey.name ?? ''}
           onChange={(event) => {
             editSurvey({
@@ -231,6 +241,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         <TagPicker
           selectedTags={activeSurvey.tags}
           addEnabled={true}
+          disabled={editingDisabled}
           onSelectedTagsChange={(t) =>
             editSurvey({
               ...activeSurvey,
@@ -240,6 +251,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           required
+          disabled={editingDisabled}
           error={validationErrors.includes('survey.author')}
           label={tr.EditSurveyInfo.author}
           value={activeSurvey.author ?? ''}
@@ -252,6 +264,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Input
           label={tr.EditSurveyInfo.authorUnit}
+          disabled={editingDisabled}
           value={activeSurvey.authorUnit ?? ''}
           onChange={(event) => {
             editSurvey({
@@ -260,26 +273,28 @@ export default function EditSurveyBasicSettings(props: Props) {
             });
           }}
         />
-        <Box
-          sx={{
-            width: '220px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
+        <LocalizationProvider
+          dateAdapter={AdapterDateFns}
+          adapterLocale={localLanguage}
+          localeText={{
+            dateTimePickerToolbarTitle: tr.EditSurveyInfo.selectDateAndTime,
           }}
         >
-          <LocalizationProvider
-            dateAdapter={AdapterDateFns}
-            adapterLocale={localLanguage}
-            localeText={{
-              dateTimePickerToolbarTitle: tr.EditSurveyInfo.selectDateAndTime,
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '16px',
+              justifyContent: 'space-between',
+              flex: 1,
             }}
           >
             <DateTimePicker
               label={tr.EditSurveyInfo.startDate}
+              disabled={editingDisabled}
               value={activeSurvey.startDate}
               ampm={false}
               format="dd.MM.yyyy HH:mm"
+              placeholder={tr.EditSurveyInfo.selectDate}
               onChange={(value: Date) => {
                 editSurvey({
                   ...activeSurvey,
@@ -289,8 +304,10 @@ export default function EditSurveyBasicSettings(props: Props) {
             />
             <DateTimePicker
               label={tr.EditSurveyInfo.endDate}
+              disabled={editingDisabled}
               value={activeSurvey.endDate}
               format="dd.MM.yyyy HH:mm"
+              placeholder={tr.EditSurveyInfo.selectDate}
               onChange={(value: Date) => {
                 editSurvey({
                   ...activeSurvey,
@@ -298,10 +315,11 @@ export default function EditSurveyBasicSettings(props: Props) {
                 });
               }}
             />
-          </LocalizationProvider>
-        </Box>
+          </Box>
+        </LocalizationProvider>
         <Checkbox
           label={tr.EditSurvey.allowSavingUnfinished}
+          disabled={editingDisabled}
           checked={activeSurvey.allowSavingUnfinished}
           onChange={(event) =>
             editSurvey({
@@ -313,6 +331,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         />
         <Checkbox
           label={tr.EditSurvey.displayPrivacyStatement}
+          disabled={editingDisabled}
           checked={activeSurvey.displayPrivacyStatement}
           onChange={(event) =>
             editSurvey({
@@ -327,6 +346,7 @@ export default function EditSurveyBasicSettings(props: Props) {
         <div>
           <Checkbox
             label={tr.EditSurveyInfo.allowTestSurvey}
+            disabled={editingDisabled}
             checked={activeSurvey.allowTestSurvey}
             aria-describedby={'publish-survey-helper-text'}
             onChange={(event) => {

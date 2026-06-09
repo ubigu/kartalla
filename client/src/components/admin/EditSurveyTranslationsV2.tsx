@@ -4,100 +4,24 @@ import {
   SurveyPageSection,
 } from '@interfaces/survey';
 import { Box, Theme, Typography, useTheme } from '@mui/material';
-import { Combobox_WIP } from '@src/components/core/Combobox';
 import { Input } from '@src/components/core/Input';
 import { loadingPulse } from '@src/components/core/styles';
 import { Tab, Tabs } from '@src/components/core/Tabs';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { useToasts } from '@src/stores/ToastContext';
-import { Language, useTranslations } from '@src/stores/TranslationContext';
-import { assertNever } from '@src/utils/typeCheck';
+import {
+  supportedLanguages,
+  useTranslations,
+} from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
+import {
+  collectPageFields,
+  collectSectionFields,
+} from '@src/utils/surveyTranslations';
 import { useState } from 'react';
-import { Checkbox } from '../core/Checkbox';
 import { Select } from '../core/Select';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
-
-export function collectPageFields(
-  page: SurveyPage,
-  lang: LanguageCode,
-): string[] {
-  const fields: string[] = [];
-  fields.push(page.title?.[lang] ?? '');
-  for (const section of page.sections ?? []) {
-    fields.push(section.title?.[lang] ?? '');
-    switch (section.type) {
-      case 'text':
-        fields.push(section.body?.[lang] ?? '');
-        break;
-      case 'image':
-        fields.push(section.altText?.[lang] ?? '');
-        break;
-      case 'radio':
-      case 'checkbox':
-      case 'sorting':
-        section.options?.forEach((option) => {
-          fields.push(option.text?.[lang] ?? '');
-          if (option.info) fields.push(option.info[lang] ?? '');
-        });
-        break;
-      case 'radio-image':
-        section.options?.forEach((option) => {
-          fields.push(option.text?.[lang] ?? '');
-          fields.push(option.altText?.[lang] ?? '');
-          if (option.info) fields.push(option.info[lang] ?? '');
-        });
-        break;
-      case 'slider':
-        if (section.minLabel) fields.push(section.minLabel[lang] ?? '');
-        if (section.maxLabel) fields.push(section.maxLabel[lang] ?? '');
-        break;
-      case 'matrix':
-      case 'multi-matrix':
-        section.classes?.forEach((matrixClass) =>
-          fields.push(matrixClass[lang] ?? ''),
-        );
-        section.subjects?.forEach((subject) =>
-          fields.push(subject[lang] ?? ''),
-        );
-        break;
-      case 'budgeting':
-      case 'geo-budgeting':
-        section.targets?.forEach((target) =>
-          fields.push(target.name?.[lang] ?? ''),
-        );
-        if (section.helperText) fields.push(section.helperText[lang] ?? '');
-        break;
-      case 'grouped-checkbox':
-        section.groups?.forEach((group) => {
-          fields.push(group.name?.[lang] ?? '');
-          group.options?.forEach((option) => {
-            fields.push(option.text?.[lang] ?? '');
-            if (option.info) fields.push(option.info[lang] ?? '');
-          });
-        });
-        break;
-      case 'personal-info':
-        if (section.customLabel) fields.push(section.customLabel[lang] ?? '');
-        break;
-      case 'free-text':
-      case 'numeric':
-      case 'map':
-      case 'attachment':
-      case 'document':
-        // title only — no additional translatable fields
-        break;
-      default:
-        assertNever(section);
-    }
-    if (section.info) fields.push(section.info[lang] ?? '');
-    section.followUpSections?.forEach((followUp) =>
-      fields.push(followUp.title?.[lang] ?? ''),
-    );
-  }
-  return fields;
-}
 
 function getPageTabColor(
   page: SurveyPage,
@@ -114,68 +38,12 @@ function getPageTabColor(
   return anyMissing ? theme.palette.textWarning.main : undefined;
 }
 
-export function countSectionRows(section: SurveyPageSection): number {
-  let count = 1; // questionText title row
-  switch (section.type) {
-    case 'text':
-      count += 1;
-      break;
-    case 'image':
-      count += 1;
-      break;
-    case 'radio':
-    case 'checkbox':
-    case 'sorting':
-      section.options?.forEach((opt) => {
-        count += 1;
-        if (opt.info) count += 1;
-      });
-      break;
-    case 'radio-image':
-      section.options?.forEach((opt) => {
-        count += 2;
-        if (opt.info) count += 1;
-      });
-      break;
-    case 'slider':
-      if (section.minLabel) count += 1;
-      if (section.maxLabel) count += 1;
-      break;
-    case 'matrix':
-    case 'multi-matrix':
-      count += (section.classes?.length ?? 0) + (section.subjects?.length ?? 0);
-      break;
-    case 'budgeting':
-    case 'geo-budgeting':
-      count += section.targets?.length ?? 0;
-      if (section.helperText) count += 1;
-      break;
-    case 'grouped-checkbox':
-      section.groups?.forEach((group) => {
-        count += 1;
-        group.options?.forEach((opt) => {
-          count += 1;
-          if (opt.info) count += 1;
-        });
-      });
-      break;
-    case 'personal-info':
-      if (section.customLabel) count += 1;
-      break;
-    case 'map':
-      count += section.subQuestions?.length ?? 0;
-      break;
-    case 'free-text':
-    case 'numeric':
-    case 'attachment':
-    case 'document':
-      break;
-    default:
-      assertNever(section);
-  }
-  if (section.info) count += 1;
-  count += section.followUpSections?.length ?? 0;
-  return count;
+function capitalizeFirst(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function countSectionRows(section: SurveyPageSection): number {
+  return collectSectionFields(section, 'fi').length;
 }
 
 export const inlineToolbarOptions = {
@@ -183,58 +51,30 @@ export const inlineToolbarOptions = {
   inline: { options: ['bold', 'italic'] },
 };
 
-export function LanguageSelector({
-  allLanguages,
-  enabledLanguages,
-  onToggle,
-  label,
-  getLabel,
-}: {
-  allLanguages: Language[];
-  enabledLanguages: Record<Language, boolean>;
-  onToggle: (lang: Language, enabled: boolean) => void;
-  label: string;
-  getLabel: (lang: Language) => string;
-}) {
-  const theme = useTheme();
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <Typography
-        sx={{ fontSize: '12px', color: theme.palette.textInteractive.main }}
-      >
-        {label}
-      </Typography>
-      <Box sx={{ display: 'flex', gap: '4px' }}>
-        {allLanguages.map((lang, idx) => {
-          const isChecked = !!enabledLanguages[lang];
-          return (
-            <Checkbox
-              key={`${lang}-${idx}`}
-              label={getLabel(lang)}
-              onClick={() => onToggle(lang, !isChecked)}
-              checked={isChecked}
-            />
-          );
-        })}
-      </Box>
-    </Box>
-  );
-}
-
 export default function EditSurveyTranslationsV2() {
   const { activeSurvey, activeSurveyLoading, editSurvey, editPage } =
     useSurvey();
-  const { tr, language, languages } = useTranslations();
-  const { showToast } = useToasts();
+  const { workingLanguage } = useWorkingLanguage();
+  const { tr, language } = useTranslations();
   const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
-  const enabledLanguages = languages.filter(
+  const enabledLanguages = supportedLanguages.filter(
     (lang) => activeSurvey.enabledLanguages[lang],
   );
-  const [columnLangs, setColumnLangs] = useState<LanguageCode[]>(languages);
-  const [visibleColCount, setVisibleColCount] = useState(languages.length);
+  const otherEnabledLanguages = enabledLanguages.filter(
+    (lang) => lang !== workingLanguage,
+  );
+  const [columnLangs, setColumnLangs] = useState<LanguageCode[]>(
+    enabledLanguages.filter((l) => l !== workingLanguage),
+  );
+  const [visibleColCount, setVisibleColCount] = useState(
+    enabledLanguages.length,
+  );
 
-  const visibleCols = columnLangs.slice(0, visibleColCount);
+  const visibleCols = [
+    workingLanguage,
+    ...columnLangs.slice(0, visibleColCount - 1),
+  ];
 
   const pages = activeSurvey.pages ?? [];
   const activePage = pages[activeTab];
@@ -265,30 +105,11 @@ export default function EditSurveyTranslationsV2() {
       <Typography variant="mainHeader" component="h1">
         {tr.EditSurveyTranslations.multilingualism}
       </Typography>
-
-      <LanguageSelector
-        allLanguages={languages}
-        enabledLanguages={activeSurvey.enabledLanguages}
-        label={tr.EditSurveyTranslations.supportedLanguages}
-        getLabel={(lang) => `${tr.EditSurveyTranslations[lang]} (${lang})`}
-        onToggle={(lang, enabled) => {
-          const next = { ...activeSurvey.enabledLanguages, [lang]: enabled };
-          if (!Object.values(next).some(Boolean)) {
-            showToast({
-              severity: 'error',
-              message: tr.EditSurveyTranslations.errorAtleastOnelanguage,
-            });
-            return;
-          }
-          editSurvey({ ...activeSurvey, enabledLanguages: next });
-        }}
-      />
-
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
+          gap: '24px',
           minWidth: 'max-content',
         }}
       >
@@ -336,7 +157,7 @@ export default function EditSurveyTranslationsV2() {
             >
               <Select
                 value={String(visibleColCount)}
-                options={languages.map((_, colIndex) => ({
+                options={enabledLanguages.map((_, colIndex) => ({
                   value: String(colIndex + 1),
                   label: `${colIndex + 1} ${colIndex === 0 ? tr.EditSurveyTranslations.column : tr.EditSurveyTranslations.columns}`,
                 }))}
@@ -344,32 +165,76 @@ export default function EditSurveyTranslationsV2() {
                 sx={{ width: '100%' }}
               />
             </Box>
-            {visibleCols.map((lang, colIdx) => (
-              <Box
-                component="th"
-                scope="col"
-                key={colIdx}
-                sx={{ padding: '2px 8px' }}
+            <Box component="th" scope="col" sx={{ padding: '2px 8px' }}>
+              <Typography
+                sx={(theme) => ({
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  color: theme.palette.textSecondary.main,
+                  textAlign: 'left',
+                  height: '28px',
+                  lineHeight: '28px',
+                  padding: '0 6px',
+                })}
               >
-                <Combobox_WIP
-                  value={lang}
-                  options={languages.map((langCode) => ({
-                    value: langCode,
-                    label: `${tr.EditSurveyTranslations[langCode]} (${langCode})`,
-                  }))}
-                  onChange={(value) => {
-                    const next = [...columnLangs];
-                    next[colIdx] = value as LanguageCode;
-                    setColumnLangs(next);
+                {capitalizeFirst(tr.EditSurveyTranslations[workingLanguage])} (
+                {workingLanguage}){' '}
+                <Box
+                  component={'span'}
+                  sx={{
+                    color: theme.palette.harmaa.main,
+                    fontWeight: 400,
                   }}
-                  sx={(theme) => ({
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    color: theme.palette.textSecondary.main,
-                  })}
-                />
-              </Box>
-            ))}
+                >
+                  {'(työstökieli)'}
+                </Box>
+              </Typography>
+            </Box>
+            {visibleCols
+              .filter((l) => l !== workingLanguage)
+              .map((lang, colIdx) => (
+                <Box
+                  component="th"
+                  scope="col"
+                  key={`${lang}-${colIdx}`}
+                  sx={{ padding: '2px 8px' }}
+                >
+                  {otherEnabledLanguages.length <= 1 ? (
+                    <Typography
+                      sx={(theme) => ({
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: theme.palette.textSecondary.main,
+                        textAlign: 'left',
+                        height: '28px',
+                        lineHeight: '28px',
+                        padding: '0 6px',
+                      })}
+                    >
+                      {capitalizeFirst(tr.EditSurveyTranslations[lang])} ({lang}
+                      )
+                    </Typography>
+                  ) : (
+                    <Select
+                      value={lang}
+                      options={otherEnabledLanguages.map((langCode) => ({
+                        value: langCode,
+                        label: `${capitalizeFirst(tr.EditSurveyTranslations[langCode])} (${langCode})`,
+                      }))}
+                      onChange={(value) => {
+                        const next = [...columnLangs];
+                        next[colIdx] = value as LanguageCode;
+                        setColumnLangs(next);
+                      }}
+                      sx={(theme) => ({
+                        width: '100%',
+                        fontWeight: 700,
+                        color: theme.palette.textSecondary.main,
+                      })}
+                    />
+                  )}
+                </Box>
+              ))}
           </Box>
         </Box>
 

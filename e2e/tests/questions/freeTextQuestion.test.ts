@@ -3,23 +3,20 @@ import { getFreeTextQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } fro
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.freetext);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.freetext, ['fi']);
 const freeTextQuestion = getFreeTextQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Free text question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
-  test('basic answer', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('basic answer', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     await surveyEditPage.createFreeTextQuestion(freeTextQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -33,15 +30,13 @@ test.describe('Free text question', () => {
     ).toBeVisible();
   });
 
-  test('with max length', async ({ surveyEditPage, surveyPage, shortcuts }) => {
+  test('with max length', async ({ surveyData, surveyEditPage, surveyPage, shortcuts }) => {
     const shortMaxLength = 20;
     await surveyEditPage.createFreeTextQuestion({
       ...freeTextQuestion,
       maxLength: shortMaxLength,
     });
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

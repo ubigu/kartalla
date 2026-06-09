@@ -27,7 +27,7 @@ export function RadioImageQuestion({
   onChange,
   setDirty,
 }: Props) {
-  const { surveyLanguage } = useTranslations();
+  const { language } = useTranslations();
   const actionRef = useRef([]);
 
   if (autoFocus) {
@@ -57,7 +57,7 @@ export function RadioImageQuestion({
             : event.currentTarget.value,
         );
       }}
-      name={`${question.title?.[surveyLanguage]}-group`}
+      name={`${question.title?.[language]}-group`}
     >
       {question.options.map((option, index) => (
         <FormControlLabel
@@ -80,7 +80,7 @@ export function RadioImageQuestion({
                   width: '100%',
                 }}
                 src={`/api/file/${option.imageUrl}`}
-                alt={option.altText?.[surveyLanguage]}
+                alt={option.altText?.[language]}
               />
               {option.attributions && (
                 <Typography

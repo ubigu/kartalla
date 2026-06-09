@@ -610,10 +610,6 @@ export interface Survey {
    */
   enabledLanguages: EnabledLanguages;
   /**
-   * The primary authoring language of the survey
-   */
-  primaryLanguage: LanguageCode;
-  /**
    * Is the survey archived
    */
   isArchived: boolean;
@@ -684,7 +680,7 @@ export interface SectionOptionGroup {
 /**
  * Supported language codes
  */
-export type LanguageCode = 'fi' | 'en' | 'se';
+export type LanguageCode = 'fi' | 'en' | 'sv';
 
 /**
  * Type for localization typing

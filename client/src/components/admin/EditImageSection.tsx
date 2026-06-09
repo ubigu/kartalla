@@ -3,6 +3,7 @@ import { SurveyImageSection } from '@interfaces/survey';
 import { TextField } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 
 import FileUpload from './FileUpload';
 
@@ -18,7 +19,8 @@ export default function EditImageSection({
   disabled,
 }: Props) {
   const { activeSurvey } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
+  const { workingLanguage } = useWorkingLanguage();
 
   return (
     <>
@@ -54,14 +56,14 @@ export default function EditImageSection({
         }}
       />
       <TextField
-        value={section.altText[surveyLanguage]}
+        value={section.altText[workingLanguage]}
         label={tr.EditImageSection.altText}
         onChange={(event) =>
           onChange({
             ...section,
             altText: {
               ...section.altText,
-              [surveyLanguage]: event.target.value,
+              [workingLanguage]: event.target.value,
             },
           })
         }

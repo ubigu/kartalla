@@ -3,27 +3,25 @@ import { getBudgetingQuestionData, getTestSurveyData, TEST_SURVEY_URL_NAMES } fr
 import { test } from '../../utils/fixtures';
 
 const PAGE_NAME = 'Sivu 1';
-const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.budgeting);
-let surveyData = testSurveyData;
+const testSurveyData = getTestSurveyData(TEST_SURVEY_URL_NAMES.budgeting, ['fi']);
 const budgetingQuestion = getBudgetingQuestionData(PAGE_NAME);
 
+test.use({ surveyParams: testSurveyData });
+
 test.describe('Budgeting question', () => {
-  test.beforeEach(async ({ shortcuts }) => {
-    surveyData = await shortcuts.createSurveyViaApi(testSurveyData);
-  });
-  test.afterEach(async ({ shortcuts }) => {
-    await shortcuts.deleteSurvey();
+  test.beforeEach(async ({ surveyData, surveyEditPage }) => {
+    surveyEditPage.surveyId = surveyData.id;
+    await surveyEditPage.goto();
   });
 
   test('allocate budget across targets', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
   }) => {
     await surveyEditPage.createBudgetingQuestion(budgetingQuestion);
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,
@@ -43,6 +41,7 @@ test.describe('Budgeting question', () => {
   });
 
   test('full allocation required', async ({
+    surveyData,
     surveyEditPage,
     surveyPage,
     shortcuts,
@@ -54,9 +53,7 @@ test.describe('Budgeting question', () => {
       .getByRole('checkbox', { name: 'Koko budjetti käytettävä' })
       .check();
     await surveyEditPage.page.getByRole('button', { name: 'Tallenna' }).click();
-    await expect(surveyEditPage.page.getByRole('alert')).toHaveText(
-      'Kysely tallennettiin onnistuneesti!',
-    );
+    await surveyEditPage.expectSaveSuccess();
 
     await shortcuts.publishAndStartSurvey(
       surveyData.title,

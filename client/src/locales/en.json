@@ -45,10 +45,10 @@
     "saveFailedAnswerSubmitted": "Survey responses prevent saving changes.",
     "invalidFields": "The following fields have invalid values:",
     "validationError": {
-      "survey.title": "Survey title",
-      "survey.name": "Survey name",
-      "survey.author": "Survey author / contact person",
-      "survey.mapUrl": "URL for the Oskari map publication"
+      "survey.title": "Survey title not set",
+      "survey.name": "Survey address not set",
+      "survey.author": "Survey author / contact person not set",
+      "survey.mapUrl": "Oskari map publication URL not set"
     },
     "toFrontPage": "Back to the admin panel",
     "basicSettings": "Survey basic settings",
@@ -80,13 +80,15 @@
     "content": "Content",
     "multilingualism": "Multilingualism",
     "manageTranslations": "Manage translations",
+    "languageSettings": "Language settings",
+    "languageSettingsNotConfirmed": "Language settings not confirmed",
     "developedBy": "Kartalla survey service developed by Ubigu Oy"
   },
   "EditSurveyInfo": {
     "title": "Survey title",
     "subtitle": "Survey subtitle",
     "description": "Survey description",
-    "name": "Survey name",
+    "address": "Address",
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",
     "authorUnit": "Survey author's / contact person's unit",
@@ -107,6 +109,7 @@
     "availableMapLayers": "Available map layers:",
     "startDate": "Start date",
     "endDate": "End date",
+    "selectDate": "Select date...",
     "selectDateAndTime": "Select date and time",
     "theme": "Theme",
     "selectTheme": "Choose a theme",
@@ -439,12 +442,12 @@
     "defaultMinLabel": "Strongly disagree",
     "defaultMaxLabel": "Strongly agree",
     "defaultTranslatedMinLabel": {
-      "se": "Helt oense",
+      "sv": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
-      "se": "Helt enig",
+      "sv": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },
@@ -523,13 +526,14 @@
       "frontPage": "Surveys"
     },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
-    "editSurvey": "Edit survey",
-    "viewSurvey": "View survey",
+    "editSurvey": "Edit",
+    "viewSurvey": "Details",
+    "settings": "Settings",
     "publishNow": "Publish now",
     "confirmPublish": "Are you sure you want to publish the survey?",
     "publishSuccessful": "Survey published!",
     "publishFailed": "Failed to publish survey. Please try again later.",
-    "unpublish": "Unpublish survey",
+    "unpublish": "Close",
     "confirmUnpublish": "Are you sure you want to unpublish the survey?",
     "unpublishSuccessful": "Survey unpublished successfully!",
     "unpublishFailed": "Failed to unpublish the survey. Please try again later.",
@@ -542,9 +546,10 @@
     "openFrom": "Open from",
     "published": "Published",
     "notPublished": "Unpublished",
+    "noPublishDate": "No publish date set",
     "showAuthoredOnly": "Show authored surveys only",
     "showPublishedOnly": "Show published surveys only",
-    "copySurvey": "Copy survey",
+    "duplicateSurvey": "Duplicate",
     "answers": "Answers",
     "archiveLabel": "Archive",
     "activeLabel": "Active",
@@ -763,7 +768,7 @@
     "changeLanguage": "Change service language",
     "fi": "Suomi",
     "en": "English",
-    "se": "Svenska"
+    "sv": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -771,8 +776,33 @@
     "surveyLanguage": "Survey language",
     "workingLanguage": "Working language",
     "answerLanguage": "Answer language",
-    "multilingual": "Multilingual",
-    "workingLanguageHelperText": "In which language are you building the survey? If the survey is multilingual, you can change the working language and enter the survey content in different languages."
+    "multilingual": "The survey is multilingual",
+    "multilingualOption": "Multilingual",
+    "workingLanguageHelperText": "In which language are you building the survey? If the survey is multilingual, also select which languages are supported in the survey.",
+    "confirmLanguageSettings": "Confirm language settings",
+    "discardLanguageChanges": "Discard language changes",
+    "workingLanguageInputLabel": "Language",
+    "initialSettingsTitle": "New survey language settings",
+    "initialSettingsDescription": "You are creating a new survey. Let's set up the language settings first.",
+    "workingLanguageSelectLabel": "In which language are you building the survey?",
+    "multilingualQuestion": "Do you plan to add translations to the survey?",
+    "monolingualPrefix": "The survey will only be published in the language",
+    "multilingualRadioLabel": "The survey will be translated into multiple languages",
+    "initialSettingsFootnote": "You can edit and complete the language settings later in Language Settings.",
+    "translationsEntered": "translations entered",
+    "deleteTranslations": "Delete translations...",
+    "enteredTranslations": "Entered translations",
+    "supportedLanguagesLabel": "Languages supported in the survey",
+    "moveContentDialogTitle": "Move current language content?",
+    "moveContentDialogPart1": "Do you want to move the current content added in",
+    "moveContentDialogPart2": "to language",
+    "dontMove": "Don't move",
+    "move": "Move",
+    "languageNames": {
+      "fi": "Finnish",
+      "en": "English",
+      "sv": "Swedish"
+    }
   },
   "EditSurveyTranslations": {
     "enableLocalisation": "Allow publishing the survey with multiple languages",
@@ -786,7 +816,7 @@
     "surveySubtitle": "Survey subtitle",
     "fi": "Finnish",
     "en": "English",
-    "se": "Swedish",
+    "sv": "Swedish",
     "page": "page",
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
@@ -958,11 +988,16 @@
   "OlMap": {
     "layerFetchError": "Failed to load map layers. Using default map."
   },
+  "TranslationProvider": {
+    "loadingTranslations": "Loading translations"
+  },
   "ApiResponses": {
     "NO_ANSWERS_FOUND": "No answers found.",
     "NO_ANSWERS_AVAILABLE": "No answers available.",
     "NO_ATTACHMENTS_AVAILABLE": "No attachments available.",
     "USER_NOT_PERMITTED_TO_VIEW": "User not author, editor nor viewer of the survey.",
-    "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey."
+    "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey.",
+    "DUPLICATE_SURVEY_NAME": "Survey with the same name already exists. Please choose another name and try again.",
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes."
   }
 }

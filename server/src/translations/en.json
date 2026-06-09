@@ -4,6 +4,8 @@
   "somethingElse": "Something else, what",
   "question": "Question",
   "subquestion": "Subquestion",
+  "page": "Page",
+  "unnamedSubquestion": "Unnamed subquestion",
   "dontKnow": "I don't know",
   "unfinishedSubmission": "Unfinished submission",
   "unfinishedSurveyInfo": "Your submission to the survey {surveyTitle} has been saved as unfinished. Your answers will be taken into account only when you have finished answering the survey and submitted your answers.",
@@ -19,7 +21,7 @@
   "newUserRequest": "New user request",
   "fi": "Finnish",
   "en": "English",
-  "se": "Swedish",
+  "sv": "Swedish",
   "questionTypes": {
     "radio": "Single choice question",
     "radio-image": "Image choice question",
@@ -56,6 +58,9 @@
     "visibleLayers": "Visible layers"
   },
   "GeoBudgetingQuestion": {
-    "summary": "Summary"
+    "summary": "Summary",
+    "target": "Target",
+    "price": "Price",
+    "unit": "Unit"
   }
 }

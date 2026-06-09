@@ -1,18 +1,13 @@
 import { expect, Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class SurveyAdminPage {
-  private _page: Page;
-
+export class SurveyAdminPage extends BasePage {
   constructor(page: Page) {
-    this._page = page;
+    super(page);
   }
 
-  get page() {
-    return this._page;
-  }
-
-  async goto() {
-    await this._page.goto(`http://localhost:8080/admin/`);
+  async goto(lang?: string) {
+    await this._page.goto(`/admin/${lang ? `?lang=${lang}` : ''}`);
   }
 
   async getSurveyList() {
@@ -25,7 +20,7 @@ export class SurveyAdminPage {
     });
     const publishButton = surveyItem.getByRole('button', { name: 'julkaise' });
     const unPublishButton = surveyItem.getByRole('button', {
-      name: 'Päätä kysely',
+      name: 'Päätä',
     });
 
     // Need to wait here because isVisible() does not wait for the element to be visible
