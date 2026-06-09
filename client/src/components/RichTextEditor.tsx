@@ -3,13 +3,18 @@ import { Box, Typography } from '@mui/material';
 import { Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import { convertFromHTML } from 'draft-convert';
 import { convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown } from 'markdown-draft-js';
 import remarkRehype from 'remark-rehype';
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Editor, EditorProps } from 'react-draft-wysiwyg';
 import rehypeFormat from 'rehype-format';
 import rehypeRaw from 'rehype-raw';
@@ -218,12 +223,15 @@ function editorStateToMarkdown(
 const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
   const [editorState, setEditorState] = useState<EditorState | null>(null);
 
+  const lastEmittedValue = useRef<string | null>(null);
+
   const { onChange, ...restProps } = props;
 
   useImperativeHandle(
     ref,
     () => ({
       setEditorValue: async (value: string) => {
+        lastEmittedValue.current = value;
         const newEditorState = await markdownToEditorState(value);
         setEditorState(newEditorState);
       },
@@ -231,19 +239,21 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
     [],
   );
 
-  const { language } = useTranslations();
-  const { workingLanguage } = useWorkingLanguage();
-
   useEffect(() => {
-    async function updateEditorState() {
-      const newEditorState = await markdownToEditorState(props.value);
-      setEditorState(newEditorState);
+    // Ignore the value coming back from our own onChange.
+    if (props.value === lastEmittedValue.current) {
+      return;
     }
-    updateEditorState();
+    let cancelled = false;
+    markdownToEditorState(props.value).then((newEditorState) => {
+      if (!cancelled) {
+        setEditorState(newEditorState);
+      }
+    });
     return () => {
-      updateEditorState();
+      cancelled = true;
     };
-  }, [language, workingLanguage]);
+  }, [props.value]);
 
   const classes = useStyles({
     editorHeight: props.editorHeight,
@@ -256,12 +266,12 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
       return;
     }
     setEditorState(editorState);
-    props.onChange(
-      editorStateToMarkdown(
-        editorState,
-        props.toolbarOptions?.fontSize?.options,
-      ),
+    const markdown = editorStateToMarkdown(
+      editorState,
+      props.toolbarOptions?.fontSize?.options,
     );
+    lastEmittedValue.current = markdown;
+    props.onChange(markdown);
   }
 
   return (
