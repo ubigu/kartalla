@@ -43,10 +43,10 @@ import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
 import { Chip } from '../core/Chip';
 import BlockIcon from '../icons/BlockIcon';
-import CheckIcon from '../icons/CheckIcon';
 import CopyPlusIcon from '../icons/CopyPlusIcon';
 import FolderIcon from '../icons/FolderIcon';
-import SettingsIcon from '../icons/SettingsIcon';
+import RockerSmallIcon from '../icons/RockerSmallIcon';
+import SettingsSmallIcon from '../icons/SettingsSmallIcon';
 
 const fadeTimeout = 350;
 const CARD_BORDER_RADIUS = '8px';
@@ -57,6 +57,7 @@ function BarberPoleBorder({ published }: { published: boolean }) {
       sx={{
         alignSelf: 'stretch',
         width: '8px',
+        flexShrink: 0,
         borderRadius: CARD_BORDER_RADIUS,
         margin: '6px',
         border: '0.5px solid var rgba(233, 236, 239, 1))',
@@ -175,6 +176,53 @@ export default function SurveyListItem(props: Props) {
     [survey.name],
   );
 
+  function renderSchedulingInfo() {
+    const hasNoSchedule = !survey.startDate && !survey.endDate;
+
+    let dateInfo = null;
+    if (survey.startDate && survey.endDate) {
+      dateInfo = (
+        <Typography>
+          {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')}
+          &nbsp;–&nbsp;
+          {format(survey.endDate, 'd.M.yyyy')}
+        </Typography>
+      );
+    } else if (survey.startDate) {
+      dateInfo = (
+        <Typography>
+          {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
+        </Typography>
+      );
+    }
+
+    let publishStatus;
+    if (survey.isPublished) {
+      publishStatus = (
+        <Typography variant="published" sx={{ fontSize: '0.875rem' }}>
+          -&nbsp;{tr.SurveyList.published}
+        </Typography>
+      );
+    } else {
+      publishStatus = hasNoSchedule ? (
+        <Typography variant="published" sx={{ fontSize: '0.875rem' }}>
+          {tr.SurveyList.noPublishDate}
+        </Typography>
+      ) : (
+        <Typography variant="published" sx={{ fontSize: '0.875rem' }}>
+          -&nbsp;{tr.SurveyList.notPublished}
+        </Typography>
+      );
+    }
+
+    return (
+      <>
+        {dateInfo}
+        {publishStatus}
+      </>
+    );
+  }
+
   return (
     <ListItem
       sx={{
@@ -206,7 +254,7 @@ export default function SurveyListItem(props: Props) {
     >
       <Card sx={cardStyles(theme, loading)}>
         <BarberPoleBorder published={survey.isPublished} />
-        <Box flex={1}>
+        <Box flex={1} minWidth={0}>
           <CardContent sx={{ paddingX: '8px', paddingY: '16px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="h5" component="h3" sx={{ fontWeight: 700 }}>
@@ -336,78 +384,41 @@ export default function SurveyListItem(props: Props) {
                   alignItems: 'center',
                 }}
               >
-                {/* Scheduling info (start/end dates) */}
                 <CalendarSmallIcon
                   fontSize="small"
                   color="primary"
                   sx={{ fontSize: '14px' }}
                 />
-                {survey.startDate && survey.endDate ? (
-                  <Typography>
-                    {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')}{' '}
-                    - {format(survey.endDate, 'd.M.yyyy')}
-                  </Typography>
-                ) : survey.startDate ? (
-                  <Typography>
-                    {tr.SurveyList.openFrom}{' '}
-                    {format(survey.startDate, 'd.M.yyyy')}
-                  </Typography>
-                ) : null}
-                {/* Current publish status */}
-                {survey.isPublished ? (
-                  <Typography
-                    variant="published"
-                    color={'textInteractive'}
-                    sx={{
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {' '}
-                    - {tr.SurveyList.published}
-                  </Typography>
-                ) : (
-                  <Typography
-                    variant="published"
-                    color={'textInteractive'}
-                    sx={{
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {' '}
-                    - {tr.SurveyList.notPublished}
-                  </Typography>
-                )}
+                {renderSchedulingInfo()}
               </Stack>
             </Stack>
           </CardContent>
           <CardActions
-            style={{
+            sx={{
+              gap: '2px',
               paddingTop: '0',
               paddingBottom: '14px',
               width: '100%',
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'flex-start',
+              '& > *': {
+                whiteSpace: 'nowrap',
+              },
             }}
           >
             <Button
-              startIcon={<SettingsIcon stroke="currentColor" />}
+              startIcon={<SettingsSmallIcon stroke="currentColor" />}
               component={NavLink}
               to={`${url}kyselyt/${survey.id}`}
               disabled={disableUsersViewAccessToSurvey}
             >
-              {!survey.isArchived &&
-              (activeUserIsSuperUser ||
-                activeUserIsAdmin ||
-                survey.editors.includes(activeUser?.id) ||
-                activeUser?.id === survey.authorId)
-                ? tr.SurveyList.editSurvey
-                : tr.SurveyList.viewSurvey}
+              {tr.SurveyList.settings}
             </Button>
             {/* Allow publish only if it isn't yet published, has a name, and is not archived */}
             {!survey.isPublished && survey.name && !survey.isArchived && (
               <Button
-                startIcon={<CheckIcon />}
+                startIcon={<RockerSmallIcon />}
                 disabled={disableUsersWriteAccessToSurvey}
                 onClick={() => {
                   setPublishConfirmDialogOpen(true);
