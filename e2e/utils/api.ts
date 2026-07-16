@@ -46,13 +46,11 @@ export async function postSurvey(params: SurveyParams): Promise<string> {
   }>('/surveys', { method: 'POST' });
 
   const extraPages = await Promise.all(
-    params.pageNames
-      .slice(1)
-      .map(() =>
-        apiFetch<{ id: number }>(`/surveys/${survey.id}/page`, {
-          method: 'POST',
-        }),
-      ),
+    params.pageNames.slice(1).map(() =>
+      apiFetch<{ id: number }>(`/surveys/${survey.id}/page`, {
+        method: 'POST',
+      }),
+    ),
   );
   const allPages = [...survey.pages, ...extraPages];
 
@@ -64,8 +62,6 @@ export async function postSurvey(params: SurveyParams): Promise<string> {
       title: { fi: params.title },
       subtitle: { fi: params.subtitle },
       author: params.author,
-      startDate: new Date(Date.now() - 3_600_000).toISOString(),
-      endDate: new Date(Date.now() + 365 * 24 * 3_600_000).toISOString(),
       ...(params.languages && {
         enabledLanguages: Object.fromEntries(
           ['fi', 'en', 'sv'].map((l) => [l, params.languages!.includes(l)]),
