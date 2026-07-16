@@ -21,7 +21,7 @@ export default function SurveyLanguageRouter(): null {
 
   useEffect(() => {
     if (!survey) {
-      setLanguageQuiet(detectBrowserLanguage());
+      setLanguageQuiet(isLanguage(lang) ? lang : detectBrowserLanguage());
       return;
     }
     const enabled = Object.entries(survey.enabledLanguages)
