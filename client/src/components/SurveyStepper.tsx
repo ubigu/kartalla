@@ -724,7 +724,9 @@ export default function SurveyStepper({
           <Box
             sx={{
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
+              justifyContent: 'center',
               overflow: 'auto',
               height: '100%',
               width: '100%',
@@ -754,11 +756,15 @@ export default function SurveyStepper({
                       fontSize: '0.8rem',
                     },
                   }),
-                  position: 'absolute',
-                  bottom: 0,
+                  ...(currentPage.sidebar.imageSize === 'original' && {
+                    position: 'sticky',
+                    bottom: 0,
+                    right: 0,
+                    left: 0,
+                  }),
                   padding: '0.5rem',
-                  borderTopLeftRadius: '0.25rem',
-                  right: 0,
+                  alignSelf: 'stretch',
+                  textAlign: 'right',
                   color: 'white',
                   backgroundColor: theme.palette.primary.main,
                 })}
@@ -949,20 +955,25 @@ export default function SurveyStepper({
             </Paper>
 
             <div style={{ flexGrow: 1 }}>{sidePane}</div>
-            <Typography
-              sx={(theme) => ({
-                position: 'sticky',
-                textAlign: 'center',
-                bottom: 0,
-                padding: '0.5rem',
-                borderTopLeftRadius: '0.25rem',
-                right: 0,
-                color: 'white',
-                backgroundColor: theme.palette.primary.main,
-              })}
-            >
-              {currentPage.sidebar.imageAttributions}
-            </Typography>
+            {currentPage.sidebar.type === 'image' &&
+              currentPage.sidebar.imageAttributions && (
+                <Typography
+                  sx={(theme) => ({
+                    textAlign: 'center',
+                    padding: '0.5rem',
+                    color: 'white',
+                    backgroundColor: theme.palette.primary.main,
+                    ...(currentPage.sidebar.imageSize === 'original' && {
+                      position: 'sticky',
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                    }),
+                  })}
+                >
+                  {currentPage.sidebar.imageAttributions}
+                </Typography>
+              )}
           </Drawer>
         </>
       )}

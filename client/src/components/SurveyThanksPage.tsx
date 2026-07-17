@@ -129,7 +129,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         {thanksPageImageHeaderQuery.imageHeaders && (
           <div
             className="spacer"
-            style={{ minHeight: '40vh', width: '100%', position: 'relative' }}
+            style={{
+              minHeight: '40vh',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
           >
             <img
               style={{
@@ -142,11 +148,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             {thanksPageImageHeaderQuery.imageHeaders?.attributions && (
               <Typography
                 sx={(theme) => ({
-                  position: 'absolute',
-                  bottom: 0,
                   padding: '0.5rem',
-                  borderTopLeftRadius: '0.25rem',
-                  right: 0,
+                  textAlign: 'right',
+                  alignSelf: 'stretch',
                   color: 'white',
                   backgroundColor: theme.palette.primary.main,
                 })}
