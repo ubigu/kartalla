@@ -31,7 +31,10 @@ import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import { ComponentType, useEffect, useMemo, useRef, useState } from 'react';
@@ -386,7 +389,9 @@ export default function SurveyStepper({
     } catch (error) {
       showToast({
         severity: 'error',
-        message: tr.SurveyStepper.errorSubmittingSurvey,
+        message:
+          getApiTranslation(error?.message_code, tr, error?.info?.title) ||
+          tr.SurveyStepper.errorSubmittingSurvey,
       });
       setLoading(false);
     }

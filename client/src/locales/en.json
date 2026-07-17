@@ -998,6 +998,7 @@
     "USER_NOT_PERMITTED_TO_VIEW": "User not author, editor nor viewer of the survey.",
     "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey.",
     "DUPLICATE_SURVEY_NAME": "Survey with the same name already exists. Please choose another name and try again.",
-    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes."
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes.",
+    "BUDGET_NOT_FULLY_ALLOCATED": "The full budget must be used for question {x}."
   }
 }

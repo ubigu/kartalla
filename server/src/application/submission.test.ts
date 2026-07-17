@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SRID } from '@src/constants';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@src/database', () => ({
   getDb: vi.fn(),
@@ -40,15 +40,17 @@ vi.mock('./map', async () => {
   };
 });
 
+import { SubmissionAnswerEntry } from '@interfaces/survey';
 import { getDb } from '@src/database';
-import { getOskariMapSrid } from './map';
-import { getSurvey } from './survey';
 import { buildMockDb } from '@src/tests/helpers';
+import { getOskariMapSrid } from './map';
 import {
+  createSurveySubmission,
   getAnswerEntries,
   getSubmissionsForSurvey,
   getUnfinishedAnswerEntries,
 } from './submission';
+import { getSurvey } from './survey';
 
 const oskariSurvey = {
   mapProvider: 'oskari',
@@ -156,6 +158,71 @@ describe('getSurveyTargetSrid SRID propagation', () => {
         surveyId: 1,
         targetSrid: DEFAULT_SRID,
       });
+    });
+  });
+});
+
+describe('createSurveySubmission budgeting validation', () => {
+  let mockDb: ReturnType<typeof buildMockDb>;
+
+  const sectionId = 10;
+
+  const budgetingQuestionRow = {
+    id: sectionId,
+    title: { fi: 'Budjetti', en: 'Budget', sv: 'Budget' },
+    totalBudget: '100',
+    requireFullAllocation: true,
+    inputMode: 'absolute',
+    type: 'budgeting' as const,
+    targets: [{ name: { fi: 'A', en: 'A', sv: 'A' }, price: 10 }],
+  };
+
+  function primeQueries(budgetingRows: unknown[]) {
+    mockDb.manyOrNone
+      .mockResolvedValueOnce([]) // validateEntriesByAnswerLimits
+      .mockResolvedValueOnce([]) // validateEntriesByIsRequired
+      .mockResolvedValueOnce(budgetingRows) // validateBudgetingEntries
+      .mockResolvedValueOnce([{ id: 101 }]); // inserted answer_entry ids
+    mockDb.oneOrNone.mockResolvedValueOnce(null); // no existing unfinished submission
+    mockDb.one.mockResolvedValueOnce({
+      id: 1,
+      unfinished_token: null,
+      updated_at: new Date('2024-01-01'),
+    });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = buildMockDb();
+    vi.mocked(getDb).mockReturnValue(mockDb);
+  });
+
+  it('allows a partially allocated "pieces" mode budget even when requireFullAllocation is set', async () => {
+    primeQueries([{ ...budgetingQuestionRow, budgetingMode: 'pieces' }]);
+
+    // 1 piece bought out of a possible 10 (price 10, totalBudget 100) - not fully allocated
+    const answerEntries: SubmissionAnswerEntry[] = [
+      { sectionId, type: 'budgeting', value: [1] },
+    ];
+
+    await expect(
+      createSurveySubmission(1, answerEntries, null, false, 'fi'),
+    ).resolves.toMatchObject({ id: 1 });
+  });
+
+  it('rejects a partially allocated "direct" mode budget when requireFullAllocation is set', async () => {
+    primeQueries([{ ...budgetingQuestionRow, budgetingMode: 'direct' }]);
+
+    // Only 40 of the 100 total budget allocated
+    const answerEntries: SubmissionAnswerEntry[] = [
+      { sectionId, type: 'budgeting', value: [40] },
+    ];
+
+    await expect(
+      createSurveySubmission(1, answerEntries, null, false, 'fi'),
+    ).rejects.toMatchObject({
+      status: 400,
+      message_code: 'BUDGET_NOT_FULLY_ALLOCATED',
     });
   });
 });
