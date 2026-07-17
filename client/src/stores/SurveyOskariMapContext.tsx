@@ -5,7 +5,7 @@ import {
 } from '@interfaces/survey';
 import { colors } from '@src/themes/colors';
 import { Geometry, LineString, Point, Polygon } from 'geojson';
-import { Channel, DrawingEventHandler } from 'oskari-rpc';
+import OskariRPC, { Channel, DrawingEventHandler } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import {
   Dispatch,
@@ -25,22 +25,37 @@ import {
 interface OskariState {
   rpcChannel: Channel | null;
   oskariVersion: number | null;
+  mapError: boolean;
 }
 
 type OskariAction =
   | { type: 'SET_RPC_CHANNEL'; rpcChannel: Channel | null }
-  | { type: 'SET_OSKARI_VERSION'; value: number };
+  | { type: 'SET_OSKARI_VERSION'; value: number }
+  | { type: 'SET_MAP_ERROR'; value: boolean };
 
 type OskariContextType = [OskariState, Dispatch<OskariAction>];
 
 const oskariStateDefaults: OskariState = {
   rpcChannel: null,
   oskariVersion: null,
+  mapError: false,
 };
 
 export const SurveyOskariMapContext = createContext<OskariContextType | null>(
   null,
 );
+
+// Oskari's RPC channel has no error callback for a failed/invalid map URL -
+// if the map doesn't become ready within this time, treat it as an error
+const MAP_READY_TIMEOUT = 15000;
+
+function getOrigin(url: string) {
+  const anchorElement = document.createElement('a');
+  anchorElement.href = url;
+  return `${anchorElement.protocol}//${anchorElement.hostname}${
+    anchorElement.port ? `:${anchorElement.port}` : ''
+  }`;
+}
 
 const defaultViewLayer = 'defaultView';
 const answerGeometryLayer = 'answers';
@@ -100,6 +115,8 @@ function reducer(state: OskariState, action: OskariAction): OskariState {
       return { ...state, rpcChannel: action.rpcChannel };
     case 'SET_OSKARI_VERSION':
       return { ...state, oskariVersion: action.value };
+    case 'SET_MAP_ERROR':
+      return { ...state, mapError: action.value };
     default:
       throw new Error('Invalid action type');
   }
@@ -536,16 +553,37 @@ export function useSurveyOskariMap() {
     return provider;
   }, []);
 
+  async function initializeMap(iframe: HTMLIFrameElement, url: string) {
+    if (!iframe || !url) {
+      return;
+    }
+    dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel: null });
+    dispatch({ type: 'SET_MAP_ERROR', value: false });
+    const channel = OskariRPC.connect(iframe, getOrigin(url));
+
+    const isReady = await new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => resolve(false), MAP_READY_TIMEOUT);
+      channel.onReady(() => {
+        clearTimeout(timeout);
+        resolve(true);
+      });
+    });
+
+    if (!isReady) {
+      dispatch({ type: 'SET_MAP_ERROR', value: true });
+      return;
+    }
+
+    dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel: channel });
+    channel.getInfo((info) => {
+      const version = Number(info.version.split('.').join(''));
+      dispatch({ type: 'SET_OSKARI_VERSION', value: version });
+    });
+  }
+
   return {
-    setRpcChannel(channel: Channel | null) {
-      dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel: channel });
-      if (channel) {
-        channel.getInfo((info) => {
-          const version = Number(info.version.split('.').join(''));
-          dispatch({ type: 'SET_OSKARI_VERSION', value: version });
-        });
-      }
-    },
+    initializeMap,
+    mapError: state.mapError,
     provider,
     isReady,
   };

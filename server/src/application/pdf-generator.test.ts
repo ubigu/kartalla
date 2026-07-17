@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockLogger } from '@src/tests/helpers';
 
 vi.mock('pdfmake', () => {
   const createPdf = vi.fn();
@@ -20,9 +21,7 @@ vi.mock('./survey', () => ({
   getOptionsForSurvey: vi.fn(),
 }));
 
-vi.mock('@src/logger', () => ({
-  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
-}));
+vi.mock('@src/logger', () => ({ default: mockLogger() }));
 
 import {
   SubmissionAnswerEntry,

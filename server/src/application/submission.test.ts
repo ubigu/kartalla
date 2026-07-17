@@ -1,5 +1,6 @@
 import { DEFAULT_SRID } from '@src/constants';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildMockDb, mockLogger } from '@src/tests/helpers';
 
 vi.mock('@src/database', () => ({
   getDb: vi.fn(),
@@ -9,9 +10,7 @@ vi.mock('@src/database', () => ({
   encryptionKey: 'test-key',
 }));
 
-vi.mock('@src/logger', () => ({
-  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
-}));
+vi.mock('@src/logger', () => ({ default: mockLogger() }));
 
 vi.mock('@src/fileValidation', () => ({
   bufferFromDataUrl: vi.fn(),
@@ -42,7 +41,7 @@ vi.mock('./map', async () => {
 
 import { SubmissionAnswerEntry } from '@interfaces/survey';
 import { getDb } from '@src/database';
-import { buildMockDb } from '@src/tests/helpers';
+import { mockOlSurvey, mockOskariSurvey } from '@src/tests/data/survey';
 import { getOskariMapSrid } from './map';
 import {
   createSurveySubmission,
@@ -51,12 +50,6 @@ import {
   getUnfinishedAnswerEntries,
 } from './submission';
 import { getSurvey } from './survey';
-
-const oskariSurvey = {
-  mapProvider: 'oskari',
-  mapUrl: 'https://oskari.example.com',
-};
-const olSurvey = { mapProvider: 'openlayers', mapUrl: '' };
 
 describe('getSurveyTargetSrid SRID propagation', () => {
   let mockDb: ReturnType<typeof buildMockDb>;
@@ -73,12 +66,12 @@ describe('getSurveyTargetSrid SRID propagation', () => {
     });
 
     it('passes oskari SRID (3067) to the DB query', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(oskariSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOskariSurvey as any);
       vi.mocked(getOskariMapSrid).mockResolvedValue(3067);
 
       await getAnswerEntries(1);
 
-      expect(getOskariMapSrid).toHaveBeenCalledWith(oskariSurvey.mapUrl);
+      expect(getOskariMapSrid).toHaveBeenCalledWith(mockOskariSurvey.mapUrl);
       expect(mockDb.manyOrNone).toHaveBeenCalledWith(
         expect.any(String),
         [1, 3067],
@@ -86,7 +79,7 @@ describe('getSurveyTargetSrid SRID propagation', () => {
     });
 
     it('passes DEFAULT_SRID when mapProvider is openlayers', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(olSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOlSurvey as any);
 
       await getAnswerEntries(1);
 
@@ -109,12 +102,12 @@ describe('getSurveyTargetSrid SRID propagation', () => {
     });
 
     it('passes oskari SRID (3067) to the DB query', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(oskariSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOskariSurvey as any);
       vi.mocked(getOskariMapSrid).mockResolvedValue(3067);
 
       await getUnfinishedAnswerEntries(token);
 
-      expect(getOskariMapSrid).toHaveBeenCalledWith(oskariSurvey.mapUrl);
+      expect(getOskariMapSrid).toHaveBeenCalledWith(mockOskariSurvey.mapUrl);
       expect(mockDb.manyOrNone).toHaveBeenCalledWith(expect.any(String), [
         token,
         3067,
@@ -122,7 +115,7 @@ describe('getSurveyTargetSrid SRID propagation', () => {
     });
 
     it('passes DEFAULT_SRID when mapProvider is openlayers', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(olSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOlSurvey as any);
 
       await getUnfinishedAnswerEntries(token);
 
@@ -136,12 +129,12 @@ describe('getSurveyTargetSrid SRID propagation', () => {
 
   describe('getSubmissionsForSurvey', () => {
     it('passes oskari SRID (3067) to the DB query', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(oskariSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOskariSurvey as any);
       vi.mocked(getOskariMapSrid).mockResolvedValue(3067);
 
       await getSubmissionsForSurvey(1);
 
-      expect(getOskariMapSrid).toHaveBeenCalledWith(oskariSurvey.mapUrl);
+      expect(getOskariMapSrid).toHaveBeenCalledWith(mockOskariSurvey.mapUrl);
       expect(mockDb.manyOrNone).toHaveBeenCalledWith(expect.any(String), {
         surveyId: 1,
         targetSrid: 3067,
@@ -149,7 +142,7 @@ describe('getSurveyTargetSrid SRID propagation', () => {
     });
 
     it('passes DEFAULT_SRID when mapProvider is openlayers', async () => {
-      vi.mocked(getSurvey).mockResolvedValue(olSurvey as any);
+      vi.mocked(getSurvey).mockResolvedValue(mockOlSurvey as any);
 
       await getSubmissionsForSurvey(1);
 

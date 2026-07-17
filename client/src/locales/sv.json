@@ -642,7 +642,8 @@
     "browsingInstructions": "Navigera i kartvyn med piltangenterna. Zooma in och ut med plustecknet och minustecknet.",
     "editGeometries": "Redigera dina kartmarkeringar",
     "finishEditingGeometries": "Avsluta redigeringen av kartmarkeringar",
-    "iFrameTitle": "Kartvy"
+    "iFrameTitle": "Kartvy",
+    "loadError": "Det gick inte att ladda kartan. Försök igen senare."
   },
   "MatrixQuestion": {
     "emptyAnswer": "Jag vet inte",
@@ -720,6 +721,9 @@
     "mapMarkingIndex": "Kartmarkering {x}",
     "hideOldResponses": "Dölj äldre kommentarer...",
     "showOldResponses": "Visa {x} äldre kommentarer..."
+  },
+  "OskariMap": {
+    "loadError": "Det gick inte att ladda kartan."
   },
   "AppBar": {
     "survey": "Enkät",

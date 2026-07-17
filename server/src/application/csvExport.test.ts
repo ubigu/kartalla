@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockLogger } from '@src/tests/helpers';
 
 vi.mock('@src/database', () => ({
   getDb: vi.fn(),
   encryptionKey: 'test-key',
 }));
 
-vi.mock('@src/logger', () => ({
-  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
-}));
+vi.mock('@src/logger', () => ({ default: mockLogger() }));
 
 vi.mock('./exportUtils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./exportUtils')>();

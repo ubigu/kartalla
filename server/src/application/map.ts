@@ -4,6 +4,7 @@ import {
   Survey,
 } from '@interfaces/survey';
 import { DEFAULT_SRID } from '@src/constants';
+import logger from '@src/logger';
 import fetch, { Response } from 'node-fetch';
 import { getDb } from '../database';
 import { NotFoundError } from '../error';
@@ -86,7 +87,14 @@ export async function getSurveyTargetSrid(
   if (survey.mapProvider === 'openlayers') {
     return DEFAULT_SRID;
   }
-  return getOskariMapSrid(survey.mapUrl);
+  try {
+    return await getOskariMapSrid(survey.mapUrl);
+  } catch (error) {
+    logger.error(
+      `Failed to get Oskari map SRID: ${error.message}. Using default ${DEFAULT_SRID}.`,
+    );
+    return DEFAULT_SRID;
+  }
 }
 
 export async function getOskariMapSrid(mapUrl: string) {

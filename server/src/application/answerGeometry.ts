@@ -1,5 +1,6 @@
 import { LanguageCode, LocalizedSurveyMapLayer } from '@interfaces/survey';
 import { getDb } from '@src/database';
+import logger from '@src/logger';
 import useTranslations from '@src/translations/useTranslations';
 import fs, { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
@@ -320,7 +321,12 @@ export async function getGeometryDBEntriesAsGeoJSON(
   const [targetSrid, checkboxOptions, mapLayers] = await Promise.all([
     getSurveyTargetSrid(survey),
     getCheckboxOptionsFromDB(surveyId),
-    getAvailableOskariMapLayers(survey.mapUrl),
+    getAvailableOskariMapLayers(survey.mapUrl).catch((error) => {
+      logger.error(
+        `Failed to get available Oskari map layers: ${error.message}. Using no layers.`,
+      );
+      return [];
+    }),
   ]);
   const rows = await getGeometryDBEntries(surveyId, targetSrid);
 

@@ -643,7 +643,8 @@
     "browsingInstructions": "Pan the map view with the arrow keys, zoom in and out using plus and minus keys.",
     "editGeometries": "Modify your previous map answers",
     "finishEditingGeometries": "Stop modifying map answers",
-    "iFrameTitle": "Map view"
+    "iFrameTitle": "Map view",
+    "loadError": "Failed to load the map. Please try again later."
   },
   "MatrixQuestion": {
     "emptyAnswer": "I don't know",
@@ -721,6 +722,9 @@
     "mapMarkingIndex": "Map marking {x}",
     "hideOldResponses": "Hide old comments...",
     "showOldResponses": "Display {x} older comments"
+  },
+  "OskariMap": {
+    "loadError": "Failed to load the map."
   },
   "AppBar": {
     "survey": "Survey",

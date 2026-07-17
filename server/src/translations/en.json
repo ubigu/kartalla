@@ -55,7 +55,8 @@
   },
   "MapQuestion": {
     "annotation": "Annotation",
-    "visibleLayers": "Visible layers"
+    "visibleLayers": "Visible layers",
+    "screenshotUnavailable": "Screenshot unavailable"
   },
   "GeoBudgetingQuestion": {
     "summary": "Summary",

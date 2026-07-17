@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
 
+export function mockLogger() {
+  return { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() };
+}
+
 export function buildMockDb() {
   const mockDb: any = {
     none: vi.fn().mockResolvedValue(undefined),

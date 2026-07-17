@@ -643,7 +643,8 @@
     "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
     "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
-    "iFrameTitle": "Karttanäkymä"
+    "iFrameTitle": "Karttanäkymä",
+    "loadError": "Kartan lataaminen epäonnistui. Yritä myöhemmin uudelleen."
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa",
@@ -721,6 +722,9 @@
     "mapMarkingIndex": "Karttamerkintä {x}",
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
+  },
+  "OskariMap": {
+    "loadError": "Kartan lataaminen epäonnistui."
   },
   "AppBar": {
     "survey": "Kysely",

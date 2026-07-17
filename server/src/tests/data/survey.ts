@@ -1,5 +1,12 @@
 import { Survey, SurveyPersonalInfoQuestion } from '@interfaces/survey';
 
+export const mockOskariSurvey = {
+  mapProvider: 'oskari',
+  mapUrl: 'https://oskari.example.com',
+};
+
+export const mockOlSurvey = { mapProvider: 'openlayers', mapUrl: '' };
+
 export const createMockSurvey = (
   id: number,
   pageId: number,

@@ -16,9 +16,7 @@ vi.mock('@src/database', () => ({
   encryptionKey: 'test-key',
 }));
 
-vi.mock('@src/logger', () => ({
-  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
-}));
+vi.mock('@src/logger', () => ({ default: mockLogger() }));
 
 vi.mock('@src/user', () => ({
   dbOrganizationIdToOrganization: vi.fn((id: string) => ({ id, name: id })),
@@ -27,7 +25,7 @@ vi.mock('@src/user', () => ({
 }));
 
 import { getDb } from '@src/database';
-import { buildMockDb } from '@src/tests/helpers';
+import { buildMockDb, mockLogger } from '@src/tests/helpers';
 import { createSurvey, updateSurvey } from './survey';
 
 describe('updateSurvey', () => {
