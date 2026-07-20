@@ -35,8 +35,16 @@ interface Props {
 export function emojiToSvg(emoji: string, size: number) {
   // These dimensions are eyeballed to look good both in React UI and Oskari map
   const fontSize = size;
-  const padding = 10;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-padding / 2} ${-padding / 2} ${size + padding} ${size + padding}" width="${size}" height="${size}"><text x="${size / 2}" y="${size / 2}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}">${emoji}</text></svg>`;
+  const padding = 0.25 * size;
+  // The text never uses the whole fontsize and there's some built in margin
+  const approxSvgHeightFromBaseline = fontSize * 0.7;
+  // We don't use dominant-baseline because Oskari doesn't seem to respect it
+  const y = size / 2 + approxSvgHeightFromBaseline / 2;
+  return `<svg xmlns="http://www.w3.org/2000/svg" 
+   viewBox="${-padding / 2} ${-padding / 2} ${size + padding} ${size + padding}" 
+   width="${size}" height="${size}"><text x="${size / 2}" y="${y}" 
+   text-anchor="middle" 
+   font-size="${fontSize}">${emoji}</text></svg>`;
 }
 
 export function SvgIconSelect(props: Props) {
