@@ -60,69 +60,117 @@ export function copySurveyLanguage<T>(
   return survey;
 }
 
+const OPTIONAL_SECTION_FIELDS: Partial<
+  Record<SurveyPageSection['type'], string[]>
+> = {
+  budgeting: ['helperText'],
+  'geo-budgeting': ['helperText'],
+};
+
+function isOptionalSectionField(
+  sectionType: SurveyPageSection['type'],
+  key: string,
+): boolean {
+  return OPTIONAL_SECTION_FIELDS[sectionType]?.includes(key) ?? false;
+}
+
+interface SectionField {
+  key: string;
+  value: string;
+}
+
 /**
  * Single source of truth for which fields are translatable per section type
- * and in what order. collectPageFields and countSectionRows both derive from
- * this — the rendering in SurveySectionTranslationBody must match this order.
+ * and in what order. collectSectionFields, collectPageFields and
+ * countSectionRows all derive from this — the rendering in
+ * SurveySectionTranslationBody must match this order.
  */
-export function collectSectionFields(
+function collectSectionFieldEntries(
   section: SurveyPageSection,
   lang: LanguageCode,
-): string[] {
-  const fields: string[] = [];
-  fields.push(section.title?.[lang] ?? '');
+): SectionField[] {
+  const fields: SectionField[] = [];
+  fields.push({ key: 'title', value: section.title?.[lang] ?? '' });
 
   switch (section.type) {
     case 'text':
-      fields.push(section.body?.[lang] ?? '');
+      fields.push({ key: 'body', value: section.body?.[lang] ?? '' });
       break;
     case 'image':
-      fields.push(section.altText?.[lang] ?? '');
+      fields.push({ key: 'altText', value: section.altText?.[lang] ?? '' });
       break;
     case 'radio':
     case 'checkbox':
     case 'sorting':
       section.options?.forEach((option) => {
-        fields.push(option.text?.[lang] ?? '');
-        if (option.info) fields.push(option.info[lang] ?? '');
+        fields.push({ key: 'option.text', value: option.text?.[lang] ?? '' });
+        if (option.info)
+          fields.push({ key: 'option.info', value: option.info[lang] ?? '' });
       });
       break;
     case 'radio-image':
       section.options?.forEach((option) => {
-        fields.push(option.text?.[lang] ?? '');
-        fields.push(option.altText?.[lang] ?? '');
-        if (option.info) fields.push(option.info[lang] ?? '');
+        fields.push({ key: 'option.text', value: option.text?.[lang] ?? '' });
+        fields.push({
+          key: 'option.altText',
+          value: option.altText?.[lang] ?? '',
+        });
+        if (option.info)
+          fields.push({ key: 'option.info', value: option.info[lang] ?? '' });
       });
       break;
     case 'slider':
-      if (section.minLabel) fields.push(section.minLabel[lang] ?? '');
-      if (section.maxLabel) fields.push(section.maxLabel[lang] ?? '');
+      if (section.minLabel)
+        fields.push({ key: 'minLabel', value: section.minLabel[lang] ?? '' });
+      if (section.maxLabel)
+        fields.push({ key: 'maxLabel', value: section.maxLabel[lang] ?? '' });
       break;
     case 'matrix':
     case 'multi-matrix':
-      section.classes?.forEach((c) => fields.push(c[lang] ?? ''));
-      section.subjects?.forEach((s) => fields.push(s[lang] ?? ''));
+      section.classes?.forEach((c) =>
+        fields.push({ key: 'class', value: c[lang] ?? '' }),
+      );
+      section.subjects?.forEach((s) =>
+        fields.push({ key: 'subject', value: s[lang] ?? '' }),
+      );
       break;
     case 'budgeting':
     case 'geo-budgeting':
-      section.targets?.forEach((t) => fields.push(t.name?.[lang] ?? ''));
-      if (section.helperText) fields.push(section.helperText[lang] ?? '');
+      section.targets?.forEach((t) =>
+        fields.push({ key: 'target.name', value: t.name?.[lang] ?? '' }),
+      );
+      if (section.helperText)
+        fields.push({
+          key: 'helperText',
+          value: section.helperText[lang] ?? '',
+        });
       break;
     case 'grouped-checkbox':
       section.groups?.forEach((group) => {
-        fields.push(group.name?.[lang] ?? '');
+        fields.push({ key: 'group.name', value: group.name?.[lang] ?? '' });
         group.options?.forEach((option) => {
-          fields.push(option.text?.[lang] ?? '');
-          if (option.info) fields.push(option.info[lang] ?? '');
+          fields.push({ key: 'option.text', value: option.text?.[lang] ?? '' });
+          if (option.info)
+            fields.push({
+              key: 'option.info',
+              value: option.info[lang] ?? '',
+            });
         });
       });
       break;
     case 'personal-info':
-      if (section.customLabel) fields.push(section.customLabel[lang] ?? '');
+      if (section.customLabel)
+        fields.push({
+          key: 'customLabel',
+          value: section.customLabel[lang] ?? '',
+        });
       break;
     case 'map':
       section.subQuestions?.forEach((subQ) =>
-        fields.push(subQ.title?.[lang] ?? ''),
+        fields.push({
+          key: 'subQuestion.title',
+          value: subQ.title?.[lang] ?? '',
+        }),
       );
       break;
     case 'free-text':
@@ -134,12 +182,46 @@ export function collectSectionFields(
       assertNever(section);
   }
 
-  if (section.info) fields.push(section.info[lang] ?? '');
+  if (section.info)
+    fields.push({ key: 'info', value: section.info[lang] ?? '' });
   section.followUpSections?.forEach((fu) =>
-    fields.push(fu.title?.[lang] ?? ''),
+    fields.push({ key: 'followUp.title', value: fu.title?.[lang] ?? '' }),
   );
 
   return fields;
+}
+
+export function collectSectionFields(
+  section: SurveyPageSection,
+  lang: LanguageCode,
+): string[] {
+  return collectSectionFieldEntries(section, lang).map((field) => field.value);
+}
+
+/**
+ * Like collectSectionFields, but optional fields (see OPTIONAL_SECTION_FIELDS)
+ * are dropped unless they're actually used in at least one enabled language —
+ * mirroring how frontPageFields/thanksPageFields treat their optional fields.
+ */
+function getSectionFieldsByLangForCompleteness(
+  section: SurveyPageSection,
+  enabledLanguages: LanguageCode[],
+): (lang: LanguageCode) => string[] {
+  const isFieldUsed = (key: string) =>
+    enabledLanguages.some((lang) =>
+      collectSectionFieldEntries(section, lang)
+        .find((field) => field.key === key)
+        ?.value.trim(),
+    );
+
+  return (lang) =>
+    collectSectionFieldEntries(section, lang)
+      .filter(
+        (field) =>
+          !isOptionalSectionField(section.type, field.key) ||
+          isFieldUsed(field.key),
+      )
+      .map((field) => field.value);
 }
 
 export function collectPageFields(
@@ -152,6 +234,20 @@ export function collectPageFields(
     fields.push(...collectSectionFields(section, lang));
   }
   return fields;
+}
+
+function getPageFieldsByLangForCompleteness(
+  page: SurveyPage,
+  enabledLanguages: LanguageCode[],
+): (lang: LanguageCode) => string[] {
+  const sectionFieldsByLang = (page.sections ?? []).map((section) =>
+    getSectionFieldsByLangForCompleteness(section, enabledLanguages),
+  );
+
+  return (lang) => [
+    page.title?.[lang] ?? '',
+    ...sectionFieldsByLang.flatMap((fieldsByLang) => fieldsByLang(lang)),
+  ];
 }
 
 export function collectSurveyFields(
@@ -252,7 +348,7 @@ export function getPageTabColor(
   theme: Theme,
 ): string | undefined {
   return getTabColor(
-    (lang) => collectPageFields(page, lang),
+    getPageFieldsByLangForCompleteness(page, enabledLanguages),
     enabledLanguages,
     theme,
   );
@@ -305,8 +401,8 @@ export function getLangBadgeStatus(
 ): 'default' | 'warning' | 'error' {
   const sectionFieldsByLang = [
     getFrontPageFieldsByLang(survey, enabledLanguages),
-    ...(survey.pages ?? []).map(
-      (page) => (lang: LanguageCode) => collectPageFields(page, lang),
+    ...(survey.pages ?? []).map((page) =>
+      getPageFieldsByLangForCompleteness(page, enabledLanguages),
     ),
     getThanksPageFieldsByLang(survey, enabledLanguages),
   ];

@@ -1,5 +1,6 @@
 import { Theme } from '@mui/material';
 import {
+  createMockBudgetingQuestion,
   createMockRadioQuestion,
   createMockSurvey,
   createMockTextSection,
@@ -347,6 +348,30 @@ describe('getPageTabColor', () => {
 
     expect(getPageTabColor(page, ['fi', 'en'], theme)).toBe(
       theme.palette.textError.main,
+    );
+  });
+
+  it('ignores an empty budgeting helperText, since it is not shown to respondents when empty', () => {
+    const page = buildPage();
+    page.title = { fi: 'Sivu', en: 'Page', sv: '' };
+    const budgeting = createMockBudgetingQuestion(200);
+    budgeting.targets[0].name = { fi: 'Kohde', en: 'Target', sv: '' };
+    budgeting.helperText = { fi: '', en: '', sv: '' };
+    page.sections = [budgeting];
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('still flags an unevenly translated budgeting helperText', () => {
+    const page = buildPage();
+    page.title = { fi: 'Sivu', en: 'Page', sv: '' };
+    const budgeting = createMockBudgetingQuestion(200);
+    budgeting.targets[0].name = { fi: 'Kohde', en: 'Target', sv: '' };
+    budgeting.helperText = { fi: 'Ohje', en: '', sv: '' };
+    page.sections = [budgeting];
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBe(
+      theme.palette.textWarning.main,
     );
   });
 });

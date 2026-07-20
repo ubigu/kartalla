@@ -1,5 +1,6 @@
 import {
   Survey,
+  SurveyBudgetingQuestion,
   SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveyTextSection,
@@ -95,6 +96,23 @@ export const createMockTextSection = (id: number): SurveyTextSection => ({
   title: { fi: 'Otsikko', en: 'Title', sv: '' },
   body: { fi: 'Tekstiä', en: 'Some text', sv: '' },
   bodyColor: '#000000',
+});
+
+export const createMockBudgetingQuestion = (
+  id: number,
+): SurveyBudgetingQuestion => ({
+  id,
+  type: 'budgeting',
+  title: { fi: 'Budjetointi', en: 'Budgeting', sv: '' },
+  isRequired: false,
+  budgetingMode: 'pieces',
+  totalBudget: 100,
+  targets: [
+    {
+      name: { fi: 'Kohde 1', en: 'Target 1', sv: '' },
+    },
+  ],
+  allocationDirection: 'decreasing',
 });
 
 export const createMockRadioQuestion = (id: number): SurveyRadioQuestion => ({
