@@ -1,4 +1,4 @@
-import { EnabledLanguages } from '@interfaces/survey';
+import { EnabledLanguages, Survey, SurveyPage } from '@interfaces/survey';
 import {
   Box,
   BoxProps,
@@ -30,6 +30,15 @@ import { editPageContainerSx } from './EditSurvey';
 
 interface Props {
   canEdit: boolean;
+}
+
+function applySurveyLanguageChange(
+  survey: Survey,
+  editSurvey: (survey: Survey) => void,
+  editPage: (page: SurveyPage) => void,
+) {
+  editSurvey(survey);
+  survey.pages?.forEach(editPage);
 }
 
 type LanguageItemProps = {
@@ -165,11 +174,15 @@ function useLanguageItemData() {
 function LanguageList() {
   const { activeSurvey, workingLanguage, translationCounts, getLabel } =
     useLanguageItemData();
-  const { editSurvey } = useSurvey();
+  const { editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
 
   function handleDeleteTranslations(lang: Language) {
-    editSurvey(clearSurveyLanguage({ ...activeSurvey }, lang));
+    applySurveyLanguageChange(
+      clearSurveyLanguage({ ...activeSurvey }, lang),
+      editSurvey,
+      editPage,
+    );
   }
 
   return (
@@ -215,7 +228,7 @@ function LanguageList() {
 }
 
 function MultiLanguageFieldset({ canEdit }: { canEdit: boolean }) {
-  const { activeSurvey, editSurvey } = useSurvey();
+  const { activeSurvey, editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const { workingLanguage, translationCounts, getLabel, setWorkingLanguage } =
@@ -226,7 +239,11 @@ function MultiLanguageFieldset({ canEdit }: { canEdit: boolean }) {
   );
 
   function handleDeleteTranslations(lang: Language) {
-    editSurvey(clearSurveyLanguage({ ...activeSurvey }, lang));
+    applySurveyLanguageChange(
+      clearSurveyLanguage({ ...activeSurvey }, lang),
+      editSurvey,
+      editPage,
+    );
   }
 
   function handleLanguageToggle(
@@ -362,7 +379,7 @@ function LanguageMoveDialog({
 }
 
 export function EditSurveyLanguages({ canEdit }: Props) {
-  const { activeSurvey, editSurvey } = useSurvey();
+  const { activeSurvey, editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
   const { workingLanguage, setWorkingLanguage } = useWorkingLanguage();
   const [proposedWorkingLanguage, setProposedWorkingLanguage] =
@@ -449,13 +466,15 @@ export function EditSurveyLanguages({ canEdit }: Props) {
         targetLanguage={proposedWorkingLanguage}
         onMove={() => {
           if (!proposedWorkingLanguage) return;
-          editSurvey({
-            ...copySurveyLanguage(
-              activeSurvey,
+          applySurveyLanguageChange(
+            copySurveyLanguage(
+              { ...activeSurvey },
               workingLanguage,
               proposedWorkingLanguage,
             ),
-          });
+            editSurvey,
+            editPage,
+          );
           setWorkingLanguage(proposedWorkingLanguage);
           setProposedWorkingLanguage(null);
         }}

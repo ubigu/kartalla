@@ -64,6 +64,19 @@ describe('walkLocalizedTexts', () => {
       { fi: 'a', en: 'b', sv: '' },
     ]);
   });
+
+  it('yields localized nodes held directly as array items, e.g. matrix classes/subjects', () => {
+    const tree = {
+      classes: [
+        { fi: 'Sarake 1', en: '', sv: '' },
+        { fi: 'Sarake 2', en: '', sv: '' },
+      ],
+    };
+    expect([...walkLocalizedTexts(tree)]).toEqual([
+      { fi: 'Sarake 1', en: '', sv: '' },
+      { fi: 'Sarake 2', en: '', sv: '' },
+    ]);
+  });
 });
 
 describe('clearSurveyLanguage', () => {

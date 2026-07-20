@@ -1,6 +1,6 @@
 import { SurveyEditPage, SurveyParams } from '../../pages/surveyEditPage';
 import { setUserDefaultLanguage } from '../../utils/api';
-import { getTestSurveyData } from '../../utils/data';
+import { getMatrixQuestionData, getTestSurveyData } from '../../utils/data';
 import { expect, test } from './fixtures';
 import {
   goToBasicSettings,
@@ -276,6 +276,12 @@ test.describe('Survey edit language settings', () => {
       surveyEditPage,
     }) => {
       const page = surveyEditPage.page;
+      await surveyEditPage.createMatrixQuestion(
+        getMatrixQuestionData('Sivu 1'),
+        ['fi', 'en'],
+      );
+      await surveyEditPage.expectSaveSuccess();
+
       await page.getByRole('combobox', { name: 'Työstökieli' }).click();
       await page.getByRole('option', { name: 'englanti (en)' }).click();
       await fillMandatoryBasicSettings(surveyEditPage);
@@ -286,13 +292,13 @@ test.describe('Survey edit language settings', () => {
       await page.getByRole('option', { name: /englanti \(en\)/i }).click();
 
       await surveyEditPage.goToPage('Kieliasetukset');
-      await page.getByLabel('suomi (fi): käännöksiä syötetty 5/6').click();
+      await page.getByLabel('suomi (fi): käännöksiä syötetty 12/13').click();
 
       await page.getByRole('button', { name: 'Poista käännökset...' }).click();
       await surveyEditPage.saveSurvey();
 
       await expect(
-        page.getByLabel('suomi (fi): käännöksiä syötetty 0/6'),
+        page.getByLabel('suomi (fi): käännöksiä syötetty 0/13'),
       ).toBeVisible();
     });
   });

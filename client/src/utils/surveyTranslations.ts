@@ -17,23 +17,26 @@ export function isLocalizedText(value: unknown): value is LocalizedText {
   const entries = Object.entries(value);
   return (
     entries.length > 0 &&
-    entries.every(([key, val]) => isLanguage(key) && typeof val === 'string')
+    entries.every(
+      ([key, val]) =>
+        isLanguage(key) && (val === null || typeof val === 'string'),
+    )
   );
 }
 
 export function* walkLocalizedTexts(node: unknown): Generator<LocalizedText> {
   if (!node || typeof node !== 'object') return;
+  if (isLocalizedText(node)) {
+    yield node;
+    return;
+  }
   if (Array.isArray(node)) {
     for (const item of node) yield* walkLocalizedTexts(item);
     return;
   }
   for (const [key, value] of Object.entries(node)) {
     if (SKIP_KEYS.has(key)) continue;
-    if (isLocalizedText(value)) {
-      yield value;
-    } else if (value && typeof value === 'object') {
-      yield* walkLocalizedTexts(value);
-    }
+    yield* walkLocalizedTexts(value);
   }
 }
 
