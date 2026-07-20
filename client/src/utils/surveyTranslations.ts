@@ -5,6 +5,8 @@ import {
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
+import { Theme } from '@mui/material';
+import { isSurveyFieldRequired } from '@src/stores/SurveyContext';
 import { isLanguage } from '@src/stores/TranslationContext';
 import { assertNever } from './typeCheck';
 
@@ -183,4 +185,134 @@ export function countSurveyTranslations(
     };
   }
   return counts;
+}
+
+export function isSectionCompleteInLang(
+  fieldsByLang: (lang: LanguageCode) => string[],
+  lang: LanguageCode,
+): boolean {
+  return fieldsByLang(lang).every((field) => field.trim());
+}
+
+export function getTabColor(
+  fieldsByLang: (lang: LanguageCode) => string[],
+  enabledLanguages: LanguageCode[],
+  theme: Theme,
+): string | undefined {
+  const completeLanguages = enabledLanguages.filter((lang) =>
+    isSectionCompleteInLang(fieldsByLang, lang),
+  );
+
+  if (completeLanguages.length === enabledLanguages.length) return undefined;
+  if (completeLanguages.length > 0) return theme.palette.textWarning.main;
+  return theme.palette.textError.main;
+}
+
+export const frontPageFields: {
+  key: string;
+  values: (survey: Survey) => LocalizedText;
+}[] = [
+  { key: 'survey.title', values: (survey) => survey.title },
+  { key: 'survey.subtitle', values: (survey) => survey.subtitle },
+  { key: 'survey.description', values: (survey) => survey.description },
+];
+
+export function getFrontPageFieldsByLang(
+  survey: Survey,
+  enabledLanguages: LanguageCode[],
+): (lang: LanguageCode) => string[] {
+  const activeFields = frontPageFields.filter(
+    ({ key, values }) =>
+      isSurveyFieldRequired(key) ||
+      enabledLanguages.some((lang) => values(survey)?.[lang]?.trim()),
+  );
+
+  return (lang) =>
+    activeFields.map(({ values }) => values(survey)?.[lang] ?? '');
+}
+
+export function getFrontPageTabColor(
+  survey: Survey,
+  enabledLanguages: LanguageCode[],
+  theme: Theme,
+): string | undefined {
+  return getTabColor(
+    getFrontPageFieldsByLang(survey, enabledLanguages),
+    enabledLanguages,
+    theme,
+  );
+}
+
+export function getPageTabColor(
+  page: SurveyPage,
+  enabledLanguages: LanguageCode[],
+  theme: Theme,
+): string | undefined {
+  return getTabColor(
+    (lang) => collectPageFields(page, lang),
+    enabledLanguages,
+    theme,
+  );
+}
+
+export const thanksPageFields: {
+  key: string;
+  values: (survey: Survey) => LocalizedText;
+}[] = [
+  {
+    key: 'survey.thanksPage.title',
+    values: (survey) => survey.thanksPage?.title,
+  },
+  {
+    key: 'survey.thanksPage.text',
+    values: (survey) => survey.thanksPage?.text,
+  },
+];
+
+export function getThanksPageFieldsByLang(
+  survey: Survey,
+  enabledLanguages: LanguageCode[],
+): (lang: LanguageCode) => string[] {
+  const activeFields = thanksPageFields.filter(
+    ({ key, values }) =>
+      isSurveyFieldRequired(key) ||
+      enabledLanguages.some((lang) => values(survey)?.[lang]?.trim()),
+  );
+
+  return (lang) =>
+    activeFields.map(({ values }) => values(survey)?.[lang] ?? '');
+}
+
+export function getThanksPageTabColor(
+  survey: Survey,
+  enabledLanguages: LanguageCode[],
+  theme: Theme,
+): string | undefined {
+  return getTabColor(
+    getThanksPageFieldsByLang(survey, enabledLanguages),
+    enabledLanguages,
+    theme,
+  );
+}
+
+export function getLangBadgeStatus(
+  survey: Survey,
+  enabledLanguages: LanguageCode[],
+  lang: LanguageCode,
+): 'default' | 'warning' | 'error' {
+  const sectionFieldsByLang = [
+    getFrontPageFieldsByLang(survey, enabledLanguages),
+    ...(survey.pages ?? []).map(
+      (page) => (lang: LanguageCode) => collectPageFields(page, lang),
+    ),
+    getThanksPageFieldsByLang(survey, enabledLanguages),
+  ];
+
+  const completeSections = sectionFieldsByLang.filter((fieldsByLang) =>
+    isSectionCompleteInLang(fieldsByLang, lang),
+  );
+
+  if (completeSections.length === sectionFieldsByLang.length) return 'default';
+  if (completeSections.length > 0) return 'warning';
+  return 'error';
 }

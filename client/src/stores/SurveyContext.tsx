@@ -175,7 +175,7 @@ export const SurveyContext = createContext<Context>(null);
  * - Key = validation rule key
  * - Value = validation function (returns boolean)
  */
-const validationMap = {
+export const validationMap = {
   'survey.name': (survey: Survey) => {
     return (
       survey.name && survey.name.length > 0 && /^[a-z0-9-_]+$/.test(survey.name)
@@ -188,6 +188,10 @@ const validationMap = {
   'survey.mapUrl': (survey: Survey, state: State) =>
     !survey.mapUrl || !state.availableMapLayersError,
 };
+
+export function isSurveyFieldRequired(fieldKey: string): boolean {
+  return fieldKey in validationMap;
+}
 
 /**
  * Hook for accessing survey context.

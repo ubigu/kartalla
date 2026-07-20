@@ -812,6 +812,7 @@
     "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
     "provideTranslations": "Mikäli kysely julkaistaan usealla eri kielellä, tulee kaikki kyselyssä esiintyvät tekstit kääntää ko. kielille. Anna alla olevassa listassa kielikäännös jokaiseen puuttuvaan kohtaan.",
     "surveyInformation": "Kyselyn perusasetukset",
+    "frontPage": "Etusivu",
     "copyTextFields": "Kopioi käännettävät tietueet leikepöydälle",
     "supportedLanguages": "Mitä muita kieliä tuetaan?",
     "surveyPages": "Kyselyn sivut",

@@ -811,6 +811,7 @@
     "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
     "provideTranslations": "Om enkäten publiceras på flera språk, måste all text i enkäten översättas till dessa språk. Ange översättningar för varje saknad post i listan nedan.",
     "surveyInformation": "Grundinställningar för enkäten",
+    "frontPage": "Startsida",
     "copyTextFields": "Kopiera översättningsbara fält till Urklipp",
     "supportedLanguages": "Språk som stöds",
     "surveyPages": "Enkätens sidor",

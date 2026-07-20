@@ -35,7 +35,7 @@ import { Conditions, LanguageCode, SurveyPage } from '@interfaces/survey';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { replaceIdsWithNull } from '@src/utils/schemaValidation';
-import { collectPageFields } from '@src/utils/surveyTranslations';
+import { getLangBadgeStatus } from '@src/utils/surveyTranslations';
 import { Select } from '../core/Select';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import ConditionalPageIcon from '../icons/ConditionalPageIcon';
@@ -118,20 +118,6 @@ const styles = {
   }),
 };
 
-function getLangBadgeStatus(
-  pages: SurveyPage[],
-  lang: LanguageCode,
-): 'default' | 'warning' | 'error' {
-  let anyMissing = false;
-  for (const page of pages) {
-    const fields = collectPageFields(page, lang);
-    const filledCount = fields.filter((f) => f.trim()).length;
-    if (filledCount === 0) return 'error';
-    if (filledCount < fields.length) anyMissing = true;
-  }
-  return anyMissing ? 'warning' : 'default';
-}
-
 interface Props {
   allowEditing: boolean;
 }
@@ -157,6 +143,9 @@ export default function EditSurveySideBar(props: Props) {
   const theme = useTheme();
 
   const languageSettingsSet = hasEnabledLanguages(activeSurvey);
+  const enabledLanguages = supportedLanguages.filter(
+    (lang) => activeSurvey.enabledLanguages[lang],
+  ) as LanguageCode[];
 
   return (
     <Box
@@ -580,21 +569,16 @@ export default function EditSurveySideBar(props: Props) {
               <Typography>{tr.EditSurvey.manageTranslations}</Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: '4px', marginLeft: '16px' }}>
-              {supportedLanguages
-                .filter((lang) => activeSurvey.enabledLanguages[lang])
-                .map((lang) => (
-                  <Box
-                    key={lang}
-                    sx={styles.langBadge(
-                      getLangBadgeStatus(
-                        activeSurvey.pages,
-                        lang as LanguageCode,
-                      ),
-                    )}
-                  >
-                    {lang}
-                  </Box>
-                ))}
+              {enabledLanguages.map((lang) => (
+                <Box
+                  key={lang}
+                  sx={styles.langBadge(
+                    getLangBadgeStatus(activeSurvey, enabledLanguages, lang),
+                  )}
+                >
+                  {lang}
+                </Box>
+              ))}
             </Box>
           </SideBarItem>
         </>

@@ -812,6 +812,7 @@
     "enableLocalisation": "Allow publishing the survey with multiple languages",
     "provideTranslations": "If the survey is ment to support different languages, the translations for each text are to be provided here. Fill in the translation to the missing fields on the list below.",
     "surveyInformation": "Survey basic settings",
+    "frontPage": "Front page",
     "copyTextFields": "Copy text fields to be translated to clipboard",
     "supportedLanguages": "Supported languages",
     "surveyPages": "Survey pages",
