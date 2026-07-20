@@ -165,9 +165,11 @@ test.describe('Survey edit language settings', () => {
       await page.getByRole('option', { name: /englanti \(en\)/i }).click();
 
       await expect(
-        page.getByText('Siirretäänkö nykyinen kielisisältö?'),
+        page.getByText('Mitä tehdään nykyiselle sisällölle?'),
       ).toBeVisible();
-      await page.getByRole('button', { name: 'Siirrä', exact: true }).click();
+      await page
+        .getByRole('button', { name: /Sisältö on jo kielellä englanti/i })
+        .click();
 
       await surveyEditPage.saveSurvey();
       await expect(
@@ -187,9 +189,11 @@ test.describe('Survey edit language settings', () => {
       await page.getByRole('option', { name: /englanti \(en\)/i }).click();
 
       await expect(
-        page.getByText('Siirretäänkö nykyinen kielisisältö?'),
+        page.getByText('Mitä tehdään nykyiselle sisällölle?'),
       ).toBeVisible();
-      await page.getByRole('button', { name: 'Älä siirrä' }).click();
+      await page
+        .getByRole('button', { name: /Sisältö on kielellä suomi\./i })
+        .click();
 
       await surveyEditPage.saveSurvey();
       await expect(
