@@ -191,6 +191,7 @@ export default function EditSurvey() {
                 <VisualSeparator />
                 <EditSurveyControls
                   disabled={!allowEditing || !hasEnabledLanguages(activeSurvey)}
+                  basePath={url}
                 />
               </>
             )}

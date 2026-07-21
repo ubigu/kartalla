@@ -21,9 +21,11 @@ const rootSx = {
 
 interface Props {
   disabled?: boolean;
+  /** Route base path of the survey being edited; navigation within it is not "leaving". */
+  basePath: string;
 }
 
-export default function EditSurveyControls({ disabled }: Props) {
+export default function EditSurveyControls({ disabled, basePath }: Props) {
   const {
     originalActiveSurvey,
     activeSurvey,
@@ -49,7 +51,13 @@ export default function EditSurveyControls({ disabled }: Props) {
     retry: () => void;
   } | null>(null);
 
-  useBlocker(({ retry }) => setPendingNavigation({ retry }), !undoDisabled);
+  useBlocker(({ location, retry }) => {
+    if (location.pathname.startsWith(basePath)) {
+      retry();
+      return;
+    }
+    setPendingNavigation({ retry });
+  }, !undoDisabled);
 
   function closeUnsavedChangesDialog() {
     setPendingNavigation(null);
