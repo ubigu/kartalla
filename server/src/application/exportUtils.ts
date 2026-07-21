@@ -1,5 +1,6 @@
 import { LanguageCode, LocalizedText } from '@interfaces/survey';
 import { encryptionKey, getDb } from '@src/database';
+import useTranslations from '@src/translations/useTranslations';
 import { indexToAlpha } from '@src/utils';
 import {
   AnswerEntry,
@@ -340,6 +341,7 @@ function submissionAnswersToJson(
   predecessorIndexes,
   lang: LanguageCode = 'fi',
 ) {
+  const tr = useTranslations(lang);
   const ret = {};
 
   answerEntries.forEach((answer) => {
@@ -396,7 +398,7 @@ function submissionAnswersToJson(
             classIndex == null
               ? ''
               : Number(classIndex) === -1
-                ? 'EOS'
+                ? tr.dontKnow
                 : (sectionDetails.details.classes[Number(classIndex)][lang] ??
                   sectionDetails.details.classes[Number(classIndex)]['fi']);
         });
