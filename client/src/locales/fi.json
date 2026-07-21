@@ -126,7 +126,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
-    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
+    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
     "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
     "emailSubject": "Viestin aihe",
@@ -134,7 +134,7 @@
     "info": "Lisätiedot",
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
     "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
-    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle sekä sivujen alamarginaaleihin.",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään raportin etusivulle sekä sivujen alamarginaaleihin.",
     "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat",
     "required": "Vastaajan sähköpostiosoite pakollinen",
     "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."

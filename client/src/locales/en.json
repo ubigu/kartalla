@@ -126,7 +126,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Enable sending reports of the survey answers via email",
-    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be sent as PDF reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent.",
+    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be sent as reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent.",
     "autoSendTo": "Email recipients",
     "autoSendToHelperText": "The answer report will be sent as an attachment to each of these email recipients (in addition to the respondent)",
     "emailSubject": "Email subject",
@@ -134,7 +134,7 @@
     "info": "Additional information",
     "infoHelperText": "Additional information will be displayed on the front page of the answer report.",
     "includePersonalInfo": "Include respondent's personal information",
-    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the report.",
     "includeMarginImages": "Include top and bottom margin images",
     "required": "Respondent's email address required",
     "requiredHelperText": "The respondent must provide their email address to answer the survey."
