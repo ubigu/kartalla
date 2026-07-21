@@ -160,6 +160,43 @@ describe('initializePuppeteerCluster', () => {
 
     expect(launchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('logs and does not throw when Cluster.launch rejects', async () => {
+    launchMock.mockRejectedValue(new Error('failed to launch chromium'));
+
+    const mod = await loadModule();
+    await expect(mod.initializePuppeteerCluster()).resolves.toBeUndefined();
+
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      expect.stringContaining('failed to launch chromium'),
+    );
+    // Subsequent calls degrade gracefully instead of crashing the caller.
+    await expect(
+      mod.getPuppeteerScreenshots({} as ScreenshotJobData),
+    ).rejects.toThrow('Puppeteer cluster not initialized');
+  });
+
+  it('logs, closes the cluster, and does not throw when cluster.task rejects', async () => {
+    const fakeCluster = createFakeCluster();
+    fakeCluster.task.mockRejectedValue(new Error('task registration failed'));
+    (fakeCluster as unknown as { close: ReturnType<typeof vi.fn> }).close = vi
+      .fn()
+      .mockResolvedValue(undefined);
+    launchMock.mockResolvedValue(fakeCluster);
+
+    const mod = await loadModule();
+    await expect(mod.initializePuppeteerCluster()).resolves.toBeUndefined();
+
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      expect.stringContaining('task registration failed'),
+    );
+    expect(
+      (fakeCluster as unknown as { close: ReturnType<typeof vi.fn> }).close,
+    ).toHaveBeenCalledTimes(1);
+    await expect(
+      mod.getPuppeteerScreenshots({} as ScreenshotJobData),
+    ).rejects.toThrow('Puppeteer cluster not initialized');
+  });
 });
 
 describe('getPuppeteerScreenshots', () => {
@@ -182,6 +219,22 @@ describe('getPuppeteerScreenshots', () => {
 
     expect(fakeCluster.execute).toHaveBeenCalledWith(jobData);
     expect(result).toBe(expected);
+  });
+
+  it('logs and rethrows when cluster.execute rejects', async () => {
+    const fakeCluster = createFakeCluster();
+    launchMock.mockResolvedValue(fakeCluster);
+    fakeCluster.execute.mockRejectedValue(new Error('browser crashed'));
+
+    const mod = await loadModule();
+    await mod.initializePuppeteerCluster();
+
+    await expect(
+      mod.getPuppeteerScreenshots({} as ScreenshotJobData),
+    ).rejects.toThrow('browser crashed');
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      expect.stringContaining('browser crashed'),
+    );
   });
 });
 
@@ -219,6 +272,29 @@ describe('svgToPng', () => {
     });
     expect(result).toBeInstanceOf(Buffer);
     expect(Array.from(result)).toEqual([1, 2, 3]);
+  });
+
+  it('logs and throws when no svg element is found in the content', async () => {
+    const fakeCluster = createFakeCluster();
+    launchMock.mockResolvedValue(fakeCluster);
+    const page = createFakePage({ $: vi.fn().mockResolvedValue(null) });
+
+    fakeCluster.execute.mockImplementation(
+      async (
+        data: string,
+        task: (args: { page: Page; data: string }) => unknown,
+      ) => task({ page, data }),
+    );
+
+    const mod = await loadModule();
+    await mod.initializePuppeteerCluster();
+
+    await expect(mod.svgToPng('<p>not an svg</p>')).rejects.toThrow(
+      'No <svg> element found',
+    );
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      expect.stringContaining('No <svg> element found'),
+    );
   });
 });
 

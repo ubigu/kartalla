@@ -3,7 +3,6 @@ import {
   SubmissionAnswerEntry,
   Survey,
 } from '@interfaces/survey';
-import logger from '@src/logger';
 import useTranslations from '@src/translations/useTranslations';
 import MarkdownIt from 'markdown-it';
 import { Attachment } from 'nodemailer/lib/mailer';
@@ -77,21 +76,19 @@ export async function sendSubmissionReport({
     ...(includeAttachments ? getAttachments(answerEntries) : []),
   ];
 
-  try {
-    await sendMail({
-      message: {
-        to,
-        attachments,
-      },
-      template: 'submission-report',
-      locals: {
-        body,
-        subject,
-        noReply,
-      },
-    });
-  } catch (error) {
-    // If sending the mail fails, ignore the error
-    logger.error(`Error sending submission report mail: ${error}`);
-  }
+  // Let send failures propagate - the caller (the email queue worker) is
+  // responsible for logging and retrying, since it needs the error to decide
+  // whether to back off and try again.
+  await sendMail({
+    message: {
+      to,
+      attachments,
+    },
+    template: 'submission-report',
+    locals: {
+      body,
+      subject,
+      noReply,
+    },
+  });
 }

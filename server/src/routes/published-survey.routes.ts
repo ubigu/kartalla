@@ -1,13 +1,11 @@
 import { SubmissionAnswerEntry, SubmissionInfo } from '@interfaces/survey';
-import { generatePdf } from '@src/application/pdf-generator';
 import {
   createSurveySubmission,
+  EmailJobRequest,
   getSurveyAnswerLanguage,
   getUnfinishedAnswerEntries,
 } from '@src/application/submission';
 import { getPublishedSurvey, getSurvey } from '@src/application/survey';
-import { sendSubmissionReport } from '@src/email/submission-report';
-import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { ForbiddenError, NotFoundError } from '@src/error';
 import { getOrganizationIdWithName } from '@src/user';
 import { validateRequest } from '@src/utils';
@@ -97,59 +95,39 @@ router.post(
 
     const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    const { id: submissionId, timestamp } = await createSurveySubmission(
+
+    // Report emails aren't sent here - they're enqueued atomically with the
+    // submission row itself, and delivered later by the email queue worker
+    // (report-handlers.ts), which regenerates the PDF from the submission ID.
+    const submissionInfo: SubmissionInfo = req.body.info;
+    const emailJobs: EmailJobRequest[] = survey.email.enabled
+      ? [
+          ...(submissionInfo?.email
+            ? [
+                {
+                  type: 'submission-report' as const,
+                  to: submissionInfo.email,
+                  includeAttachments: false,
+                },
+              ]
+            : []),
+          ...(survey.email?.autoSendTo ?? []).map((to) => ({
+            type: 'submission-report' as const,
+            to,
+            includeAttachments: true,
+          })),
+        ]
+      : [];
+
+    await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken,
       false,
       answerLanguage,
+      emailJobs,
     );
-    // We are done with this request - start sending the emails in the background
     res.status(201).send();
-
-    // Return if email is not enabled for this survey
-    if (!survey.email.enabled) {
-      return;
-    }
-
-    // Generate the PDF
-    const pdfFile = await generatePdf(
-      survey,
-      { id: submissionId, timestamp },
-      survey.email.includePersonalInfo
-        ? answerEntries
-        : answerEntries.filter(
-            (entry: SubmissionAnswerEntry) => entry.type !== 'personal-info',
-          ),
-      answerLanguage,
-    );
-
-    // Send the report to the submitter, if they provided their email address
-    const submissionInfo: SubmissionInfo = req.body.info;
-    if (submissionInfo?.email) {
-      sendSubmissionReport({
-        to: submissionInfo.email,
-        language: answerLanguage,
-        survey,
-        pdfFile,
-        submissionId,
-        answerEntries,
-        includeAttachments: false,
-      });
-    }
-
-    // Send the report to all auto send recipients
-    (survey.email?.autoSendTo ?? []).map((email) => {
-      sendSubmissionReport({
-        to: email,
-        language: answerLanguage,
-        survey,
-        pdfFile,
-        submissionId,
-        answerEntries,
-        includeAttachments: true,
-      });
-    });
   }),
 );
 
@@ -201,16 +179,9 @@ router.post(
       unfinishedToken,
       true,
       language,
+      [{ type: 'unfinished-submission', to: req.body.email }],
     );
     res.json({ token: newToken });
-
-    // Send the email in the background
-    sendUnfinishedSubmissionLink({
-      to: req.body.email,
-      token: newToken,
-      survey,
-      language,
-    });
   }),
 );
 

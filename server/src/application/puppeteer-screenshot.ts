@@ -70,7 +70,7 @@ async function generateScreenshots({
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
     });
 
-    page.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
+    await page.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
     await page.goto(mapUrl, { waitUntil: 'networkidle0' });
 
     await page.evaluate(() => {
@@ -210,25 +210,38 @@ export async function initializePuppeteerCluster() {
     ? Number(process.env.PUPPETEER_CLUSTER_MAX_CONCURRENCY)
     : 2;
 
-  cluster = await Cluster.launch({
-    concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency,
-    timeout: 600000,
-    puppeteerOptions: {
-      defaultViewport: null,
-      args: [
-        '--no-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--proxy-server=direct://',
-        '--proxy-bypass-list=*',
-      ],
-    },
-  });
-  await cluster.task(generateScreenshots);
+  let launchedCluster: GenericCluster;
+  try {
+    launchedCluster = await Cluster.launch({
+      concurrency: Cluster.CONCURRENCY_CONTEXT,
+      maxConcurrency,
+      timeout: 600000,
+      puppeteerOptions: {
+        defaultViewport: null,
+        args: [
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--proxy-server=direct://',
+          '--proxy-bypass-list=*',
+        ],
+      },
+    });
+    await launchedCluster.task(generateScreenshots);
+    cluster = launchedCluster;
+  } catch (error) {
+    logger.error(
+      `Failed to initialize Puppeteer cluster, screenshots will be unavailable: ${error.message}`,
+    );
+    if (launchedCluster) {
+      await (launchedCluster as unknown as { close(): Promise<void> })
+        .close()
+        .catch(() => {});
+    }
+  }
 }
 
 export async function getPuppeteerScreenshots(
@@ -237,26 +250,43 @@ export async function getPuppeteerScreenshots(
   if (!cluster) {
     throw new Error('Puppeteer cluster not initialized');
   }
-  return cluster.execute(jobData);
+  try {
+    return await cluster.execute(jobData);
+  } catch (error) {
+    logger.error(
+      `Puppeteer cluster failed to execute screenshot job: ${error.message}`,
+    );
+    throw error;
+  }
 }
 
 export async function svgToPng(svgContent: string): Promise<Buffer> {
   if (!cluster) {
     throw new Error('Puppeteer cluster not initialized');
   }
-  return cluster.execute(
-    svgContent,
-    async ({ page, data }: { page: Page; data: string }) => {
-      await page.setContent(
-        `<!DOCTYPE html><html><body style="margin:0;padding:0;background:transparent">${data}</body></html>`,
-        { waitUntil: 'load' },
-      );
-      const element = await page.$('svg');
-      const screenShot = await element.screenshot({
-        type: 'png',
-        omitBackground: true,
-      });
-      return Buffer.from(screenShot);
-    },
-  );
+  try {
+    return await cluster.execute(
+      svgContent,
+      async ({ page, data }: { page: Page; data: string }) => {
+        await page.setContent(
+          `<!DOCTYPE html><html><body style="margin:0;padding:0;background:transparent">${data}</body></html>`,
+          { waitUntil: 'load' },
+        );
+        const element = await page.$('svg');
+        if (!element) {
+          throw new Error('No <svg> element found in provided content');
+        }
+        const screenShot = await element.screenshot({
+          type: 'png',
+          omitBackground: true,
+        });
+        return Buffer.from(screenShot);
+      },
+    );
+  } catch (error) {
+    logger.error(
+      `Failed to convert SVG to PNG via Puppeteer: ${error.message}`,
+    );
+    throw error;
+  }
 }
