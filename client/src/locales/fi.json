@@ -65,6 +65,7 @@
     "preview": "Esikatselu",
     "toSurveyPage": "Kyselysivulle",
     "preventUnloadConfirm": "Sivulla on tallentamattomia muutoksia. Haluatko varmasti poistua sivulta?",
+    "unsavedChangesConfirm": "Haluatko tallentaa keskeneräiset muutokset?",
     "deleteSurvey": "Poista kysely",
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",

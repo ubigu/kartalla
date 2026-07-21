@@ -65,6 +65,7 @@
     "preview": "Förhandsgranska",
     "toSurveyPage": "Till undersökningssidan",
     "preventUnloadConfirm": "Det finns osparade ändringar på sidan. Vill du verkligen lämna sidan?",
+    "unsavedChangesConfirm": "Vill du spara de oavslutade ändringarna?",
     "deleteSurvey": "Ta bort undersökningen",
     "deleteSurveyConfirm": "Vill du verkligen ta bort hela undersökningen? Åtgärden kan inte ångras.",
     "deleteSurveyFailed": "Det uppstod ett fel när undersökningen skulle tas bort. Försök igen senare.",

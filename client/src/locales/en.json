@@ -65,6 +65,7 @@
     "preview": "Preview",
     "toSurveyPage": "Go to survey",
     "preventUnloadConfirm": "You have unsaved changes. Are you sure you want to continue?",
+    "unsavedChangesConfirm": "Do you want to save the unfinished changes?",
     "deleteSurvey": "Delete survey",
     "deleteSurveyConfirm": "Are you sure you want to delete the survey? This action cannot be reversed.",
     "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",

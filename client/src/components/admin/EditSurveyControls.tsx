@@ -1,5 +1,6 @@
-import { Box, Button, Tooltip } from '@mui/material';
+import { Box, Button, DialogContentText, Tooltip } from '@mui/material';
 import SaveIcon from '@src/components/icons/SaveIcon';
+import { useBlocker } from '@src/hooks/useBlocker';
 import { hasEnabledLanguages, useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import {
@@ -7,7 +8,8 @@ import {
   useTranslations,
 } from '@src/stores/TranslationContext';
 import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { BaseDialog } from '../core/BaseDialog';
 import ClearIcon from '../icons/ClearIcon';
 
 const rootSx = {
@@ -38,6 +40,46 @@ export default function EditSurveyControls({ disabled }: Props) {
   const languagesNotSet = !hasEnabledLanguages(activeSurvey);
   const undoDisabled =
     disabled || !hasActiveSurveyChanged || activeSurveyLoading;
+  const hasInvalidFields = Boolean(
+    languagesNotSet ||
+    (validationErrors?.length && validationErrors.length > 0),
+  );
+
+  const [pendingNavigation, setPendingNavigation] = useState<{
+    retry: () => void;
+  } | null>(null);
+
+  useBlocker(({ retry }) => setPendingNavigation({ retry }), !undoDisabled);
+
+  function closeUnsavedChangesDialog() {
+    setPendingNavigation(null);
+  }
+
+  function discardAndContinue() {
+    discardChanges();
+    resetWorkingLanguage(originalActiveSurvey);
+    pendingNavigation?.retry();
+    closeUnsavedChangesDialog();
+  }
+
+  async function saveAndContinue() {
+    try {
+      await saveChanges();
+      showToast({
+        severity: 'success',
+        message: tr.EditSurvey.saveSuccessful,
+      });
+      pendingNavigation?.retry();
+    } catch (error: any) {
+      showToast({
+        severity: 'error',
+        message:
+          getApiTranslation(error.message_code, tr) || tr.EditSurvey.saveFailed,
+      });
+    } finally {
+      closeUnsavedChangesDialog();
+    }
+  }
   const invalidFieldsLabel = [
     languagesNotSet ? tr.EditSurvey.languageSettingsNotConfirmed : null,
     ...(validationErrors
@@ -64,64 +106,100 @@ export default function EditSurveyControls({ disabled }: Props) {
   }, [languagesNotSet, validationErrors]);
 
   return (
-    <Box sx={rootSx}>
-      <Button
-        variant="text"
-        disabled={undoDisabled}
-        startIcon={<ClearIcon />}
-        onClick={() => {
-          discardChanges();
-          resetWorkingLanguage(originalActiveSurvey);
-        }}
-      >
-        {tr.commands.cancel}
-      </Button>
-      <Tooltip
-        title={
-          languagesNotSet ||
-          (validationErrors?.length && validationErrors.length > 0)
-            ? validationErrorTooltip
-            : tr.commands.save
+    <>
+      <BaseDialog
+        open={pendingNavigation !== null}
+        onClose={closeUnsavedChangesDialog}
+        content={
+          <DialogContentText>
+            {tr.EditSurvey.unsavedChangesConfirm}
+          </DialogContentText>
         }
-      >
-        <span>
-          <Button
-            variant="contained"
-            disabled={
-              disabled ||
-              !hasActiveSurveyChanged ||
-              activeSurveyLoading ||
-              Boolean(validationErrors?.length && validationErrors.length > 0)
-            }
-            color="primary"
-            aria-label={
-              languagesNotSet ||
-              (validationErrors?.length && validationErrors.length > 0)
-                ? invalidFieldsLabel
-                : tr.commands.save
-            }
-            startIcon={<SaveIcon />}
-            onClick={async () => {
-              try {
-                await saveChanges();
-                showToast({
-                  severity: 'success',
-                  message: tr.EditSurvey.saveSuccessful,
-                });
-              } catch (error: any) {
-                showToast({
-                  severity: 'error',
-                  message:
-                    getApiTranslation(error.message_code, tr) ||
-                    tr.EditSurvey.saveFailed,
-                });
+        actions={
+          <Box display={'flex'} flex={1} sx={{ gap: '8px' }}>
+            <Button
+              startIcon={<ClearIcon />}
+              variant="text"
+              onClick={closeUnsavedChangesDialog}
+            >
+              {tr.commands.cancel}
+            </Button>
+            <Button
+              sx={{ marginLeft: 'auto' }}
+              variant="outlined"
+              onClick={discardAndContinue}
+            >
+              {tr.options.no}
+            </Button>
+            <Button
+              variant="outlined"
+              disabled={hasInvalidFields}
+              onClick={saveAndContinue}
+            >
+              {tr.options.yes}
+            </Button>
+          </Box>
+        }
+      />
+      <Box sx={rootSx}>
+        <Button
+          variant="text"
+          disabled={undoDisabled}
+          startIcon={<ClearIcon />}
+          onClick={() => {
+            discardChanges();
+            resetWorkingLanguage(originalActiveSurvey);
+          }}
+        >
+          {tr.commands.cancel}
+        </Button>
+        <Tooltip
+          title={
+            languagesNotSet ||
+            (validationErrors?.length && validationErrors.length > 0)
+              ? validationErrorTooltip
+              : tr.commands.save
+          }
+        >
+          <span>
+            <Button
+              variant="contained"
+              disabled={
+                disabled ||
+                !hasActiveSurveyChanged ||
+                activeSurveyLoading ||
+                Boolean(validationErrors?.length && validationErrors.length > 0)
               }
-            }}
-          >
-            {tr.commands.save}
-          </Button>
-        </span>
-      </Tooltip>
-    </Box>
+              color="primary"
+              aria-label={
+                languagesNotSet ||
+                (validationErrors?.length && validationErrors.length > 0)
+                  ? invalidFieldsLabel
+                  : tr.commands.save
+              }
+              startIcon={<SaveIcon />}
+              onClick={async () => {
+                try {
+                  await saveChanges();
+                  showToast({
+                    severity: 'success',
+                    message: tr.EditSurvey.saveSuccessful,
+                  });
+                } catch (error: any) {
+                  showToast({
+                    severity: 'error',
+                    message:
+                      getApiTranslation(error.message_code, tr) ||
+                      tr.EditSurvey.saveFailed,
+                  });
+                }
+              }}
+            >
+              {tr.commands.save}
+            </Button>
+          </span>
+        </Tooltip>
+      </Box>
+    </>
   );
 }
