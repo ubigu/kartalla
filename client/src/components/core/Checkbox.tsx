@@ -12,12 +12,16 @@ interface IconProps {
   backgroundColor?: string;
 }
 
+const iconSize = 28;
+const checkboxHorizontalPadding = 9;
+const helperTextMarginLeft = iconSize + checkboxHorizontalPadding;
+
 const iconBaseStyle = (backgroundColor?: string) => {
   const { palette } = useTheme();
   return {
     backgroundColor: backgroundColor ?? palette.surfaceInput.main,
-    width: '28px',
-    height: '28px',
+    width: `${iconSize}px`,
+    height: `${iconSize}px`,
     borderRadius: controlBorderRadius,
     boxShadow: '0px 1px 2px 0px #59788626 inset',
     border: `0.5px solid ${palette.borderSubtle.main}`,
@@ -48,10 +52,19 @@ const UncheckedIcon = ({ backgroundColor }: IconProps) => {
 
 interface Props extends Omit<CheckboxProps, 'size'> {
   label?: React.ReactNode;
+  helperText?: React.ReactNode;
   checkboxBackground?: string;
 }
 
-export function Checkbox({ label, sx, checkboxBackground, ...props }: Props) {
+export function Checkbox({
+  label,
+  helperText,
+  sx,
+  checkboxBackground,
+  inputProps,
+  'aria-describedby': ariaDescribedBy,
+  ...props
+}: Props) {
   const { palette } = useTheme();
 
   const checkbox = (
@@ -68,17 +81,30 @@ export function Checkbox({ label, sx, checkboxBackground, ...props }: Props) {
       size="large"
       checkedIcon={<CheckedIcon backgroundColor={checkboxBackground} />}
       icon={<UncheckedIcon backgroundColor={checkboxBackground} />}
+      inputProps={{ 'aria-describedby': ariaDescribedBy, ...inputProps }}
       {...props}
     />
   );
 
-  if (label == null) return checkbox;
+  const control =
+    label == null ? (
+      checkbox
+    ) : (
+      <FormControlLabel
+        sx={{ height: 'fit-content', marginLeft: '-9px', ...sx }}
+        control={checkbox}
+        label={label}
+      />
+    );
+
+  if (helperText == null) return control;
 
   return (
-    <FormControlLabel
-      sx={{ height: 'fit-content', marginLeft: '-9px', ...sx }}
-      control={checkbox}
-      label={label}
-    />
+    <div>
+      {control}
+      <div style={{ marginLeft: `${helperTextMarginLeft}px` }}>
+        {helperText}
+      </div>
+    </div>
   );
 }

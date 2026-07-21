@@ -60,10 +60,18 @@ export default function EditSurveyEmail({ canEdit }: Props) {
       </Typography>
       <div>
         <Checkbox
-          aria-describedby={'enable-email-helper'}
           label={tr.EditSurveyEmail.enable}
+          helperText={
+            <InputHelperText
+              id={'enable-email-helper'}
+              sx={{ paddingTop: '4px' }}
+            >
+              {tr.EditSurveyEmail.enableHelperText}
+            </InputHelperText>
+          }
           disabled={editingDisabled}
           checked={activeSurvey.email.enabled ?? false}
+          aria-describedby={'enable-email-helper'}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
@@ -74,9 +82,6 @@ export default function EditSurveyEmail({ canEdit }: Props) {
             });
           }}
         />
-        <InputHelperText id={'enable-email-helper'} sx={{ paddingTop: '4px' }}>
-          {tr.EditSurveyEmail.enableHelperText}
-        </InputHelperText>
       </div>
       {activeSurvey.email.enabled && (
         <>
@@ -97,10 +102,18 @@ export default function EditSurveyEmail({ canEdit }: Props) {
             />
             <div>
               <Checkbox
-                aria-describedby={'include-personal-info-helper'}
                 label={tr.EditSurveyEmail.includePersonalInfo}
+                helperText={
+                  <InputHelperText
+                    id={'include-personal-info-helper'}
+                    sx={{ paddingTop: '4px' }}
+                  >
+                    {tr.EditSurveyEmail.includePersonalInfoHelperText}
+                  </InputHelperText>
+                }
                 disabled={editingDisabled}
                 checked={activeSurvey.email.includePersonalInfo}
+                aria-describedby={'include-personal-info-helper'}
                 onChange={(event) => {
                   editSurvey({
                     ...activeSurvey,
@@ -111,19 +124,21 @@ export default function EditSurveyEmail({ canEdit }: Props) {
                   });
                 }}
               />
-              <InputHelperText
-                id={'include-personal-info-helper'}
-                sx={{ paddingTop: '4px' }}
-              >
-                {tr.EditSurveyEmail.includePersonalInfoHelperText}
-              </InputHelperText>
             </div>
             <div>
               <Checkbox
-                aria-describedby={'email-required-helper'}
                 label={tr.EditSurveyEmail.required}
+                helperText={
+                  <InputHelperText
+                    id={'email-required-helper'}
+                    sx={{ paddingTop: '4px' }}
+                  >
+                    {tr.EditSurveyEmail.requiredHelperText}
+                  </InputHelperText>
+                }
                 disabled={editingDisabled}
                 checked={activeSurvey.email.required}
+                aria-describedby={'email-required-helper'}
                 onChange={(event) => {
                   editSurvey({
                     ...activeSurvey,
@@ -134,12 +149,6 @@ export default function EditSurveyEmail({ canEdit }: Props) {
                   });
                 }}
               />
-              <InputHelperText
-                id={'email-required-helper'}
-                sx={{ paddingTop: '4px' }}
-              >
-                {tr.EditSurveyEmail.requiredHelperText}
-              </InputHelperText>
             </div>
           </Box>
           <div>
