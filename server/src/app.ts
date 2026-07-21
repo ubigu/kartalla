@@ -6,6 +6,8 @@ import * as path from 'path';
 import { initializePuppeteerCluster } from './application/screenshot';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
 import { initializeDatabase, migrateUp } from './database';
+import { initializeEmailQueueWorker } from './email/queue';
+import { registerReportEmailHandlers } from './email/report-handlers';
 import { HttpResponseError } from './error';
 import { initSecrets, secrets } from './keyVaultSecrets';
 import logger from './logger';
@@ -207,6 +209,10 @@ async function start() {
 
   // Start up Puppeteer cluster for taking screenshots
   await initializePuppeteerCluster();
+
+  // Start the background worker that sends queued report emails
+  registerReportEmailHandlers();
+  initializeEmailQueueWorker();
 
   const configureAuthFn =
     process.env.AUTH_ENABLED === 'true'

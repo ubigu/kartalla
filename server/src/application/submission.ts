@@ -18,6 +18,7 @@ import {
   getGeoJSONColumn,
   getMultiInsertQuery,
 } from '@src/database';
+import { enqueueEmailJob } from '@src/email/queue';
 import {
   BadRequestError,
   InternalServerError,
@@ -431,12 +432,22 @@ async function getPersonalInfo(
 }
 
 /**
+ * A report email to enqueue once the submission it depends on has been
+ * created. submissionId/token are filled in by createSurveySubmission itself,
+ * once known, rather than by the caller.
+ */
+export type EmailJobRequest =
+  | { type: 'submission-report'; to: string; includeAttachments: boolean }
+  | { type: 'unfinished-submission'; to: string };
+
+/**
  * Create a submission and related answer entries
  * @param surveyID Survey ID
  * @param answerEntries Answer entries
  * @param unfinishedToken Token for previous unfinished submission
  * @param unfinished Save as unfinished?
  * @param language Language used when answering the survey
+ * @param emailJobs Report emails to enqueue atomically with the submission row
  */
 export async function createSurveySubmission(
   surveyID: number,
@@ -444,6 +455,7 @@ export async function createSurveySubmission(
   unfinishedToken: string,
   unfinished = false,
   language: LanguageCode,
+  emailJobs: EmailJobRequest[] = [],
 ) {
   await validateAttachmentEntries(answerEntries);
 
@@ -475,29 +487,62 @@ export async function createSurveySubmission(
     );
   });
 
-  // Create a new submission row - if unfinished, create a new unfinished token or use the old one if it exists
-  const submissionRow = await getDb().one<{
-    id: number;
-    unfinished_token?: string;
-    updated_at: Date;
-  }>(
-    !unfinished
-      ? `
-    INSERT INTO data.submission (survey_id, created_at, language) VALUES (
-      $1,
-      COALESCE($2, NOW()),
-      $4
-    ) RETURNING id, updated_at;
-  `
-      : `
-    INSERT INTO data.submission (survey_id, created_at, unfinished_token, language) VALUES (
+  // Create the submission row and enqueue any requested report emails in the
+  // same transaction - either both are committed or neither is, so a report
+  // can never end up owed without a durable record of it (or vice versa).
+  const submissionRow = await getDb().tx(async (t) => {
+    const row = await t.one<{
+      id: number;
+      unfinished_token?: string;
+      updated_at: Date;
+    }>(
+      !unfinished
+        ? `
+      INSERT INTO data.submission (survey_id, created_at, language) VALUES (
         $1,
         COALESCE($2, NOW()),
-        COALESCE($3, gen_random_uuid()),
         $4
-    ) RETURNING id, unfinished_token, updated_at;`,
-    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language],
-  );
+      ) RETURNING id, updated_at;
+    `
+        : `
+      INSERT INTO data.submission (survey_id, created_at, unfinished_token, language) VALUES (
+          $1,
+          COALESCE($2, NOW()),
+          COALESCE($3, gen_random_uuid()),
+          $4
+      ) RETURNING id, unfinished_token, updated_at;`,
+      [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language],
+    );
+
+    for (const job of emailJobs) {
+      if (job.type === 'submission-report') {
+        await enqueueEmailJob(
+          'submission-report',
+          {
+            submissionId: row.id,
+            surveyId: surveyID,
+            to: job.to,
+            language,
+            includeAttachments: job.includeAttachments,
+          },
+          t,
+        );
+      } else {
+        await enqueueEmailJob(
+          'unfinished-submission',
+          {
+            surveyId: surveyID,
+            to: job.to,
+            token: row.unfinished_token,
+            language,
+          },
+          t,
+        );
+      }
+    }
+
+    return row;
+  });
 
   if (!submissionRow) {
     logger.error(
