@@ -346,6 +346,14 @@ export default function EditSurveyBasicSettings(props: Props) {
         <div>
           <Checkbox
             label={tr.EditSurveyInfo.allowTestSurvey}
+            helperText={
+              <InputHelperText
+                id={'publish-survey-helper-text'}
+                sx={{ paddingTop: '4px' }}
+              >
+                {tr.EditSurveyInfo.allowTestSurveyHelperText}
+              </InputHelperText>
+            }
             disabled={editingDisabled}
             checked={activeSurvey.allowTestSurvey}
             aria-describedby={'publish-survey-helper-text'}
@@ -357,8 +365,13 @@ export default function EditSurveyBasicSettings(props: Props) {
             }}
           />
           {activeSurvey.allowTestSurvey && (
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+            <Box
+              sx={{
+                marginTop: '24px',
+                display: 'flex',
+                gap: '0.5rem',
+                alignItems: 'center',
+              }}
             >
               <Typography>
                 {tr.EditSurveyInfo.testSurveyUrl}:{' '}
@@ -371,14 +384,8 @@ export default function EditSurveyBasicSettings(props: Props) {
                 </Link>
               </Typography>
               <CopyToClipboard data={testSurveyUrl} />
-            </div>
+            </Box>
           )}
-          <InputHelperText
-            id={'publish-survey-helper-text'}
-            sx={{ paddingTop: '4px' }}
-          >
-            {tr.EditSurveyInfo.allowTestSurveyHelperText}
-          </InputHelperText>
         </div>
         {props.canEdit && (
           <div className={classes.actions}>

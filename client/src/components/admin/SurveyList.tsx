@@ -1,5 +1,6 @@
 import { Survey } from '@interfaces/survey';
 import {
+  Box,
   FormControlLabel,
   List,
   Skeleton,
@@ -7,7 +8,6 @@ import {
   Tab,
   Tabs,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { TagPicker } from '@src/components/admin/TagPicker';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
@@ -18,13 +18,13 @@ import LoadingButton from '../LoadingButton';
 import { LoadingBackdrop } from './LoadingBackdrop';
 import SurveyListItem from './SurveyListItem';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
     gap: '1rem',
-    minWidth: '330px',
+    minWidth: '520px',
     maxWidth: '650px',
     width: '45vw',
   },
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
   item: {
     boxShadow: '0px 2px 4px rgba(63, 111, 127, 0.9)',
   },
-});
+};
 
 const tabs = ['active', 'archived'];
 
@@ -49,7 +49,6 @@ export default function SurveyList() {
   const [showPublishedOnly, setShowPublishedOnly] = useState<boolean>(false);
   const [filterTags, setFilterTags] = useState<string[]>([]);
   const [copying, setCopying] = useState(false);
-  const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
   const history = useHistory();
@@ -84,7 +83,7 @@ export default function SurveyList() {
   }, [showAuthoredOnly, showPublishedOnly]);
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles.root}>
       <Tabs
         value={tabView}
         indicatorColor="primary"
@@ -109,7 +108,7 @@ export default function SurveyList() {
           />
         ))}
       </Tabs>
-      <div className={classes.actions}>
+      <Box sx={styles.actions}>
         <FormControlLabel
           value="showAuthored"
           control={
@@ -120,9 +119,9 @@ export default function SurveyList() {
           }
           label={tr.SurveyList.showAuthoredOnly}
         />
-      </div>
+      </Box>
       {tabView === 'active' && (
-        <div className={classes.actions}>
+        <Box sx={styles.actions}>
           <FormControlLabel
             value="showPublished"
             control={
@@ -154,16 +153,16 @@ export default function SurveyList() {
           >
             {tr.SurveyList.createNewSurvey}
           </LoadingButton>
-        </div>
+        </Box>
       )}
 
-      <div className={classes.actions}>
+      <Box sx={styles.actions}>
         <TagPicker
           selectedTags={filterTags}
           addEnabled={false}
           onSelectedTagsChange={(t) => setFilterTags(t)}
         />
-      </div>
+      </Box>
       {surveysLoading ? (
         <Skeleton variant="rectangular" width="auto" height={210} />
       ) : (
@@ -222,6 +221,6 @@ export default function SurveyList() {
           <LoadingBackdrop open={copying} />
         </>
       )}
-    </div>
+    </Box>
   );
 }

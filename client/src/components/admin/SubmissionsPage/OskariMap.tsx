@@ -1,12 +1,15 @@
 // @ts-strict-ignore
-import { useSurveyMap } from '@src/stores/SurveyMapContext';
+import { Box } from '@mui/material';
+import OskariMapStatusOverlay from '@src/components/map/OskariMapStatusOverlay';
 import { useOskari } from '@src/hooks/map/useOskari';
+import { useSurveyMap } from '@src/stores/SurveyMapContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { Feature, Geometry } from 'geojson';
 import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import { useEffect, useMemo, useRef } from 'react';
-import { AnswerSelection } from './AnswersList';
 import { isFeatureSelected } from './AnswerMap';
+import { AnswerSelection } from './AnswersList';
 
 interface Props {
   url: string;
@@ -29,10 +32,12 @@ export default function OskariMap({
     setFeatureClickHandler,
     drawFeatures,
     isMapReady,
+    mapError,
     setVisibleLayers,
     oskariVersion,
   } = useOskari();
   const { mapFeatureColorScheme } = useSurveyMap();
+  const { tr } = useTranslations();
 
   // Default feature style
   const defaultFeatureStyles = useMemo(() => {
@@ -212,18 +217,26 @@ export default function OskariMap({
   }, [layers, isMapReady]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      style={{
-        border: 0,
-        width: '100%',
-        height: '100%',
-        margin: '0 auto',
-      }}
-      src={url}
-      allow="geolocation"
-      allowFullScreen
-      loading="lazy"
-    />
+    <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+      <OskariMapStatusOverlay
+        isMapReady={isMapReady}
+        mapError={mapError}
+        loadErrorText={tr.OskariMap.loadError}
+      />
+      <iframe
+        ref={iframeRef}
+        style={{
+          border: 0,
+          width: '100%',
+          height: '100%',
+          margin: '0 auto',
+          opacity: isMapReady ? 1 : 0,
+        }}
+        src={url}
+        allow="geolocation"
+        allowFullScreen
+        loading="lazy"
+      />
+    </Box>
   );
 }

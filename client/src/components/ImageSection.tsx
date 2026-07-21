@@ -66,8 +66,9 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
       </div>
       {
         <Box
-          position="relative"
           sx={{
+            display: 'flex',
+            flexDirection: 'column',
             border: 'solid 1px #e4e4e4',
           }}
         >
@@ -89,11 +90,8 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
           {section.attributions && (
             <Typography
               sx={(theme) => ({
-                position: 'absolute',
-                bottom: 0,
                 padding: '0.5rem',
-                borderTopLeftRadius: '0.25rem',
-                right: 0,
+                textAlign: 'right',
                 color: 'white',
                 backgroundColor: theme.palette.primary.main,
               })}

@@ -43,8 +43,13 @@ function getOrigin(url: string) {
   }`;
 }
 
+// Oskari's RPC channel has no error callback for a failed/invalid map URL -
+// if the map doesn't become ready within this time, treat it as an error
+const MAP_READY_TIMEOUT = 15000;
+
 export function useOskari() {
   const [rpcChannel, setRpcChannel] = useState<Channel | null>(null);
+  const [mapError, setMapError] = useState(false);
   const [featureClickEventHandler, setFeatureClickEventHandler] =
     useState<FeatureEventHandler | null>(null);
   const [markerClickEventHandler, setMarkerClickEventHandler] =
@@ -70,18 +75,27 @@ export function useOskari() {
     if (!iframe || !url) {
       return;
     }
-    // Reset RPC channel (i.e. make map "not ready")
+    // Reset RPC channel (i.e. make map "not ready") and any previous error
     setRpcChannel(null);
     setAllLayers(null);
+    setMapError(false);
     const channel = OskariRPC.connect(iframe, getOrigin(url));
 
-    // Wait for the channel to get ready before proceeding
-    await new Promise<void>((resolve) => {
+    // Wait for the channel to get ready before proceeding, but don't wait
+    // forever - an invalid map URL never calls onReady, it just stays silent
+    const isReady = await new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => resolve(false), MAP_READY_TIMEOUT);
       channel.onReady(() => {
+        clearTimeout(timeout);
         setRpcChannel(channel);
-        resolve();
+        resolve(true);
       });
     });
+
+    if (!isReady) {
+      setMapError(true);
+      return;
+    }
 
     // Get all layers and persist them into the state
     const allLayers = await new Promise<number[]>((resolve) => {
@@ -274,6 +288,7 @@ export function useOskari() {
   return {
     initializeMap,
     isMapReady: Boolean(rpcChannel) && Boolean(allLayers),
+    mapError,
     setFeatureClickHandler,
     clearFeatures,
     drawFeatures,

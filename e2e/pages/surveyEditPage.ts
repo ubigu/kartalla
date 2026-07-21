@@ -213,6 +213,20 @@ export class SurveyEditPage extends BasePage {
     return this._page.locator('.section-accordion-expanded');
   }
 
+  private static readonly LANGUAGE_LABELS: Record<string, string> = {
+    fi: 'suomi (fi)',
+    en: 'englanti (en)',
+    sv: 'ruotsi (sv)',
+  };
+
+  /** Switches the survey's working (content) language via the sidebar selector. */
+  private async setWorkingLanguage(language: string) {
+    await this._page.getByRole('combobox', { name: 'Työstökieli' }).click();
+    await this._page
+      .getByRole('option', { name: SurveyEditPage.LANGUAGE_LABELS[language] })
+      .click();
+  }
+
   /** Fills the title and "required" toggle shared by every question type. */
   private async fillCommonFields(
     question: Locator,
@@ -253,29 +267,33 @@ export class SurveyEditPage extends BasePage {
   }
 
   /**
-   * Adds and fills a list of option rows where no row exists yet, clicking
-   * "add option" before each one. Used by matrix rows and budgeting targets.
+   * Adds and fills a list of option rows, clicking "add option" only for rows
+   * that don't exist yet. Used by matrix rows and budgeting targets, and safe
+   * to call again (e.g. to fill in another language's translations) once the
+   * rows already exist.
    */
   private async addAndFillOptions(question: Locator, options: string[]) {
     for (const [idx, option] of options.entries()) {
-      await question.getByLabel('add-question-option').click();
-      await question
-        .getByTestId(`radio-input-option-${idx}`)
-        .locator('textarea')
-        .nth(0)
-        .fill(option);
+      const optionLocator = question.getByTestId(`radio-input-option-${idx}`);
+      if ((await optionLocator.count()) === 0) {
+        await question.getByLabel('add-question-option').click();
+      }
+      await optionLocator.locator('textarea').nth(0).fill(option);
     }
   }
 
-  /** Adds and fills matrix columns (answer classes). */
+  /**
+   * Adds and fills matrix columns (answer classes), clicking "add" only for
+   * columns that don't exist yet so it's safe to call again for another
+   * language's translations.
+   */
   private async fillMatrixColumns(question: Locator, columns: string[]) {
     for (const [idx, col] of columns.entries()) {
-      await question.getByLabel('add-matrix-class').click();
-      await question
-        .getByTestId(`matrix-class-${idx}`)
-        .locator('input')
-        .nth(0)
-        .fill(col);
+      const colLocator = question.getByTestId(`matrix-class-${idx}`);
+      if ((await colLocator.count()) === 0) {
+        await question.getByLabel('add-matrix-class').click();
+      }
+      await colLocator.locator('input').nth(0).fill(col);
     }
   }
 
@@ -439,16 +457,22 @@ export class SurveyEditPage extends BasePage {
     await this.saveQuestion();
   }
 
-  async createMatrixQuestion(params: MatrixQuestionParams) {
+  async createMatrixQuestion(
+    params: MatrixQuestionParams,
+    languages: string[] = ['fi'],
+  ) {
     const question = await this.startQuestion(
       params.pageName,
       'Lisää likert-kysymys',
     );
-    await this.fillCommonFields(question, params);
-    await this.addAndFillOptions(question, params.matrixRows);
-    await this.fillMatrixColumns(question, params.matrixColumns);
-    await this.fillAdditionalInfo(question, params.additionalInfo);
-    await this.saveQuestion();
+    for (const [idx, language] of languages.entries()) {
+      if (idx > 0) await this.setWorkingLanguage(language);
+      await this.fillCommonFields(question, params);
+      await this.addAndFillOptions(question, params.matrixRows);
+      await this.fillMatrixColumns(question, params.matrixColumns);
+      await this.fillAdditionalInfo(question, params.additionalInfo);
+      await this.saveQuestion();
+    }
   }
 
   async createGroupedCheckboxQuestion(params: GroupedCheckboxQuestionParams) {

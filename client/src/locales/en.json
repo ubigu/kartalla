@@ -65,6 +65,7 @@
     "preview": "Preview",
     "toSurveyPage": "Go to survey",
     "preventUnloadConfirm": "You have unsaved changes. Are you sure you want to continue?",
+    "unsavedChangesConfirm": "Do you want to save the unfinished changes?",
     "deleteSurvey": "Delete survey",
     "deleteSurveyConfirm": "Are you sure you want to delete the survey? This action cannot be reversed.",
     "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",
@@ -126,7 +127,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Enable sending reports of the survey answers via email",
-    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be sent as PDF reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent.",
+    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be sent as reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent.",
     "autoSendTo": "Email recipients",
     "autoSendToHelperText": "The answer report will be sent as an attachment to each of these email recipients (in addition to the respondent)",
     "emailSubject": "Email subject",
@@ -134,7 +135,7 @@
     "info": "Additional information",
     "infoHelperText": "Additional information will be displayed on the front page of the answer report.",
     "includePersonalInfo": "Include respondent's personal information",
-    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the report.",
     "includeMarginImages": "Include top and bottom margin images",
     "required": "Respondent's email address required",
     "requiredHelperText": "The respondent must provide their email address to answer the survey."
@@ -643,7 +644,8 @@
     "browsingInstructions": "Pan the map view with the arrow keys, zoom in and out using plus and minus keys.",
     "editGeometries": "Modify your previous map answers",
     "finishEditingGeometries": "Stop modifying map answers",
-    "iFrameTitle": "Map view"
+    "iFrameTitle": "Map view",
+    "loadError": "Failed to load the map. Please try again later."
   },
   "MatrixQuestion": {
     "emptyAnswer": "I don't know",
@@ -722,6 +724,9 @@
     "hideOldResponses": "Hide old comments...",
     "showOldResponses": "Display {x} older comments"
   },
+  "OskariMap": {
+    "loadError": "Failed to load the map."
+  },
   "AppBar": {
     "survey": "Survey",
     "generalNotifications": "Notifications",
@@ -793,11 +798,10 @@
     "deleteTranslations": "Delete translations...",
     "enteredTranslations": "Entered translations",
     "supportedLanguagesLabel": "Languages supported in the survey",
-    "moveContentDialogTitle": "Move current language content?",
-    "moveContentDialogPart1": "Do you want to move the current content added in",
-    "moveContentDialogPart2": "to language",
-    "dontMove": "Don't move",
-    "move": "Move",
+    "moveContentDialogTitle": "What should be done with the current content?",
+    "moveContentDialogDescription": "You are changing the language of the survey, but content has already been entered. What do you want to do with the content that has already been entered?",
+    "moveOption": "The content is already in {x}, so nothing needs to be done to it.",
+    "dontMoveOption": "The content is in {x}. Start a new translation from scratch.",
     "languageNames": {
       "fi": "Finnish",
       "en": "English",
@@ -808,6 +812,7 @@
     "enableLocalisation": "Allow publishing the survey with multiple languages",
     "provideTranslations": "If the survey is ment to support different languages, the translations for each text are to be provided here. Fill in the translation to the missing fields on the list below.",
     "surveyInformation": "Survey basic settings",
+    "frontPage": "Front page",
     "copyTextFields": "Copy text fields to be translated to clipboard",
     "supportedLanguages": "Supported languages",
     "surveyPages": "Survey pages",
@@ -998,6 +1003,7 @@
     "USER_NOT_PERMITTED_TO_VIEW": "User not author, editor nor viewer of the survey.",
     "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey.",
     "DUPLICATE_SURVEY_NAME": "Survey with the same name already exists. Please choose another name and try again.",
-    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes."
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes.",
+    "BUDGET_NOT_FULLY_ALLOCATED": "The full budget must be used for question {x}."
   }
 }

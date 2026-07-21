@@ -683,9 +683,10 @@ export interface SectionOptionGroup {
 export type LanguageCode = 'fi' | 'en' | 'sv';
 
 /**
- * Type for localization typing
+ * Type for localization typing. Values are `null` until a translator fills
+ * them in for a given language (e.g. a freshly added matrix class/option).
  */
-type LocalizedText = Record<LanguageCode, string>;
+type LocalizedText = Record<LanguageCode, string | null>;
 
 /**
  * Intersected subset of answers for map subquestions.

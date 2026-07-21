@@ -65,6 +65,7 @@
     "preview": "Förhandsgranska",
     "toSurveyPage": "Till undersökningssidan",
     "preventUnloadConfirm": "Det finns osparade ändringar på sidan. Vill du verkligen lämna sidan?",
+    "unsavedChangesConfirm": "Vill du spara de oavslutade ändringarna?",
     "deleteSurvey": "Ta bort undersökningen",
     "deleteSurveyConfirm": "Vill du verkligen ta bort hela undersökningen? Åtgärden kan inte ångras.",
     "deleteSurveyFailed": "Det uppstod ett fel när undersökningen skulle tas bort. Försök igen senare.",
@@ -126,7 +127,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Tillåt rapportering av svar via e-post",
-    "enableHelperText": "Om du tillåter rapportering av svar via e-post, skickas individuella svar som pdf-rapporter till de angivna adresserna nedan. Dessutom ombeds respondenten att ange sin e-postadress i slutet av undersökningen för att få pdf-rapporten skickad till sig.",
+    "enableHelperText": "Om du tillåter rapportering av svar via e-post, skickas individuella svar som rapporter till de angivna adresserna nedan. Dessutom ombeds respondenten att ange sin e-postadress i slutet av undersökningen för att få pdf-rapporten skickad till sig.",
     "autoSendTo": "Mottagarens e-postadresser",
     "autoSendToHelperText": "Pdf-rapport om varje svar skickas som bilaga till dessa adresser (förutom respondenten själv).",
     "emailSubject": "Ämne för meddelandet",
@@ -134,7 +135,7 @@
     "info": "Ytterligare information",
     "infoHelperText": "Ytterligare information visas på framsidan av e-postmeddelandet som skickas med svarrapporten.",
     "includePersonalInfo": "Inkludera respondentens personuppgifter",
-    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten.",
+    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av rapporten.",
     "includeMarginImages": "Inkludera bilder för övre och nedre marginal",
     "required": "Respondentens e-postadress är obligatorisk",
     "requiredHelperText": "Respondenten måste ange sin e-postadress för att kunna svara på enkäten."
@@ -642,7 +643,8 @@
     "browsingInstructions": "Navigera i kartvyn med piltangenterna. Zooma in och ut med plustecknet och minustecknet.",
     "editGeometries": "Redigera dina kartmarkeringar",
     "finishEditingGeometries": "Avsluta redigeringen av kartmarkeringar",
-    "iFrameTitle": "Kartvy"
+    "iFrameTitle": "Kartvy",
+    "loadError": "Det gick inte att ladda kartan. Försök igen senare."
   },
   "MatrixQuestion": {
     "emptyAnswer": "Jag vet inte",
@@ -721,6 +723,9 @@
     "hideOldResponses": "Dölj äldre kommentarer...",
     "showOldResponses": "Visa {x} äldre kommentarer..."
   },
+  "OskariMap": {
+    "loadError": "Det gick inte att ladda kartan."
+  },
   "AppBar": {
     "survey": "Enkät",
     "generalNotifications": "Meddelanden",
@@ -792,11 +797,10 @@
     "deleteTranslations": "Ta bort översättningar...",
     "enteredTranslations": "Angivna översättningar",
     "supportedLanguagesLabel": "Språk som stöds i enkäten",
-    "moveContentDialogTitle": "Flytta nuvarande språkinnehåll?",
-    "moveContentDialogPart1": "Vill du flytta det nuvarande innehållet lagt till på",
-    "moveContentDialogPart2": "till språket",
-    "dontMove": "Flytta inte",
-    "move": "Flytta",
+    "moveContentDialogTitle": "Vad ska göras med det aktuella innehållet?",
+    "moveContentDialogDescription": "Du håller på att byta språk för enkäten, men innehåll har redan matats in. Vad vill du göra med det innehåll som redan har matats in?",
+    "moveOption": "Innehållet är redan på {x}, så inget behöver göras med det.",
+    "dontMoveOption": "Innehållet är på {x}. Börja en ny översättning från början.",
     "languageNames": {
       "fi": "finska",
       "en": "engelska",
@@ -807,6 +811,7 @@
     "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
     "provideTranslations": "Om enkäten publiceras på flera språk, måste all text i enkäten översättas till dessa språk. Ange översättningar för varje saknad post i listan nedan.",
     "surveyInformation": "Grundinställningar för enkäten",
+    "frontPage": "Startsida",
     "copyTextFields": "Kopiera översättningsbara fält till Urklipp",
     "supportedLanguages": "Språk som stöds",
     "surveyPages": "Enkätens sidor",
@@ -997,6 +1002,7 @@
     "USER_NOT_PERMITTED_TO_VIEW": "Användaren är inte skapare, redaktör eller granskare av enkäten.",
     "USER_NOT_PERMITTED_TO_EDIT": "Användaren är inte skapare eller redaktör av enkäten.",
     "DUPLICATE_SURVEY_NAME": "En enkät med samma namn finns redan. Välj ett annat namn och försök igen.",
-    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Enkätens svar förhindrar att ändringarna sparas."
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Enkätens svar förhindrar att ändringarna sparas.",
+    "BUDGET_NOT_FULLY_ALLOCATED": "Hela budgeten för frågan {x} måste användas."
   }
 }

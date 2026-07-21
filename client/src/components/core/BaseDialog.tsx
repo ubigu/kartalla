@@ -4,6 +4,8 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  SxProps,
+  Theme,
   useTheme,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -19,9 +21,17 @@ interface Props {
   title?: string;
   content: ReactNode;
   actions: ReactNode;
+  sx?: SxProps<Theme>;
 }
 
-export function BaseDialog({ open, onClose, title, content, actions }: Props) {
+export function BaseDialog({
+  open,
+  onClose,
+  title,
+  content,
+  actions,
+  sx,
+}: Props) {
   const { tr } = useTranslations();
   const theme = useTheme();
 
@@ -31,6 +41,7 @@ export function BaseDialog({ open, onClose, title, content, actions }: Props) {
       onClose={onClose}
       aria-labelledby={title ? 'base-dialog-title' : undefined}
       aria-describedby="base-dialog-description"
+      PaperProps={{ sx }}
     >
       {title && (
         <DialogTitle

@@ -31,7 +31,10 @@ import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import { ComponentType, useEffect, useMemo, useRef, useState } from 'react';
@@ -386,7 +389,9 @@ export default function SurveyStepper({
     } catch (error) {
       showToast({
         severity: 'error',
-        message: tr.SurveyStepper.errorSubmittingSurvey,
+        message:
+          getApiTranslation(error?.message_code, tr, error?.info?.title) ||
+          tr.SurveyStepper.errorSubmittingSurvey,
       });
       setLoading(false);
     }
@@ -724,7 +729,9 @@ export default function SurveyStepper({
           <Box
             sx={{
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
+              justifyContent: 'center',
               overflow: 'auto',
               height: '100%',
               width: '100%',
@@ -754,11 +761,15 @@ export default function SurveyStepper({
                       fontSize: '0.8rem',
                     },
                   }),
-                  position: 'absolute',
-                  bottom: 0,
+                  ...(currentPage.sidebar.imageSize === 'original' && {
+                    position: 'sticky',
+                    bottom: 0,
+                    right: 0,
+                    left: 0,
+                  }),
                   padding: '0.5rem',
-                  borderTopLeftRadius: '0.25rem',
-                  right: 0,
+                  alignSelf: 'stretch',
+                  textAlign: 'right',
                   color: 'white',
                   backgroundColor: theme.palette.primary.main,
                 })}
@@ -949,20 +960,25 @@ export default function SurveyStepper({
             </Paper>
 
             <div style={{ flexGrow: 1 }}>{sidePane}</div>
-            <Typography
-              sx={(theme) => ({
-                position: 'sticky',
-                textAlign: 'center',
-                bottom: 0,
-                padding: '0.5rem',
-                borderTopLeftRadius: '0.25rem',
-                right: 0,
-                color: 'white',
-                backgroundColor: theme.palette.primary.main,
-              })}
-            >
-              {currentPage.sidebar.imageAttributions}
-            </Typography>
+            {currentPage.sidebar.type === 'image' &&
+              currentPage.sidebar.imageAttributions && (
+                <Typography
+                  sx={(theme) => ({
+                    textAlign: 'center',
+                    padding: '0.5rem',
+                    color: 'white',
+                    backgroundColor: theme.palette.primary.main,
+                    ...(currentPage.sidebar.imageSize === 'original' && {
+                      position: 'sticky',
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                    }),
+                  })}
+                >
+                  {currentPage.sidebar.imageAttributions}
+                </Typography>
+              )}
           </Drawer>
         </>
       )}

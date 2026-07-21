@@ -1,4 +1,6 @@
+import { Theme } from '@mui/material';
 import {
+  createMockBudgetingQuestion,
   createMockRadioQuestion,
   createMockSurvey,
   createMockTextSection,
@@ -7,9 +9,21 @@ import { describe, expect, it } from 'vitest';
 import {
   clearSurveyLanguage,
   copySurveyLanguage,
+  getFrontPageTabColor,
+  getLangBadgeStatus,
+  getPageTabColor,
+  getTabColor,
+  getThanksPageTabColor,
   isLocalizedText,
   walkLocalizedTexts,
 } from './surveyTranslations';
+
+const theme = {
+  palette: {
+    textError: { main: 'red' },
+    textWarning: { main: 'yellow' },
+  },
+} as Theme;
 
 describe('isLocalizedText', () => {
   it('accepts objects keyed only by language codes with string values', () => {
@@ -49,6 +63,19 @@ describe('walkLocalizedTexts', () => {
     };
     expect([...walkLocalizedTexts(tree)]).toEqual([
       { fi: 'a', en: 'b', sv: '' },
+    ]);
+  });
+
+  it('yields localized nodes held directly as array items, e.g. matrix classes/subjects', () => {
+    const tree = {
+      classes: [
+        { fi: 'Sarake 1', en: '', sv: '' },
+        { fi: 'Sarake 2', en: '', sv: '' },
+      ],
+    };
+    expect([...walkLocalizedTexts(tree)]).toEqual([
+      { fi: 'Sarake 1', en: '', sv: '' },
+      { fi: 'Sarake 2', en: '', sv: '' },
     ]);
   });
 });
@@ -152,7 +179,7 @@ describe('copySurveyLanguage', () => {
 describe('on a realistic survey', () => {
   const buildSurvey = () => {
     const survey = createMockSurvey(1, 10);
-    survey.pages[0].sections = [
+    survey.pages![0].sections = [
       createMockTextSection(100),
       createMockRadioQuestion(101),
     ];
@@ -165,7 +192,7 @@ describe('on a realistic survey', () => {
 
     expect(survey.title.fi).toBe('');
     expect(survey.thanksPage.title.fi).toBe('');
-    const radio = survey.pages[0].sections[1];
+    const radio = survey.pages![0].sections[1];
     if (radio.type !== 'radio') throw new Error('expected radio section');
     expect(radio.title.fi).toBe('');
     expect(radio.options[0].text.fi).toBe('');
@@ -180,7 +207,7 @@ describe('on a realistic survey', () => {
 
     expect(survey.title.en).toBe('Testikysely');
     expect(survey.title.fi).toBe('');
-    const radio = survey.pages[0].sections[1];
+    const radio = survey.pages![0].sections[1];
     if (radio.type !== 'radio') throw new Error('expected radio section');
     expect(radio.options[0].text.en).toBe('Vaihtoehto 1');
     expect(radio.options[0].text.fi).toBe('');
@@ -195,9 +222,222 @@ describe('on a realistic survey', () => {
 
     expect(survey.title.en).toBe('Testikysely');
     expect(survey.title.fi).toBe('Testikysely');
-    const radio = survey.pages[0].sections[1];
+    const radio = survey.pages![0].sections[1];
     if (radio.type !== 'radio') throw new Error('expected radio section');
     expect(radio.options[0].text.en).toBe('Vaihtoehto 1');
     expect(radio.options[0].text.fi).toBe('Vaihtoehto 1');
+  });
+});
+
+describe('getTabColor', () => {
+  it('is green (undefined) when every field is filled in every language', () => {
+    expect(getTabColor(() => ['a', 'b'], ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('is green (undefined) when there are no fields to check at all', () => {
+    expect(getTabColor(() => [], ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('is yellow when some language has every field filled but another does not', () => {
+    expect(
+      getTabColor(
+        (lang) => (lang === 'fi' ? ['a', 'b'] : ['', '']),
+        ['fi', 'en'],
+        theme,
+      ),
+    ).toBe(theme.palette.textWarning.main);
+  });
+
+  it('is red when no single language has every field filled, even though every field is filled somewhere', () => {
+    expect(
+      getTabColor(
+        (lang) => (lang === 'fi' ? ['a', ''] : ['', 'b']),
+        ['fi', 'en'],
+        theme,
+      ),
+    ).toBe(theme.palette.textError.main);
+  });
+});
+
+describe('getFrontPageTabColor', () => {
+  it('ignores optional fields (subtitle, description) left empty in every language', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.title = { fi: 'Otsikko', en: 'Title', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+
+    expect(getFrontPageTabColor(survey, ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('is yellow when an optional field is used in one language but not another', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.title = { fi: 'Otsikko', en: 'Title', sv: '' };
+    survey.subtitle = { fi: 'Alaotsikko', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+
+    expect(getFrontPageTabColor(survey, ['fi', 'en'], theme)).toBe(
+      theme.palette.textWarning.main,
+    );
+  });
+
+  it('is red when the mandatory title is missing in every language, even if an optional field is fully translated', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.title = { fi: '', en: '', sv: '' };
+    survey.subtitle = { fi: 'Alaotsikko', en: 'Subtitle', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+
+    expect(getFrontPageTabColor(survey, ['fi', 'en'], theme)).toBe(
+      theme.palette.textError.main,
+    );
+  });
+
+  it('is yellow when the mandatory title is filled in one language but not another', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.title = { fi: 'Otsikko', en: '', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+
+    expect(getFrontPageTabColor(survey, ['fi', 'en'], theme)).toBe(
+      theme.palette.textWarning.main,
+    );
+  });
+});
+
+describe('getThanksPageTabColor', () => {
+  it('is green (undefined) when both fields are left empty in every language, since neither is mandatory today', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.thanksPage = {
+      title: { fi: '', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getThanksPageTabColor(survey, ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('is yellow, not red, when a used optional field is only translated in one language', () => {
+    const survey = createMockSurvey(1, 10);
+    survey.thanksPage = {
+      title: { fi: 'Kiitos', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getThanksPageTabColor(survey, ['fi', 'en'], theme)).toBe(
+      theme.palette.textWarning.main,
+    );
+  });
+});
+
+describe('getPageTabColor', () => {
+  const buildPage = () => {
+    const survey = createMockSurvey(1, 10);
+    const page = survey.pages![0];
+    page.sections = [createMockTextSection(100)];
+    return page;
+  };
+
+  it('is green (undefined) when the page title and every section field are filled in every language', () => {
+    const page = buildPage();
+    page.title = { fi: 'Sivu', en: 'Page', sv: '' };
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('is red when the page title is missing in every language, even though a section field is fully translated', () => {
+    const page = buildPage();
+    page.title = { fi: '', en: '', sv: '' };
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBe(
+      theme.palette.textError.main,
+    );
+  });
+
+  it('ignores an empty budgeting helperText, since it is not shown to respondents when empty', () => {
+    const page = buildPage();
+    page.title = { fi: 'Sivu', en: 'Page', sv: '' };
+    const budgeting = createMockBudgetingQuestion(200);
+    budgeting.targets[0].name = { fi: 'Kohde', en: 'Target', sv: '' };
+    budgeting.helperText = { fi: '', en: '', sv: '' };
+    page.sections = [budgeting];
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBeUndefined();
+  });
+
+  it('still flags an unevenly translated budgeting helperText', () => {
+    const page = buildPage();
+    page.title = { fi: 'Sivu', en: 'Page', sv: '' };
+    const budgeting = createMockBudgetingQuestion(200);
+    budgeting.targets[0].name = { fi: 'Kohde', en: 'Target', sv: '' };
+    budgeting.helperText = { fi: 'Ohje', en: '', sv: '' };
+    page.sections = [budgeting];
+
+    expect(getPageTabColor(page, ['fi', 'en'], theme)).toBe(
+      theme.palette.textWarning.main,
+    );
+  });
+});
+
+describe('getLangBadgeStatus', () => {
+  const buildSurvey = () => {
+    const survey = createMockSurvey(1, 10);
+    survey.pages![0].sections = [createMockTextSection(100)];
+    return survey;
+  };
+
+  it('is default when the front page, every page, and the thanks page are fully filled in the language', () => {
+    const survey = buildSurvey();
+    survey.title = { fi: 'Otsikko', en: 'Title', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+    survey.pages![0].title = { fi: 'Sivu', en: 'Page', sv: '' };
+    survey.thanksPage = {
+      title: { fi: '', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'en')).toBe('default');
+  });
+
+  it('is warning (not default) when only the front page title is missing in the language, even though every page is complete', () => {
+    const survey = buildSurvey();
+    survey.title = { fi: 'Otsikko', en: '', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+    survey.pages![0].title = { fi: 'Sivu', en: 'Page', sv: '' };
+    survey.thanksPage = {
+      title: { fi: '', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'en')).toBe('warning');
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'fi')).toBe('default');
+  });
+
+  it('is error when the front page, pages, and a used thanks page field are all missing in the language', () => {
+    const survey = buildSurvey();
+    survey.title = { fi: 'Otsikko', en: '', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+    survey.pages![0].title = { fi: 'Sivu', en: '', sv: '' };
+    survey.thanksPage = {
+      title: { fi: 'Kiitos', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'en')).toBe('error');
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'fi')).toBe('default');
+  });
+
+  it('does not force error from an unused optional thanks page when everything else is complete', () => {
+    const survey = buildSurvey();
+    survey.title = { fi: 'Otsikko', en: 'Title', sv: '' };
+    survey.subtitle = { fi: '', en: '', sv: '' };
+    survey.description = { fi: '', en: '', sv: '' };
+    survey.pages![0].title = { fi: 'Sivu', en: 'Page', sv: '' };
+    survey.thanksPage = {
+      title: { fi: '', en: '', sv: '' },
+      text: { fi: '', en: '', sv: '' },
+    };
+
+    expect(getLangBadgeStatus(survey, ['fi', 'en'], 'en')).toBe('default');
   });
 });

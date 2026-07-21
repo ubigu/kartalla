@@ -21,14 +21,14 @@ export default function SurveyLanguageRouter(): null {
 
   useEffect(() => {
     if (!survey) {
-      setLanguageQuiet(detectBrowserLanguage());
+      setLanguageQuiet(isLanguage(lang) ? lang : detectBrowserLanguage());
       return;
     }
     const enabled = Object.entries(survey.enabledLanguages)
       .filter(([, e]) => e)
       .map(([l]) => l as Language);
     const browserLang = detectBrowserLanguage();
-    let target: Language | undefined;
+    let target: Language;
     if (
       survey.localisationEnabled &&
       isLanguage(lang) &&
@@ -38,10 +38,12 @@ export default function SurveyLanguageRouter(): null {
     } else if (enabled.includes(browserLang)) {
       target = browserLang;
     } else {
-      target = enabled[0];
+      // enabledLanguages should never be empty for a published survey, but fall
+      // back to the browser language rather than leaving it unresolved if it is.
+      target = enabled[0] ?? browserLang;
     }
 
-    if (target && target !== language) setLanguageQuiet(target);
+    if (target !== language) setLanguageQuiet(target);
   }, [lang, survey]);
 
   return null;

@@ -208,11 +208,14 @@ async function validateEntriesByIsRequired(
  * Check if given answer entries are valid.
  * @param answerEntries Answer entries to validate
  */
-async function validateEntries(answerEntries: SubmissionAnswerEntry[]) {
+async function validateEntries(
+  answerEntries: SubmissionAnswerEntry[],
+  language: LanguageCode,
+) {
   await Promise.all([
     validateEntriesByAnswerLimits(answerEntries),
     validateEntriesByIsRequired(answerEntries),
-    validateBudgetingEntries(answerEntries),
+    validateBudgetingEntries(answerEntries, language),
   ]);
 }
 
@@ -257,13 +260,16 @@ async function validateAttachmentEntries(
  * Validate budgeting question entries to ensure allocations don't exceed total budget.
  * Applies to both 'budgeting' and 'geo-budgeting' question types.
  * @param answerEntries Answer entries to validate
+ * @param language Language used when answering the survey
  */
 async function validateBudgetingEntries(
   answerEntries: SubmissionAnswerEntry[],
+  language: LanguageCode,
 ) {
   // Get all budgeting questions and their constraints from db
   const budgetingQuestions = await getDb().manyOrNone<{
     id: number;
+    title: LocalizedText;
     totalBudget: string; // pg returns numeric as string
     requireFullAllocation: boolean;
     inputMode?: 'absolute' | 'percentage';
@@ -273,6 +279,7 @@ async function validateBudgetingEntries(
   }>(
     `SELECT
       id,
+      title,
       (details->>'totalBudget')::numeric as "totalBudget",
       (details->>'requireFullAllocation')::boolean as "requireFullAllocation",
       details->>'inputMode' as "inputMode",
@@ -354,9 +361,15 @@ async function validateBudgetingEntries(
     }
 
     // If requireFullAllocation is set, validate that budget is fully used
-    if (question.requireFullAllocation && totalUsed !== budgetLimit) {
+    if (
+      question.budgetingMode === 'direct' &&
+      question.requireFullAllocation &&
+      totalUsed !== budgetLimit
+    ) {
       throw new BadRequestError(
         `Budget for question ${question.id} must be fully allocated: ${totalUsed} != ${budgetLimit}`,
+        { title: question.title?.[language] },
+        'BUDGET_NOT_FULLY_ALLOCATED',
       );
     }
   });
@@ -436,7 +449,7 @@ export async function createSurveySubmission(
 
   // Only validate the entries if saving the final submission (not unfinished)
   if (!unfinished) {
-    await validateEntries(answerEntries);
+    await validateEntries(answerEntries, language);
   }
 
   // If unfinished token was provided, delete the old submission and pick the old "created at" timestamp

@@ -320,6 +320,26 @@ function getOptionSelectionImage(
   return option?.image;
 }
 
+function getScreenshotImageContent(
+  screenshot: ScreenshotJobReturnData | undefined,
+  tr: ReturnType<typeof useTranslations>,
+  style: string,
+): Content {
+  if (screenshot?.image == null) {
+    return {
+      text: tr.MapQuestion.screenshotUnavailable,
+      width: 200,
+      style,
+      italics: true,
+    };
+  }
+  return {
+    image: 'data:image/png;base64,' + screenshot.image.toString('base64'),
+    width: 200,
+    style,
+  };
+}
+
 function getContent(
   answerEntry: SubmissionAnswerEntry | undefined,
   sections: SurveyPageSection[],
@@ -506,13 +526,7 @@ function getContent(
           );
           return {
             columns: [
-              {
-                image:
-                  'data:image/png;base64,' +
-                  screenshot!.image.toString('base64'),
-                width: 200,
-                style,
-              },
+              getScreenshotImageContent(screenshot, tr, style),
               [
                 {
                   text: `${tr.MapQuestion.annotation}:`,
@@ -527,9 +541,9 @@ function getContent(
                   style: 'subQuestionTitle',
                 },
                 {
-                  text: !screenshot!.layerNames.length
+                  text: !screenshot?.layerNames.length
                     ? '-'
-                    : screenshot!.layerNames.join(', '),
+                    : screenshot.layerNames.join(', '),
                   style: 'subQuestionAnswer',
                 },
                 ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
@@ -708,13 +722,7 @@ function getContent(
 
           return {
             columns: [
-              {
-                image:
-                  'data:image/png;base64,' +
-                  screenshot!.image.toString('base64'),
-                width: 200,
-                style,
-              },
+              getScreenshotImageContent(screenshot, tr, style),
               [
                 {
                   text: `${tr.MapQuestion.annotation}: ${index + 1}/${answerEntry.value.length}`,
@@ -729,9 +737,9 @@ function getContent(
                   style: 'subQuestionTitle',
                 } as Content,
                 {
-                  text: !screenshot!.layerNames.length
+                  text: !screenshot?.layerNames.length
                     ? '-'
-                    : screenshot!.layerNames.join(', '),
+                    : screenshot.layerNames.join(', '),
                   style: 'subQuestionAnswer',
                 } as Content,
               ],

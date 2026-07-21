@@ -113,9 +113,12 @@ function isApiTranslationKey(key: unknown): key is ApiTranslationKey {
 export function getApiTranslation(
   key: unknown,
   tr: (typeof translations)[Language],
+  replaceX?: string,
 ): string {
   if (!isApiTranslationKey(key)) return typeof key === 'string' ? key : '';
-  return tr.ApiResponses[key];
+  return replaceX != null
+    ? tr.ApiResponses[key].replace('{x}', replaceX)
+    : tr.ApiResponses[key];
 }
 
 function reducer(_state: State, action: Action): State {

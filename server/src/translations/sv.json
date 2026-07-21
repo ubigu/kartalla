@@ -55,7 +55,8 @@
   },
   "MapQuestion": {
     "annotation": "Anteckning",
-    "visibleLayers": "Synliga lager"
+    "visibleLayers": "Synliga lager",
+    "screenshotUnavailable": "Skärmbild inte tillgänglig"
   },
   "GeoBudgetingQuestion": {
     "summary": "Sammanfattning",

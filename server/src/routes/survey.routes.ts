@@ -486,6 +486,15 @@ router.post(
       );
     }
 
+    const surveyToPublish = await getSurvey({ id: surveyId });
+    if (!Object.values(surveyToPublish.enabledLanguages).some(Boolean)) {
+      throw new BadRequestError(
+        'Cannot publish a survey with no enabled languages',
+        undefined,
+        'NO_ENABLED_LANGUAGES',
+      );
+    }
+
     const survey = await publishSurvey(surveyId);
     res.status(200).json(survey);
   }),

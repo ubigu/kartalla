@@ -31,7 +31,7 @@ export interface ScreenshotJobData {
 export interface ScreenshotJobReturnData {
   sectionId: number;
   index: number;
-  image: Buffer;
+  image: Buffer | null;
   layerNames: string[];
 }
 

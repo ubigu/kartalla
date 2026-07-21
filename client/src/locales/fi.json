@@ -65,6 +65,7 @@
     "preview": "Esikatselu",
     "toSurveyPage": "Kyselysivulle",
     "preventUnloadConfirm": "Sivulla on tallentamattomia muutoksia. Haluatko varmasti poistua sivulta?",
+    "unsavedChangesConfirm": "Haluatko tallentaa keskeneräiset muutokset?",
     "deleteSurvey": "Poista kysely",
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
@@ -126,7 +127,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
-    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
+    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
     "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
     "emailSubject": "Viestin aihe",
@@ -134,7 +135,7 @@
     "info": "Lisätiedot",
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
     "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
-    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle sekä sivujen alamarginaaleihin.",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään raportin etusivulle sekä sivujen alamarginaaleihin.",
     "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat",
     "required": "Vastaajan sähköpostiosoite pakollinen",
     "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
@@ -643,7 +644,8 @@
     "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
     "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
-    "iFrameTitle": "Karttanäkymä"
+    "iFrameTitle": "Karttanäkymä",
+    "loadError": "Kartan lataaminen epäonnistui. Yritä myöhemmin uudelleen."
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa",
@@ -722,6 +724,9 @@
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
+  "OskariMap": {
+    "loadError": "Kartan lataaminen epäonnistui."
+  },
   "AppBar": {
     "survey": "Kysely",
     "generalNotifications": "Tiedotteet",
@@ -793,11 +798,10 @@
     "deleteTranslations": "Poista käännökset...",
     "enteredTranslations": "Syötetyt käännökset",
     "supportedLanguagesLabel": "Kyselyssä tuetut kielet",
-    "moveContentDialogTitle": "Siirretäänkö nykyinen kielisisältö?",
-    "moveContentDialogPart1": "Haluatko siirtää nykyiset, kielellä",
-    "moveContentDialogPart2": "lisätyt sisällöt kieleen",
-    "dontMove": "Älä siirrä",
-    "move": "Siirrä",
+    "moveContentDialogTitle": "Mitä tehdään nykyiselle sisällölle?",
+    "moveContentDialogDescription": "Olet vaihtamassa kyselyn kieltä, mutta kyselyyn on jo syötetty sisältöä. Mitä haluat tehdä jo syötetylle sisällölle?",
+    "moveOption": "Sisältö on jo kielellä {x}, eikä sille tarvitse tehdä mitään.",
+    "dontMoveOption": "Sisältö on kielellä {x}. Aloita uusi käännös puhtaalta pöydältä.",
     "languageNames": {
       "fi": "suomi",
       "en": "englanti",
@@ -808,6 +812,7 @@
     "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
     "provideTranslations": "Mikäli kysely julkaistaan usealla eri kielellä, tulee kaikki kyselyssä esiintyvät tekstit kääntää ko. kielille. Anna alla olevassa listassa kielikäännös jokaiseen puuttuvaan kohtaan.",
     "surveyInformation": "Kyselyn perusasetukset",
+    "frontPage": "Etusivu",
     "copyTextFields": "Kopioi käännettävät tietueet leikepöydälle",
     "supportedLanguages": "Mitä muita kieliä tuetaan?",
     "surveyPages": "Kyselyn sivut",
@@ -997,6 +1002,7 @@
     "USER_NOT_PERMITTED_TO_VIEW": "Käyttäjällä ei ole oikeutta tarkastella kyselyä.",
     "USER_NOT_PERMITTED_TO_EDIT": "Käyttäjällä ei ole oikeutta muokata kyselyä.",
     "DUPLICATE_SURVEY_NAME": "Saman niminen kysely on jo olemassa. Valitse toinen nimi ja yritä uudestaan.",
-    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Kyselyn vastaukset estävät muutosten tallentamisen."
+    "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Kyselyn vastaukset estävät muutosten tallentamisen.",
+    "BUDGET_NOT_FULLY_ALLOCATED": "Kysymyksen {x} koko budjetti tulee käyttää."
   }
 }

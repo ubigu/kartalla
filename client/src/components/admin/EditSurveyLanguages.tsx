@@ -1,4 +1,4 @@
-import { EnabledLanguages } from '@interfaces/survey';
+import { EnabledLanguages, Survey, SurveyPage } from '@interfaces/survey';
 import {
   Box,
   BoxProps,
@@ -30,6 +30,15 @@ import { editPageContainerSx } from './EditSurvey';
 
 interface Props {
   canEdit: boolean;
+}
+
+function applySurveyLanguageChange(
+  survey: Survey,
+  editSurvey: (survey: Survey) => void,
+  editPage: (page: SurveyPage) => void,
+) {
+  editSurvey(survey);
+  survey.pages?.forEach(editPage);
 }
 
 type LanguageItemProps = {
@@ -165,11 +174,15 @@ function useLanguageItemData() {
 function LanguageList() {
   const { activeSurvey, workingLanguage, translationCounts, getLabel } =
     useLanguageItemData();
-  const { editSurvey } = useSurvey();
+  const { editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
 
   function handleDeleteTranslations(lang: Language) {
-    editSurvey(clearSurveyLanguage({ ...activeSurvey }, lang));
+    applySurveyLanguageChange(
+      clearSurveyLanguage({ ...activeSurvey }, lang),
+      editSurvey,
+      editPage,
+    );
   }
 
   return (
@@ -215,7 +228,7 @@ function LanguageList() {
 }
 
 function MultiLanguageFieldset({ canEdit }: { canEdit: boolean }) {
-  const { activeSurvey, editSurvey } = useSurvey();
+  const { activeSurvey, editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const { workingLanguage, translationCounts, getLabel, setWorkingLanguage } =
@@ -226,7 +239,11 @@ function MultiLanguageFieldset({ canEdit }: { canEdit: boolean }) {
   );
 
   function handleDeleteTranslations(lang: Language) {
-    editSurvey(clearSurveyLanguage({ ...activeSurvey }, lang));
+    applySurveyLanguageChange(
+      clearSurveyLanguage({ ...activeSurvey }, lang),
+      editSurvey,
+      editPage,
+    );
   }
 
   function handleLanguageToggle(
@@ -311,42 +328,43 @@ function LanguageMoveDialog({
   const { tr } = useTranslations();
 
   const dialogContent = (
-    <Typography sx={{ fontWeight: 300 }}>
-      {tr.SurveyLanguageMenu.moveContentDialogPart1}{' '}
-      <Box component={'span'} fontWeight={600}>
-        {tr.EditSurveyTranslations[workingLanguage]}
-      </Box>{' '}
-      {tr.SurveyLanguageMenu.moveContentDialogPart2}{' '}
-      <Box component={'span'} fontWeight={600}>
-        {targetLanguage && tr.EditSurveyTranslations[targetLanguage]}
-      </Box>
-      ?
-    </Typography>
+    <Stack sx={{ gap: '8px', flex: 1 }}>
+      <Typography sx={{ fontWeight: 300 }}>
+        {tr.SurveyLanguageMenu.moveContentDialogDescription}
+      </Typography>
+      <Button
+        onClick={onMove}
+        variant="outlined"
+        fullWidth
+        sx={{ textAlign: 'start' }}
+      >
+        {tr.SurveyLanguageMenu.moveOption.replace(
+          '{x}',
+          targetLanguage ? tr.EditSurveyTranslations[targetLanguage] : '',
+        )}
+      </Button>
+      <Button
+        onClick={onDontMove}
+        variant="outlined"
+        fullWidth
+        sx={{ textAlign: 'start' }}
+      >
+        {tr.SurveyLanguageMenu.dontMoveOption.replace(
+          '{x}',
+          tr.EditSurveyTranslations[workingLanguage],
+        )}
+      </Button>
+    </Stack>
   );
 
   const dialogActions = (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: '8px',
-        justifyContent: 'space-between',
-        flex: 1,
-      }}
-    >
+    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
       <Button
         onClick={onCancel}
         startIcon={<ClearIcon htmlColor={theme.palette.primary.main} />}
       >
         {tr.commands.cancel}
       </Button>
-      <Box sx={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
-        <Button onClick={onDontMove} variant="outlined">
-          {tr.SurveyLanguageMenu.dontMove}
-        </Button>
-        <Button onClick={onMove} variant="outlined">
-          {tr.SurveyLanguageMenu.move}
-        </Button>
-      </Box>
     </Box>
   );
 
@@ -357,12 +375,13 @@ function LanguageMoveDialog({
       content={dialogContent}
       actions={dialogActions}
       onClose={() => onCancel()}
+      sx={{ maxWidth: '360px' }}
     />
   );
 }
 
 export function EditSurveyLanguages({ canEdit }: Props) {
-  const { activeSurvey, editSurvey } = useSurvey();
+  const { activeSurvey, editSurvey, editPage } = useSurvey();
   const { tr } = useTranslations();
   const { workingLanguage, setWorkingLanguage } = useWorkingLanguage();
   const [proposedWorkingLanguage, setProposedWorkingLanguage] =
@@ -372,12 +391,16 @@ export function EditSurveyLanguages({ canEdit }: Props) {
     ? 'multilingual'
     : workingLanguage;
 
+  const translationCounts = useMemo(
+    () => countSurveyTranslations(activeSurvey, supportedLanguages),
+    [activeSurvey],
+  );
+
   const multipleTranslationsSet = useMemo(
     () =>
-      Object.values(
-        countSurveyTranslations(activeSurvey, supportedLanguages),
-      ).filter((count) => count.filled > 0).length > 1,
-    [activeSurvey],
+      Object.values(translationCounts).filter((count) => count.filled > 0)
+        .length > 1,
+    [translationCounts],
   );
 
   function handleSurveyLanguageModeChange(
@@ -403,8 +426,10 @@ export function EditSurveyLanguages({ canEdit }: Props) {
       });
       if (prevValue === 'multilingual') {
         setWorkingLanguage(newValue);
-      } else {
+      } else if (translationCounts[newValue].filled === 0) {
         setProposedWorkingLanguage(newValue);
+      } else {
+        setWorkingLanguage(newValue);
       }
     }
   }
@@ -449,13 +474,15 @@ export function EditSurveyLanguages({ canEdit }: Props) {
         targetLanguage={proposedWorkingLanguage}
         onMove={() => {
           if (!proposedWorkingLanguage) return;
-          editSurvey({
-            ...copySurveyLanguage(
-              activeSurvey,
+          applySurveyLanguageChange(
+            copySurveyLanguage(
+              { ...activeSurvey },
               workingLanguage,
               proposedWorkingLanguage,
             ),
-          });
+            editSurvey,
+            editPage,
+          );
           setWorkingLanguage(proposedWorkingLanguage);
           setProposedWorkingLanguage(null);
         }}

@@ -14,6 +14,11 @@ async function enableMultilingualWithEnglish(page: Page) {
   await page.getByRole('button', { name: 'Vahvista kieliasetukset' }).click();
 }
 
+async function confirmMonolingual(page: Page) {
+  await goToBasicSettings(page);
+  await page.getByRole('button', { name: 'Vahvista kieliasetukset' }).click();
+}
+
 test.describe('Public survey language routing', () => {
   let surveyData: SurveyParams & { id: string };
 
@@ -29,9 +34,14 @@ test.describe('Public survey language routing', () => {
   });
 
   test('single-language survey ignores lang query param', async ({
+    surveyEditPage,
     surveyAdminPage,
     surveyPage,
   }) => {
+    await surveyEditPage.goto();
+    await confirmMonolingual(surveyEditPage.page);
+    await surveyEditPage.saveSurvey();
+
     await surveyAdminPage.goto();
     await surveyAdminPage.publishSurvey(surveyData.title);
 

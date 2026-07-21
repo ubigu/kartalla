@@ -55,7 +55,8 @@
   },
   "MapQuestion": {
     "annotation": "Merkintä",
-    "visibleLayers": "Näkyvät tasot"
+    "visibleLayers": "Näkyvät tasot",
+    "screenshotUnavailable": "Kuvakaappaus ei ole saatavilla"
   },
   "GeoBudgetingQuestion": {
     "summary": "Yhteenveto",

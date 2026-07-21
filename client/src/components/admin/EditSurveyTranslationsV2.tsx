@@ -1,8 +1,4 @@
-import {
-  LanguageCode,
-  SurveyPage,
-  SurveyPageSection,
-} from '@interfaces/survey';
+import { LanguageCode, SurveyPageSection } from '@interfaces/survey';
 import { Box, Theme, Typography, useTheme } from '@mui/material';
 import { Input } from '@src/components/core/Input';
 import { loadingPulse } from '@src/components/core/styles';
@@ -15,31 +11,31 @@ import {
 } from '@src/stores/TranslationContext';
 import { useWorkingLanguage } from '@src/stores/WorkingLanguageContext';
 import {
-  collectPageFields,
   collectSectionFields,
+  getFrontPageTabColor,
+  getPageTabColor,
+  getThanksPageTabColor,
 } from '@src/utils/surveyTranslations';
 import { useState } from 'react';
 import { Select } from '../core/Select';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
 
-function getPageTabColor(
-  page: SurveyPage,
-  enabledLanguages: LanguageCode[],
-  theme: Theme,
-): string | undefined {
-  let anyMissing = false;
-  for (const lang of enabledLanguages) {
-    const fields = collectPageFields(page, lang);
-    const filledCount = fields.filter((field) => field.trim()).length;
-    if (filledCount === 0) return theme.palette.textError.main;
-    if (filledCount < fields.length) anyMissing = true;
-  }
-  return anyMissing ? theme.palette.textWarning.main : undefined;
-}
-
 function capitalizeFirst(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function columnHeaderTextSx(theme: Theme) {
+  return {
+    fontSize: '14px',
+    fontWeight: 700,
+    color: theme.palette.textSecondary.main,
+    textAlign: 'left' as const,
+    height: '28px',
+    lineHeight: '28px',
+    padding: '0 6px',
+    whiteSpace: 'noWrap',
+  };
 }
 
 function countSectionRows(section: SurveyPageSection): number {
@@ -76,21 +72,30 @@ export default function EditSurveyTranslationsV2() {
     ...columnLangs.slice(0, visibleColCount - 1),
   ];
 
+  const formatLanguageLabel = (lang: LanguageCode) =>
+    `${capitalizeFirst(tr.EditSurveyTranslations[lang])} (${lang})`;
+
   const pages = activeSurvey.pages ?? [];
-  const activePage = pages[activeTab];
   const totalCols = visibleCols.length + 1;
 
-  // Compute cumulative start indices so stripe alternation is continuous across all tbodies
-  const SURVEY_ROW_COUNT = 3; // title, subtitle, description
-  const PAGE_TITLE_START = SURVEY_ROW_COUNT;
+  // Tab layout: [front page, ...survey pages, thanks page]
+  const frontPageTabIndex = 0;
+  const thanksPageTabIndex = pages.length + 1;
+  const isFrontPageTab = activeTab === frontPageTabIndex;
+  const isThanksPageTab = activeTab === thanksPageTabIndex;
+  const activePage =
+    activeTab >= 1 && activeTab <= pages.length
+      ? pages[activeTab - 1]
+      : undefined;
+
+  // Compute cumulative start indices so stripe alternation is continuous within the active page tab
   const sections = activePage?.sections ?? [];
   const sectionStarts: number[] = [];
-  let nextIdx = PAGE_TITLE_START + 1;
+  let nextIdx = 1;
   for (const section of sections) {
     sectionStarts.push(nextIdx);
     nextIdx += countSectionRows(section);
   }
-  const thanksStart = nextIdx;
 
   return (
     <Box
@@ -118,6 +123,14 @@ export default function EditSurveyTranslationsV2() {
         </Typography>
 
         <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tab
+            label={tr.EditSurveyTranslations.frontPage}
+            labelColor={getFrontPageTabColor(
+              activeSurvey,
+              enabledLanguages,
+              theme,
+            )}
+          />
           {pages.map((page, pageIndex) => {
             const pageTitle =
               page.title?.[language] ||
@@ -131,6 +144,14 @@ export default function EditSurveyTranslationsV2() {
               />
             );
           })}
+          <Tab
+            label={tr.EditSurveyTranslations.thanksPage}
+            labelColor={getThanksPageTabColor(
+              activeSurvey,
+              enabledLanguages,
+              theme,
+            )}
+          />
         </Tabs>
       </Box>
 
@@ -145,15 +166,14 @@ export default function EditSurveyTranslationsV2() {
         }}
       >
         <Box component="thead">
-          <Box
-            component="tr"
-            sx={(theme) => ({
-              borderBottom: `2px solid ${theme.palette.primary.main}`,
-            })}
-          >
+          <Box component="tr">
             <Box
               component="th"
-              sx={{ width: TRANSLATION_ROW_LABEL_WIDTH, padding: '4px 0' }}
+              sx={{
+                width: TRANSLATION_ROW_LABEL_WIDTH,
+                padding: '4px 0',
+                borderBottom: `2px solid ${theme.palette.primary.main}`,
+              }}
             >
               <Select
                 value={String(visibleColCount)}
@@ -165,20 +185,16 @@ export default function EditSurveyTranslationsV2() {
                 sx={{ width: '100%' }}
               />
             </Box>
-            <Box component="th" scope="col" sx={{ padding: '2px 8px' }}>
-              <Typography
-                sx={(theme) => ({
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  color: theme.palette.textSecondary.main,
-                  textAlign: 'left',
-                  height: '28px',
-                  lineHeight: '28px',
-                  padding: '0 6px',
-                })}
-              >
-                {capitalizeFirst(tr.EditSurveyTranslations[workingLanguage])} (
-                {workingLanguage}){' '}
+            <Box
+              component="th"
+              scope="col"
+              sx={{
+                padding: '2px 8px',
+                borderBottom: `2px solid ${theme.palette.primary.main}`,
+              }}
+            >
+              <Typography sx={columnHeaderTextSx}>
+                {formatLanguageLabel(workingLanguage)}{' '}
                 <Box
                   component={'span'}
                   sx={{
@@ -197,29 +213,21 @@ export default function EditSurveyTranslationsV2() {
                   component="th"
                   scope="col"
                   key={`${lang}-${colIdx}`}
-                  sx={{ padding: '2px 8px' }}
+                  sx={{
+                    padding: '2px 8px',
+                    borderBottom: `2px solid ${theme.palette.primary.main}`,
+                  }}
                 >
                   {otherEnabledLanguages.length <= 1 ? (
-                    <Typography
-                      sx={(theme) => ({
-                        fontSize: '14px',
-                        fontWeight: 700,
-                        color: theme.palette.textSecondary.main,
-                        textAlign: 'left',
-                        height: '28px',
-                        lineHeight: '28px',
-                        padding: '0 6px',
-                      })}
-                    >
-                      {capitalizeFirst(tr.EditSurveyTranslations[lang])} ({lang}
-                      )
+                    <Typography sx={columnHeaderTextSx}>
+                      {formatLanguageLabel(lang)}
                     </Typography>
                   ) : (
                     <Select
                       value={lang}
                       options={otherEnabledLanguages.map((langCode) => ({
                         value: langCode,
-                        label: `${capitalizeFirst(tr.EditSurveyTranslations[langCode])} (${langCode})`,
+                        label: formatLanguageLabel(langCode),
                       }))}
                       onChange={(value) => {
                         const next = [...columnLangs];
@@ -238,68 +246,73 @@ export default function EditSurveyTranslationsV2() {
           </Box>
         </Box>
 
-        {/* Survey-level fields */}
-        <Box component="tbody">
-          <TranslationRow
-            label={tr.EditSurveyTranslations.surveyTitle}
-            stripe={false}
-            cols={visibleCols}
-            render={(lang) => (
-              <Input
-                value={activeSurvey.title?.[lang] ?? ''}
-                onChange={(e) =>
-                  editSurvey({
-                    ...activeSurvey,
-                    title: {
-                      ...activeSurvey.title,
-                      [lang]: e.target.value,
-                    },
-                  })
-                }
-              />
-            )}
-          />
-          <TranslationRow
-            label={tr.EditSurveyTranslations.surveySubtitle}
-            stripe={true}
-            cols={visibleCols}
-            render={(lang) => (
-              <Input
-                value={activeSurvey.subtitle?.[lang] ?? ''}
-                onChange={(e) =>
-                  editSurvey({
-                    ...activeSurvey,
-                    subtitle: {
-                      ...activeSurvey.subtitle,
-                      [lang]: e.target.value,
-                    },
-                  })
-                }
-              />
-            )}
-          />
-          <TranslationRow
-            label={tr.EditSurveyTranslations.surveyDescription}
-            stripe={false}
-            cols={visibleCols}
-            headerVerticalAlign="top"
-            render={(lang) => (
-              <RichTextEditor
-                value={activeSurvey.description?.[lang] ?? ''}
-                missingValue={false}
-                onChange={(val) =>
-                  editSurvey({
-                    ...activeSurvey,
-                    description: { ...activeSurvey.description, [lang]: val },
-                  })
-                }
-                editorHeight="80px"
-                resizable
-                toolbarOptions={inlineToolbarOptions}
-              />
-            )}
-          />
-        </Box>
+        {/* Front page — survey title, subtitle, description */}
+        {isFrontPageTab && (
+          <Box component="tbody">
+            <TranslationRow
+              label={tr.EditSurveyTranslations.surveyTitle}
+              stripe={false}
+              cols={visibleCols}
+              render={(lang) => (
+                <Input
+                  value={activeSurvey.title?.[lang] ?? ''}
+                  onChange={(e) =>
+                    editSurvey({
+                      ...activeSurvey,
+                      title: {
+                        ...activeSurvey.title,
+                        [lang]: e.target.value,
+                      },
+                    })
+                  }
+                />
+              )}
+            />
+            <TranslationRow
+              label={tr.EditSurveyTranslations.surveySubtitle}
+              stripe={true}
+              cols={visibleCols}
+              render={(lang) => (
+                <Input
+                  value={activeSurvey.subtitle?.[lang] ?? ''}
+                  onChange={(e) =>
+                    editSurvey({
+                      ...activeSurvey,
+                      subtitle: {
+                        ...activeSurvey.subtitle,
+                        [lang]: e.target.value,
+                      },
+                    })
+                  }
+                />
+              )}
+            />
+            <TranslationRow
+              label={tr.EditSurveyTranslations.surveyDescription}
+              stripe={false}
+              cols={visibleCols}
+              headerVerticalAlign="top"
+              render={(lang) => (
+                <RichTextEditor
+                  value={activeSurvey.description?.[lang] ?? ''}
+                  missingValue={false}
+                  onChange={(val) =>
+                    editSurvey({
+                      ...activeSurvey,
+                      description: {
+                        ...activeSurvey.description,
+                        [lang]: val,
+                      },
+                    })
+                  }
+                  editorHeight="80px"
+                  resizable
+                  toolbarOptions={inlineToolbarOptions}
+                />
+              )}
+            />
+          </Box>
+        )}
 
         {activePage && (
           <>
@@ -307,7 +320,7 @@ export default function EditSurveyTranslationsV2() {
             <Box component="tbody">
               <TranslationRow
                 label={tr.EditSurveyTranslations.pageTitle}
-                stripe={PAGE_TITLE_START % 2 !== 0}
+                stripe={false}
                 cols={visibleCols}
                 render={(lang) => (
                   <Input
@@ -335,62 +348,62 @@ export default function EditSurveyTranslationsV2() {
                 startIndex={sectionStarts[sectionIndex]}
               />
             ))}
-
-            {/* Thanks page — only on the last page tab */}
-            {activeTab === pages.length - 1 && (
-              <Box component="tbody">
-                <TranslationRow
-                  label={tr.EditSurveyTranslations.thanksPageTitle}
-                  stripe={thanksStart % 2 !== 0}
-                  cols={visibleCols}
-                  render={(lang) => (
-                    <Input
-                      value={activeSurvey.thanksPage.title?.[lang] ?? ''}
-                      onChange={(e) =>
-                        editSurvey({
-                          ...activeSurvey,
-                          thanksPage: {
-                            ...activeSurvey.thanksPage,
-                            title: {
-                              ...activeSurvey.thanksPage.title,
-                              [lang]: e.target.value,
-                            },
-                          },
-                        })
-                      }
-                    />
-                  )}
-                />
-                <TranslationRow
-                  label={tr.EditSurveyTranslations.thanksPageText}
-                  stripe={(thanksStart + 1) % 2 !== 0}
-                  cols={visibleCols}
-                  headerVerticalAlign="top"
-                  render={(lang) => (
-                    <RichTextEditor
-                      value={activeSurvey.thanksPage.text?.[lang] ?? ''}
-                      missingValue={false}
-                      onChange={(val) =>
-                        editSurvey({
-                          ...activeSurvey,
-                          thanksPage: {
-                            ...activeSurvey.thanksPage,
-                            text: {
-                              ...activeSurvey.thanksPage.text,
-                              [lang]: val,
-                            },
-                          },
-                        })
-                      }
-                      resizable
-                      editorHeight="80px"
-                      toolbarOptions={inlineToolbarOptions}
-                    />
-                  )}
-                />
-              </Box>
-            )}
           </>
+        )}
+
+        {/* Thanks page */}
+        {isThanksPageTab && (
+          <Box component="tbody">
+            <TranslationRow
+              label={tr.EditSurveyTranslations.thanksPageTitle}
+              stripe={false}
+              cols={visibleCols}
+              render={(lang) => (
+                <Input
+                  value={activeSurvey.thanksPage.title?.[lang] ?? ''}
+                  onChange={(e) =>
+                    editSurvey({
+                      ...activeSurvey,
+                      thanksPage: {
+                        ...activeSurvey.thanksPage,
+                        title: {
+                          ...activeSurvey.thanksPage.title,
+                          [lang]: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              )}
+            />
+            <TranslationRow
+              label={tr.EditSurveyTranslations.thanksPageText}
+              stripe={true}
+              cols={visibleCols}
+              headerVerticalAlign="top"
+              render={(lang) => (
+                <RichTextEditor
+                  value={activeSurvey.thanksPage.text?.[lang] ?? ''}
+                  missingValue={false}
+                  onChange={(val) =>
+                    editSurvey({
+                      ...activeSurvey,
+                      thanksPage: {
+                        ...activeSurvey.thanksPage,
+                        text: {
+                          ...activeSurvey.thanksPage.text,
+                          [lang]: val,
+                        },
+                      },
+                    })
+                  }
+                  resizable
+                  editorHeight="80px"
+                  toolbarOptions={inlineToolbarOptions}
+                />
+              )}
+            />
+          </Box>
         )}
       </Box>
     </Box>
