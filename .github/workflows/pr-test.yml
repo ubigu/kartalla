@@ -11,8 +11,8 @@ jobs:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: '22.22.0'
       - name: Install dependencies
@@ -20,7 +20,7 @@ jobs:
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "version=$(node -e "console.log(require('./node_modules/playwright-core/package.json').version)")" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -41,8 +41,8 @@ jobs:
       run:
         working-directory: server
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: '22.22.0'
       - name: Install dependencies
@@ -59,8 +59,8 @@ jobs:
       run:
         working-directory: e2e
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: '22.22.0'
           cache: 'npm'
@@ -69,7 +69,7 @@ jobs:
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "version=$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
