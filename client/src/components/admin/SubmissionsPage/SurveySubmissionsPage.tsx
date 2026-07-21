@@ -14,7 +14,11 @@ import {
   isAnswerEmpty,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
-import { Language, useTranslations } from '@src/stores/TranslationContext';
+import {
+  Language,
+  supportedLanguages,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import {
   WorkingLanguageProvider,
   useWorkingLanguage,
@@ -230,11 +234,19 @@ function SurveySubmissionsContent({ survey }: { survey: Survey }) {
       [
         {
           id: DEFAULT_VIEW_SECTION_ID,
-          title: { [workingLanguage]: tr.SurveySubmissionsPage.summary },
+          // Shown regardless of the selected answer language, so use the
+          // same admin UI language text under every language key.
+          title: supportedLanguages.reduce(
+            (title, lang) => ({
+              ...title,
+              [lang]: tr.SurveySubmissionsPage.summary,
+            }),
+            {} as Record<Language, string>,
+          ),
         },
       ] as SurveyQuestion[],
     );
-  }, [survey, workingLanguage]);
+  }, [survey, tr]);
 
   /**
    * All answers flattened from all submissions
@@ -375,7 +387,7 @@ function SurveySubmissionsContent({ survey }: { survey: Survey }) {
               })}
               options={questions.map((question) => ({
                 value: String(question.id),
-                label: question.title[workingLanguage],
+                label: question.title[workingLanguage] ?? '',
               }))}
               renderValue={(opt) => {
                 const question = questions.find(
