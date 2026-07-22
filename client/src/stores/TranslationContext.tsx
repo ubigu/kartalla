@@ -104,6 +104,10 @@ export function useTranslations() {
   };
 }
 
+export function getTranslations(language: Language) {
+  return translations[language];
+}
+
 type ApiTranslationKey = keyof typeof fi.ApiResponses;
 
 function isApiTranslationKey(key: unknown): key is ApiTranslationKey {

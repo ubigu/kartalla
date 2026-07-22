@@ -637,6 +637,7 @@ export function useSurveyAnswers() {
         answers,
       });
       setLanguage(language);
+      return language;
     },
     /**
      * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.
