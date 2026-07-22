@@ -4,7 +4,10 @@ import { Box, CircularProgress } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getTranslations,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
@@ -92,9 +95,11 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     }
     async function continueSubmission() {
       try {
-        await loadUnfinishedEntries(unfinishedToken);
+        const unfinishedLanguage = await loadUnfinishedEntries(unfinishedToken);
         showToast({
-          message: tr.SurveyPage.loadUnfinishedSuccessful,
+          message:
+            getTranslations(unfinishedLanguage).SurveyPage
+              .loadUnfinishedSuccessful,
           severity: 'success',
         });
         setContinueUnfinished(true);
@@ -116,7 +121,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
       }
     }
     continueSubmission();
-  }, [survey, unfinishedToken]);
+  }, [survey, unfinishedToken, showToast, tr]);
 
   return !survey ? (
     loading ? (
