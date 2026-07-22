@@ -43,3 +43,9 @@ services:
     extends:
       file: docker-compose.email.yml
       service: email
+  clamav:
+    image: clamav/clamav:stable
+    platform: linux/amd64
+    # Takes a few minutes to become ready on first start while it downloads virus definitions
+    ports:
+      - '3310:3310'

@@ -19,6 +19,7 @@ import {
   validateBinaryFile,
   validateTextFile,
 } from '@src/fileValidation';
+import { scanUploadedFile } from '@src/malwareScan';
 
 import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
@@ -64,6 +65,7 @@ function upload(fileType: FileType) {
     single: (fieldName: string) => [
       multerUpload.single(fieldName),
       validateBinary(fileType),
+      scanUploadedFile(),
     ],
   };
 }

@@ -6,6 +6,7 @@ import {
 import { ensureAuthenticated, ensureFileGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { fileTypeRegex, validateTextFile } from '@src/fileValidation';
+import { scanUploadedFile } from '@src/malwareScan';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -36,7 +37,10 @@ function upload(fileType: FileType) {
   });
 
   return {
-    single: (fieldName: string) => multerUpload.single(fieldName),
+    single: (fieldName: string) => [
+      multerUpload.single(fieldName),
+      scanUploadedFile(),
+    ],
   };
 }
 
