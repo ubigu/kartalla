@@ -912,6 +912,7 @@ function dbAnswerEntriesToAnswerEntries(
     // value_feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
     value_geometry: Point | LineString | Polygon;
   })[],
+  targetSrid: number,
   parentEntryId: number = null,
 ) {
   return rows
@@ -1022,11 +1023,13 @@ function dbAnswerEntriesToAnswerEntries(
               type: 'Feature',
               geometry: row.value_geometry,
               properties: {},
+              crs: { type: 'name', properties: { name: `EPSG:${targetSrid}` } },
             },
             mapLayers: row.map_layers,
             // The function should only return map subquestion answers because of filtering - assume the type here
             subQuestionAnswers: dbAnswerEntriesToAnswerEntries(
               rows,
+              targetSrid,
               row.id,
             ) as SurveyMapSubQuestionAnswer[],
           };
@@ -1224,7 +1227,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
   const personalInfo = await getPersonalInfo(submissionId);
 
   return [
-    ...(rows ? dbAnswerEntriesToAnswerEntries(rows) : []),
+    ...(rows ? dbAnswerEntriesToAnswerEntries(rows, targetSrid) : []),
     ...(personalInfo ? [personalInfo] : []),
   ];
 }
@@ -1289,10 +1292,10 @@ export async function getAnswerEntries(
 
   if (withPersonalInfo) {
     const personalInfo = await getPersonalInfo(submissionId);
-    return [...dbAnswerEntriesToAnswerEntries(rows), personalInfo];
+    return [...dbAnswerEntriesToAnswerEntries(rows, targetSrid), personalInfo];
   }
 
-  return dbAnswerEntriesToAnswerEntries(rows);
+  return dbAnswerEntriesToAnswerEntries(rows, targetSrid);
 }
 
 /**
@@ -1453,7 +1456,7 @@ export async function getSubmissionsForSurvey(
         id: sub.id,
         timestamp: sub.timestamp,
         answerEntries: [
-          ...dbAnswerEntriesToAnswerEntries(sub.entries),
+          ...dbAnswerEntriesToAnswerEntries(sub.entries, targetSrid),
           ...(sub.personalInfo ? [sub.personalInfo] : []),
         ],
       }) as Submission,
