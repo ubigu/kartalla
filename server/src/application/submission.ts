@@ -1285,14 +1285,17 @@ export async function getAnswerEntries(
   if (rows.length === 0) {
     if (withPersonalInfo) {
       const personalInfo = await getPersonalInfo(submissionId);
-      return [personalInfo];
+      return personalInfo ? [personalInfo] : [];
     }
     return [];
   }
 
   if (withPersonalInfo) {
     const personalInfo = await getPersonalInfo(submissionId);
-    return [...dbAnswerEntriesToAnswerEntries(rows, targetSrid), personalInfo];
+    return [
+      ...dbAnswerEntriesToAnswerEntries(rows, targetSrid),
+      ...(personalInfo ? [personalInfo] : []),
+    ];
   }
 
   return dbAnswerEntriesToAnswerEntries(rows, targetSrid);
