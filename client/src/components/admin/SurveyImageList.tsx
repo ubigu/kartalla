@@ -19,7 +19,10 @@ import { makeStyles } from '@mui/styles';
 import ImageIcon from '@src/components/icons/ImageIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -289,9 +292,12 @@ export default function SurveyImageList({
       },
     });
     if (!res.ok) {
+      const resJson = await res.json().catch(() => null);
       showToast({
         severity: 'error',
-        message: tr.SurveyImageList.imageUploadError,
+        message:
+          getApiTranslation(resJson?.message_code, tr) ||
+          tr.SurveyImageList.imageUploadError,
       });
       return;
     }

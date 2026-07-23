@@ -1004,6 +1004,7 @@
     "USER_NOT_PERMITTED_TO_EDIT": "User not author nor editor of the survey.",
     "DUPLICATE_SURVEY_NAME": "Survey with the same name already exists. Please choose another name and try again.",
     "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Survey responses prevent saving changes.",
-    "BUDGET_NOT_FULLY_ALLOCATED": "The full budget must be used for question {x}."
+    "BUDGET_NOT_FULLY_ALLOCATED": "The full budget must be used for question {x}.",
+    "malware_detected": "The file failed the malware scan. Please choose a different file."
   }
 }
