@@ -1,5 +1,11 @@
 // @ts-strict-ignore
-import { IconButton, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -9,6 +15,38 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileWithPath } from 'react-dropzone';
 import DropZone from '../DropZone';
 import DownloadIcon from '../icons/DownloadIcon';
+
+function FileThumbnail({ url }: { url: string }) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <span
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 50,
+        height: 50,
+        marginRight: '1rem',
+      }}
+    >
+      {isLoading && (
+        <CircularProgress size={20} style={{ position: 'absolute' }} />
+      )}
+      <img
+        src={`/api/file/${url}`}
+        style={{
+          width: 50,
+          maxHeight: 50,
+          visibility: isLoading ? 'hidden' : 'visible',
+        }}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
+      />
+    </span>
+  );
+}
 
 interface Props {
   forMedia?: boolean;
@@ -111,13 +149,8 @@ export default function FileUpload({
         .toLowerCase();
       const name = getFileName(url);
       return (
-        <div key={url}>
-          {imageFileFormats.includes(fileFormat) && (
-            <img
-              src={`/api/file/${url}`}
-              style={{ width: 50, maxHeight: 50, marginRight: '1rem' }}
-            />
-          )}
+        <Box sx={{ display: 'flex', alignItems: 'center' }} key={url}>
+          {imageFileFormats.includes(fileFormat) && <FileThumbnail url={url} />}
           <span>{name}</span>
           <Tooltip title={tr.FileUpload.downloadFile}>
             <IconButton
@@ -154,7 +187,7 @@ export default function FileUpload({
               </IconButton>
             </span>
           </Tooltip>
-        </div>
+        </Box>
       );
     });
   }, [value]);
