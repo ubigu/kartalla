@@ -19,6 +19,10 @@ vi.mock('@src/fileValidation', () => ({
   validateTextFile: vi.fn(),
 }));
 
+vi.mock('@src/malwareScan', () => ({
+  scanBuffer: vi.fn(),
+}));
+
 vi.mock('./survey', () => ({
   getSurvey: vi.fn(),
 }));
@@ -41,6 +45,8 @@ vi.mock('./map', async () => {
 
 import { SubmissionAnswerEntry } from '@interfaces/survey';
 import { getDb } from '@src/database';
+import { bufferFromDataUrl } from '@src/fileValidation';
+import { scanBuffer } from '@src/malwareScan';
 import { mockOlSurvey, mockOskariSurvey } from '@src/tests/data/survey';
 import { getOskariMapSrid } from './map';
 import {
@@ -217,5 +223,79 @@ describe('createSurveySubmission budgeting validation', () => {
       status: 400,
       message_code: 'BUDGET_NOT_FULLY_ALLOCATED',
     });
+  });
+});
+
+describe('createSurveySubmission attachment malware scanning', () => {
+  let mockDb: ReturnType<typeof buildMockDb>;
+
+  const sectionId = 20;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = buildMockDb();
+    vi.mocked(getDb).mockReturnValue(mockDb);
+  });
+
+  it('scans each attachment file buffer before it can be persisted', async () => {
+    const fileBuffer = Buffer.from('file contents');
+    vi.mocked(bufferFromDataUrl).mockReturnValue(fileBuffer);
+    vi.mocked(scanBuffer).mockResolvedValue(undefined);
+    // Fail fast on the next step so the test doesn't need to mock the rest
+    // of the submission-creation transaction.
+    mockDb.tx.mockRejectedValue(new Error('stop after validation'));
+
+    const answerEntries: SubmissionAnswerEntry[] = [
+      {
+        sectionId,
+        type: 'attachment',
+        value: [
+          {
+            fileName: 'file.pdf',
+            fileString: 'data:application/pdf;base64,AAAA',
+          },
+        ],
+      },
+    ];
+
+    await expect(
+      createSurveySubmission(1, answerEntries, null, false, 'fi'),
+    ).rejects.toThrow('stop after validation');
+
+    expect(scanBuffer).toHaveBeenCalledWith(fileBuffer);
+  });
+
+  it('rejects the submission when malware is detected in an attachment', async () => {
+    const fileBuffer = Buffer.from('infected contents');
+    vi.mocked(bufferFromDataUrl).mockReturnValue(fileBuffer);
+    vi.mocked(scanBuffer).mockRejectedValue(
+      Object.assign(new Error('File failed malware scan'), {
+        status: 400,
+        message_code: 'malware_detected',
+      }),
+    );
+
+    const answerEntries: SubmissionAnswerEntry[] = [
+      {
+        sectionId,
+        type: 'attachment',
+        value: [
+          {
+            fileName: 'file.pdf',
+            fileString: 'data:application/pdf;base64,AAAA',
+          },
+        ],
+      },
+    ];
+
+    await expect(
+      createSurveySubmission(1, answerEntries, null, false, 'fi'),
+    ).rejects.toMatchObject({
+      status: 400,
+      message_code: 'malware_detected',
+    });
+
+    // The DB transaction must never start if the malware scan rejects.
+    expect(mockDb.tx).not.toHaveBeenCalled();
   });
 });

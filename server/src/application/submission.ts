@@ -31,6 +31,7 @@ import {
   validateTextFile,
 } from '@src/fileValidation';
 import logger from '@src/logger';
+import { scanBuffer } from '@src/malwareScan';
 import { assertNever } from '@src/utils';
 import { LineString, Point, Polygon } from 'geojson';
 import { getSurveyTargetSrid } from './map';
@@ -253,6 +254,9 @@ async function validateAttachmentEntries(
       // Check the buffer to ensure no tampering of the data URL
       const fileBuffer = bufferFromDataUrl(value.fileString);
       await validateBinaryFile(fileBuffer, 'attachment');
+
+      // Scan the file contents for malware
+      await scanBuffer(fileBuffer);
     }
   }
 }
