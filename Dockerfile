@@ -5,7 +5,7 @@
 ###
 # Base image declaration
 ###
-FROM node:22.14-alpine AS base
+FROM node:22.23.1-alpine AS base
 
 ENV APPDIR=/app
 
@@ -66,6 +66,15 @@ RUN apk update && apk add \
   ttf-freefont \
   font-noto-emoji
 
+# npm isn't needed to run the app (the container invokes node directly) and its bundled
+# deps carry known CVEs; drop it from the production image
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm \
+  # npx is bundled with npm and unused at runtime
+  /usr/local/bin/npx \
+  # corepack manages package-manager versions via package.json's "packageManager" field,
+  # which this project doesn't set, so it's unused here
+  /usr/local/lib/node_modules/corepack /usr/local/bin/corepack
+
 # Add non-root user with explicit UID and GID
 RUN addgroup --system --gid 1001 appGroup && \
   adduser --system --uid 1001 appUser
@@ -83,4 +92,4 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Don't run the app as root
 USER appUser
 
-CMD ["npm", "start"]
+CMD ["node", "-r", "ts-node/register", "-r", "tsconfig-paths/register", "dist/app"]
