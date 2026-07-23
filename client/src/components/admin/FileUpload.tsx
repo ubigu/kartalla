@@ -8,7 +8,10 @@ import {
 } from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { useFileValidator } from '@src/utils/fileValidator';
 import { getFileName, getFullFilePath } from '@src/utils/path';
 import { useEffect, useMemo, useState } from 'react';
@@ -126,6 +129,9 @@ export default function FileUpload({
           },
         );
         const resJson = await res.json();
+        if (!res.ok) {
+          throw resJson;
+        }
         // Upload complete - notify via callback
         onUpload({
           url:
@@ -135,7 +141,9 @@ export default function FileUpload({
       } catch (error) {
         showToast({
           severity: 'error',
-          message: tr.FileUpload.errorUploadingFile,
+          message:
+            getApiTranslation(error?.message_code, tr) ||
+            tr.FileUpload.errorUploadingFile,
         });
       }
     }

@@ -1003,6 +1003,7 @@
     "USER_NOT_PERMITTED_TO_EDIT": "Käyttäjällä ei ole oikeutta muokata kyselyä.",
     "DUPLICATE_SURVEY_NAME": "Saman niminen kysely on jo olemassa. Valitse toinen nimi ja yritä uudestaan.",
     "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Kyselyn vastaukset estävät muutosten tallentamisen.",
-    "BUDGET_NOT_FULLY_ALLOCATED": "Kysymyksen {x} koko budjetti tulee käyttää."
+    "BUDGET_NOT_FULLY_ALLOCATED": "Kysymyksen {x} koko budjetti tulee käyttää.",
+    "malware_detected": "Tiedosto ei läpäissyt haittaohjelmatarkistusta. Valitse toinen tiedosto."
   }
 }

@@ -19,11 +19,12 @@ export async function uploadSvgIcon(
     body: formData,
   });
 
+  const resJson = await response.json().catch((): null => null);
   if (!response.ok) {
-    throw new Error('Failed to upload SVG icon');
+    throw resJson;
   }
 
-  return response.json();
+  return resJson;
 }
 
 /**

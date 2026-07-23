@@ -18,7 +18,10 @@ import {
 import { EmojiPicker } from '@src/components/admin/EmojiPicker';
 import { IconGrid } from '@src/components/admin/IconGrid';
 import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getApiTranslation,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import {
   deleteSvgIcon,
@@ -127,7 +130,9 @@ export function SvgIconSelect(props: Props) {
     } catch (error) {
       showToast({
         severity: 'error',
-        message: tr.SvgIconSelect.uploadError,
+        message:
+          getApiTranslation(error?.message_code, tr) ||
+          tr.SvgIconSelect.uploadError,
       });
     } finally {
       setIsUploading(false);

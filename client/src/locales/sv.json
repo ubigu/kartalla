@@ -1003,6 +1003,7 @@
     "USER_NOT_PERMITTED_TO_EDIT": "Användaren är inte skapare eller redaktör av enkäten.",
     "DUPLICATE_SURVEY_NAME": "En enkät med samma namn finns redan. Välj ett annat namn och försök igen.",
     "SUBMITTED_ANSWER_PREVENTS_UPDATE": "Enkätens svar förhindrar att ändringarna sparas.",
-    "BUDGET_NOT_FULLY_ALLOCATED": "Hela budgeten för frågan {x} måste användas."
+    "BUDGET_NOT_FULLY_ALLOCATED": "Hela budgeten för frågan {x} måste användas.",
+    "malware_detected": "Filen klarade inte skadeprogramskontrollen. Välj en annan fil."
   }
 }
