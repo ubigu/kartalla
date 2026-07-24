@@ -16,8 +16,11 @@ FROM base AS client-build
 
 WORKDIR ${APPDIR}/client
 
-COPY client/package*.json ./
-RUN npm ci
+COPY client/package*.json client/.npmrc ./
+# "setup" runs `npm ci` then explicitly executes only the allowlisted lifecycle
+# scripts (see "lavamoat.allowScripts" in package.json) to limit exposure to
+# malicious install scripts from compromised/typosquatted dependencies.
+RUN npm run setup
 
 COPY interfaces ../interfaces
 COPY client ./
@@ -42,8 +45,11 @@ WORKDIR ${APPDIR}/server
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-COPY server/package*.json ./
-RUN npm ci
+COPY server/package*.json server/.npmrc ./
+# "setup" runs `npm ci` then explicitly executes only the allowlisted lifecycle
+# scripts (see "lavamoat.allowScripts" in package.json) to limit exposure to
+# malicious install scripts from compromised/typosquatted dependencies.
+RUN npm run setup
 
 COPY interfaces ../interfaces
 COPY server ./

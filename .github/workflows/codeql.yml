@@ -1,0 +1,36 @@
+##
+# Static analysis (SAST) for first-party code via GitHub CodeQL.
+# Free for public repos. Findings show up under Security > Code scanning.
+##
+name: CodeQL
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  schedule:
+    # Weekly full scan, Monday 03:30 UTC
+    - cron: '30 3 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:javascript-typescript'
