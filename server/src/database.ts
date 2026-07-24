@@ -1,5 +1,4 @@
 import retry from 'async-retry';
-import migrate from 'node-pg-migrate';
 import { Client } from 'pg';
 import PgPromise from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
@@ -154,7 +153,8 @@ export async function migrateUp() {
   if (!migrationConnection) {
     throw new Error('Database not initialized');
   }
-  await migrate({
+  const { runner } = await import('node-pg-migrate');
+  await runner({
     migrationsTable: 'pgmigrations',
     dir: 'migrations',
     direction: 'up',
