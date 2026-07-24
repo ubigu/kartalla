@@ -955,10 +955,8 @@ function dbAnswerEntriesToAnswerEntries(
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
-          if (
-            !entry &&
-            (entry = { sectionId: row.section_id, type: 'checkbox', value: [] })
-          ) {
+          if (!entry) {
+            entry = { sectionId: row.section_id, type: 'checkbox', value: [] };
             entries.push(entry);
           }
           const value = row.value_text || row.value_option_id;
@@ -976,14 +974,12 @@ function dbAnswerEntriesToAnswerEntries(
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
-          if (
-            !entry &&
-            (entry = {
+          if (!entry) {
+            entry = {
               sectionId: row.section_id,
               type: 'grouped-checkbox',
               value: [],
-            })
-          ) {
+            };
             entries.push(entry);
           }
           if (row.value_option_id) {
@@ -1006,14 +1002,12 @@ function dbAnswerEntriesToAnswerEntries(
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
-          if (
-            !entry &&
-            (entry = {
+          if (!entry) {
+            entry = {
               sectionId: row.section_id,
               type: 'map',
               value: [],
-            })
-          ) {
+            };
             entries.push(entry);
           }
           const value: MapQuestionAnswer = {
@@ -1037,9 +1031,7 @@ function dbAnswerEntriesToAnswerEntries(
               row.id,
             ) as SurveyMapSubQuestionAnswer[],
           };
-          if (value != null) {
-            entry.value.push(value);
-          }
+          entry.value.push(value);
           break;
         }
         case 'sorting':
@@ -1101,14 +1093,12 @@ function dbAnswerEntriesToAnswerEntries(
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
-          if (
-            !entry &&
-            (entry = {
+          if (!entry) {
+            entry = {
               sectionId: row.section_id,
               type: 'geo-budgeting',
               value: [],
-            })
-          ) {
+            };
             entries.push(entry);
           }
           const value: GeoBudgetingAnswer = {
@@ -1119,9 +1109,7 @@ function dbAnswerEntriesToAnswerEntries(
               properties: {},
             },
           };
-          if (value != null) {
-            entry.value.push(value);
-          }
+          entry.value.push(value);
           break;
         }
         case 'text':

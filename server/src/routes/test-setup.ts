@@ -29,7 +29,10 @@ vi.mock('../logger', () => ({
 
 vi.spyOn(console, 'error').mockImplementation(() => {});
 
+const TEST_APP_ORIGIN = 'http://localhost:8080';
+
 vi.stubEnv('AUTH_ENABLED', 'true');
+vi.stubEnv('APP_URL', TEST_APP_ORIGIN);
 
 // ─── User fixtures ────────────────────────────────────────────────────────────
 
@@ -69,7 +72,7 @@ export async function createTestApp() {
 }
 
 export async function loginAs(app: Express, user: Express.User) {
-  const agent = request.agent(app);
+  const agent = request.agent(app).set('Origin', TEST_APP_ORIGIN);
   await agent.post('/test-login').send(user).expect(200);
   return agent;
 }

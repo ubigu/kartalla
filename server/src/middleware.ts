@@ -1,8 +1,23 @@
-import { Request, Response, NextFunction, Send } from 'express';
+import { NextFunction, Request, Response, Send } from 'express';
 import NodeCache from 'node-cache';
 
 interface MiddlewareResponse extends Response {
   sendResponse?: Send;
+}
+
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+export function isTrustedOrigin(req: Request, allowedOrigin: string): boolean {
+  if (SAFE_METHODS.has(req.method)) {
+    return true;
+  }
+
+  const source = req.headers.origin ?? req.headers.referer;
+  try {
+    return !!source && new URL(source).origin === allowedOrigin;
+  } catch {
+    return false;
+  }
 }
 
 export function iconCacher(cache: NodeCache) {

@@ -52,6 +52,7 @@
     "exceljs": "^4.4.0",
     "express": "^4.22.2",
     "express-async-handler": "^1.2.0",
+    "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
     "express-validator": "^6.15.0",
     "file-type": "^21.3.4",

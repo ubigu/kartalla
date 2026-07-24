@@ -1,5 +1,6 @@
 import compression from 'compression';
 import express, { type Express } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan, { compile } from 'morgan';
 import * as path from 'path';
@@ -22,6 +23,18 @@ export async function createApp({
 }) {
   const resolvedStaticRoot = staticRoot ?? path.join(__dirname, '../static');
   const app = express();
+
+  // Global rate limiting to protect all routes against abuse/DoS.
+  // Skips health checks, which are polled frequently by infra.
+  app.use(
+    rateLimit({
+      windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60 * 1000),
+      limit: Number(process.env.RATE_LIMIT_MAX ?? 300),
+      standardHeaders: true,
+      legacyHeaders: false,
+      skip: (req) => req.path === '/api/health',
+    }),
+  );
 
   app.use((_req, res, next) => {
     res.set('Cache-Control', 'no-store, max-age=0');

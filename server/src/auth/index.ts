@@ -19,6 +19,7 @@ import expressSession from 'express-session';
 import passport from 'passport';
 import { encrypt } from '../crypto';
 import { getDb } from '../database';
+import { isTrustedOrigin } from '../middleware';
 import { configureAzureAuth } from './azure';
 import { configureAzureAuth as configureAzureAuthV2 } from './azureV2';
 import { configureGoogleOAuth } from './google-oauth';
@@ -201,6 +202,20 @@ export async function configureMockAuth(app: Express) {
  */
 export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
   return (req: Request, res: Response, next: NextFunction) => {
+    // CSRF check: the session cookie uses sameSite: 'none' (needed for the
+    // OIDC form_post callback), so it can ride along on a forged cross-site
+    // request. Only relevant once a real session is in play - guard the
+    // "already authenticated" path rather than the whole middleware, so it
+    // doesn't affect mock auth (no cookie) or the not-yet-authenticated case.
+    if (
+      process.env['AUTH_ENABLED'] === 'true' &&
+      req.isAuthenticated() &&
+      !isTrustedOrigin(req, new URL(process.env.APP_URL).origin)
+    ) {
+      res.status(403).send('Origin verification failed');
+      return;
+    }
+
     if (
       process.env['AUTH_ENABLED'] !== 'true' ||
       req.path === '/login/v1' ||
