@@ -1,9 +1,9 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import { SurveyMapQuestion } from '@interfaces/survey';
-import { unlink, writeFile } from 'fs/promises';
+import { mkdtemp, rm, writeFile } from 'fs/promises';
 import { Feature, LineString, Point, Polygon } from 'geojson';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import proj4 from 'proj4';
 import StaticMaps from 'staticmaps';
 import { DEFAULT_SRID } from '../constants';
@@ -36,7 +36,10 @@ function toWgs84(x: number, y: number, crs: string): [number, number] {
 
 async function writeTempMarker(svgContent: string): Promise<string> {
   const pngBuffer = await svgToPng(svgContent);
-  const filePath = join(tmpdir(), `marker-${crypto.randomUUID()}.png`);
+  // Create a private, exclusively-owned temp directory to avoid symlink/race
+  // attacks that plain writes into the shared os tmp dir are vulnerable to.
+  const dir = await mkdtemp(join(tmpdir(), 'marker-'));
+  const filePath = join(dir, 'marker.png');
   await writeFile(filePath, pngBuffer);
   return filePath;
 }
@@ -61,7 +64,9 @@ async function renderPoint(
     });
     await map.render();
   } finally {
-    await unlink(tempFile).catch(() => {});
+    await rm(dirname(tempFile), { recursive: true, force: true }).catch(
+      () => {},
+    );
   }
 }
 

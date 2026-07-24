@@ -100,7 +100,7 @@ export default function FileUpload({
       // Delete previous file(s)
       if (value) {
         try {
-          await Promise.all((value ?? []).map(({ url }) => deleteFile(url)));
+          await Promise.all(value.map(({ url }) => deleteFile(url)));
         } catch (error) {
           showToast({
             severity: 'error',

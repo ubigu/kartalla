@@ -380,29 +380,6 @@ export default function SurveyImageList({
     }
   }
 
-  function getImageBorderStyle(image: File) {
-    let style: { border: string } | {} = {};
-    switch (imageType) {
-      case 'backgroundImage':
-        image?.fileUrl === activeSurvey?.backgroundImageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'thanksPageImage':
-        image?.fileUrl === activeSurvey?.thanksPage.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'topMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.top?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-      case 'bottomMarginImage':
-        image?.fileUrl === activeSurvey?.marginImages?.bottom?.imageUrl &&
-          (style = { border: '4px solid #1976d2' });
-    }
-
-    return style;
-  }
-
   function getEmptyImageBorderStyle() {
     switch (imageType) {
       case 'backgroundImage':
