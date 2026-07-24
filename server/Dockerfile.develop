@@ -25,8 +25,8 @@ RUN apk update && apk add \
   curl
 
 WORKDIR /app/server
-COPY package*.json ./
-RUN npm i
+COPY package*.json .npmrc ./
+RUN npm run setup
 
 ENV TZ=Europe/Helsinki
 

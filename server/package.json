@@ -4,6 +4,7 @@
   "description": "Ubigu Kartalla API Server",
   "main": "src/app.js",
   "scripts": {
+    "setup": "npm ci && npm exec allow-scripts run",
     "dev": "concurrently npm:dev:* --color",
     "dev:server": "nodemon src/app",
     "dev:test": "vitest",
@@ -90,6 +91,8 @@
     "mailparser": "3.9.14"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "^5.1.0",
+    "@lavamoat/preinstall-always-fail": "^3.0.0",
     "@types/compression": "^1.8.1",
     "@types/connect-pg-simple": "^4.2.4",
     "@types/email-templates": "^8.0.4",
@@ -113,5 +116,13 @@
     "supertest": "^7.2.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "@lavamoat/preinstall-always-fail#3.0.0": false,
+      "passport-azure-ad>bunyan>dtrace-provider#0.8.8": false,
+      "puppeteer#24.43.1": false,
+      "staticmaps>modern-async>core-js-pure#3.49.0": false
+    }
   }
 }

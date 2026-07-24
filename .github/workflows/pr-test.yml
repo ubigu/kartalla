@@ -16,7 +16,9 @@ jobs:
         with:
           node-version: '22.22.0'
       - name: Install dependencies
-        run: npm ci
+        run: npm run setup
+      - name: Verify package signatures
+        run: npm audit signatures
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "version=$(node -e "console.log(require('./node_modules/playwright-core/package.json').version)")" >> $GITHUB_OUTPUT
@@ -46,7 +48,9 @@ jobs:
         with:
           node-version: '22.22.0'
       - name: Install dependencies
-        run: npm ci
+        run: npm run setup
+      - name: Verify package signatures
+        run: npm audit signatures
       - name: Build
         run: npm run build
       - name: Run server tests
@@ -65,7 +69,9 @@ jobs:
           node-version: '22.22.0'
           cache: 'npm'
           cache-dependency-path: ./e2e/package-lock.json
-      - run: npm i
+      - run: npm run setup
+      - name: Verify package signatures
+        run: npm audit signatures
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "version=$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT

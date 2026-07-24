@@ -4,6 +4,7 @@
   "description": "Ubigu Kartalla UI",
   "main": "dist/main.js",
   "scripts": {
+    "setup": "npm ci && npm exec allow-scripts run",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .ts,.tsx",
@@ -86,6 +87,8 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@chromatic-com/storybook": "^5.2.1",
+    "@lavamoat/allow-scripts": "^5.1.0",
+    "@lavamoat/preinstall-always-fail": "^3.0.0",
     "@storybook/addon-a11y": "^10.3.6",
     "@storybook/addon-docs": "^10.3.6",
     "@storybook/addon-onboarding": "^10.3.6",
@@ -131,8 +134,8 @@
     "typescript-strict-plugin": "^2.4.4",
     "url-parse": "^1.5.10",
     "vite": "^6.4.3",
-    "vitest": "^4.1.2",
     "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^4.1.2",
     "yaml": "^2.9.0"
   },
   "overrides": {
@@ -145,5 +148,12 @@
     "extends": [
       "plugin:storybook/recommended"
     ]
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "@lavamoat/preinstall-always-fail#3.0.0": false,
+      "core-js#3.49.0": false,
+      "vite>esbuild#0.25.9": false
+    }
   }
 }
