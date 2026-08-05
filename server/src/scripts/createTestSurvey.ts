@@ -838,10 +838,11 @@ async function main() {
          (name, title, subtitle, description, author, author_unit,
           start_date, allow_test_survey, display_privacy_statement,
           email_enabled, email_required, allow_saving_unfinished,
-          localisation_enabled, is_archived, languages, organization)
+          localisation_enabled, is_archived, languages, organization,
+          map_provider)
        VALUES ($1, $2::json, $3::json, $4::json, $5, $6,
                NOW() - interval '1 day', TRUE, FALSE,
-               FALSE, FALSE, FALSE, FALSE, FALSE, $7, $8)
+               FALSE, FALSE, FALSE, FALSE, FALSE, $7, $8, $9)
        RETURNING id`,
       [
         SURVEY_NAME,
@@ -870,6 +871,7 @@ async function main() {
         'Tietopalvelut',
         ['fi', 'en', 'sv'],
         USER_GROUP_ORG,
+        'openlayers',
       ],
     );
 

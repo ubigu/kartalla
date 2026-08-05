@@ -1,6 +1,7 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answerGeometry';
 import { generatePdf } from '@src/application/pdf-generator';
+import { addHumanReadableLabels } from '@src/application/submissionLabels';
 import {
   deletePublicationCredentials,
   getAnswerEntries,
@@ -680,13 +681,17 @@ router.get(
   asyncHandler(async (req, res) => {
     const { alphanumericIncluded, geospatialIncluded, personalIncluded } =
       res.locals;
-    const submissions = await getSubmissionsForSurvey(
-      Number(req.params.id),
-      personalIncluded,
-      alphanumericIncluded,
-      geospatialIncluded,
-    );
-    res.json(submissions);
+    const surveyId = Number(req.params.id);
+    const [submissions, survey] = await Promise.all([
+      getSubmissionsForSurvey(
+        surveyId,
+        personalIncluded,
+        alphanumericIncluded,
+        geospatialIncluded,
+      ),
+      getSurvey({ id: surveyId }),
+    ]);
+    res.json(addHumanReadableLabels(submissions, survey));
   }),
 );
 
