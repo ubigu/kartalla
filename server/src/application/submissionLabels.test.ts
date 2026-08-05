@@ -18,7 +18,11 @@ const dontKnow: LocalizedText = {
 
 function makeSurveyWithSections(sections: SurveyPageSection[]): Survey {
   const base = createMockSurvey(1, 100);
-  return { ...base, pages: [{ ...base.pages![0], sections }] };
+  return {
+    ...base,
+    pages: [{ ...base.pages![0], sections }],
+    enabledLanguages: { fi: true, en: true, sv: true },
+  };
 }
 
 function makeSubmission(
@@ -556,6 +560,32 @@ describe('addHumanReadableLabels', () => {
       });
     },
   );
+
+  it('only includes languages enabled for the survey in resolved localized text', () => {
+    const survey = {
+      ...makeSurveyWithSections([
+        {
+          id: 1,
+          type: 'radio',
+          title: lt('Radio question'),
+          isRequired: false,
+          allowCustomAnswer: false,
+          options: [{ id: 11, text: lt('Yes') }],
+        },
+      ]),
+      enabledLanguages: { fi: true, en: false, sv: false },
+    };
+    const [submission] = addHumanReadableLabels(
+      [makeSubmission(1, [{ sectionId: 1, type: 'radio', value: 11 }])],
+      survey,
+    );
+    expect(submission.answerEntries[0]).toEqual({
+      sectionId: 1,
+      type: 'radio',
+      sectionTitle: { fi: 'Radio question' },
+      value: { id: 11, label: { fi: 'Yes' } },
+    });
+  });
 
   it('leaves the entry unenriched (but does not crash) when the sectionId is not found', () => {
     const survey = makeSurveyWithSections([]);

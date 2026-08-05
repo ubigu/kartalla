@@ -1,4 +1,5 @@
 import {
+  LanguageCode,
   LocalizedText,
   PublicationSubmission,
   PublicationSubmissionAnswerEntry,
@@ -27,6 +28,25 @@ const DONT_KNOW_LABEL: LocalizedText = {
   en: en.dontKnow,
   sv: sv.dontKnow,
 };
+
+function getEnabledLanguages(survey: Survey): LanguageCode[] {
+  return (Object.keys(survey.enabledLanguages) as LanguageCode[]).filter(
+    (language) => survey.enabledLanguages[language],
+  );
+}
+
+/** Strips out any language not enabled for the survey. */
+function pickLanguages<Text extends LocalizedText | null | undefined>(
+  text: Text,
+  languages: LanguageCode[],
+): Text {
+  if (text == null) {
+    return text;
+  }
+  return Object.fromEntries(
+    languages.map((language) => [language, text[language] ?? null]),
+  ) as Text;
+}
 
 /**
  * Recursively includes follow-up sections and (for map questions)
@@ -60,8 +80,12 @@ function getSectionsById(survey: Survey): Map<number, SurveyPageSection> {
 function findOptionText(
   options: SectionOption[],
   id: number,
+  languages: LanguageCode[],
 ): LocalizedText | null {
-  return options.find((option) => option.id === id)?.text ?? null;
+  return pickLanguages(
+    options.find((option) => option.id === id)?.text ?? null,
+    languages,
+  );
 }
 
 /**
@@ -73,6 +97,7 @@ function findOptionText(
 function resolveSelectedOption(
   options: SectionOption[],
   value: string | number | null | undefined,
+  languages: LanguageCode[],
 ): { id: number; label: LocalizedText | null } | string | null {
   if (value == null) {
     return null;
@@ -80,7 +105,7 @@ function resolveSelectedOption(
   if (typeof value === 'string') {
     return value;
   }
-  return { id: value, label: findOptionText(options, value) };
+  return { id: value, label: findOptionText(options, value, languages) };
 }
 
 /**
@@ -90,28 +115,33 @@ function resolveSelectedOption(
 function resolveClassById(
   classes: LocalizedText[] | undefined,
   classIndex: string,
+  languages: LanguageCode[],
 ): { id: number; label: LocalizedText | null } {
   const id = Number(classIndex);
   if (classIndex === '-1') {
-    return { id, label: DONT_KNOW_LABEL };
+    return { id, label: pickLanguages(DONT_KNOW_LABEL, languages) };
   }
-  return { id, label: classes?.[id] ?? null };
+  return { id, label: pickLanguages(classes?.[id] ?? null, languages) };
 }
 
 /** `classIndex` is `null` when the subject was left unanswered. */
 function resolveClass(
   classes: LocalizedText[] | undefined,
   classIndex: string | null | undefined,
+  languages: LanguageCode[],
 ): { id: number; label: LocalizedText | null } | null {
-  return classIndex == null ? null : resolveClassById(classes, classIndex);
+  return classIndex == null
+    ? null
+    : resolveClassById(classes, classIndex, languages);
 }
 
 function addLabels(
   entry: SubmissionAnswerEntry,
   sectionsById: Map<number, SurveyPageSection>,
+  languages: LanguageCode[],
 ): PublicationSubmissionAnswerEntry {
   const section = sectionsById.get(entry.sectionId);
-  const sectionTitle = section?.title;
+  const sectionTitle = pickLanguages(section?.title, languages);
 
   switch (entry.type) {
     case 'radio':
@@ -122,7 +152,7 @@ function addLabels(
       return {
         ...entry,
         sectionTitle,
-        value: resolveSelectedOption(options, entry.value),
+        value: resolveSelectedOption(options, entry.value, languages),
       };
     }
     case 'checkbox': {
@@ -130,7 +160,7 @@ function addLabels(
       const value = (entry.value ?? []).map((v) =>
         typeof v === 'string'
           ? v
-          : { id: v, label: findOptionText(options, v) },
+          : { id: v, label: findOptionText(options, v, languages) },
       );
       return { ...entry, sectionTitle, value };
     }
@@ -138,7 +168,7 @@ function addLabels(
       const options = (section as SurveySortingQuestion)?.options ?? [];
       const value = (entry.value ?? []).map((id) => ({
         id,
-        label: findOptionText(options, id),
+        label: findOptionText(options, id, languages),
       }));
       return { ...entry, sectionTitle, value };
     }
@@ -148,7 +178,11 @@ function addLabels(
         for (const group of groups) {
           const option = group.options.find((option) => option.id === id);
           if (option) {
-            return { id, group: group.name, option: option.text };
+            return {
+              id,
+              group: pickLanguages(group.name, languages),
+              option: pickLanguages(option.text, languages),
+            };
           }
         }
         return { id, group: null, option: null };
@@ -159,8 +193,8 @@ function addLabels(
       const question = section as SurveyMatrixQuestion;
       const subjects = question?.subjects ?? [];
       const value = subjects.map((subject, index) => ({
-        subject: { id: index, label: subject },
-        class: resolveClass(question?.classes, entry.value?.[index]),
+        subject: { id: index, label: pickLanguages(subject, languages) },
+        class: resolveClass(question?.classes, entry.value?.[index], languages),
       }));
       return { ...entry, sectionTitle, value };
     }
@@ -168,9 +202,9 @@ function addLabels(
       const question = section as SurveyMultiMatrixQuestion;
       const subjects = question?.subjects ?? [];
       const value = subjects.map((subject, index) => ({
-        subject: { id: index, label: subject },
+        subject: { id: index, label: pickLanguages(subject, languages) },
         classes: (entry.value?.[index] ?? []).map((classIndex) =>
-          resolveClassById(question?.classes, classIndex),
+          resolveClassById(question?.classes, classIndex, languages),
         ),
       }));
       return { ...entry, sectionTitle, value };
@@ -179,7 +213,7 @@ function addLabels(
       const question = section as SurveyBudgetingQuestion;
       const targets = question?.targets ?? [];
       const value = targets.map((target, index) => ({
-        target: { id: index, label: target.name },
+        target: { id: index, label: pickLanguages(target.name, languages) },
         value: entry.value?.[index] ?? 0,
       }));
       return { ...entry, sectionTitle, value };
@@ -189,7 +223,10 @@ function addLabels(
       const targets = question?.targets ?? [];
       const value = (entry.value ?? []).map((placement) => ({
         ...placement,
-        targetName: targets[placement.targetIndex]?.name ?? null,
+        targetName: pickLanguages(
+          targets[placement.targetIndex]?.name ?? null,
+          languages,
+        ),
       }));
       return { ...entry, sectionTitle, value };
     }
@@ -197,7 +234,7 @@ function addLabels(
       const value = (entry.value ?? []).map((mapAnswer) => ({
         ...mapAnswer,
         subQuestionAnswers: (mapAnswer.subQuestionAnswers ?? []).map(
-          (subEntry) => addLabels(subEntry, sectionsById),
+          (subEntry) => addLabels(subEntry, sectionsById, languages),
         ),
       }));
       return { ...entry, sectionTitle, value };
@@ -218,10 +255,11 @@ export function addHumanReadableLabels(
   survey: Survey,
 ): PublicationSubmission[] {
   const sectionsById = getSectionsById(survey);
+  const languages = getEnabledLanguages(survey);
   return submissions.map((submission) => ({
     ...submission,
     answerEntries: (submission.answerEntries ?? []).map((entry) =>
-      addLabels(entry, sectionsById),
+      addLabels(entry, sectionsById, languages),
     ),
   }));
 }
