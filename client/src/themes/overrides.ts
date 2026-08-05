@@ -310,6 +310,17 @@ export const commonOverrides: Components<Omit<Theme, 'components'>> = {
     },
   },
   MuiFormLabel: { styleOverrides: { root: { color: colors.harmaa } } },
+  MuiInputLabel: {
+    styleOverrides: {
+      root: {
+        '&.MuiInputLabel-outlined': {
+          backgroundColor: colors.surfacePrimary,
+          padding: '0 4px',
+          borderRadius: '4px',
+        },
+      },
+    },
+  },
   MuiTableCell: { styleOverrides: { root: { color: colors.harmaa } } },
   MuiAlert: {
     defaultProps: {
