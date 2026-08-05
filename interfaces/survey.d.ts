@@ -921,6 +921,156 @@ export interface Submission {
   answerEntries?: SubmissionAnswerEntry[];
 }
 
+/**
+ * Picks the `SubmissionAnswerEntry` branch(es) matching `Type`, adds the
+ * common `sectionTitle`, and - via `Overrides` - replaces whichever of the
+ * branch's own fields (typically `value`) need a human-readable shape,
+ * instead of appending separate, positionally-matched label fields.
+ */
+type WithPublicationLabels<
+  Type extends SubmissionAnswerEntry['type'],
+  Overrides extends object = {},
+> = Omit<Extract<SubmissionAnswerEntry, { type: Type }>, keyof Overrides> & {
+  sectionTitle?: LocalizedText;
+} & Overrides;
+
+/**
+ * radio / radio-image: `value` becomes the resolved id + text for the
+ * selected option, or stays the raw string if it's a custom answer (no id
+ * to map). `label` is `null` if the option can no longer be found.
+ */
+type PublicationOptionAnswerEntry = WithPublicationLabels<
+  'radio' | 'radio-image',
+  { value: { id: number; label: LocalizedText | null } | string }
+>;
+
+/**
+ * checkbox: `value` becomes each selected option's id + text, or the raw
+ * custom-answer string (already human-readable, no id to map).
+ */
+type PublicationCheckboxAnswerEntry = WithPublicationLabels<
+  'checkbox',
+  { value: ({ id: number; label: LocalizedText | null } | string)[] }
+>;
+
+/** sorting: `value` becomes the ordered options' id + text */
+type PublicationSortingAnswerEntry = WithPublicationLabels<
+  'sorting',
+  { value: { id: number; label: LocalizedText | null }[] }
+>;
+
+/**
+ * grouped-checkbox: `value` becomes each selected option's id, group name
+ * and option text.
+ */
+type PublicationGroupedOptionAnswerEntry = WithPublicationLabels<
+  'grouped-checkbox',
+  {
+    value: {
+      id: number;
+      group: LocalizedText | null;
+      option: LocalizedText | null;
+    }[];
+  }
+>;
+
+/**
+ * matrix: `value` becomes one entry per subject (id = index in `subjects`),
+ * paired with its resolved class (id = index in `classes`, or -1 for
+ * "don't know"; `class` is `null` only when the subject is unanswered).
+ */
+type PublicationMatrixAnswerEntry = WithPublicationLabels<
+  'matrix',
+  {
+    value: {
+      subject: { id: number; label: LocalizedText };
+      class: { id: number; label: LocalizedText | null } | null;
+    }[];
+  }
+>;
+
+/** multi-matrix: like matrix, but each subject can have multiple classes selected */
+type PublicationMultiMatrixAnswerEntry = WithPublicationLabels<
+  'multi-matrix',
+  {
+    value: {
+      subject: { id: number; label: LocalizedText };
+      classes: { id: number; label: LocalizedText | null }[];
+    }[];
+  }
+>;
+
+/**
+ * budgeting: `value` becomes each target (id = index in `targets`) paired
+ * with its resolved name and allocated amount.
+ */
+type PublicationBudgetAnswerEntry = WithPublicationLabels<
+  'budgeting',
+  {
+    value: { target: { id: number; label: LocalizedText }; value: number }[];
+  }
+>;
+
+/**
+ * geo-budgeting: `value` keeps each placement's own fields (including its
+ * `targetIndex`), with the resolved target name attached directly onto it.
+ */
+type PublicationGeoBudgetAnswerEntry = WithPublicationLabels<
+  'geo-budgeting',
+  { value: (GeoBudgetingAnswer & { targetName: LocalizedText | null })[] }
+>;
+
+/**
+ * map: `value` keeps its own shape, but each placement's nested
+ * `subQuestionAnswers` are recursively enriched the same way.
+ */
+type PublicationMapAnswerEntry = WithPublicationLabels<
+  'map',
+  {
+    value: (Omit<MapQuestionAnswer, 'subQuestionAnswers'> & {
+      subQuestionAnswers: PublicationSubmissionAnswerEntry[];
+    })[];
+  }
+>;
+
+/**
+ * Question types whose `value` is already human-readable - only the common
+ * `sectionTitle` is added.
+ */
+type PublicationPlainAnswerEntry = WithPublicationLabels<
+  'personal-info' | 'free-text' | 'numeric' | 'slider' | 'attachment'
+>;
+
+/**
+ * A `SubmissionAnswerEntry` enriched with human-readable, localized text
+ * resolved against the survey's question definitions (options/classes/
+ * subjects/targets), for use in the public submission publication API. Ids
+ * are kept alongside their resolved text directly within `value` (e.g.
+ * `{ id, label }`) rather than in a separate, positionally-matched field.
+ */
+export type PublicationSubmissionAnswerEntry =
+  | PublicationOptionAnswerEntry
+  | PublicationCheckboxAnswerEntry
+  | PublicationSortingAnswerEntry
+  | PublicationGroupedOptionAnswerEntry
+  | PublicationMatrixAnswerEntry
+  | PublicationMultiMatrixAnswerEntry
+  | PublicationBudgetAnswerEntry
+  | PublicationGeoBudgetAnswerEntry
+  | PublicationMapAnswerEntry
+  | PublicationPlainAnswerEntry;
+
+/**
+ * A `Submission` whose answer entries have been enriched with
+ * human-readable labels. See `PublicationSubmissionAnswerEntry`.
+ */
+export interface PublicationSubmission extends Omit<
+  Submission,
+  'answerEntries'
+> {
+  answerEntries?: PublicationSubmissionAnswerEntry[];
+}
+
 export type ImageType =
   | 'backgroundImage'
   | 'thanksPageImage'
