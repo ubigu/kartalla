@@ -18,7 +18,7 @@
     "@lavamoat/allow-scripts": "^5.1.0",
     "@lavamoat/preinstall-always-fail": "^3.0.0",
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
     "dayjs": "^1.11.20",
     "pg": "^8.20.0"
