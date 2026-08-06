@@ -847,6 +847,7 @@
     "additionalInfo": "Lisätiedot",
     "column": "sarake",
     "columns": "saraketta",
+    "workingLanguageLabel": "työstökieli",
     "thanksPageTitle": "Kiitos-sivun otsikko",
     "thanksPageText": "Kiitos-sivun teksti"
   },

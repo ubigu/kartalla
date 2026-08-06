@@ -16,7 +16,7 @@ import {
   getPageTabColor,
   getThanksPageTabColor,
 } from '@src/utils/surveyTranslations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select } from '../core/Select';
 import { SurveySectionTranslationBody } from './SurveySectionTranslationBody';
 import { TRANSLATION_ROW_LABEL_WIDTH, TranslationRow } from './TranslationRow';
@@ -66,6 +66,10 @@ export default function EditSurveyTranslationsV2() {
   const [visibleColCount, setVisibleColCount] = useState(
     enabledLanguages.length,
   );
+
+  useEffect(() => {
+    setColumnLangs(enabledLanguages.filter((l) => l !== workingLanguage));
+  }, [workingLanguage]);
 
   const visibleCols = [
     workingLanguage,
@@ -202,7 +206,7 @@ export default function EditSurveyTranslationsV2() {
                     fontWeight: 400,
                   }}
                 >
-                  {'(työstökieli)'}
+                  {`(${tr.EditSurveyTranslations.workingLanguageLabel})`}
                 </Box>
               </Typography>
             </Box>

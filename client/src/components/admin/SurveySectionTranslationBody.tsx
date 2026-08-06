@@ -543,7 +543,7 @@ export function SurveySectionTranslationBody({
         SurveyPageSection,
         { type: 'personal-info' }
       >;
-      if (!s.customLabel) return null;
+      if (!s.askCustom) return null;
       return (
         <TranslationRow
           stripe={nextStripe()}
