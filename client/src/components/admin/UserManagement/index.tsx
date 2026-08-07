@@ -77,8 +77,6 @@ export function UserManagement() {
           display: 'flex',
           flexDirection: 'column',
           gap: '84px',
-          height: 'calc(100vh - 70px)',
-          overflowY: 'hidden',
         }}
       >
         <UserGroupManagement
