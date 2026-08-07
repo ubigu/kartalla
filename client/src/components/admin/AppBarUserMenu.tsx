@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
+import { adminPaths } from '@src/utils/adminPaths';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { InstructionsDialog } from './InstructionsDialog';
@@ -59,7 +60,9 @@ export default function AppBarUserMenu() {
         }}
       >
         {activeUserIsAdmin && (
-          <MenuItem onClick={() => history.push('/karttajulkaisut')}>
+          <MenuItem
+            onClick={() => history.push(`/${adminPaths.mapPublications}`)}
+          >
             {tr.AppBarUserMenu.editMapPublications}
           </MenuItem>
         )}
@@ -67,7 +70,7 @@ export default function AppBarUserMenu() {
           <MenuItem
             onClick={() => {
               setMenuOpen(false);
-              history.push('/kayttajahallinta');
+              history.push(`/${adminPaths.userManagement}`);
             }}
           >
             {tr.AppBarUserMenu.userManagement}

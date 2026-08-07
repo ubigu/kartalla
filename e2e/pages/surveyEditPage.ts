@@ -121,11 +121,11 @@ export class SurveyEditPage extends BasePage {
 
   async goto() {
     if (this._surveyId) {
-      await this._page.goto(`/admin/kyselyt/${this._surveyId}`);
+      await this._page.goto(`/admin/surveys/${this._surveyId}`);
     } else {
       await this._page.goto('/admin');
       await this._page.getByRole('button', { name: 'Uusi kysely' }).click();
-      await this._page.waitForURL('**/admin/kyselyt/*/perusasetukset');
+      await this._page.waitForURL('**/admin/surveys/*/basic-settings');
       const urlParts = this._page.url().split('/');
       this._surveyId = urlParts[urlParts.length - 2];
     }
@@ -166,10 +166,10 @@ export class SurveyEditPage extends BasePage {
   }
 
   async fillThanksPage(params: SurveyThanksPageParams) {
-    await this._page.getByRole('link', { name: 'Kiitos-sivu' }).click();
-    await this._page.getByLabel('Kiitos-sivun otsikko').fill(params.title);
+    await this._page.getByRole('link', { name: 'Kiitossivu' }).click();
+    await this._page.getByLabel('Kiitossivun otsikko').fill(params.title);
     await this._page
-      .getByLabel('Kiitos-sivun teksti')
+      .getByLabel('Kiitossivun teksti')
       .locator('div')
       .nth(2)
       .fill(params.text);

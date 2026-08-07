@@ -33,6 +33,7 @@ import {
   useWorkingLanguage,
   useWorkingLanguageInlineDescription,
 } from '@src/stores/WorkingLanguageContext';
+import { adminPaths } from '@src/utils/adminPaths';
 import { getLayerName } from '@src/utils/map/oskariHelpers';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
@@ -123,7 +124,7 @@ export default function EditSurveyPage(props: Props) {
   // If page ID in URL doesn't exist, redirect to survey front page
   useEffect(() => {
     if (activeSurvey && !page) {
-      history.push(`/kyselyt/${surveyId}`);
+      history.push(`/${adminPaths.surveys}/${surveyId}`);
     }
   }, [activeSurvey, page]);
 
@@ -550,7 +551,7 @@ export default function EditSurveyPage(props: Props) {
           <Button
             onClick={() =>
               history.push(
-                `kyselyt/${surveyId}/${editSurveyPaths.basicSettings}`,
+                `${adminPaths.surveys}/${surveyId}/${editSurveyPaths.basicSettings}`,
               )
             }
             color="primary"

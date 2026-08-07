@@ -10,6 +10,7 @@ import ToastProvider from '@src/stores/ToastContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import UserProvider from '@src/stores/UserContext';
 import { theme } from '@src/themes/admin';
+import { adminPaths } from '@src/utils/adminPaths';
 import fiLocale from 'date-fns/locale/fi';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
@@ -47,22 +48,22 @@ export default function AdminApplication() {
           <GeneralNotificationProvider>
             <AdminLanguageRouter />
             <Switch>
-              <Route path="/kyselyt/:surveyId">
+              <Route path={`/${adminPaths.surveys}/:surveyId`}>
                 <EditSurvey />
               </Route>
-              <Route path="/vastaukset/:surveyId">
+              <Route path={`/${adminPaths.submissions}/:surveyId`}>
                 <SurveySubmissionsPage />
               </Route>
-              <Route path="/rajapintakuvaus">
+              <Route path={`/${adminPaths.apiDescription}`}>
                 <ApiInstructions />
               </Route>
-              <ProtectedRoute path="/kayttajahallinta">
+              <ProtectedRoute path={`/${adminPaths.userManagement}`}>
                 <UserManagement />
               </ProtectedRoute>
-              <Route path="/tiedotteet">
+              <Route path={`/${adminPaths.notifications}`}>
                 <GeneralNotifications />
               </Route>
-              <Route path="/karttajulkaisut">
+              <Route path={`/${adminPaths.mapPublications}`}>
                 <AdminMapPublications />
               </Route>
               <Route path="/" exact>

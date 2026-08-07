@@ -486,7 +486,7 @@ export default function EditSurveySideBar(props: Props) {
                           // Create new blank page and set its contents from Clipboard -context
                           const blankPage = await createPage();
                           history.push(
-                            `${url}/sivut/${blankPage.id}?lang=${language}`,
+                            `${url}/${editSurveyPaths.pages}/${blankPage.id}?lang=${language}`,
                           );
                           setNewPageDisabled(false);
 

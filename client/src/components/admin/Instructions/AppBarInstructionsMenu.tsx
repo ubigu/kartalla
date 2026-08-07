@@ -5,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';
 
 import InfoIcon from '@src/components/icons/InfoIcon';
+import { adminPaths } from '@src/utils/adminPaths';
 import { VersionInfoDialog } from '../VersionInfoDialog';
 
 export function AppBarInstructionsMenu() {
@@ -52,7 +53,7 @@ export function AppBarInstructionsMenu() {
         <MenuItem component={'a'} href="/api/file/instructions" target="_blank">
           {tr.AppBarInstructionsMenu.instructions}
         </MenuItem>
-        <MenuItem component={NavLink} to="/rajapintakuvaus">
+        <MenuItem component={NavLink} to={`/${adminPaths.apiDescription}`}>
           {tr.AppBarInstructionsMenu.apiDescription}
         </MenuItem>
         <MenuItem component={Button} onClick={() => setVersionInfoOpen(true)}>

@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { User } from '@interfaces/user';
 import { UserGroup } from '@interfaces/userGroup';
 import {
@@ -173,7 +172,7 @@ export function UserList({
                     )}
                     <TableCell>
                       <UserGroupSelect
-                        forPendingUser={user.isPending}
+                        forPendingUser={Boolean(user?.isPending)}
                         availableUserGroups={availableUserGroups.filter(
                           (group) =>
                             user.organizations.some(

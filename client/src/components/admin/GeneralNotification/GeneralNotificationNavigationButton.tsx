@@ -2,6 +2,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { MegaphoneIcon } from '@src/components/icons/MegaphoneIcon';
 import { useGeneralNotifications } from '@src/stores/GeneralNotificationContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { adminPaths } from '@src/utils/adminPaths';
 
 import { useHistory } from 'react-router-dom';
 
@@ -18,7 +19,7 @@ export function GeneralNotificationNavigationButton() {
         ]
       }
     >
-      <IconButton onClick={() => history.push('/tiedotteet')}>
+      <IconButton onClick={() => history.push(`/${adminPaths.notifications}`)}>
         <MegaphoneIcon htmlColor="white" />
         {newNotifications && (
           <Box

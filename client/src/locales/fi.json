@@ -60,7 +60,7 @@
     "email": "Sähköposti",
     "newPage": "Lisää uusi sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "thanksPage": "Kiitos-sivu",
+    "thanksPage": "Kiitossivu",
     "translations": "Käännökset",
     "preview": "Esikatselu",
     "toSurveyPage": "Kyselysivulle",
@@ -394,13 +394,13 @@
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noBackgroundImage": "Ei taustakuvaa",
-    "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
+    "noThanksPageImage": "Ei Kiitossivun kuvaa",
     "noTopMarginImage": "Ei ylämarginaalin kuvaa",
     "noBottomMarginImage": "Ei alamarginaalin kuvaa",
     "noImage": "Ei kuvaa",
     "loadingImages": "Ladataan kuvia",
     "surveyImage": "Kyselyn taustakuva",
-    "thanksPageImage": "Kiitos-sivun kuva",
+    "thanksPageImage": "Kiitossivun kuva",
     "topMarginImage": "Ylämarginaalin kuva",
     "bottomMarginImage": "Alamarginaalin kuva",
     "image": "Kuva",
@@ -455,8 +455,8 @@
     "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {
-    "title": "Kiitos-sivun otsikko",
-    "text": "Kiitos-sivun teksti"
+    "title": "Kiitossivun otsikko",
+    "text": "Kiitossivun teksti"
   },
   "RichTextEditor": {
     "generic.add": "Lisää",
@@ -826,7 +826,7 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu",
+    "thanksPage": "Kiitossivu",
     "errorAtleastOnelanguage": "Valitse vähintään yksi kieli.",
     "addLanguage": "Lisää kieli",
     "multilingualism": "Monikielisyys",
@@ -848,8 +848,8 @@
     "column": "sarake",
     "columns": "saraketta",
     "workingLanguageLabel": "työstökieli",
-    "thanksPageTitle": "Kiitos-sivun otsikko",
-    "thanksPageText": "Kiitos-sivun teksti"
+    "thanksPageTitle": "Kiitossivun otsikko",
+    "thanksPageText": "Kiitossivun teksti"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
