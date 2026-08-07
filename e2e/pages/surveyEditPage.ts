@@ -166,10 +166,10 @@ export class SurveyEditPage extends BasePage {
   }
 
   async fillThanksPage(params: SurveyThanksPageParams) {
-    await this._page.getByRole('link', { name: 'Kiitos-sivu' }).click();
-    await this._page.getByLabel('Kiitos-sivun otsikko').fill(params.title);
+    await this._page.getByRole('link', { name: 'Kiitossivu' }).click();
+    await this._page.getByLabel('Kiitossivun otsikko').fill(params.title);
     await this._page
-      .getByLabel('Kiitos-sivun teksti')
+      .getByLabel('Kiitossivun teksti')
       .locator('div')
       .nth(2)
       .fill(params.text);
