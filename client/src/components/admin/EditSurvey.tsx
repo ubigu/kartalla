@@ -39,15 +39,15 @@ export const editPageContainerSx = {
 };
 
 export const editSurveyPaths = {
-  basicSettings: 'perusasetukset',
-  languageSettings: 'kieliasetukset',
-  permissions: 'käyttäjäoikeudet',
-  appearance: 'ulkoasu',
-  mapData: 'kartta-aineistot',
-  emails: 'sähköpostit',
-  pages: 'sivut',
-  thanksPage: 'kiitos-sivu',
-  translations: 'käännökset',
+  basicSettings: 'basic-settings',
+  languageSettings: 'language-settings',
+  permissions: 'permissions',
+  appearance: 'appearance',
+  mapData: 'map-data',
+  emails: 'emails',
+  pages: 'pages',
+  thanksPage: 'thanks-page',
+  translations: 'translations',
 } as const;
 
 export default function EditSurvey() {

@@ -33,6 +33,7 @@ import { useUser } from '@src/stores/UserContext';
 
 import { CredentialsEntry } from '@interfaces/submission';
 import { theme } from '@src/themes/admin';
+import { adminPaths } from '@src/utils/adminPaths';
 import { getPublicSurveyUrl } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import { format } from 'date-fns';
@@ -410,7 +411,7 @@ export default function SurveyListItem(props: Props) {
             <Button
               startIcon={<SettingsSmallIcon stroke="currentColor" />}
               component={NavLink}
-              to={`${url}kyselyt/${survey.id}`}
+              to={`${url}${adminPaths.surveys}/${survey.id}`}
               disabled={disableUsersViewAccessToSurvey}
             >
               {tr.SurveyList.settings}
@@ -447,7 +448,7 @@ export default function SurveyListItem(props: Props) {
                 const newSurveyId = await creteSurveyFromPrevious(survey.id);
                 if (!newSurveyId) return;
                 props.onCopyEnd?.();
-                window.open(`/admin/kyselyt/${newSurveyId}`);
+                window.open(`/admin/${adminPaths.surveys}/${newSurveyId}`);
               }}
             >
               {' '}
@@ -496,7 +497,7 @@ export default function SurveyListItem(props: Props) {
               }
               component={NavLink}
               variant="contained"
-              to={`vastaukset/${survey.id}`}
+              to={`${adminPaths.submissions}/${survey.id}`}
             >
               {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
             </Button>

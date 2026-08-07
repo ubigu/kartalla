@@ -12,6 +12,7 @@ import { TagPicker } from '@src/components/admin/TagPicker';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { adminPaths } from '@src/utils/adminPaths';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import LoadingButton from '../LoadingButton';
@@ -140,7 +141,7 @@ export default function SurveyList() {
               try {
                 const newSurvey = await createNewSurvey();
                 setNewSurveyLoading(false);
-                history.push(`/kyselyt/${newSurvey.id}`);
+                history.push(`/${adminPaths.surveys}/${newSurvey.id}`);
               } catch (error) {
                 showToast({
                   severity: 'error',
